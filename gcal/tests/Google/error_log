@@ -1,0 +1,4 @@
+[08-Apr-2017 19:54:02 Etc/GMT] PHP Fatal error:  Class 'BaseTest' not found in /home/rothrres/public_html/gcal/tests/Google/CacheTest.php on line 25
+[08-Apr-2017 19:54:04 Etc/GMT] PHP Fatal error:  Class 'BaseTest' not found in /home/rothrres/public_html/gcal/tests/Google/ClientTest.php on line 26
+[08-Apr-2017 19:54:08 Etc/GMT] PHP Fatal error:  Class 'BaseTest' not found in /home/rothrres/public_html/gcal/tests/Google/ModelTest.php on line 22
+[08-Apr-2017 19:54:12 Etc/GMT] PHP Fatal error:  Class 'Google_Model' not found in /home/rothrres/public_html/gcal/tests/Google/ServiceTest.php on line 22

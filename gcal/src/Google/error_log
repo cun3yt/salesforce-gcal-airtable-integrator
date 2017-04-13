@@ -1,0 +1,2 @@
+[08-Apr-2017 19:53:45 Etc/GMT] PHP Deprecated:  google-api-php-client's autoloader was moved to vendor/autoload.php in 2.0.0. This redirect will be removed in 2.1. Please adjust your code to use the new location. in /home/rothrres/public_html/gcal/src/Google/autoload.php on line 19
+[08-Apr-2017 19:53:59 Etc/GMT] PHP Deprecated:  google-api-php-client's autoloader was moved to vendor/autoload.php in 2.0.0. This redirect will be removed in 2.1. Please adjust your code to use the new location. in /home/rothrres/public_html/gcal/src/Google/autoload.php on line 19

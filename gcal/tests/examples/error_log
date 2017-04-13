@@ -1,0 +1,9 @@
+[08-Apr-2017 19:54:21 Etc/GMT] PHP Fatal error:  Class 'BaseTest' not found in /home/rothrres/public_html/gcal/tests/examples/batchTest.php on line 23
+[08-Apr-2017 19:54:23 Etc/GMT] PHP Fatal error:  Class 'BaseTest' not found in /home/rothrres/public_html/gcal/tests/examples/idTokenTest.php on line 23
+[08-Apr-2017 19:54:25 Etc/GMT] PHP Fatal error:  Class 'BaseTest' not found in /home/rothrres/public_html/gcal/tests/examples/indexTest.php on line 23
+[08-Apr-2017 19:54:26 Etc/GMT] PHP Fatal error:  Class 'BaseTest' not found in /home/rothrres/public_html/gcal/tests/examples/largeFileUploadTest.php on line 23
+[08-Apr-2017 19:54:28 Etc/GMT] PHP Fatal error:  Class 'BaseTest' not found in /home/rothrres/public_html/gcal/tests/examples/multiApiTest.php on line 23
+[08-Apr-2017 19:54:30 Etc/GMT] PHP Fatal error:  Class 'BaseTest' not found in /home/rothrres/public_html/gcal/tests/examples/serviceAccountTest.php on line 23
+[08-Apr-2017 19:54:32 Etc/GMT] PHP Fatal error:  Class 'BaseTest' not found in /home/rothrres/public_html/gcal/tests/examples/simpleFileUploadTest.php on line 23
+[08-Apr-2017 19:54:34 Etc/GMT] PHP Fatal error:  Class 'BaseTest' not found in /home/rothrres/public_html/gcal/tests/examples/simpleQueryTest.php on line 23
+[08-Apr-2017 19:54:36 Etc/GMT] PHP Fatal error:  Class 'BaseTest' not found in /home/rothrres/public_html/gcal/tests/examples/urlShortenerTest.php on line 23

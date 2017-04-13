@@ -1,0 +1,7 @@
+[09-Apr-2017 13:01:16 Etc/GMT] PHP Fatal error:  Class 'BaseTest' not found in /home/rothrres/public_html/gcal/tests/Google/Service/AdSenseTest.php on line 19
+[09-Apr-2017 13:01:17 Etc/GMT] PHP Fatal error:  Class 'BaseTest' not found in /home/rothrres/public_html/gcal/tests/Google/Service/PagespeedonlineTest.php on line 19
+[09-Apr-2017 13:01:19 Etc/GMT] PHP Fatal error:  Class 'BaseTest' not found in /home/rothrres/public_html/gcal/tests/Google/Service/PlusTest.php on line 19
+[09-Apr-2017 13:01:20 Etc/GMT] PHP Fatal error:  Class 'Google_Service' not found in /home/rothrres/public_html/gcal/tests/Google/Service/ResourceTest.php on line 27
+[09-Apr-2017 13:01:22 Etc/GMT] PHP Fatal error:  Class 'BaseTest' not found in /home/rothrres/public_html/gcal/tests/Google/Service/TasksTest.php on line 19
+[09-Apr-2017 13:01:23 Etc/GMT] PHP Fatal error:  Class 'BaseTest' not found in /home/rothrres/public_html/gcal/tests/Google/Service/UrlshortenerTest.php on line 19
+[09-Apr-2017 13:01:25 Etc/GMT] PHP Fatal error:  Class 'BaseTest' not found in /home/rothrres/public_html/gcal/tests/Google/Service/YouTubeTest.php on line 19

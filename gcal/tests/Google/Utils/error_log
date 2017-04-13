@@ -1,0 +1,1 @@
+[09-Apr-2017 13:01:28 Etc/GMT] PHP Fatal error:  Class 'BaseTest' not found in /home/rothrres/public_html/gcal/tests/Google/Utils/UriTemplateTest.php on line 22
