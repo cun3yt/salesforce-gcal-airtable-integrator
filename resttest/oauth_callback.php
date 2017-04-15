@@ -55,5 +55,5 @@ if (!isset($instance_url) || $instance_url == "") {
 $_SESSION['arraccess'] = $response;
 
 //header( 'Location: savetokens.php' ) ;
-header( 'Location: http://ec2-34-208-42-244.us-west-2.compute.amazonaws.com/'.$strCurrentClientFolderName.'/sf/savetokens.php' ) ;
+header( 'Location: http://ec2-34-210-36-40.us-west-2.compute.amazonaws.com/'.$strCurrentClientFolderName.'/sf/savetokens.php' ) ;
 ?>

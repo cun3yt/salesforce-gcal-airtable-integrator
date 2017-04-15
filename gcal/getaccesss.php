@@ -12,7 +12,7 @@ $guzzleClient = new \GuzzleHttp\Client(array( 'curl' => array( CURLOPT_SSL_VERIF
 $client->setHttpClient($guzzleClient);
 $client->setAccessType("offline");
 $client->setIncludeGrantedScopes(true);
-$client->setRedirectUri('http://ec2-34-208-42-244.us-west-2.compute.amazonaws.com/gcal/getaccesss.php');
+$client->setRedirectUri('http://ec2-34-210-36-40.us-west-2.compute.amazonaws.com/gcal/getaccesss.php');
 if (!isset($_GET['code'])) {
 	$client->setApprovalPrompt('force');
 	$auth_url = $client->createAuthUrl();
@@ -35,7 +35,7 @@ if (!isset($_GET['code'])) {
 	//exit;
 	?>
 	<script type="text/javascript">
-		window.location = "http://ec2-34-208-42-244.us-west-2.compute.amazonaws.com/gcal/testcalnews.php";
+		window.location = "http://ec2-34-210-36-40.us-west-2.compute.amazonaws.com/gcal/testcalnews.php";
 	</script>
 	<?php
 }

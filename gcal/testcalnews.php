@@ -103,7 +103,7 @@ if (is_array($strTok) && (count($strTok)>0)) {
 		//window.close();
 		//window.opener.location.reload();
 		var strClientFolderName = '<?php echo $strCurrentClientFolderName; ?>';
-		window.location.href = "http://ec2-34-208-42-244.us-west-2.compute.amazonaws.com/"+strClientFolderName+"/loadcals.php"
+		window.location.href = "http://ec2-34-210-36-40.us-west-2.compute.amazonaws.com/"+strClientFolderName+"/loadcals.php"
 	</script>
 	<?php
 	exit;
@@ -111,7 +111,7 @@ if (is_array($strTok) && (count($strTok)>0)) {
 } else {
 	?>
 	<script type="text/javascript">
-		window.location = "http://ec2-34-208-42-244.us-west-2.compute.amazonaws.com/gcal/getaccesss.php";
+		window.location = "http://ec2-34-210-36-40.us-west-2.compute.amazonaws.com/gcal/getaccesss.php";
 	</script>
 	<?php
 	exit;

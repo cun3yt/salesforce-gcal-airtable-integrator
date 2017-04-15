@@ -34,7 +34,7 @@ if(is_array($_SESSION['arraccess']) && (count($_SESSION['arraccess'])>0))
 		$isUpdated = fnUpdateSalesUser($arrUserDetail[0]['id'],$arrSales);
 		if($isUpdated)
 		{
-			header('Location: http://ec2-34-208-42-244.us-west-2.compute.amazonaws.com/'.$strCurrentClientFolderName.'/loadcals.php');
+			header('Location: http://ec2-34-210-36-40.us-west-2.compute.amazonaws.com/'.$strCurrentClientFolderName.'/loadcals.php');
 		}
 		else
 		{
@@ -46,7 +46,7 @@ if(is_array($_SESSION['arraccess']) && (count($_SESSION['arraccess'])>0))
 		$IsSaved = fnSaveSalesUserToAT($arrSales);
 		if($IsSaved)
 		{
-			header('Location: http://ec2-34-208-42-244.us-west-2.compute.amazonaws.com/'.$strCurrentClientFolderName.'/loadcals.php');
+			header('Location: http://ec2-34-210-36-40.us-west-2.compute.amazonaws.com/'.$strCurrentClientFolderName.'/loadcals.php');
 		}
 		else
 		{

@@ -1,12 +1,12 @@
 <?php
 error_reporting(~E_NOTICE && ~E_DEPRECATED);
 session_start();
-require_once 'vendor/autoload.php';
+require_once '/var/www/html/gcal/vendor/autoload.php';
 require_once 'config.php';
 $strClientDomain = $strClientDomainName;
 $strPersonalDomain = implode(",",$arrPersonalDoamin);
 $client = new Google_Client();
-$client->setAuthConfig('calendar.json');
+$client->setAuthConfig('/var/www/html/gcal/15FiveCal.json');
 $client->addScope(array(Google_Service_Calendar::CALENDAR));
 $guzzleClient = new \GuzzleHttp\Client(array( 'curl' => array( CURLOPT_SSL_VERIFYPEER => false, ), ));
 $client->setHttpClient($guzzleClient);
@@ -462,21 +462,63 @@ function fnGetLatestMeetsForUser($strEmail)
 
 function fnSendAccountExpirationMail($strEmail = "")
 {
+	global $strClientFolderName,$strFromEmailAddress,$strSmtpHost,$strSmtpUsername,$strSmtpPassword,$strSmtpPPort;
 	if($strEmail)
 	{
 		$to = $strEmail;
 		$subject = "Google Calendar Access Expired";
+		$strFrom = $strFromEmailAddress;
 		
 		$message = "Hello There,".'<br/><br/>';
 		$message .= 'The Access to your calendar has been expired. <br/><br/>';
-		$message .= 'Please login at following URL to revoke the access: <a href="http://www.rothrsolutions.com/gcal/loadcals.php">Revoke Access</a> <br/><br/><br/>';
+		$message .= 'Please login at following URL to revoke the access: <a href="http://ec2-34-210-36-40.us-west-2.compute.amazonaws.com/'.$strClientFolderName.'/loadcals.php">Revoke Access</a> <br/><br/><br/>';
 		$message .= 'Thanks';
 		
-		$headers = "MIME-Version: 1.0" . "\r\n";
+		/* $headers = "MIME-Version: 1.0" . "\r\n";
 		$headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
 		
 		$headers .= 'From: johnrola36@gmail.com'."\r\n";							
-		$retval = mail ($to,$subject,$message,$headers);
+		$retval = mail ($to,$subject,$message,$headers); */
+		
+		
+		
+		/* define('USERNAME','AKIAIBPZMF6PMB6XK2OA');
+		define('PASSWORD','At6xulRB6J8VtWqlLWQZ5+NWas6G2GchiYVInzyeD2Xe');
+		define('HOST', 'email-smtp.us-west-2.amazonaws.com');
+		define('PORT', '587'); */
+		
+		require_once 'Mail.php';
+
+		$headers = array (
+		  'From' => $strFrom,
+		  'To' => $to,
+		  'Subject' => $subject);
+
+		$smtpParams = array (
+		  'host' => $strSmtpHost,
+		  'port' => $strSmtpPPort,
+		  'auth' => true,
+		  'username' => $strSmtpUsername,
+		  'password' => $strSmtpPassword
+		);
+
+		 // Create an SMTP client.
+		$mail = Mail::factory('smtp', $smtpParams);
+
+		// Send the email.
+		$result = $mail->send($to, $headers, $message);
+
+		if (PEAR::isError($result)) 
+		{
+		  echo("Email not sent. " .$result->getMessage() ."\n");
+		  
+		  return false;
+		} 
+		else 
+		{
+		  echo("Email sent!"."\n");
+		  return true;
+		}
 	}
 	else
 	{
