@@ -138,7 +138,7 @@ if(is_array($arrGcalUser) && (count($arrGcalUser)>0))
 			$domain = substr(strrchr($strEm, "@"), 1);
 			//if($domain != $strClientDomain)
 			//if($domain == "gmail.com")
-			if($domain != $strClientDomain)
+			if(strtolower($domain) != strtolower($strClientDomain))
 			{
 				$strEmailDomain = $domain;
 				//$strEmailDomain = "gmail.com";
@@ -194,18 +194,23 @@ if(is_array($arrGcalUser) && (count($arrGcalUser)>0))
 				}
 				else
 				{
+					echo "---".$strEm;
 					$arrAccountDetailSF = fnGetContactDetailFromSf($instance_url, $access_token,$strEm);
-					//print("into insert <pre>");
-					//print_r($arrAccountDetailSF);
-					//continue;
+					
 					if(is_array($arrAccountDetailSF['records']) && (count($arrAccountDetailSF['records'])>0))
 					{
 						//print("into insert <pre>");
 						//print_r($arrAccountDetailSF);
 						//continue;
 						$arrAccDetail = fnGetAccountDetail($arrAccountDetailSF['records'][0]['AccountId']);
-						
+						//print("into insert <pre>");
+						//print_r($arrAccDetail);
+						//continue;
 						$arrUpdatedAccountHistory = fnInsertContact($arrAccountDetailSF['records'],$arrAccDetail[0]['id']);
+						
+						//print("<pre>");
+						//print_r($arrUpdatedAccountHistory);
+						///continue;
 						if(is_array($arrUpdatedAccountHistory) && (count($arrUpdatedAccountHistory)>0))
 						{
 							if($arrUpdatedAccountHistory['id'])
@@ -706,14 +711,16 @@ function fnGetAccountDetail($strAccId = "")
 		curl_setopt($ch,CURLOPT_URL, $url);
 
 		//execute post
-		$result = curl_exec($ch);
+		echo "---".$result = curl_exec($ch);
 		if(!$result)
 		{
-			echo 'error:' . curl_error($ch);
+			//echo "hi";exit;
+			//echo 'error:' . curl_error($ch);
 			return false;
 		}
 		else
 		{
+			//echo "Bi";exit;
 			$arrResponse = json_decode($result,true);
 			//print("<pre>");
 			//print_r($arrResponse);

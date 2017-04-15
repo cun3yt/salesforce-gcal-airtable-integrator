@@ -148,197 +148,98 @@ if(is_array($arrGcalUser) && (count($arrGcalUser)>0))
 			$domain = substr(strrchr($strEm, "@"), 1);
 			//if($domain != $strClientDomain)
 			//if($domain == "mesosphere.io")
-			if($domain != $strClientDomain)
+			if(strtolower($domain) != strtolower($strClientDomain))
 			{
-				$intExterNameEmails++;
-				$arrDomainInfo = explode(".",$domain);
-				$strEmailDomain = $arrDomainInfo[0]; 
-				//echo "--".$strEmailDomain = $domain;
-				//$strEmailDomain = "gmail.com";
-				//continue;
-				
-				$strEmail = $strEm;
-				$arrAccountDetail = fnGetAccountDetail($strEmailDomain);
-				//print("<pre>");
-				//print_r($arrAccountDetail);
-				//continue;
-				if(is_array($arrAccountDetail) && (count($arrAccountDetail)>0))
+				if(!in_array(strtolower($domain),$arrBannedDomains))
 				{
-					//echo "--".$strEmailDomain;
-					//echo "--".$arrAccountDetail[0]['AccountNumber'];
-					/*else
-					{*/
-						$arrAccountDetailSF = fnGetAccountDetailFromSf($instance_url, $access_token, $strEmailDomain);
-						//print("into insert <pre>");
-						//print_r($arrAccountDetailSF);
-						//continue;
-						if(is_array($arrAccountDetailSF['records']) && (count($arrAccountDetailSF['records'])>0))
-						{
-							
-							if(in_array($arrAccountDetailSF['records'][0]['Name'],$arrAccDomains))
-							{
-								continue;
-							}
-							else
-							{
-								$IsToBeInserted = fnCheckIfAccountHistoryToBeInserted($arrAccountDetailSF['records']);
-								//continue;
-								if($IsToBeInserted)
-								{
-									if($IsToBeInserted == "1")
-									{
-										$isUpdatedAccountHistory = fnInsertAccountHistory($arrAccountDetailSF['records'],$arrAccountDetail[0]['id']);
-										//echo "---".$isUpdatedAccountHistory['id'];
-										//echo "---".$arrAccountDetailSF['records'][0]['Name'];
-										//echo "---".$strARecId;
-										
-										$arrUpdatedIds[] = $isUpdatedAccountHistory['id'];
-										$arrAccDomains[] = $arrAccountDetailSF['records'][0]['Name'];
-									}
-									else
-									{
-										
-										$arrUpdatedIds[] = $IsToBeInserted;
-										$arrAccDomains[] = $arrAccountDetailSF['records'][0]['Name'];
-									}
-								}
-								else
-								{
-									$arrUpdatedIds[] = $IsToBeInserted;
-									$arrAccDomains[] = $arrAccountDetailSF['records'][0]['Name'];
-								}
-								
-								
-								
-							}
-						}
-						else
-						{
-							$arrAccountDetailN = fnGetContactDetailFromSf($instance_url, $access_token, $strEm);
-							//print("<pre>");
-							//print_r($arrAccountDetailN);
-							//continue;
-							
-							if(is_array($arrAccountDetailN) && (count($arrAccountDetailN)>0))
-							{
-								$arrAccountDetailSFId = fnGetAccountDetailFromSfId($instance_url, $access_token, $arrAccountDetailN['records'][0]['AccountId']);
-								//print("<pre>");
-								//print_r($arrAccountDetailSFId);
-								//continue;
-								
-								if(is_array($arrAccountDetailSFId['records']) && (count($arrAccountDetailSFId['records'])>0))
-								{
-									//print("<pre>");
-									//print_r($arrAccountDetailSF);
-									
-									if(in_array($arrAccountDetailSFId['records'][0]['Name'],$arrAccDomains))
-									{
-										continue;
-									}
-									else
-									{
-										$arrAccDomains[] = $arrAccountDetailSFId['records'][0]['Name'];
-										$IsToBeInserted = fnCheckIfAccountHistoryToBeInserted($arrAccountDetailSFId['records']);
-										//continue;
-										if($IsToBeInserted)
-										{
-											if($IsToBeInserted == "1")
-											{
-												$isUpdatedAccountHistoryId = fnInsertAccountHistory($arrAccountDetailSFId['records'],$arrUpdatedAccountHistoryId['id']);
-												//$arrUpdatedIds[] = $arrUpdatedAccountHistoryId['fields']['Account ID'];
-												$arrUpdatedIds[] = $isUpdatedAccountHistoryId['id'];
-												$arrId[] = $arrUpdatedAccountHistoryId['fields']['AccountNumber'];
-												$arrAccDomains[] = $arrAccountDetailSFId['records'][0]['Name'];
-											}
-											else
-											{
-												$arrUpdatedIds[] = $IsToBeInserted;
-												$arrId[] = $arrUpdatedAccountHistoryId['fields']['AccountNumber'];
-												$arrAccDomains[] = $arrAccountDetailSFId['records'][0]['Name'];
-											}
-											
-										}
-										else
-										{
-											$arrUpdatedIds[] = $IsToBeInserted;
-											$arrId[] = $arrUpdatedAccountHistoryId['fields']['AccountNumber'];
-											$arrAccDomains[] = $arrAccountDetailSFId['records'][0]['Name'];
-										}
-									}
-								}
-								else
-								{
-									$arrProcessIds[] = $strARecId;
-								}
-							}
-							else
-							{
-								$arrProcessIds[] = $strARecId;
-							}
-						}
-					//}
-				}
-				else
-				{
-					/*if(in_array($strAccName,$arrAccDomains))
+					$intExterNameEmails++;
+					$arrDomainInfo = explode(".",$domain);
+					$strEmailDomain = $arrDomainInfo[0]; 
+					//echo "--".$strEmailDomain = $domain;
+					//$strEmailDomain = "gmail.com";
+					//continue;
+					
+					$strEmail = $strEm;
+					$arrAccountDetail = fnGetAccountDetail($strEmailDomain);
+					//print("<pre>");
+					//print_r($arrAccountDetail);
+					//continue;
+					if(is_array($arrAccountDetail) && (count($arrAccountDetail)>0))
 					{
-						continue;
-					}*/
-					/*else
-					{*/
 						//echo "--".$strEmailDomain;
-						//echo "SF ACCS";
-						$arrAccountDetailSF = fnGetAccountDetailFromSf($instance_url, $access_token,$strEmailDomain);
-						//print("into insert <pre>");
-						//print_r($arrAccountDetailSF);
-						//continue;
-						if(is_array($arrAccountDetailSF['records']) && (count($arrAccountDetailSF['records'])>0))
-						{
-							
+						//echo "--".$arrAccountDetail[0]['AccountNumber'];
+						/*else
+						{*/
+							$arrAccountDetailSF = fnGetAccountDetailFromSf($instance_url, $access_token, $strEmailDomain);
 							//print("into insert <pre>");
 							//print_r($arrAccountDetailSF);
 							//continue;
-							
-							$arrUpdatedAccountHistory = fnInsertAccount($arrAccountDetailSF['records'],$strEmailDomain);
-							//print("<pre>");
-							//print_r($arrUpdatedAccountHistoryId);
-							$isUpdatedAccountHistory = fnInsertAccountHistory($arrAccountDetailSF['records'],$arrUpdatedAccountHistory['id']);
-							
-							//$arrUpdatedIds[] = $arrUpdatedAccountHistory['fields']['Account ID'];
-							$arrUpdatedIds[] = $isUpdatedAccountHistory['id'];
-							$arrId[] = $arrUpdatedAccountHistory['fields']['AccountNumber'];
-							$arrAccDomains[] = $arrAccountDetailSF['records'][0]['Name'];
-						}
-						else
-						{
-							$arrAccountDetailN = fnGetContactDetailFromSf($instance_url, $access_token, $strEm);
-							//print("<pre>");
-							//print_r($arrAccountDetailN);
-							//continue;
-							
-							if(is_array($arrAccountDetailN) && (count($arrAccountDetailN)>0))
+							if(is_array($arrAccountDetailSF['records']) && (count($arrAccountDetailSF['records'])>0))
 							{
-								$arrAccountDetailSFId = fnGetAccountDetailFromSfId($instance_url, $access_token, $arrAccountDetailN['records'][0]['AccountId']);
-								if(is_array($arrAccountDetailSFId['records']) && (count($arrAccountDetailSFId['records'])>0))
+								
+								if(in_array($arrAccountDetailSF['records'][0]['Name'],$arrAccDomains))
 								{
-									//print("<pre>");
-									//print_r($arrAccountDetailSF);
-									
-									if(in_array($arrAccountDetailSFId['records'][0]['Name'],$arrAccDomains))
+									continue;
+								}
+								else
+								{
+									$IsToBeInserted = fnCheckIfAccountHistoryToBeInserted($arrAccountDetailSF['records']);
+									//continue;
+									if($IsToBeInserted)
 									{
-										continue;
+										if($IsToBeInserted == "1")
+										{
+											$isUpdatedAccountHistory = fnInsertAccountHistory($arrAccountDetailSF['records'],$arrAccountDetail[0]['id']);
+											//echo "---".$isUpdatedAccountHistory['id'];
+											//echo "---".$arrAccountDetailSF['records'][0]['Name'];
+											//echo "---".$strARecId;
+											
+											$arrUpdatedIds[] = $isUpdatedAccountHistory['id'];
+											$arrAccDomains[] = $arrAccountDetailSF['records'][0]['Name'];
+										}
+										else
+										{
+											
+											$arrUpdatedIds[] = $IsToBeInserted;
+											$arrAccDomains[] = $arrAccountDetailSF['records'][0]['Name'];
+										}
 									}
 									else
 									{
-										$arrAccountByNameDetail = fnGetAccountDetailByName($arrAccountDetailSFId['records'][0]['Name']);
-										if(is_array($arrAccountByNameDetail) && (count($arrAccountByNameDetail)>0))
+										$arrUpdatedIds[] = $IsToBeInserted;
+										$arrAccDomains[] = $arrAccountDetailSF['records'][0]['Name'];
+									}
+									
+									
+									
+								}
+							}
+							else
+							{
+								$arrAccountDetailN = fnGetContactDetailFromSf($instance_url, $access_token, $strEm);
+								//print("<pre>");
+								//print_r($arrAccountDetailN);
+								//continue;
+								
+								if(is_array($arrAccountDetailN) && (count($arrAccountDetailN)>0))
+								{
+									$arrAccountDetailSFId = fnGetAccountDetailFromSfId($instance_url, $access_token, $arrAccountDetailN['records'][0]['AccountId']);
+									//print("<pre>");
+									//print_r($arrAccountDetailSFId);
+									//continue;
+									
+									if(is_array($arrAccountDetailSFId['records']) && (count($arrAccountDetailSFId['records'])>0))
+									{
+										//print("<pre>");
+										//print_r($arrAccountDetailSF);
+										
+										if(in_array($arrAccountDetailSFId['records'][0]['Name'],$arrAccDomains))
 										{
 											continue;
 										}
 										else
 										{
-											$arrUpdatedAccountHistoryId = fnInsertAccount($arrAccountDetailSFId['records'],$strEmailDomain);
-											
+											$arrAccDomains[] = $arrAccountDetailSFId['records'][0]['Name'];
 											$IsToBeInserted = fnCheckIfAccountHistoryToBeInserted($arrAccountDetailSFId['records']);
 											//continue;
 											if($IsToBeInserted)
@@ -365,8 +266,11 @@ if(is_array($arrGcalUser) && (count($arrGcalUser)>0))
 												$arrId[] = $arrUpdatedAccountHistoryId['fields']['AccountNumber'];
 												$arrAccDomains[] = $arrAccountDetailSFId['records'][0]['Name'];
 											}
-											
 										}
+									}
+									else
+									{
+										$arrProcessIds[] = $strARecId;
 									}
 								}
 								else
@@ -374,16 +278,114 @@ if(is_array($arrGcalUser) && (count($arrGcalUser)>0))
 									$arrProcessIds[] = $strARecId;
 								}
 							}
+						//}
+					}
+					else
+					{
+						/*if(in_array($strAccName,$arrAccDomains))
+						{
+							continue;
+						}*/
+						/*else
+						{*/
+							//echo "--".$strEmailDomain;
+							//echo "SF ACCS";
+							$arrAccountDetailSF = fnGetAccountDetailFromSf($instance_url, $access_token,$strEmailDomain);
+							print("into insert <pre>");
+							print_r($arrAccountDetailSF);
+							//continue;
+							if(is_array($arrAccountDetailSF['records']) && (count($arrAccountDetailSF['records'])>0))
+							{
+								
+								//print("into insert <pre>");
+								//print_r($arrAccountDetailSF);
+								//continue;
+								
+								$arrUpdatedAccountHistory = fnInsertAccount($arrAccountDetailSF['records'],$strEmailDomain);
+								//print("<pre>");
+								//print_r($arrUpdatedAccountHistoryId);
+								$isUpdatedAccountHistory = fnInsertAccountHistory($arrAccountDetailSF['records'],$arrUpdatedAccountHistory['id']);
+								
+								//$arrUpdatedIds[] = $arrUpdatedAccountHistory['fields']['Account ID'];
+								$arrUpdatedIds[] = $isUpdatedAccountHistory['id'];
+								$arrId[] = $arrUpdatedAccountHistory['fields']['AccountNumber'];
+								$arrAccDomains[] = $arrAccountDetailSF['records'][0]['Name'];
+							}
 							else
 							{
-								$arrProcessIds[] = $strARecId;
+								$arrAccountDetailN = fnGetContactDetailFromSf($instance_url, $access_token, $strEm);
+								//print("<pre>");
+								//print_r($arrAccountDetailN);
+								//continue;
+								
+								if(is_array($arrAccountDetailN) && (count($arrAccountDetailN)>0))
+								{
+									$arrAccountDetailSFId = fnGetAccountDetailFromSfId($instance_url, $access_token, $arrAccountDetailN['records'][0]['AccountId']);
+									if(is_array($arrAccountDetailSFId['records']) && (count($arrAccountDetailSFId['records'])>0))
+									{
+										//print("<pre>");
+										//print_r($arrAccountDetailSF);
+										
+										if(in_array($arrAccountDetailSFId['records'][0]['Name'],$arrAccDomains))
+										{
+											continue;
+										}
+										else
+										{
+											$arrAccountByNameDetail = fnGetAccountDetailByName($arrAccountDetailSFId['records'][0]['Name']);
+											if(is_array($arrAccountByNameDetail) && (count($arrAccountByNameDetail)>0))
+											{
+												continue;
+											}
+											else
+											{
+												$arrUpdatedAccountHistoryId = fnInsertAccount($arrAccountDetailSFId['records'],$strEmailDomain);
+												
+												$IsToBeInserted = fnCheckIfAccountHistoryToBeInserted($arrAccountDetailSFId['records']);
+												//continue;
+												if($IsToBeInserted)
+												{
+													if($IsToBeInserted == "1")
+													{
+														$isUpdatedAccountHistoryId = fnInsertAccountHistory($arrAccountDetailSFId['records'],$arrUpdatedAccountHistoryId['id']);
+														//$arrUpdatedIds[] = $arrUpdatedAccountHistoryId['fields']['Account ID'];
+														$arrUpdatedIds[] = $isUpdatedAccountHistoryId['id'];
+														$arrId[] = $arrUpdatedAccountHistoryId['fields']['AccountNumber'];
+														$arrAccDomains[] = $arrAccountDetailSFId['records'][0]['Name'];
+													}
+													else
+													{
+														$arrUpdatedIds[] = $IsToBeInserted;
+														$arrId[] = $arrUpdatedAccountHistoryId['fields']['AccountNumber'];
+														$arrAccDomains[] = $arrAccountDetailSFId['records'][0]['Name'];
+													}
+													
+												}
+												else
+												{
+													$arrUpdatedIds[] = $IsToBeInserted;
+													$arrId[] = $arrUpdatedAccountHistoryId['fields']['AccountNumber'];
+													$arrAccDomains[] = $arrAccountDetailSFId['records'][0]['Name'];
+												}
+												
+											}
+										}
+									}
+									else
+									{
+										$arrProcessIds[] = $strARecId;
+									}
+								}
+								else
+								{
+									$arrProcessIds[] = $strARecId;
+								}
+								//echo "No Account Present Other domain";
+								//continue;
 							}
-							//echo "No Account Present Other domain";
-							//continue;
-						}
-					//}
-				}
-				
+						//}
+					}
+				}				
 				//exit;
 			}
 			else
@@ -904,7 +906,7 @@ function fnGetAccountDetailFromSf($instance_url, $access_token,$strAccDomain = "
 		 //echo "--".$strAccDomain;
 		 //return;
 		 //exit;
-		$query = "SELECT Name, Id, NumberOfEmployees, BillingCity, AnnualRevenue, Account_Status__c, Billing_Cycle__c, Subscription_End_Date__c, ARR__c from Account WHERE Website LIKE '%".$strAccDomain."%' LIMIT 1";
+		$query = "SELECT Name, Id, NumberOfEmployees, BillingCity, AnnualRevenue, Account_Status__c, Billing_Cycle__c, Subscription_End_Date__c, ARR__c from Account WHERE Website LIKE '%".$strAccDomain."%' ORDER BY lastmodifieddate DESC LIMIT 1";
 		
 		//$query = "SELECT Name, Id, NumberOfEmployees, BillingCity, AnnualRevenue from Account WHERE Website LIKE '%".$strAccDomain."' LIMIT 1";
 		 

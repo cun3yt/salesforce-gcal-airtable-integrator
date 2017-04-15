@@ -148,7 +148,7 @@ if(is_array($arrGcalUser) && (count($arrGcalUser)>0))
 			$domain = substr(strrchr($strEm, "@"), 1);
 			//if($domain != $strClientDomain)
 			//if($domain == "mesosphere.io")
-			if($domain != $strClientDomain)
+			if(strtolower($domain) != strtolower($strClientDomain))
 			{
 				$intExterNameEmails++;
 				$arrDomainInfo = explode(".",$domain);
@@ -289,8 +289,8 @@ if(is_array($arrGcalUser) && (count($arrGcalUser)>0))
 						//echo "--".$strEmailDomain;
 						//echo "SF ACCS";
 						$arrAccountDetailSF = fnGetAccountDetailFromSf($instance_url, $access_token,$strEmailDomain);
-						//print("into insert <pre>");
-						//print_r($arrAccountDetailSF);
+						print("into insert <pre>");
+						print_r($arrAccountDetailSF);
 						//continue;
 						if(is_array($arrAccountDetailSF['records']) && (count($arrAccountDetailSF['records'])>0))
 						{
@@ -904,7 +904,7 @@ function fnGetAccountDetailFromSf($instance_url, $access_token,$strAccDomain = "
 		 //echo "--".$strAccDomain;
 		 //return;
 		 //exit;
-		$query = "SELECT Name, Id, NumberOfEmployees, BillingCity, AnnualRevenue, Account_Status__c, Billing_Cycle__c, Subscription_End_Date__c, ARR__c from Account WHERE Website LIKE '%".$strAccDomain."%' LIMIT 1";
+		$query = "SELECT Name, Id, NumberOfEmployees, BillingCity, AnnualRevenue, Account_Status__c, Billing_Cycle__c, Subscription_End_Date__c, ARR__c from Account WHERE Website LIKE '%".$strAccDomain."%' ORDER BY lastmodifieddate DESC LIMIT 1";
 		
 		//$query = "SELECT Name, Id, NumberOfEmployees, BillingCity, AnnualRevenue from Account WHERE Website LIKE '%".$strAccDomain."' LIMIT 1";
 		 

@@ -270,7 +270,7 @@ if(is_array($arrGcalUser) && (count($arrGcalUser)>0))
 												
 												$inDForm = date("Y-m-d",strtotime($strStardDate))." 00:00:00";
 												$strStartTime = strtotime($inDForm);
-												$strProcessTime = strtotime("+3 day", $strStartTime);
+												$strProcessTime = strtotime("+7 day", $strStartTime);
 												$arrResultData[$intFrCnt]['processtime'] = $strProcessTime;
 												
 												//echo "---".$strProcessTime;
