@@ -416,7 +416,7 @@ $intSalesUserRow = mysql_num_rows($strGetSalesUserQueryExe);*/
 										if($strStatus == "expired")
 										{
 											?>
-												<a href="http://ec2-34-208-42-244.us-west-2.compute.amazonaws.com/gcal/testcalnews.php"><button type="button" class="setting-btn">Activate</button></a>
+												<a href="http://ec2-34-210-36-40.us-west-2.compute.amazonaws.com/gcal/testcalnews.php"><button type="button" class="setting-btn">Activate</button></a>
 											<?php
 										}
 									?>
@@ -428,7 +428,7 @@ $intSalesUserRow = mysql_num_rows($strGetSalesUserQueryExe);*/
 					}
 				}
 			?>		
-			<div class="calendor-btn"><a href="http://ec2-34-208-42-244.us-west-2.compute.amazonaws.com/gcal/testcalnews.php"><button type="button" class="add-button">Add Calender</button></a></div>
+			<div class="calendor-btn"><a href="http://ec2-34-210-36-40.us-west-2.compute.amazonaws.com/gcal/testcalnews.php"><button type="button" class="add-button">Add Calender</button></a></div>
 		</div>
 		
 		<div class="heading"></div>
@@ -454,7 +454,7 @@ $intSalesUserRow = mysql_num_rows($strGetSalesUserQueryExe);*/
 										{
 											?>
 												<p>&nbsp;</p>
-												<a href="http://ec2-34-208-42-244.us-west-2.compute.amazonaws.com/resttest/oauth.php"><button type="button" class="setting-btn">Reconnect</button></a>
+												<a href="http://ec2-34-210-36-40.us-west-2.compute.amazonaws.com/resttest/oauth.php"><button type="button" class="setting-btn">Reconnect</button></a>
 											<?php
 										}
 										else
@@ -476,7 +476,7 @@ $intSalesUserRow = mysql_num_rows($strGetSalesUserQueryExe);*/
 				else
 				{
 					?>
-						<div class="calendor-btn"><a href="http://ec2-34-208-42-244.us-west-2.compute.amazonaws.com/resttest/oauth.php"><button type="button" class="add-button">Login with Salesforce </button></a></div>
+						<div class="calendor-btn"><a href="http://ec2-34-210-36-40.us-west-2.compute.amazonaws.com/resttest/oauth.php"><button type="button" class="add-button">Login with Salesforce </button></a></div>
 					<?php
 				}
 			?>
