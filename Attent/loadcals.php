@@ -408,7 +408,7 @@ function fnGetSalesUser()
 										if($strStatus == "expired")
 										{
 											?>
-												<a href="http://ec2-34-210-36-40.us-west-2.compute.amazonaws.com/Attent/testcalnews.php"><button type="button" class="setting-btn">Activate</button></a>
+												<a href="http://ec2-34-210-36-40.us-west-2.compute.amazonaws.com/gcal/testcalnews.php"><button type="button" class="setting-btn">Activate</button></a>
 											<?php
 										}
 									?>
@@ -420,7 +420,7 @@ function fnGetSalesUser()
 					}
 				}
 			?>		
-			<div class="calendor-btn"><a href="http://ec2-34-210-36-40.us-west-2.compute.amazonaws.com/Attent/testcalnews.php"><button type="button" class="add-button">Add Calender</button></a></div>
+			<div class="calendor-btn"><a href="http://ec2-34-210-36-40.us-west-2.compute.amazonaws.com/gcal/testcalnews.php"><button type="button" class="add-button">Add Calender</button></a></div>
 		</div>
 		
 		<div class="heading"></div>
