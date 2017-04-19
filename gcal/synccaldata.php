@@ -1,12 +1,12 @@
 <?php
 error_reporting(~E_NOTICE && ~E_DEPRECATED);
 session_start();
-require_once 'vendor/autoload.php';
+require_once '/var/www/html/gcal/vendor/autoload.php';
 $strClientDomain = "15five.com";
 $arrPersonalDoamin = array("gmail.com","yahoo.com","yahoo.co.in","aol.com","att.net","comcast.net","facebook.com","gmail.com","gmx.com","googlemail.com","google.com","hotmail.com","hotmail.co.uk","mac.com","me.com","mail.com","msn.com","live.com","sbcglobal.net","verizon.net","yahoo.com","yahoo.co.uk","rediif.com");
 $strPersonalDomain = implode(",",$arrPersonalDoamin);
 $client = new Google_Client();
-$client->setAuthConfig('calendar.json');
+$client->setAuthConfig('/var/www/html/gcal/15FiveCal.json');
 $client->addScope(array(Google_Service_Calendar::CALENDAR));
 $guzzleClient = new \GuzzleHttp\Client(array( 'curl' => array( CURLOPT_SSL_VERIFYPEER => false, ), ));
 $client->setHttpClient($guzzleClient);
@@ -270,7 +270,8 @@ if(is_array($arrGcalUser) && (count($arrGcalUser)>0))
 												
 												$inDForm = date("Y-m-d",strtotime($strStardDate))." 00:00:00";
 												$strStartTime = strtotime($inDForm);
-												$strProcessTime = strtotime("+7 day", $strStartTime);
+												//$strProcessTime = strtotime("+7 day", $strStartTime);
+												$strProcessTime = strtotime("+3 day", $strStartTime);
 												$arrResultData[$intFrCnt]['processtime'] = $strProcessTime;
 												
 												//echo "---".$strProcessTime;

@@ -3,7 +3,9 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Replace sender@example.com with your "From" address. 
+echo phpinfo();
+
+/* // Replace sender@example.com with your "From" address. 
 // This address must be verified with Amazon SES.
 define('SENDER', 'rajendra@techilaservices.com');        
 
@@ -54,7 +56,7 @@ if (PEAR::isError($result)) {
   echo("Email not sent. " .$result->getMessage() ."\n");
 } else {
   echo("Email sent!"."\n");
-}
+} */
 
 /* $to = "rajendrakumar.kandpal@gmail.com";
 $subject = "Google Calendar Access Expired";

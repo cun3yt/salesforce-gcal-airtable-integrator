@@ -4,11 +4,11 @@ session_start();
 $strCurrentClient = $_SESSION['currentclient'];
 $strCurrentClientFolderName = $_SESSION['currentclientfoldername'];
 $strToken = "";
-require_once 'vendor/autoload.php';
+require_once '/var/www/html/gcal/vendor/autoload.php';
 
 $client = new Google_Client();
 //$client->setAuthConfig('calendar.json');
-$client->setAuthConfig('15FiveCal.json');
+$client->setAuthConfig('/var/www/html/gcal/15FiveCal.json');
 $client->addScope(array(Google_Service_Calendar::CALENDAR,"https://www.googleapis.com/auth/contacts.readonly","https://www.googleapis.com/auth/userinfo.profile"));
 $guzzleClient = new \GuzzleHttp\Client(array( 'curl' => array( CURLOPT_SSL_VERIFYPEER => false, ), ));
 $client->setHttpClient($guzzleClient);
