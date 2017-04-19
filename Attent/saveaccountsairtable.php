@@ -443,82 +443,37 @@ function fnCheckIfAccountHistoryToBeInserted($arrAccountHistory = array())
 			curl_close($ch);
 			return "1";
 		}
-		else
-		{
-			curl_close($ch);
-			$arrResponse = json_decode($response,true);
-			print("db history - <pre>");
-			print_r($arrResponse);
-			//exit;
-			
-			if(isset($arrResponse['records']) && (count($arrResponse['records'])>0))
-			{
-				$arrSUser = $arrResponse['records'];
-				$strAccountStatus = $arrSUser[0]['fields']['Account Status'];
-				$strEmployees = $arrSUser[0]['fields']['# Employees'];
-				$strArr = $arrSUser[0]['fields']['ARR'];
-				$strBCycle = $arrSUser[0]['fields']['Billing Cycle'];
-				$strRenewalDate = strtotime($arrSUser[0]['fields']['Renewal Date']);
-				$strBcity = $arrSUser[0]['fields']['Billing City'];
-				
-				if($strAccountStatus != $arrAccountHistory[0]['Account_Status__c'])
-				{
-					//echo "AAAA";	
-					return "1";
-				}
-				else
-				{
-					if($strEmployees != $arrAccountHistory[0]['NumberOfEmployees'])
-					{
-						//echo "BBBBB";
-						return "1";
-					}
-					else
-					{
-						if($strArr != $arrAccountHistory[0]['ARR__c'])
-						{
-							//echo "CCC";
-							
-							return "1";
-						}
-						else
-						{
-							if($strBCycle != $arrAccountHistory[0]['Billing_Cycle__c'])
-							{
-								//echo "DDDD";
-								
-								return "1";
-							}
-							else
-							{
-								if($strRenewalDate != strtotime($arrAccountHistory[0]['Subscription_End_Date__c']))
-								{
-									///echo "EEEE";
-									return "1";
-								}
-								else
-								{
-									if($strBcity != $arrAccountHistory[0]['BillingCity'])
-									{
-										//echo "FFFF";
-										return "1";
-									}
-									else
-									{
-										return $arrSUser[0]['id'];
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-			else
-			{
-				return "1";
-			}
-		}
-		
+        curl_close($ch);
+        $arrResponse = json_decode($response,true);
+        print("db history - <pre>");
+        print_r($arrResponse);
+
+        if(isset($arrResponse['records']) && (count($arrResponse['records'])>0))
+        {
+            $arrSUser = $arrResponse['records'];
+            $strEmployees = $arrSUser[0]['fields']['# Employees'];
+            $strBcity = $arrSUser[0]['fields']['Billing City'];
+
+            if($strEmployees != $arrAccountHistory[0]['NumberOfEmployees'])
+            {
+                return "1";
+            }
+            else
+            {
+                if($strBcity != $arrAccountHistory[0]['BillingCity'])
+                {
+                    return "1";
+                }
+                else
+                {
+                    return $arrSUser[0]['id'];
+                }
+            }
+        }
+        else
+        {
+            return "1";
+        }
 	}
 	else
 	{
@@ -831,25 +786,25 @@ function fnInsertAccountHistory($arrAccountHistory = array(),$strRecId)
 			$arrFields['fields']['Billing City'] = $arrAccountHistory[0]['BillingCity'];
 		}
 		
-		if($arrAccountHistory[0]['ARR__c'])
-		{
-			$arrFields['fields']['ARR'] = $arrAccountHistory[0]['ARR__c'];
-		}
-		
-		if($arrAccountHistory[0]['Billing_Cycle__c'])
-		{
-			$arrFields['fields']['Billing Cycle'] = $arrAccountHistory[0]['Billing_Cycle__c'];
-		}
-		
-		if($arrAccountHistory[0]['Account_Status__c'])
-		{
-			$arrFields['fields']['Account Status'] = $arrAccountHistory[0]['Account_Status__c'];
-		}
-		
-		if($arrAccountHistory[0]['Subscription_End_Date__c'])
-		{
-			$arrFields['fields']['Renewal Date'] = date("m/d/Y",strtotime($arrAccountHistory[0]['Subscription_End_Date__c']));
-		}
+//		if($arrAccountHistory[0]['ARR__c'])
+//		{
+//			$arrFields['fields']['ARR'] = $arrAccountHistory[0]['ARR__c'];
+//		}
+//
+//		if($arrAccountHistory[0]['Billing_Cycle__c'])
+//		{
+//			$arrFields['fields']['Billing Cycle'] = $arrAccountHistory[0]['Billing_Cycle__c'];
+//		}
+//
+//		if($arrAccountHistory[0]['Account_Status__c'])
+//		{
+//			$arrFields['fields']['Account Status'] = $arrAccountHistory[0]['Account_Status__c'];
+//		}
+//
+//		if($arrAccountHistory[0]['Subscription_End_Date__c'])
+//		{
+//			$arrFields['fields']['Renewal Date'] = date("m/d/Y",strtotime($arrAccountHistory[0]['Subscription_End_Date__c']));
+//		}
 		
 		
 		
@@ -906,7 +861,7 @@ function fnGetAccountDetailFromSf($instance_url, $access_token,$strAccDomain = "
 		 //echo "--".$strAccDomain;
 		 //return;
 		 //exit;
-		$query = "SELECT Name, Id, NumberOfEmployees, BillingCity, AnnualRevenue, Account_Status__c, Billing_Cycle__c, Subscription_End_Date__c, ARR__c from Account WHERE Website LIKE '%".$strAccDomain."%' ORDER BY lastmodifieddate DESC LIMIT 1";
+		$query = "SELECT Name, Id, NumberOfEmployees, BillingCity from Account WHERE Website LIKE '%".$strAccDomain."%' ORDER BY lastmodifieddate DESC LIMIT 1";
 		
 		//$query = "SELECT Name, Id, NumberOfEmployees, BillingCity, AnnualRevenue from Account WHERE Website LIKE '%".$strAccDomain."' LIMIT 1";
 		 
