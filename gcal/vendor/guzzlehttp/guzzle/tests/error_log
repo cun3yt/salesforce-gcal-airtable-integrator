@@ -1,0 +1,18 @@
+[09-Apr-2017 23:57:28 Etc/GMT] PHP Fatal error:  Class 'PHPUnit_Framework_TestCase' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/guzzle/tests/BatchResultsTest.php on line 10
+[09-Apr-2017 23:57:32 Etc/GMT] PHP Fatal error:  Class 'PHPUnit_Framework_TestCase' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/guzzle/tests/ClientTest.php on line 23
+[09-Apr-2017 23:57:34 Etc/GMT] PHP Fatal error:  Class 'PHPUnit_Framework_TestCase' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/guzzle/tests/CollectionTest.php on line 8
+[09-Apr-2017 23:57:42 Etc/GMT] PHP Fatal error:  Class 'PHPUnit_Framework_TestCase' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/guzzle/tests/IntegrationTest.php on line 14
+[09-Apr-2017 23:57:51 Etc/GMT] PHP Fatal error:  Class 'PHPUnit_Framework_TestCase' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/guzzle/tests/MimetypesTest.php on line 11
+[09-Apr-2017 23:57:54 Etc/GMT] PHP Fatal error:  Class 'PHPUnit_Framework_TestCase' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/guzzle/tests/PoolTest.php on line 19
+[09-Apr-2017 23:58:00 Etc/GMT] PHP Fatal error:  Class 'PHPUnit_Framework_TestCase' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/guzzle/tests/QueryParserTest.php on line 9
+[09-Apr-2017 23:58:08 Etc/GMT] PHP Fatal error:  Class 'PHPUnit_Framework_TestCase' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/guzzle/tests/QueryTest.php on line 8
+[09-Apr-2017 23:58:14 Etc/GMT] PHP Fatal error:  Class 'PHPUnit_Framework_TestCase' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/guzzle/tests/RequestFsmTest.php on line 23
+[09-Apr-2017 23:58:19 Etc/GMT] PHP Fatal error:  Class 'PHPUnit_Framework_TestCase' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/guzzle/tests/RingBridgeTest.php on line 18
+[09-Apr-2017 23:58:25 Etc/GMT] PHP Fatal error:  Class 'PHPUnit_Framework_TestCase' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/guzzle/tests/TransactionTest.php on line 10
+[09-Apr-2017 23:58:26 Etc/GMT] PHP Fatal error:  Class 'PHPUnit_Framework_TestCase' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/guzzle/tests/UriTemplateTest.php on line 11
+[09-Apr-2017 23:58:28 Etc/GMT] PHP Fatal error:  Class 'PHPUnit_Framework_TestCase' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/guzzle/tests/UrlTest.php on line 11
+[09-Apr-2017 23:58:31 Etc/GMT] PHP Fatal error:  Class 'PHPUnit_Framework_TestCase' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/guzzle/tests/UtilsTest.php on line 7
+[09-Apr-2017 23:58:34 Etc/GMT] PHP Warning:  require(/home/rothrres/public_html/gcal/vendor/guzzlehttp/guzzle/tests/../vendor/autoload.php): failed to open stream: No such file or directory in /home/rothrres/public_html/gcal/vendor/guzzlehttp/guzzle/tests/bootstrap.php on line 2
+[09-Apr-2017 23:58:34 Etc/GMT] PHP Warning:  require(/home/rothrres/public_html/gcal/vendor/guzzlehttp/guzzle/tests/../vendor/autoload.php): failed to open stream: No such file or directory in /home/rothrres/public_html/gcal/vendor/guzzlehttp/guzzle/tests/bootstrap.php on line 2
+[09-Apr-2017 23:58:34 Etc/GMT] PHP Fatal error:  require(): Failed opening required '/home/rothrres/public_html/gcal/vendor/guzzlehttp/guzzle/tests/../vendor/autoload.php' (include_path='.:/opt/alt/php54/usr/share/pear:/opt/alt/php54/usr/share/php') in /home/rothrres/public_html/gcal/vendor/guzzlehttp/guzzle/tests/bootstrap.php on line 2
+[09-Apr-2017 23:58:39 Etc/GMT] PHP Parse error:  syntax error, unexpected '$client' (T_VARIABLE) in /home/rothrres/public_html/gcal/vendor/guzzlehttp/guzzle/tests/perf.php on line 40

@@ -1,0 +1,15 @@
+[09-Apr-2017 23:58:40 Etc/GMT] PHP Fatal error:  Interface 'Psr\Http\Message\StreamInterface' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/src/AppendStream.php on line 12
+[09-Apr-2017 23:58:42 Etc/GMT] PHP Fatal error:  Interface 'Psr\Http\Message\StreamInterface' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/src/BufferStream.php on line 15
+[09-Apr-2017 23:58:46 Etc/GMT] PHP Fatal error:  Interface 'Psr\Http\Message\StreamInterface' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/src/CachingStream.php on line 11
+[09-Apr-2017 23:58:49 Etc/GMT] PHP Fatal error:  Interface 'Psr\Http\Message\StreamInterface' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/src/DroppingStream.php on line 11
+[09-Apr-2017 23:58:54 Etc/GMT] PHP Fatal error:  Interface 'Psr\Http\Message\StreamInterface' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/src/FnStream.php on line 13
+[09-Apr-2017 23:58:58 Etc/GMT] PHP Fatal error:  Interface 'Psr\Http\Message\StreamInterface' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/src/InflateStream.php on line 18
+[09-Apr-2017 23:59:00 Etc/GMT] PHP Fatal error:  Interface 'Psr\Http\Message\StreamInterface' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/src/LazyOpenStream.php on line 11
+[09-Apr-2017 23:59:05 Etc/GMT] PHP Fatal error:  Interface 'Psr\Http\Message\StreamInterface' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/src/LimitStream.php on line 11
+[09-Apr-2017 23:59:15 Etc/GMT] PHP Fatal error:  Interface 'Psr\Http\Message\StreamInterface' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/src/MultipartStream.php on line 11
+[09-Apr-2017 23:59:22 Etc/GMT] PHP Fatal error:  Interface 'Psr\Http\Message\StreamInterface' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/src/NoSeekStream.php on line 10
+[09-Apr-2017 23:59:25 Etc/GMT] PHP Fatal error:  Interface 'Psr\Http\Message\StreamInterface' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/src/PumpStream.php on line 17
+[09-Apr-2017 23:59:28 Etc/GMT] PHP Fatal error:  Interface 'Psr\Http\Message\RequestInterface' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/src/Request.php on line 13
+[09-Apr-2017 23:59:30 Etc/GMT] PHP Fatal error:  Interface 'Psr\Http\Message\ResponseInterface' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/src/Response.php on line 10
+[09-Apr-2017 23:59:32 Etc/GMT] PHP Fatal error:  Interface 'Psr\Http\Message\StreamInterface' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/src/Stream.php on line 12
+[09-Apr-2017 23:59:41 Etc/GMT] PHP Fatal error:  Interface 'Psr\Http\Message\UriInterface' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/src/Uri.php on line 13

@@ -1,0 +1,5 @@
+[09-Apr-2017 23:56:16 Etc/GMT] PHP Fatal error:  Interface 'GuzzleHttp\ClientInterface' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/guzzle/src/Client.php on line 19
+[09-Apr-2017 23:56:20 Etc/GMT] PHP Fatal error:  Interface 'GuzzleHttp\Event\HasEmitterInterface' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/guzzle/src/ClientInterface.php on line 13
+[09-Apr-2017 23:56:21 Etc/GMT] PHP Fatal error:  Interface 'GuzzleHttp\ToArrayInterface' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/guzzle/src/Collection.php on line 12
+[09-Apr-2017 23:56:54 Etc/GMT] PHP Fatal error:  Interface 'GuzzleHttp\Ring\Future\FutureInterface' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/guzzle/src/Pool.php on line 35
+[09-Apr-2017 23:56:58 Etc/GMT] PHP Fatal error:  Class 'GuzzleHttp\Collection' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/guzzle/src/Query.php on line 8

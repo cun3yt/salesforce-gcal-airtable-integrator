@@ -391,7 +391,7 @@ $intSalesUserRow = mysql_num_rows($strGetSalesUserQueryExe);*/
 <body>
 <iframe id="logoutframe" src="https://accounts.google.com/logout" style="display: none"></iframe>
 <div class="main">
-		<div class="heading"></div>
+		<div class="heading">This is a test</div>
 		<div class="content">
 			<?php
 				if(is_array($arrGcalUser) && (count($arrGcalUser)>0))

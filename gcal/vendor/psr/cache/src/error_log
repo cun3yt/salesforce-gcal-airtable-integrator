@@ -1,0 +1,1 @@
+[10-Apr-2017 00:05:22 Etc/GMT] PHP Fatal error:  Interface 'Psr\Cache\CacheException' not found in /home/rothrres/public_html/gcal/vendor/psr/cache/src/InvalidArgumentException.php on line 12

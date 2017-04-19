@@ -1,0 +1,21 @@
+[09-Apr-2017 23:59:49 Etc/GMT] PHP Fatal error:  Class 'PHPUnit_Framework_TestCase' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/tests/AppendStreamTest.php on line 8
+[09-Apr-2017 23:59:52 Etc/GMT] PHP Fatal error:  Class 'PHPUnit_Framework_TestCase' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/tests/BufferStreamTest.php on line 7
+[09-Apr-2017 23:59:54 Etc/GMT] PHP Fatal error:  Class 'PHPUnit_Framework_TestCase' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/tests/CachingStreamTest.php on line 11
+[09-Apr-2017 23:59:56 Etc/GMT] PHP Fatal error:  Class 'PHPUnit_Framework_TestCase' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/tests/DroppingStreamTest.php on line 8
+[10-Apr-2017 00:00:06 Etc/GMT] PHP Fatal error:  Class 'PHPUnit_Framework_TestCase' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/tests/FnStreamTest.php on line 11
+[10-Apr-2017 00:00:24 Etc/GMT] PHP Fatal error:  Class 'PHPUnit_Framework_TestCase' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/tests/FunctionsTest.php on line 9
+[10-Apr-2017 00:00:27 Etc/GMT] PHP Fatal error:  Class 'PHPUnit_Framework_TestCase' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/tests/InflateStreamTest.php on line 8
+[10-Apr-2017 00:00:29 Etc/GMT] PHP Fatal error:  Class 'PHPUnit_Framework_TestCase' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/tests/LazyOpenStreamTest.php on line 7
+[10-Apr-2017 00:00:31 Etc/GMT] PHP Fatal error:  Class 'PHPUnit_Framework_TestCase' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/tests/LimitStreamTest.php on line 14
+[10-Apr-2017 00:00:33 Etc/GMT] PHP Fatal error:  Class 'PHPUnit_Framework_TestCase' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/tests/MultipartStreamTest.php on line 8
+[10-Apr-2017 00:00:35 Etc/GMT] PHP Fatal error:  Class 'PHPUnit_Framework_TestCase' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/tests/NoSeekStreamTest.php on line 12
+[10-Apr-2017 00:00:38 Etc/GMT] PHP Fatal error:  Class 'PHPUnit_Framework_TestCase' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/tests/PumpStreamTest.php on line 9
+[10-Apr-2017 00:00:40 Etc/GMT] PHP Fatal error:  Class 'PHPUnit_Framework_TestCase' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/tests/RequestTest.php on line 11
+[10-Apr-2017 00:00:42 Etc/GMT] PHP Fatal error:  Class 'PHPUnit_Framework_TestCase' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/tests/ResponseTest.php on line 12
+[10-Apr-2017 00:00:43 Etc/GMT] PHP Fatal error:  Interface 'Psr\Http\Message\StreamInterface' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/tests/StreamDecoratorTraitTest.php on line 9
+[10-Apr-2017 00:00:47 Etc/GMT] PHP Fatal error:  Class 'PHPUnit_Framework_TestCase' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/tests/StreamTest.php on line 11
+[10-Apr-2017 00:00:51 Etc/GMT] PHP Fatal error:  Class 'PHPUnit_Framework_TestCase' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/tests/StreamWrapperTest.php on line 11
+[10-Apr-2017 00:00:53 Etc/GMT] PHP Fatal error:  Class 'PHPUnit_Framework_TestCase' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/tests/UriTest.php on line 10
+[10-Apr-2017 00:00:55 Etc/GMT] PHP Warning:  require(/home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/tests/../vendor/autoload.php): failed to open stream: No such file or directory in /home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/tests/bootstrap.php on line 4
+[10-Apr-2017 00:00:55 Etc/GMT] PHP Warning:  require(/home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/tests/../vendor/autoload.php): failed to open stream: No such file or directory in /home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/tests/bootstrap.php on line 4
+[10-Apr-2017 00:00:55 Etc/GMT] PHP Fatal error:  require(): Failed opening required '/home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/tests/../vendor/autoload.php' (include_path='.:/opt/alt/php54/usr/share/pear:/opt/alt/php54/usr/share/php') in /home/rothrres/public_html/gcal/vendor/guzzlehttp/psr7/tests/bootstrap.php on line 4

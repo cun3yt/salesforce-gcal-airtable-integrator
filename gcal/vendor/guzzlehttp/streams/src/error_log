@@ -1,0 +1,14 @@
+[10-Apr-2017 00:01:51 Etc/GMT] PHP Fatal error:  Interface 'GuzzleHttp\Stream\StreamInterface' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/streams/src/AppendStream.php on line 12
+[10-Apr-2017 00:01:56 Etc/GMT] PHP Fatal error:  Interface 'GuzzleHttp\Stream\StreamInterface' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/streams/src/AsyncReadStream.php on line 23
+[10-Apr-2017 00:01:59 Etc/GMT] PHP Fatal error:  Interface 'GuzzleHttp\Stream\StreamInterface' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/streams/src/BufferStream.php on line 17
+[10-Apr-2017 00:02:02 Etc/GMT] PHP Fatal error:  Interface 'GuzzleHttp\Stream\StreamInterface' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/streams/src/CachingStream.php on line 11
+[10-Apr-2017 00:02:05 Etc/GMT] PHP Fatal error:  Interface 'GuzzleHttp\Stream\StreamInterface' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/streams/src/DroppingStream.php on line 9
+[10-Apr-2017 00:02:10 Etc/GMT] PHP Fatal error:  Interface 'GuzzleHttp\Stream\StreamInterface' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/streams/src/FnStream.php on line 11
+[10-Apr-2017 00:02:18 Etc/GMT] PHP Fatal error:  Interface 'GuzzleHttp\Stream\StreamInterface' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/streams/src/InflateStream.php on line 16
+[10-Apr-2017 00:02:24 Etc/GMT] PHP Fatal error:  Interface 'GuzzleHttp\Stream\StreamInterface' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/streams/src/LazyOpenStream.php on line 9
+[10-Apr-2017 00:02:28 Etc/GMT] PHP Fatal error:  Interface 'GuzzleHttp\Stream\StreamInterface' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/streams/src/LimitStream.php on line 10
+[10-Apr-2017 00:02:40 Etc/GMT] PHP Fatal error:  Interface 'GuzzleHttp\Stream\StreamInterface' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/streams/src/MetadataStreamInterface.php on line 11
+[10-Apr-2017 00:02:43 Etc/GMT] PHP Fatal error:  Interface 'GuzzleHttp\Stream\StreamInterface' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/streams/src/NoSeekStream.php on line 8
+[10-Apr-2017 00:02:47 Etc/GMT] PHP Fatal error:  Interface 'GuzzleHttp\Stream\StreamInterface' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/streams/src/NullStream.php on line 9
+[10-Apr-2017 00:02:50 Etc/GMT] PHP Fatal error:  Interface 'GuzzleHttp\Stream\StreamInterface' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/streams/src/PumpStream.php on line 17
+[10-Apr-2017 00:02:54 Etc/GMT] PHP Fatal error:  Interface 'GuzzleHttp\Stream\StreamInterface' not found in /home/rothrres/public_html/gcal/vendor/guzzlehttp/streams/src/Stream.php on line 8
