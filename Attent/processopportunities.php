@@ -88,7 +88,11 @@ if (is_array($arrGcalUser) && (count($arrGcalUser) > 0)) {
         }
     }
 }
-
+/**
+ * Return Customer's Sales Person
+ *
+ * @return array | bool
+ */
 function fnGetSalesUser() {
     global $strAirtableBase, $strAirtableApiKey, $strAirtableBaseEndpoint;
     $base = $strAirtableBase;
@@ -96,6 +100,7 @@ function fnGetSalesUser() {
     $strApiKey = $strAirtableApiKey;
     $url = $strAirtableBaseEndpoint . $base . '/' . $table;
     $authorization = "Authorization: Bearer " . $strApiKey;
+
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_HTTPGET, 1);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -106,7 +111,6 @@ function fnGetSalesUser() {
     //execute post
     $result = curl_exec($ch);
     if (!$result) {
-        //echo "HI";exit;
         echo 'error:' . curl_error($ch);
         return false;
     } else {
