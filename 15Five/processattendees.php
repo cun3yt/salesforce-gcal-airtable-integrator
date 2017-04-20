@@ -1,23 +1,38 @@
 <?php
+/*
+*
+* This file is basically responsible for processing meetings from airtable and fetching attendees respective contact from 
+* salesforce and than mapping it within airtable base for easy lookup and reference.
+*
+*/
 error_reporting(~E_WARNING && ~E_NOTICE);
 session_start();
+// we need to include config file so as to get set customer enviornment for processing attendees
 require_once('config.php');
+// we will inform script about the client domian, so that while processing system knows about the client domain and work accordingly.
+$strClientDomain = $strClientDomainName;
+
+// We declare some global salesforce access token variables that will be needed to fetching attendees contact data.
 $access_token = "";
 $instance_url = "";
 $strRecordId = "";
+
+// Get the registerd salesforce oAuth access entry from customer's airtable base, as it will be needed for reference to fetch contact data.
 $arrSalesUser = fnGetSalesUser();
 //print("<pre>");
 //print_r($arrSalesUser);exit;
 
 if(is_array($arrSalesUser) && (count($arrSalesUser)>0))
 {
+	// if we get salesforce OAuth access data we iterate and use the access data and assign it out global variables declared.
+	
 	$arrSalesTokenDetail = $arrSalesUser[0]['fields'];
 	if(is_array($arrSalesTokenDetail) && (count($arrSalesTokenDetail)>0))
 	{
 		$arrSDetail = json_decode($arrSalesTokenDetail['salesuseraccesstoken'],true);
-		$access_token = $arrSDetail['access_token'];
-		$instance_url = $arrSDetail['instance_url'];
-		$strRecordId = $arrSalesUser[0]['id'];
+		$access_token = $arrSDetail['access_token']; // assiging access token to our global variable
+		$instance_url = $arrSDetail['instance_url']; // assiging access URL to our global variable
+		$strRecordId = $arrSalesUser[0]['id']; // airtable record id, pulled just incase if we are to update particular record
 	}
 }
 //echo "--".$access_token;
@@ -25,52 +40,211 @@ if(is_array($arrSalesUser) && (count($arrSalesUser)>0))
 //echo "--".$strRecordId;
 //exit;
 
-function fnGetSalesUser()
-{
-	global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
-	$base = $strAirtableBase;
-	$table = 'salesuser';
-	$strApiKey = $strAirtableApiKey;
-	$url = $strAirtableBaseEndpoint.$base.'/'.$table;
-	$authorization = "Authorization: Bearer ".$strApiKey;
-	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_HTTPGET, 1);
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-	curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-	curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
-	//set the url, number of POST vars, POST data
-	curl_setopt($ch,CURLOPT_URL, $url);
-
-	//execute post
-	$result = curl_exec($ch);
-	if(!$result)
-	{
-		echo 'error:' . curl_error($ch);
-		
-		return false;
-	}
-	else
-	{
-		$arrResponse = json_decode($result,true);
-		if(isset($arrResponse['records']) && (count($arrResponse['records'])>0))
-		{
-			$arrSUser = $arrResponse['records'];
-			return $arrSUser;
-			
-		}
-		else
-		{
-			return false;
-		}
-	}
-}
-
-$strClientDomain = $strClientDomainName;
+/*
+*
+* Below you will see system fetching unprocessed attendees from customeer's meeting table 
+* System will connect to meeting history table and fetch unprocessed attendees from there 
+*/
 $arrGcalUser = fnGetProcessAccounts();
 //print("<pre>");
 //print_r($arrGcalUser);
 //exit;
 
+
+/*
+*
+* If there are unprocessed attendees, script will iterate through it and connecte to salesforece and fetch the respective 
+* contact that matches the attendee and than put pulled contact in attendee table in customer airtable base and also add an 
+* entry in attendee history table in customer airtable base.
+*
+*/
+
+if(is_array($arrGcalUser) && (count($arrGcalUser)>0))
+{
+	// iteration will only be conducted if there are more than 0 unprocessed attendees fetched from customers airtable base.
+	
+	//print("<pre>");
+	//print_r($arrGcalUser);
+	//exit;
+	$intFrCnt = 0;
+	foreach($arrGcalUser as $arrUser)
+	{
+		
+		// Iterating through attendee here
+		
+		//print("<pre>");
+		//print_r($arrUser);
+		//continue;
+		$arrUpdatedIds = array();
+		$intFrCnt++;
+		$strARecId = $arrUser['id'];
+		
+		// ecah meeting record will have attendees detail for that meeting, we will access every attendees email for that meeting
+		// there can be multiple attendees for a meeting, we explode and prepare array of attendees so that we can iterate and process each single attendee from the meet and try to fetch its respective contact detial from sfdc.
+		$arrEmails = explode(",",$arrUser['fields']['Attendee Email(s)']);
+		foreach($arrEmails as $strEm)
+		{
+			// Now we iterate through each attendee to check and get their respective contact details from sfdc
+			
+			$domain = substr(strrchr($strEm, "@"), 1); // we extract the domain part, so as to compare if it belongs to client domain or some external domain
+			
+			// comaparison we only process attendees those are external to client domains
+			//if($domain != $strClientDomain)
+			//if($domain == "gmail.com")
+			if(strtolower($domain) != strtolower($strClientDomain))
+			{
+				$strEmailDomain = $domain;
+				//$strEmailDomain = "gmail.com";
+				//continue;
+				
+				$strEmail = $strEm;
+				$arrAccountDetail = fnGetContactDetail($strEm); // check and get contact from airtable 
+				//print("<pre>");
+				//print_r($arrAccountDetail);
+				//continue;
+				if(is_array($arrAccountDetail) && (count($arrAccountDetail)>0))
+				{
+					// if contact found in airtable than we connect to sf and fetch the latest modified contact from sf
+					// check to see if the latest fetched record does have any updated values
+					// if they are updated we add a record in the attendee history table
+					// and than map it with meeting history table for look up
+					
+					
+					//print("<pre>");
+					//print_r($arrAccountDetail);
+					
+					// connecting and getting latest modified contact detail from sf
+					$arrAccountDetailSF = fnGetContactDetailFromSf($instance_url, $access_token, $strEm);
+					//print("<pre>");
+					//print_r($arrAccountDetailSF);
+					//continue;
+					if(is_array($arrAccountDetailSF['records']) && (count($arrAccountDetailSF['records'])>0))
+					{
+						//print("<pre>");
+						//print_r($arrAccountDetailSF);
+						
+						// we now check if contact details fetched from sfdc, has some updated values or not
+						// if yes than we add it into attendee history table otherwise we proceed to next attendee
+						// system makes note of the attendee history record if it was created for mapping 
+						$IsToBeInserted = fnCheckIfContactHistoryToBeInserted($arrAccountDetailSF['records']);
+						//continue;
+						if($IsToBeInserted)
+						{
+							if($IsToBeInserted == "1")
+							{
+								if($arrAccountDetail[0]['id'])
+								{
+									$isUpdatedAccountHistory = fnInsertContactHistory($arrAccountDetailSF['records'],$arrAccountDetail[0]['id']);
+									$arrUpdatedIds[] = $isUpdatedAccountHistory['id']; // noting the attendee history record created so as to mapp it with the meeting record for lookup
+								}
+								//$boolUpdateAccount = fnUpdateAccountRecord($strARecId,$arrAccountDetailSF['records'][0]['Name'],$isUpdatedAccountHistory['id']);
+							}
+							else
+							{
+								//$arrOppHIds[] = $IsToBeInserted;
+								$arrUpdatedIds[] = $IsToBeInserted; // noting the attendee history record created so as to mapp it with the meeting record for lookup
+								
+								//$boolUpdateAccount = fnUpdateAccountRecord($strARecId,$arrAccountDetailSF['records'][0]['Name'],$IsToBeInserted);
+							}
+						}
+						else
+						{
+							$arrUpdatedIds[] = $IsToBeInserted; // noting the attendee history record created so as to mapp it with the meeting record for lookup
+						}						
+					}
+					else
+					{
+						//echo "No Account Present";
+						continue;
+					}
+				}
+				else
+				{
+					// if attendee not present in airtable, we connect to sf and get the contact details from sf
+					// create a attendee record in the attendee table
+					// create a attendee history record in attendee history table and 
+					// mapp attendee hostory record to meeting record 
+					
+					echo "---".$strEm;
+					// fetching the latest modified attendee detail from sf
+					$arrAccountDetailSF = fnGetContactDetailFromSf($instance_url, $access_token,$strEm);
+					
+					if(is_array($arrAccountDetailSF['records']) && (count($arrAccountDetailSF['records'])>0))
+					{
+						//print("into insert <pre>");
+						//print_r($arrAccountDetailSF);
+						//continue;
+						
+						// getting the account related information for a attendee from sfdc
+						$arrAccDetail = fnGetAccountDetail($arrAccountDetailSF['records'][0]['AccountId']);
+						//print("into insert <pre>");
+						//print_r($arrAccDetail);
+						//continue;
+						
+						// creating a attendee record in airtable by pushing the contact record along with account detail pulled from sf.
+						$arrUpdatedAccountHistory = fnInsertContact($arrAccountDetailSF['records'],$arrAccDetail[0]['id']);
+						
+						//print("<pre>");
+						//print_r($arrUpdatedAccountHistory);
+						///continue;
+						
+						// createing attendee history record with help of pulled contact details from sf
+						if(is_array($arrUpdatedAccountHistory) && (count($arrUpdatedAccountHistory)>0))
+						{
+							if($arrUpdatedAccountHistory['id'])
+							{
+								$isUpdatedAccountHistory = fnInsertContactHistory($arrAccountDetailSF['records'],$arrUpdatedAccountHistory['id']);
+								$arrUpdatedIds[] = $isUpdatedAccountHistory['id']; // noting the attendee history record created so as to mapp it with the meeting record for lookup
+							}
+						}
+					}
+					else
+					{
+						//echo "No Account Present Other domain";
+						continue;
+					}
+				}
+				
+				//exit;
+			}
+			else
+			{
+				continue;
+			}
+		}
+		
+		// All the noted attendee record are here mapped with meeting history table
+		// if there are none we flag it as "NO SFDC Contact"
+		if(is_array($arrUpdatedIds) && (count($arrUpdatedIds)>0))
+		{
+			$boolUpdateAccount = fnUpdateAccountRecord($strARecId,$arrUpdatedIds);
+		}
+		else
+		{
+			$boolUpdateNoContact = fnUpdateNoContact($strARecId);
+		}
+		
+		//print("<pre>");
+		//print_r($arrEmails);
+		//$strName = fnGetUserName($strEmail);
+		
+		
+		if($strName)
+		{
+			//echo "--".$boolNameUpdated = fnUpdateUserName($strName,$strARecId);
+		}
+		else
+		{
+			continue;
+		}
+	}
+}
+
+/*
+* Function to connect to airtable base and get unprocessed attendees from meeting table in airtable
+* Unproceed attendees are pulled from Unmapped Attendees view under meeting history table
+* we process 5 records in 1 go
+*/
 function fnGetProcessAccounts()
 {
 	global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
@@ -117,148 +291,56 @@ function fnGetProcessAccounts()
 	}
 }
 
-if(is_array($arrGcalUser) && (count($arrGcalUser)>0))
+/*
+Function to connect to airtable base and get customers salesforce OAuth acceess
+*/
+function fnGetSalesUser()
 {
-	//print("<pre>");
-	//print_r($arrGcalUser);
-	//exit;
-	$intFrCnt = 0;
-	foreach($arrGcalUser as $arrUser)
+	global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
+	$base = $strAirtableBase;
+	$table = 'salesuser';
+	$strApiKey = $strAirtableApiKey;
+	$url = $strAirtableBaseEndpoint.$base.'/'.$table;
+	$authorization = "Authorization: Bearer ".$strApiKey;
+	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_HTTPGET, 1);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+	curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
+	//set the url, number of POST vars, POST data
+	curl_setopt($ch,CURLOPT_URL, $url);
+
+	//execute post
+	$result = curl_exec($ch);
+	if(!$result)
 	{
-		//print("<pre>");
-		//print_r($arrUser);
-		//continue;
-		$arrUpdatedIds = array();
-		$intFrCnt++;
-		$strARecId = $arrUser['id'];
-		$arrEmails = explode(",",$arrUser['fields']['Attendee Email(s)']);
-		foreach($arrEmails as $strEm)
+		echo 'error:' . curl_error($ch);
+		
+		return false;
+	}
+	else
+	{
+		$arrResponse = json_decode($result,true);
+		if(isset($arrResponse['records']) && (count($arrResponse['records'])>0))
 		{
+			$arrSUser = $arrResponse['records'];
+			return $arrSUser;
 			
-			$domain = substr(strrchr($strEm, "@"), 1);
-			//if($domain != $strClientDomain)
-			//if($domain == "gmail.com")
-			if(strtolower($domain) != strtolower($strClientDomain))
-			{
-				$strEmailDomain = $domain;
-				//$strEmailDomain = "gmail.com";
-				//continue;
-				
-				$strEmail = $strEm;
-				$arrAccountDetail = fnGetContactDetail($strEm);
-				//print("<pre>");
-				//print_r($arrAccountDetail);
-				//continue;
-				if(is_array($arrAccountDetail) && (count($arrAccountDetail)>0))
-				{
-					//print("<pre>");
-					//print_r($arrAccountDetail);
-					$arrAccountDetailSF = fnGetContactDetailFromSf($instance_url, $access_token, $strEm);
-					//print("<pre>");
-					//print_r($arrAccountDetailSF);
-					//continue;
-					if(is_array($arrAccountDetailSF['records']) && (count($arrAccountDetailSF['records'])>0))
-					{
-						//print("<pre>");
-						//print_r($arrAccountDetailSF);
-						$IsToBeInserted = fnCheckIfContactHistoryToBeInserted($arrAccountDetailSF['records']);
-						//continue;
-						if($IsToBeInserted)
-						{
-							if($IsToBeInserted == "1")
-							{
-								if($arrAccountDetail[0]['id'])
-								{
-									$isUpdatedAccountHistory = fnInsertContactHistory($arrAccountDetailSF['records'],$arrAccountDetail[0]['id']);
-									$arrUpdatedIds[] = $isUpdatedAccountHistory['id'];
-								}
-								//$boolUpdateAccount = fnUpdateAccountRecord($strARecId,$arrAccountDetailSF['records'][0]['Name'],$isUpdatedAccountHistory['id']);
-							}
-							else
-							{
-								//$arrOppHIds[] = $IsToBeInserted;
-								$arrUpdatedIds[] = $IsToBeInserted;
-								//$boolUpdateAccount = fnUpdateAccountRecord($strARecId,$arrAccountDetailSF['records'][0]['Name'],$IsToBeInserted);
-							}
-						}
-						else
-						{
-							$arrUpdatedIds[] = $IsToBeInserted;
-						}						
-					}
-					else
-					{
-						//echo "No Account Present";
-						continue;
-					}
-				}
-				else
-				{
-					echo "---".$strEm;
-					$arrAccountDetailSF = fnGetContactDetailFromSf($instance_url, $access_token,$strEm);
-					
-					if(is_array($arrAccountDetailSF['records']) && (count($arrAccountDetailSF['records'])>0))
-					{
-						//print("into insert <pre>");
-						//print_r($arrAccountDetailSF);
-						//continue;
-						$arrAccDetail = fnGetAccountDetail($arrAccountDetailSF['records'][0]['AccountId']);
-						//print("into insert <pre>");
-						//print_r($arrAccDetail);
-						//continue;
-						$arrUpdatedAccountHistory = fnInsertContact($arrAccountDetailSF['records'],$arrAccDetail[0]['id']);
-						
-						//print("<pre>");
-						//print_r($arrUpdatedAccountHistory);
-						///continue;
-						if(is_array($arrUpdatedAccountHistory) && (count($arrUpdatedAccountHistory)>0))
-						{
-							if($arrUpdatedAccountHistory['id'])
-							{
-								$isUpdatedAccountHistory = fnInsertContactHistory($arrAccountDetailSF['records'],$arrUpdatedAccountHistory['id']);
-								$arrUpdatedIds[] = $isUpdatedAccountHistory['id'];
-							}
-						}
-					}
-					else
-					{
-						//echo "No Account Present Other domain";
-						continue;
-					}
-				}
-				
-				//exit;
-			}
-			else
-			{
-				continue;
-			}
-		}
-		if(is_array($arrUpdatedIds) && (count($arrUpdatedIds)>0))
-		{
-			$boolUpdateAccount = fnUpdateAccountRecord($strARecId,$arrUpdatedIds);
 		}
 		else
 		{
-			$boolUpdateNoContact = fnUpdateNoContact($strARecId);
-		}
-		
-		//print("<pre>");
-		//print_r($arrEmails);
-		
-		//$strName = fnGetUserName($strEmail);
-		
-		
-		if($strName)
-		{
-			//echo "--".$boolNameUpdated = fnUpdateUserName($strName,$strARecId);
-		}
-		else
-		{
-			continue;
+			return false;
 		}
 	}
 }
+
+
+/*
+* Function to check fetched contact details from sf and existing contact detail in attendee history table
+* If detail dont match, means there is update in contact and we return true, so as to make a new entry record in attendee 
+* history table
+* Other wise we return the existing attendee history record id for mapping 
+*/
 
 function fnCheckIfContactHistoryToBeInserted($arrAccountHistory = array())
 {
@@ -336,6 +418,12 @@ function fnCheckIfContactHistoryToBeInserted($arrAccountHistory = array())
 	}
 }
 
+/*
+* Function to map flag attendee for meeting as no sfdc contact
+* If none of the attendee details are found than meeting record get flagged
+* This function accepts the meeting recordid which is to flagged
+*/
+
 function fnUpdateNoContact($strRecId)
 {
 	global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
@@ -390,6 +478,12 @@ function fnUpdateNoContact($strRecId)
 	}
 
 }
+
+/*
+* Function to map flag attendee details with meeting record
+* it takes attendee history record id as parameter and maps it with meeting history record id for lookup
+* it also flags the meeting record as mapped attendee- which represent completion of attendee mapping process
+*/
 
 function fnUpdateAccountRecord($strRecId,$strId)
 {
@@ -446,6 +540,11 @@ function fnUpdateAccountRecord($strRecId,$strId)
 	}
 
 }
+
+/*
+* Function to create a attendee record in airtable from the pulled contact information from sf.
+* It takes all the contact information along with account information and creates an entry into attendee table in airtable
+*/
 
 function fnInsertContact($arrAccountHistory = array(),$strId = "")
 {
@@ -517,6 +616,11 @@ function fnInsertContact($arrAccountHistory = array(),$strId = "")
 		return false;
 	}
 }
+
+/*
+* Function to create a attendee history record in airtable from the pulled contact information from sf.
+* It return an array of created record with its unique record it which can be used for mapping with meeting records
+*/
 
 function fnInsertContactHistory($arrAccountHistory = array(),$strRecId)
 {
@@ -598,6 +702,12 @@ function fnInsertContactHistory($arrAccountHistory = array(),$strRecId)
 	}
 }
 
+/*
+* Function to connect to sf and pull the contact detail from sf
+* It accepts email as parameter and queries the contact object in sf to pull details
+* It returns pulled contact detail from sf other wise false
+*/
+
 function fnGetContactDetailFromSf($instance_url, $access_token,$strEmail = "")
 {
 	if($strEmail)
@@ -634,6 +744,13 @@ function fnGetContactDetailFromSf($instance_url, $access_token,$strEmail = "")
 		return false;
 	}
 }
+
+/*
+* Function to check contact detail in attendee table of airtable
+* It is useful to avoid unnecessary calls to sf
+* It takes input as email and searches the attendee table for the email and return the complete record if found otherwise
+* returns false
+*/
 
 function fnGetContactDetail($strEmail = "")
 {
@@ -687,6 +804,12 @@ function fnGetContactDetail($strEmail = "")
 		return false;
 	}
 }
+
+/*
+* Function to check Account detail in account table of airtable
+* It takes input as account id as unique identfier form the contact detail
+* If found returns the complete record other wise returns false
+*/
 
 function fnGetAccountDetail($strAccId = "")
 {
