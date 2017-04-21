@@ -1,6 +1,0 @@
-Test file for a dummy commit on server!
-
-
-This is another change.
-
-Yet another one.
