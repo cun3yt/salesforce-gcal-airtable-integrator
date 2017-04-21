@@ -7,9 +7,9 @@
 */
 error_reporting(~E_WARNING && ~E_NOTICE);
 session_start();
-// we need to include config file so as to get set customer enviornment for processing attendees
+// we need to include config file so as to get set customer environment for processing attendees
 require_once('config.php');
-// we will inform script about the client domian, so that while processing system knows about the client domain and work accordingly.
+// we will inform script about the client domain, so that while processing system knows about the client domain and work accordingly.
 $strClientDomain = $strClientDomainName;
 
 // We declare some global salesforce access token variables that will be needed to fetching attendees contact data.
@@ -17,7 +17,7 @@ $access_token = "";
 $instance_url = "";
 $strRecordId = "";
 
-// Get the registerd salesforce oAuth access entry from customer's airtable base, as it will be needed for reference to fetch contact data.
+// Get the registered salesforce oAuth access entry from customer's airtable base, as it will be needed for reference to fetch contact data.
 $arrSalesUser = fnGetSalesUser();
 //print("<pre>");
 //print_r($arrSalesUser);exit;
@@ -30,9 +30,9 @@ if(is_array($arrSalesUser) && (count($arrSalesUser)>0))
 	if(is_array($arrSalesTokenDetail) && (count($arrSalesTokenDetail)>0))
 	{
 		$arrSDetail = json_decode($arrSalesTokenDetail['salesuseraccesstoken'],true);
-		$access_token = $arrSDetail['access_token']; // assiging access token to our global variable
-		$instance_url = $arrSDetail['instance_url']; // assiging access URL to our global variable
-		$strRecordId = $arrSalesUser[0]['id']; // airtable record id, pulled just incase if we are to update particular record
+		$access_token = $arrSDetail['access_token']; // assigning access token to our global variable
+		$instance_url = $arrSDetail['instance_url']; // assigning access URL to our global variable
+		$strRecordId = $arrSalesUser[0]['id']; // airtable record id, pulled just in case if we are to update particular record
 	}
 }
 //echo "--".$access_token;
@@ -292,7 +292,7 @@ function fnGetProcessAccounts()
 }
 
 /*
-Function to connect to airtable base and get customers salesforce OAuth acceess
+Function to connect to airtable base and get customers salesforce OAuth access
 */
 function fnGetSalesUser()
 {

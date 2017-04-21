@@ -10,13 +10,13 @@
 
 error_reporting(~E_NOTICE && ~E_DEPRECATED);
 session_start();
-// we need to include config file so as to get set customer enviornment for processing
+// we need to include config file so as to get set customer environment for processing
 require_once('config.php');
 
 /*
 *
 * Below 2 lines are important and we have used session to store current client details temporarily as a checkpoint.
-* System looks up the current checkpoint in its temporary storage and identifies the correct place or callback URL with this * informatiom for further processing,  .
+* System looks up the current checkpoint in its temporary storage and identifies the correct place or callback URL with this * information for further processing,  .
 * When system comes back with help of call back url through session variables, it process further and stores current clients * google access or salesforce access to their own airtable base.
 *
 */
@@ -39,7 +39,7 @@ $arrUData = $_SESSION['userdata'];
 
 /*
 *
-* Below you will see system will just will check temporary storage and iterate through it to updated customer's airtable base with access 
+* Below you will see system will just check temporary storage and iterate through it to updated customer's airtable base with access
 * details present in temporary storage
 *
 */
