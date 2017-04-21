@@ -1,10 +1,23 @@
 <?php
+//ini_set('display_errors', 1);
+//ini_set('display_startup_errors', 1);
+//error_reporting(E_ALL);
+/*
+*
+* This file is basically responsible for pulling the meetings from the customer google calendar account and putting it under
+* meeting history table in customer airtable.
+* This script runs on periodic basis to keep calendar meeting data upto date in airtable
+*/
 error_reporting(~E_NOTICE && ~E_DEPRECATED);
 session_start();
+// setting and loading the dependencies for google api to work
 require_once '/var/www/html/gcal/vendor/autoload.php';
+// we need to include config file so as to get set customer environment for refreshing customer google calendar account
 require_once 'config.php';
+// we will inform script about the client domain, so that while processing system knows about the client domain and work accordingly.
 $strClientDomain = $strClientDomainName;
 $strPersonalDomain = implode(",",$arrPersonalDoamin);
+
 $client = new Google_Client();
 $client->setAuthConfig('/var/www/html/gcal/15FiveCal.json');
 $client->addScope(array(Google_Service_Calendar::CALENDAR));
@@ -13,51 +26,23 @@ $client->setHttpClient($guzzleClient);
 $client->setAccessType("offline");
 //echo "hi";exit;
 
+// Get the registerd google calendar oAuth access entry from customer's airtable base
 $arrGcalUser = fnGetGcalUser();
 //print("<pre>");
 //print_r($arrGcalUser);
 
-function fnGetGcalUser()
-{
-	global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
-	$base = $strAirtableBase;
-	$table = 'gaccounts';
-	$strApiKey = $strAirtableApiKey;
-	$url = $strAirtableBaseEndpoint.$base.'/'.$table;
-	$authorization = "Authorization: Bearer ".$strApiKey;
-	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_HTTPGET, 1);
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-	curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-	curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
-	//set the url, number of POST vars, POST data
-	curl_setopt($ch,CURLOPT_URL, $url);
 
-	//execute post
-	$result = curl_exec($ch);
-	if(!$result)
-	{
-		echo 'error:' . curl_error($ch);
-		return false;
-	}
-	else
-	{
-		$arrResponse = json_decode($result,true);
-		if(isset($arrResponse['records']) && (count($arrResponse['records'])>0))
-		{
-			$arrSUser = $arrResponse['records'];
-			return $arrSUser;
-			
-		}
-		else
-		{
-			return false;
-		}
-	}
-}
+// system will get the access token from airtable
+// use it to connect to google calendar account
+// if system not able to connect to google calendar due to token expiry, system will send mail to customer for access revoke and mark the token as expired in airtable
+// pull the meeting and insert it into meeting history airtable
+// system will pull all the meetings for the current year starting from the first month of the current year till end of the ongoing month.
+// forevery event or meeting pulled from google calendar system will derive the meeting opportunity procesing time, which will meeting date + 3days and add this time in meeting history table
 
 if(is_array($arrGcalUser) && (count($arrGcalUser)>0))
 {
+	// going through through the pulled google OAuth access record
+	
 	//print("<pre>");
 	//print_r($arrGcalUser);
 	//exit;
@@ -72,7 +57,7 @@ if(is_array($arrGcalUser) && (count($arrGcalUser)>0))
 		$arrUserDet = $arrUser['fields'];
 		$strEmail = $arrUserDet['user_email'];
 		$strARecId = $arrUser['id'];
-		$arrTok = json_decode($arrUserDet['user_token'],true);
+		$arrTok = json_decode($arrUserDet['user_token'],true); // getting hold of access token from the pulled record
 		//print("<pre>");
 		//print_r($arrTok);
 		//exit;
@@ -80,13 +65,13 @@ if(is_array($arrGcalUser) && (count($arrGcalUser)>0))
 		if(is_array($arrTok) && (count($arrTok)>0))
 		{
 			$client->setAccessToken($arrTok);
-			$service = new Google_Service_Calendar($client);
+			$service = new Google_Service_Calendar($client); // initializing access token for connection
 			
 			//echo "hi";
 			//exit;
 			try 
 			{
-				$calendarList = $service->calendarList->listCalendarList();
+				$calendarList = $service->calendarList->listCalendarList(); // fetching calendar in current accessed account
 				//print("<pre>");
 				//print_r($calendarList);
 				//exit;
@@ -103,7 +88,7 @@ if(is_array($arrGcalUser) && (count($arrGcalUser)>0))
 						
 						if($calendar->id)
 						{
-							
+							// filter all other calendar other than client domain
 							if(strpos($calendar->id, $strClientDomain) !== false) 
 							{
 								$intCalNt++;
@@ -119,7 +104,7 @@ if(is_array($arrGcalUser) && (count($arrGcalUser)>0))
 								//echo "hi";
 								if($calendar->primary == "1")
 								{
-									$strUserId = $calendar->id;
+									$strUserId = $calendar->id; //  store the userid when primary flag is set
 									$arrUserData[json_encode($strTok)] = $calendar->id;
 								}
 								//if($calendar->id == "nazar@15five.com")
@@ -127,11 +112,16 @@ if(is_array($arrGcalUser) && (count($arrGcalUser)>0))
 									//echo "--".$calendar->timeZone;
 									date_default_timezone_set($calendar->timeZone);
 									//$strDate = date('Y-m-d',strtotime(' -58 day'));
+									
+									// set the lower limit for the meetings to be fetched
 									echo "---".$strDate = date('Y-m-d',strtotime(' -1 day'));
-									$strEndDate = date("Y-m-d",strtotime('first day of +1 month'));
+									
+									// set the upper limit for the meetings to be fetched
+									$strEndDate = date("Y-m-d",strtotime('first day of +1 month')); 
 									$strNeededStartDate = date("Y")."-"."01"."-"."01";
 									// get the latest present meeting date from airtable and fetch all meets from that date ahead 
 									
+									// for current calendar fetch the latest meet present in airtable so as to set the lower limit for further pulling calendar meets
 									$arrMeets = fnGetLatestMeetsForUser($calendar->id);
 									//print("<pre>");
 									//print_r($arrMeets);
@@ -150,18 +140,23 @@ if(is_array($arrGcalUser) && (count($arrGcalUser)>0))
 											}
 											else
 											{
+												
+												// if found set the lower limit to the latest meet date found
+												// so as to pull meets from that date and dates ahead from that found dates
 												$strDate = date('Y-m-d',$strMeetingFormattedDate);
 											}
 										}
 										else
 										{
 											
+											// if not found than set the lower limit to first month of current year
 											$strDate = date('Y-m-d',strtotime($strNeededStartDate));
 										}
 										
 									}
 									else
 									{
+										// if not found than set the lower limit to first month of current year
 										$strDate = date('Y-m-d',strtotime($strNeededStartDate));
 									}
 									
@@ -173,7 +168,7 @@ if(is_array($arrGcalUser) && (count($arrGcalUser)>0))
 
 									//echo "---".$strMinTime = date('c',strtotime($strDate));
 									
-									
+									// set params so as to pull calendar events like time upper and lower limits
 									$optParams = array(
 									  'timeMin' => date('c',strtotime($strDate)),
 									  'timeMax' => date('c',strtotime($strEndDate)),
@@ -183,6 +178,8 @@ if(is_array($arrGcalUser) && (count($arrGcalUser)>0))
 									//print("<pre>");
 									//print_r($optParams);
 									//continue;
+									
+									// get all the events as per filters
 									$results = $service->events->listEvents($calendarId, $optParams);
 									
 									
@@ -257,7 +254,8 @@ if(is_array($arrGcalUser) && (count($arrGcalUser)>0))
 												
 												$inDForm = date("Y-m-d",strtotime($strStardDate))." 00:00:00";
 												$strStartTime = strtotime($inDForm);
-												$strProcessTime = strtotime("+7 day", $strStartTime);
+												 // set +3day time for opprtunity processing
+												$strProcessTime = strtotime("+3 day", $strStartTime);
 												$arrResultData[$intFrCnt]['processtime'] = $strProcessTime;
 												
 												//echo "---".$strProcessTime;
@@ -345,6 +343,7 @@ if(is_array($arrGcalUser) && (count($arrGcalUser)>0))
 												
 												if(is_array($arrEventAttendees) && (count($arrEventAttendees)>0))
 												{
+													// using the event id check to see if meeting already exists
 													$isAttPresent = fnCheckMeetingAlreadyPresent($arrResultData[$intFrCnt]);
 											
 													//$fh = fopen("checkmeetinginserted.txt","a");
@@ -353,6 +352,7 @@ if(is_array($arrGcalUser) && (count($arrGcalUser)>0))
 																
 													if(!$isAttPresent)
 													{
+														// if not than we insert meeting into the meeting history table
 														//$arrAtt = (array) $arrAttend;
 														$isAttendeesSaved = fnSaveAirtableMeetings($arrResultData[$intFrCnt]);
 													}
@@ -384,6 +384,9 @@ if(is_array($arrGcalUser) && (count($arrGcalUser)>0))
 			}
 			catch(Exception $e) 
 			{
+				// if exception thrown during connection check to see if its for invalid credentials
+				// mark the access record in airtable base as expired and send a notification mail to customer
+				
 				print("<pre>");
 				echo $e->getMessage();
 				$arrMessageDetails = json_decode($e->getMessage(),true);
@@ -392,18 +395,66 @@ if(is_array($arrGcalUser) && (count($arrGcalUser)>0))
 					if($arrMessageDetails['error']['message'] == "Invalid Credentials")
 					{
 						
-						fnUpdatesGstatus($strEmail);
+						fnUpdatesGstatus($strEmail); // mark the access record as expired
 						
 						
 						//echo "Send email to ".$strEmail.", saying credentials not working";
 						//fnSendAccountExpirationMail($strEmail);
-						fnSendAccountExpirationMail($strEmail);
+						fnSendAccountExpirationMail($strEmail); // send notification email
 					}
 				}
 			}
 		}
 	}
 }
+
+
+/*
+Function to connect to airtable base and get customers gcals OAuth acceess
+*/
+function fnGetGcalUser()
+{
+	global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
+	$base = $strAirtableBase;
+	$table = 'gaccounts';
+	$strApiKey = $strAirtableApiKey;
+	$url = $strAirtableBaseEndpoint.$base.'/'.$table;
+	$authorization = "Authorization: Bearer ".$strApiKey;
+	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_HTTPGET, 1);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+	curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
+	//set the url, number of POST vars, POST data
+	curl_setopt($ch,CURLOPT_URL, $url);
+
+	//execute post
+	$result = curl_exec($ch);
+	if(!$result)
+	{
+		echo 'error:' . curl_error($ch);
+		return false;
+	}
+	else
+	{
+		$arrResponse = json_decode($result,true);
+		if(isset($arrResponse['records']) && (count($arrResponse['records'])>0))
+		{
+			$arrSUser = $arrResponse['records'];
+			return $arrSUser;
+			
+		}
+		else
+		{
+			return false;
+		}
+	}
+}
+
+/*
+Function to connect to airtable base latest record for the passed email address
+System uses the Meetingsreverse view of airtable for this processing
+*/
 
 function fnGetLatestMeetsForUser($strEmail)
 {
@@ -459,6 +510,10 @@ function fnGetLatestMeetsForUser($strEmail)
 		return false;
 	}
 }
+
+/*
+Function to send notification mail about access token expiry and how to revoke the access
+*/
 
 function fnSendAccountExpirationMail($strEmail = "")
 {
@@ -526,6 +581,10 @@ function fnSendAccountExpirationMail($strEmail = "")
 	}
 }
 
+
+/*
+Function to set access record as expire when access token gets expired
+*/
 function fnUpdatesGstatus($strEmail = "")
 {
 	global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
@@ -586,6 +645,9 @@ function fnUpdatesGstatus($strEmail = "")
 	}
 }
 
+/*
+Function to set access record as expire when access token gets expired
+*/
 function fnGetUsergAcc($strEmail = "")
 {
 	global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
@@ -636,6 +698,10 @@ function fnGetUsergAcc($strEmail = "")
 	}
 }
 
+/*
+*Function to save google meets into airtable meeting history table
+* It takes event record as input parameter and returns the created record as reposne or false otherwise 
+*/
 function fnSaveAirtableMeetings($arrRecord = array())
 {
 	global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
@@ -732,7 +798,11 @@ function fnSaveAirtableMeetings($arrRecord = array())
 	}
 }
 
-
+/*
+*Function to check if meet already present in airtable meeting history table
+* It takes gcal eventid as parameter to check
+* Returns true if found false otherwise
+*/
 function fnCheckMeetingAlreadyPresent($arrRecord = array())
 {
 	global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;

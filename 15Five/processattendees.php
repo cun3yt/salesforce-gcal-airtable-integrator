@@ -336,7 +336,7 @@ function fnGetSalesUser()
 
 
 /*
-* Function to check fetched contact details from sf and existing contact detail in attendee history table
+* Function to check fetched contact details from sf and existing contact detail in attendee history table are same or diff
 * If detail dont match, means there is update in contact and we return true, so as to make a new entry record in attendee 
 * history table
 * Other wise we return the existing attendee history record id for mapping 

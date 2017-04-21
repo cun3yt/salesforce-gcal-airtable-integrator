@@ -1,9 +1,30 @@
 <?php
+/*
+*
+* This file is basically responsible to run on periodic basis and referesh the customers access token so that there is 
+* uninterrupted connection to customer sf account.
+*
+*/
+
+// setting and loading the dependencies for google api to work
 require_once '../../resttest/config.php';
+// we need to include config file so as to get set customer environment for refreshing customer google calendar account
 require_once '../config.php';
+// Get the registerd salesforce oAuth access entry from customer's airtable base
 $arrSalesUser = fnGetSalesUser();
 //print("<pre>");
 //print_r($arrSalesUser);exit;
+
+// we connect to airtable and salesuser table
+// get the access detail
+// refersh the token, during the process if token is invalid we updates sales access record as expired
+// and send notification mail to sales user for revoking access
+
+
+
+
+
+// We declare some global salesforce access token variables that will be needed to fetching attendees contact data.
 $access_token = "";
 $instance_url = "";
 $strRecordId = "";
@@ -24,6 +45,33 @@ if(is_array($arrSalesUser) && (count($arrSalesUser)>0))
 		$strEm = $arrSalesTokenDetail['email'];
 	}
 }
+
+
+
+
+// check if access token is set
+if($access_token)
+{
+	
+	// initiate refresh token process
+	$strNewAccessToken = refreshtoken($instance_url, $access_token,$strEm);
+	
+	// check to see if we have new access token
+	if($strNewAccessToken)
+	{
+		//echo "--".$instance_url;
+		//echo "--".$access_token;
+		//echo "--".$strRecordId;exit;
+		
+		// update airtable base for new access token
+		fnUpdateAccessTokenSalesUser($instance_url,$strNewAccessToken,$strRecordId);
+		
+	}
+}
+
+/*
+Function to connect to airtable base and get customers salesforce OAuth acceess
+*/
 
 function fnGetSalesUser()
 {
@@ -65,25 +113,10 @@ function fnGetSalesUser()
 	}
 }
 
-
-
-if($access_token)
-{
-	
-	
-	$strNewAccessToken = refreshtoken($instance_url, $access_token,$strEm);
-	
-	
-	if($strNewAccessToken)
-	{
-		//echo "--".$instance_url;
-		//echo "--".$access_token;
-		//echo "--".$strRecordId;exit;
-		
-		fnUpdateAccessTokenSalesUser($instance_url,$strNewAccessToken,$strRecordId);
-		
-	}
-}
+/*
+*Function to connect to airtable base and update sales force access details with new token
+*It accepts new token as parameter and sales access record id where new token is to be updated
+*/
 
 function fnUpdateAccessTokenSalesUser($instance_url, $access_token,$strRecId)
 {
@@ -128,6 +161,11 @@ function fnUpdateAccessTokenSalesUser($instance_url, $access_token,$strRecId)
 	}
 
 }
+
+/*
+* Function to connect to salesforce and generate new access token
+* It takes current refresh token as parameter, work on it and on success return new access token on failure it returns false 
+*/
 
 function refreshtoken($instance_url, $access_token,$strEmail = "") {
     
@@ -191,6 +229,13 @@ function refreshtoken($instance_url, $access_token,$strEmail = "") {
 	}
 }
 
+
+/*
+* Function to connect to update customer salesforce access status
+* It takes parameter as email address of customer to update the record with status
+* On success it returns true other wise false
+*/
+
 function fnUpdatesSGstatus($strEmail = "")
 {
 	global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
@@ -251,6 +296,12 @@ function fnUpdatesSGstatus($strEmail = "")
 	}
 }
 
+
+/*
+* Function to connect airtabale and get access of customer's sales access record
+* It takes parameter as customer email address
+* On success it returns true other wise false
+*/
 function fnGetUsergAcc($strEmail = "")
 {
 	global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
@@ -299,6 +350,10 @@ function fnGetUsergAcc($strEmail = "")
 		}
 	}
 }
+
+/*
+Function to send notification mail about access token expiry and how to revoke the access
+*/
 
 function fnUpdateSalesAmidminForTokenExpiry($strEmail)
 {

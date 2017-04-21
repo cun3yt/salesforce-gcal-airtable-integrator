@@ -1,11 +1,81 @@
 <?php
-error_reporting(~E_NOTICE && ~E_DEPRECATED);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+/*
+*
+* This file is basically responsible to use calenderemail data from  the meeting record and change it into more meaning form * like Name for better understanding.
+* System does not update the calendaremail just used and gets the formatted information and puts it other column in meeting 
+* history airtable base.
+*
+*/
+//error_reporting(~E_NOTICE && ~E_DEPRECATED);
 session_start();
+// we need to include config file so as to get set customer environment for processing attendees
 require_once('config.php');
+// we will inform script about the client domain, so that while processing system knows about the client domain and work accordingly.
 $strClientDomain = $strClientDomainName;
+// we fetch meeting records from the meeting history table in airtable where calendar was not processed
+// so that we can iterate through them and proccess them for needed purpose.
 $arrGcalUser = fnGetProcessCalendar();
 //print("<pre>");
 //print_r($arrGcalUser);
+
+
+/*
+*
+* Now all the unprocessed calendar records, we have it in array
+* It will be iterated one by one, respective name will be looked up in People table of airtable
+* On match the name will be fetched from the people airtable base and than
+* Respective airtable record will be updated with name for the calendaremail
+*
+*/
+
+
+if(is_array($arrGcalUser) && (count($arrGcalUser)>0))
+{
+	// system only proceeds if there are more than one calendar not processed record present in array
+	
+	
+	//print("<pre>");
+	//print_r($arrGcalUser);
+	//exit;
+	$intFrCnt = 0;
+	foreach($arrGcalUser as $arrUser)
+	{
+		
+		
+		//print("<pre>");
+		//print_r($arrUser);
+		//continue;
+		
+		$intFrCnt++;
+		$strARecId = $arrUser['id'];
+		$strEmail = $arrUser['fields']['calendaremail'];
+		
+		// foreach calendaremail from a meeting, we get the username matching to the email from the people table in airtable 
+		$strName = fnGetUserName($strEmail);
+		
+		// on fetching the username we update the meeting record othwerise we dont update it
+		if($strName)
+		{
+			echo "--".$boolNameUpdated = fnUpdateUserName($strName,$strARecId);
+		}
+		else
+		{
+			
+			echo "--".$boolNameUpdated = fnUpdateUserName("",$strARecId);
+			//continue;
+		}
+	}
+}
+
+/*
+* Function to connect to airtable base and get calenderaemail information from calendar_not_processed view of airtable on 
+* meeting history table
+* System process such 50 records at one go
+* it return record list on mactch other wise return false
+*/
 
 function fnGetProcessCalendar()
 {
@@ -51,6 +121,12 @@ function fnGetProcessCalendar()
 		}
 	}
 }
+
+/*
+* Function to connect to airtable base and looks up for the calendraemail in people table
+* On match found it will return the macthed record and user name detail for that email address other wise return false
+* It takes calendaremail as parameter 
+*/
 
 function fnGetUserName($strEmail = "")
 {
@@ -114,36 +190,11 @@ function fnGetUserName($strEmail = "")
 	}
 }
 
-if(is_array($arrGcalUser) && (count($arrGcalUser)>0))
-{
-	//print("<pre>");
-	//print_r($arrGcalUser);
-	//exit;
-	$intFrCnt = 0;
-	foreach($arrGcalUser as $arrUser)
-	{
-		//print("<pre>");
-		//print_r($arrUser);
-		//continue;
-		
-		$intFrCnt++;
-		$strARecId = $arrUser['id'];
-		$strEmail = $arrUser['fields']['calendaremail'];
-		$strName = fnGetUserName($strEmail);
-		
-		
-		if($strName)
-		{
-			echo "--".$boolNameUpdated = fnUpdateUserName($strName,$strARecId);
-		}
-		else
-		{
-			
-			echo "--".$boolNameUpdated = fnUpdateUserName("",$strARecId);
-			//continue;
-		}
-	}
-}
+/*
+* Function to connect to airtable base and update meeting history table with name
+* It will take name which will be updated
+* It will take meeting history table record id as another table where it will be updated
+*/
 
 function fnUpdateUserName($strName,$strRecId)
 {

@@ -1,12 +1,32 @@
 <?php
+/*
+*
+* This file is basically responsible save token generated during the OAuth Process.
+* It access the system temporary storage and find the access details and saves into airtable base
+*/
 error_reporting(~E_WARNING && ~E_NOTICE);
 session_start();
+// we need to include config file so as to get set customer environment for refreshing customer google calendar account
 require_once '../config.php';
+// we will inform script about the currrent client domain, so that while processing system knows about the client and work accordingly.
 $strCurrentClient = $_SESSION['currentclient'];
 $strCurrentClientFolderName = $_SESSION['currentclientfoldername'];
+
+
+// system will access the temporary storage
+// get hold of the access tokens
+// using tokens system will connect to salesforce to fetch user details
+// system will than update airtable base with access token and user details
+
+
+
 //echo "HI";exit;
+
+// check to see if access token present in temporary storage
 if(is_array($_SESSION['arraccess']) && (count($_SESSION['arraccess'])>0))
 {
+	
+	
 	$arrTokendData = $_SESSION['arraccess'];
 	$access_token = $arrTokendData['access_token'];
 	$instance_url = $arrTokendData['instance_url'];
@@ -16,7 +36,7 @@ if(is_array($_SESSION['arraccess']) && (count($_SESSION['arraccess'])>0))
 	$arrSales['instanceurl'] = $arrTokendData['instance_url'];
 	$strUserUrl = $arrTokendData['id'];
 	$arrUserUrlDetail = explode("/",$strUserUrl);
-	$arrUDetail = fnGetUserDetailFromSF($strUserUrl,$arrSales['accesstoken']);
+	$arrUDetail = fnGetUserDetailFromSF($strUserUrl,$arrSales['accesstoken']); // connect to salesforce and get user details
 	//print("<pre>");
 	//print_r($arrUDetail);
 	//exit;
@@ -28,9 +48,11 @@ if(is_array($_SESSION['arraccess']) && (count($_SESSION['arraccess'])>0))
 	//$arrSales['userid'] = substr($arrUserUrlDetail[count($arrUserUrlDetail)-1],0,-3);
 	$arrSales['userid'] = $arrUserUrlDetail[count($arrUserUrlDetail)-1];
 	
+	// check to see if sales access token already present
 	$arrUserDetail = fnCheckAlreadySavedSalesUser($arrSales['email']);
 	if(is_array($arrUserDetail) && (count($arrUserDetail)>0))
 	{
+		// if present we update access token
 		$isUpdated = fnUpdateSalesUser($arrUserDetail[0]['id'],$arrSales);
 		if($isUpdated)
 		{
@@ -43,6 +65,7 @@ if(is_array($_SESSION['arraccess']) && (count($_SESSION['arraccess'])>0))
 	}
 	else
 	{
+		// if not we insert sales acess token
 		$IsSaved = fnSaveSalesUserToAT($arrSales);
 		if($IsSaved)
 		{
@@ -56,6 +79,12 @@ if(is_array($_SESSION['arraccess']) && (count($_SESSION['arraccess'])>0))
 	
 	
 }
+
+/*
+* Function to connect to airtable base and check sales access token already exists for user
+* It takes email as parameter to check if record exists
+* If present it returns true otherwise false
+*/
 
 function fnCheckAlreadySavedSalesUser($strEmail = "")
 {
@@ -110,6 +139,13 @@ function fnCheckAlreadySavedSalesUser($strEmail = "")
 	}
 }
 
+
+/*
+* Function to connect to salesforce and get further needed detail of current user from salesforce
+* It takes endpoint url as parameter to fetch details, present in the given access token
+* If foundt returns the user record, false otherwise
+*/
+
 function fnGetUserDetailFromSF($strUserUrl, $access_token)
 {
 	if($strUserUrl)
@@ -146,6 +182,12 @@ function fnGetUserDetailFromSF($strUserUrl, $access_token)
 		return false;
 	}
 }
+
+/*
+* Function to connect to airtable base and save sales user access details
+* It takes sales acess record as parameter and saves it
+* on success it return inserted record, false otherwise
+*/
 
 function fnSaveSalesUserToAT($arrRecord = array())
 {
@@ -206,6 +248,13 @@ function fnSaveSalesUserToAT($arrRecord = array())
 		return false;
 	}
 }
+
+/*
+* Function to connect to airtable base and update sales user access details
+* It takes sales access record id as parameter record to update record for
+* It takes sales access record as parameter and updates it on provided record it
+* on success it return updated record, false otherwise
+*/
 
 function fnUpdateSalesUser($strRecId,$arrRecord = array())
 {

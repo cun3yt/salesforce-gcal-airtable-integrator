@@ -455,6 +455,9 @@ Salesforce account.
 		<div class="heading"></div>
 		<div class="content">
 			<?php
+				// We check first if customers airtable base has OAuth access details
+				// If they are present we iterate through the airtable record and print on interface
+				// here we are iterating the array vraible which supposed to hold google and salesforce access data and we are iterating through them to print it.
 				if(is_array($arrGcalUser) && (count($arrGcalUser)>0))
 				{
 					//print("<pre>");
@@ -474,8 +477,13 @@ Salesforce account.
 									<div class="title"><img src="img/callendor.png" >Calendar</div>
 									<p><?php echo $arrUserDetail[0]; ?></p>
 									<?php
+										// for each access record we check the access status
+										// if the access record says as expired than we show the Activate button
+										// which will again do OAuth and setup the access again.
 										if($strStatus == "expired")
 										{
+											
+											
 											?>
 												<a href="http://ec2-34-210-36-40.us-west-2.compute.amazonaws.com/gcal/testcalnews.php"><button type="button" class="setting-btn">Activate</button></a>
 											<?php
@@ -488,13 +496,20 @@ Salesforce account.
 						<?php
 					}
 				}
-			?>		
+			?>
+			<!-- Incase above iteration does not result in listing account than you will see the following code snippet which will show the Add calendar button which initiate OAuth and setup the access to google calendar account of user.
+			This button will redirect to the specified from where OAuth is handeled.
+			-->
 			<div class="calendor-btn"><a href="http://ec2-34-210-36-40.us-west-2.compute.amazonaws.com/gcal/testcalnews.php"><button type="button" class="add-button">Add Calender</button></a></div>
 		</div>
 		
 		<div class="heading"></div>
 		<div class="content">
 			<?php
+			
+				// On the similar lines we check customers airtable base for access to salesforces account
+				// If found we pull it into array variable and than iterate through the array to print and show the user the stored access to salesforce account.
+				// System is built to connect to only 1 salesforce account for a given customer.
 				if(is_array($arrSalesUser) && (count($arrSalesUser)>0))
 				{
 					//print("<pre>");
@@ -502,6 +517,10 @@ Salesforce account.
 					$intFrCnt = 0;
 					foreach($arrSalesUser as $arrUser)
 					{
+						// here we are iterating through stored salesforce access and checking the status and printing it on interface accordingly.
+						
+						
+						
 						$strStatus = $arrUser['fields']['status'];
 						$intFrCnt++;
 						
@@ -511,8 +530,16 @@ Salesforce account.
 								<div class="box-content">
 									<div class="title">Salesforce</div>
 									<?php
+										// for each access record we check the access status
+										// if the access record says as expired than we show the Reconnect button
+										// which will again do OAuth and setup the access again.
+										// Otherwise it will just show as connected.
+										
+										
 										if($strStatus == "expired")
 										{
+											
+											
 											?>
 												<p>&nbsp;</p>
 												<a href="http://ec2-34-210-36-40.us-west-2.compute.amazonaws.com/resttest/oauth.php"><button type="button" class="setting-btn">Reconnect</button></a>
@@ -536,6 +563,9 @@ Salesforce account.
 				}
 				else
 				{
+					
+					// we show login with salesforce button only if there are no salesforce account connected
+					// This button redirects to third party file from where OAuth for salesforce is taken care of.
 					?>
 						<div class="calendor-btn"><a href="http://ec2-34-210-36-40.us-west-2.compute.amazonaws.com/resttest/oauth.php"><button type="button" class="add-button">Login with Salesforce </button></a></div>
 					<?php
