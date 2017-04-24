@@ -84,13 +84,19 @@ if(is_array($arrGcalUser) && (count($arrGcalUser)>0))
 					foreach($calendarList->getItems() as $calendar)
 					{
 						//echo "--".$calendar->id;
+						//echo "--".$strClientDomain;
 						//exit;
 						
 						if($calendar->id)
 						{
 							// filter all other calendar other than client domain
-							if(strpos($calendar->id, $strClientDomain) !== false) 
+							
+							//echo "----".stripos($calendar->id, $strClientDomain);
+							//exit;
+							if(stripos($calendar->id, $strClientDomain) !== false) 
 							{
+								
+								
 								$intCalNt++;
 								
 								//if($intCalNt == 2)
@@ -107,14 +113,14 @@ if(is_array($arrGcalUser) && (count($arrGcalUser)>0))
 									$strUserId = $calendar->id; //  store the userid when primary flag is set
 									$arrUserData[json_encode($strTok)] = $calendar->id;
 								}
-								//if($calendar->id == "nazar@15five.com")
+								//if($calendar->id == "carson@15five.com")
 								//{
 									//echo "--".$calendar->timeZone;
 									date_default_timezone_set($calendar->timeZone);
 									//$strDate = date('Y-m-d',strtotime(' -58 day'));
 									
 									// set the lower limit for the meetings to be fetched
-									echo "---".$strDate = date('Y-m-d',strtotime(' -1 day'));
+									echo "---".$strDate = date('Y-m-d',strtotime(' -24 day'));
 									
 									// set the upper limit for the meetings to be fetched
 									$strEndDate = date("Y-m-d",strtotime('first day of +1 month')); 
@@ -162,8 +168,8 @@ if(is_array($arrGcalUser) && (count($arrGcalUser)>0))
 									
 									$calendarId = $calendar->id;
 									
-									
-									
+									//echo "---".$strDate;
+									//continue;
 									
 
 									//echo "---".$strMinTime = date('c',strtotime($strDate));
