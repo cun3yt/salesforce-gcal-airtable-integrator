@@ -113,7 +113,7 @@ if(is_array($arrGcalUser) && (count($arrGcalUser)>0))
 									$strUserId = $calendar->id; //  store the userid when primary flag is set
 									$arrUserData[json_encode($strTok)] = $calendar->id;
 								}
-								//if($calendar->id == "carson@15five.com")
+								//if($calendar->id == "luke@15five.com")
 								//{
 									//echo "--".$calendar->timeZone;
 									date_default_timezone_set($calendar->timeZone);
