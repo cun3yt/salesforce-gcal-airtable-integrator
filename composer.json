@@ -1,0 +1,8 @@
+{
+    "name": "attent/integrator",
+    "description": "Attent.ai Integrator",
+    "type": "project",
+    "require": {
+        "propel/propel": "~2.0@dev"
+    }
+}
