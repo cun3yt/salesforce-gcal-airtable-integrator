@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<database name="default" defaultIdMethod="native" namespace="DataModels" defaultPhpNamingMethod="underscore">
+  <table name="account" idMethod="native" phpName="Account" namespace="DataModels">
+    <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="name" phpName="Name" type="VARCHAR" size="255"/>
+    <column name="email_domain" phpName="EmailDomain" type="VARCHAR" size="255"/>
+    <column name="website" phpName="Website" type="VARCHAR" size="255"/>
+    <column name="sfdc_account_id" phpName="SfdcAccountId" type="INTEGER"/>
+  </table>
+  <table name="account_has_contact" idMethod="native" phpName="AccountHasContact" namespace="DataModels">
+    <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="account_id" phpName="AccountId" type="INTEGER"/>
+    <column name="contact_id" phpName="ContactId" type="INTEGER"/>
+  </table>
+  <table name="account_history" idMethod="native" phpName="AccountHistory" namespace="DataModels">
+    <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="account_id" phpName="AccountId" type="INTEGER"/>
+    <column name="account_status_id" phpName="AccountStatusId" type="INTEGER"/>
+    <column name="billing_cycle_id" phpName="BillingCycleId" type="INTEGER"/>
+    <column name="billing_city" phpName="BillingCity" type="VARCHAR" size="255"/>
+    <column name="renewal_date" phpName="RenewalDate" type="DATE"/>
+    <column name="num_employees" phpName="NumEmployees" type="INTEGER"/>
+    <column name="ARR" phpName="Arr" type="VARCHAR"/>
+  </table>
+  <table name="account_status" idMethod="native" phpName="AccountStatus" namespace="DataModels">
+    <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="customer_id" phpName="CustomerId" type="INTEGER"/>
+    <column name="status" phpName="Status" type="VARCHAR" size="255"/>
+  </table>
+  <table name="billing_cycle" idMethod="native" phpName="BillingCycle" namespace="DataModels">
+    <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="customer_id" phpName="CustomerId" type="INTEGER"/>
+    <column name="type" phpName="Type" type="VARCHAR" size="255"/>
+  </table>
+  <table name="buyer_stage" idMethod="native" phpName="BuyerStage" namespace="DataModels">
+    <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="customer_id" phpName="CustomerId" type="INTEGER"/>
+    <column name="stage" phpName="Stage" type="VARCHAR" size="255"/>
+  </table>
+  <table name="contact" idMethod="native" phpName="Contact" namespace="DataModels">
+    <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="email" phpName="Email" type="VARCHAR" size="255"/>
+    <column name="full_name" phpName="FullName" type="VARCHAR" size="255"/>
+    <column name="account_id" phpName="AccountId" type="INTEGER"/>
+    <column name="sfdc_contact_id" phpName="SfdcContactId" type="INTEGER"/>
+    <column name="sfdc_contact_name" phpName="SfdcContactName" type="VARCHAR" size="255"/>
+  </table>
+  <table name="contact_history" idMethod="native" phpName="ContactHistory" namespace="DataModels">
+    <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="contact_id" phpName="ContactId" type="INTEGER"/>
+    <column name="account_id" phpName="AccountId" type="INTEGER"/>
+    <column name="sfdc_title" phpName="SfdcTitle" type="LONGVARCHAR"/>
+    <column name="sfdc_mailing_city" phpName="SfdcMailingCity" type="LONGVARCHAR"/>
+  </table>
+  <table name="customer" idMethod="native" phpName="Customer" namespace="DataModels">
+    <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="name" phpName="Name" type="VARCHAR" size="255" required="true"/>
+    <column name="website" phpName="Website" type="VARCHAR" size="255"/>
+    <column name="email_domain" phpName="EmailDomain" type="VARCHAR" size="255"/>
+  </table>
+  <table name="customer_contact" idMethod="native" phpName="CustomerContact" namespace="DataModels">
+    <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="name" phpName="Name" type="VARCHAR" size="255"/>
+    <column name="surname" phpName="Surname" type="VARCHAR" size="255"/>
+    <column name="title" phpName="Title" type="VARCHAR" size="127"/>
+    <column name="email" phpName="Email" type="VARCHAR" size="255"/>
+  </table>
+  <table name="customer_contact_integration" idMethod="native" phpName="CustomerContactIntegration" namespace="DataModels">
+    <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="customer_contact_id" phpName="CustomerContactId" type="INTEGER"/>
+    <column name="type" phpName="Type" type="VARCHAR" size="255"/>
+    <column name="status" phpName="Status" type="VARCHAR" size="255"/>
+    <column name="data" phpName="Data" type="VARCHAR"/>
+  </table>
+  <table name="meeting" idMethod="native" phpName="Meeting" namespace="DataModels">
+    <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="name" phpName="Name" type="VARCHAR" size="255"/>
+    <column name="event_datetime" phpName="EventDatetime" type="TIMESTAMP"/>
+    <column name="event_creator_id" phpName="EventCreatorId" type="INTEGER"/>
+    <column name="event_owner_id" phpName="EventOwnerId" type="INTEGER"/>
+    <column name="event_description" phpName="EventDescription" type="LONGVARCHAR"/>
+    <column name="account_id" phpName="AccountId" type="INTEGER"/>
+    <column name="additional_data" phpName="AdditionalData" type="VARCHAR"/>
+    <column name="created" phpName="Created" type="TIMESTAMP"/>
+    <column name="updated" phpName="Updated" type="TIMESTAMP"/>
+  </table>
+  <table name="meeting_attendee" idMethod="native" phpName="MeetingAttendee" namespace="DataModels">
+    <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="ref_type" phpName="RefType" type="VARCHAR" size="50" defaultValue="&quot;contact&quot;"/>
+    <column name="ref_id" phpName="RefId" type="INTEGER"/>
+  </table>
+  <table name="meeting_has_account_history" idMethod="native" phpName="MeetingHasAccountHistory" namespace="DataModels">
+    <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="meeting_id" phpName="MeetingId" type="INTEGER"/>
+    <column name="account_history_id" phpName="AccountHistoryId" type="INTEGER"/>
+  </table>
+  <table name="meeting_has_attendee" idMethod="native" phpName="MeetingHasAttendee" namespace="DataModels">
+    <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="meeting_id" phpName="MeetingId" type="INTEGER"/>
+    <column name="meeting_attendee_id" phpName="MeetingAttendeeId" type="INTEGER"/>
+  </table>
+  <table name="meeting_has_opportunity_history" idMethod="native" phpName="MeetingHasOpportunityHistory" namespace="DataModels">
+    <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="meeting_id" phpName="MeetingId" type="INTEGER"/>
+    <column name="opportunity_history_id" phpName="OpportunityHistoryId" type="INTEGER"/>
+  </table>
+  <table name="opportunity" idMethod="native" phpName="Opportunity" namespace="DataModels">
+    <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="account_id" phpName="AccountId" type="INTEGER"/>
+    <column name="stage_id" phpName="StageId" type="INTEGER"/>
+    <column name="name" phpName="Name" type="VARCHAR" size="255"/>
+    <column name="amount" phpName="Amount" type="VARCHAR"/>
+    <column name="close_date" phpName="CloseDate" type="TIMESTAMP"/>
+  </table>
+  <table name="opportunity_history" idMethod="native" phpName="OpportunityHistory" namespace="DataModels">
+    <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="opportunity_id" phpName="OpportunityId" type="INTEGER"/>
+    <column name="user_account_id" phpName="UserAccountId" type="INTEGER"/>
+    <column name="opportunity_stage_id" phpName="OpportunityStageId" type="INTEGER"/>
+    <column name="buyer_stage_id" phpName="BuyerStageId" type="INTEGER"/>
+    <column name="amount" phpName="Amount" type="VARCHAR"/>
+    <column name="close_date" phpName="CloseDate" type="DATE"/>
+  </table>
+  <table name="opportunity_stage" idMethod="native" phpName="OpportunityStage" namespace="DataModels">
+    <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="customer_id" phpName="CustomerId" type="LONGVARCHAR"/>
+    <column name="stage" phpName="Stage" type="VARCHAR" size="255"/>
+  </table>
+</database>

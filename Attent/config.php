@@ -1,5 +1,9 @@
 <?php
 error_reporting(~E_NOTICE && ~E_DEPRECATED);
+
+require_once '../vendor/autoload.php';
+require_once '../generated-conf/config.php';
+
 session_start();
 $strClient = "Attent";
 $strClientFolderName = 'Attent';
