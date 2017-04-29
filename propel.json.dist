@@ -1,7 +1,3 @@
-/* Copy & Paste this file as `propel.json` to define
- * your connection details
- * Don't forget to remove this comment section!
- */
 {
     "propel": {
         "database": {
