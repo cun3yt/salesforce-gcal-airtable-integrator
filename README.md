@@ -13,3 +13,4 @@ and present it in Airtable document.
 
 * Install Composer: Details are [here](https://getcomposer.org/download/)
 * Run Composer Install: `php composer.phar install`
+* Autoload Activation: `php composer.phar dump-autoload`

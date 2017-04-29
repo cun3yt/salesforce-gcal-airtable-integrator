@@ -1,0 +1,13 @@
+{
+    "propel": {
+        "database": {
+            "connections": {
+                "default": {
+                    "dsn": "__ connection details __",
+                    "user": "__ user __",
+                    "password": "__ pwd __"
+                }
+            }
+        }
+    }
+}
