@@ -14,3 +14,12 @@ and present it in Airtable document.
 * Install Composer: Details are [here](https://getcomposer.org/download/)
 * Run Composer Install: `php composer.phar install`
 * Autoload Activation: `php composer.phar dump-autoload`
+
+## Migrations
+
+### Database Change to Migration Generation
+* `vendor/propel/propel/bin/propel diff --schema-dir models`
+
+### Application of Migrations
+* `vendor/propel/propel/bin/propel migrate`
+* [More info on Migration](http://propelorm.org/documentation/09-migrations.html)
