@@ -4,13 +4,18 @@ namespace DataModels\DataModels\Base;
 
 use \Exception;
 use \PDO;
+use DataModels\DataModels\Customer as ChildCustomer;
+use DataModels\DataModels\CustomerContact as ChildCustomerContact;
+use DataModels\DataModels\CustomerContactQuery as ChildCustomerContactQuery;
 use DataModels\DataModels\CustomerQuery as ChildCustomerQuery;
+use DataModels\DataModels\Map\CustomerContactTableMap;
 use DataModels\DataModels\Map\CustomerTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
+use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\BadMethodCallException;
 use Propel\Runtime\Exception\LogicException;
@@ -88,12 +93,24 @@ abstract class Customer implements ActiveRecordInterface
     protected $email_domain;
 
     /**
+     * @var        ObjectCollection|ChildCustomerContact[] Collection to store aggregation of ChildCustomerContact objects.
+     */
+    protected $collCustomerContacts;
+    protected $collCustomerContactsPartial;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      *
      * @var boolean
      */
     protected $alreadyInSave = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildCustomerContact[]
+     */
+    protected $customerContactsScheduledForDeletion = null;
 
     /**
      * Initializes internal state of DataModels\DataModels\Base\Customer object.
@@ -556,6 +573,8 @@ abstract class Customer implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
+            $this->collCustomerContacts = null;
+
         } // if (deep)
     }
 
@@ -668,6 +687,24 @@ abstract class Customer implements ActiveRecordInterface
                     $affectedRows += $this->doUpdate($con);
                 }
                 $this->resetModified();
+            }
+
+            if ($this->customerContactsScheduledForDeletion !== null) {
+                if (!$this->customerContactsScheduledForDeletion->isEmpty()) {
+                    foreach ($this->customerContactsScheduledForDeletion as $customerContact) {
+                        // need to save related object because we set the relation to null
+                        $customerContact->save($con);
+                    }
+                    $this->customerContactsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collCustomerContacts !== null) {
+                foreach ($this->collCustomerContacts as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
             }
 
             $this->alreadyInSave = false;
@@ -824,10 +861,11 @@ abstract class Customer implements ActiveRecordInterface
      *                    Defaults to TableMap::TYPE_PHPNAME.
      * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
      * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
+     * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
      *
      * @return array an associative array containing the field names (as keys) and field values
      */
-    public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array())
+    public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
 
         if (isset($alreadyDumpedObjects['Customer'][$this->hashCode()])) {
@@ -846,6 +884,23 @@ abstract class Customer implements ActiveRecordInterface
             $result[$key] = $virtualColumn;
         }
 
+        if ($includeForeignObjects) {
+            if (null !== $this->collCustomerContacts) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'customerContacts';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'customer_contacts';
+                        break;
+                    default:
+                        $key = 'CustomerContacts';
+                }
+
+                $result[$key] = $this->collCustomerContacts->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+        }
 
         return $result;
     }
@@ -1071,6 +1126,20 @@ abstract class Customer implements ActiveRecordInterface
         $copyObj->setName($this->getName());
         $copyObj->setWebsite($this->getWebsite());
         $copyObj->setEmailDomain($this->getEmailDomain());
+
+        if ($deepCopy) {
+            // important: temporarily setNew(false) because this affects the behavior of
+            // the getter/setter methods for fkey referrer objects.
+            $copyObj->setNew(false);
+
+            foreach ($this->getCustomerContacts() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addCustomerContact($relObj->copy($deepCopy));
+                }
+            }
+
+        } // if ($deepCopy)
+
         if ($makeNew) {
             $copyObj->setNew(true);
             $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
@@ -1097,6 +1166,247 @@ abstract class Customer implements ActiveRecordInterface
         $this->copyInto($copyObj, $deepCopy);
 
         return $copyObj;
+    }
+
+
+    /**
+     * Initializes a collection based on the name of a relation.
+     * Avoids crafting an 'init[$relationName]s' method name
+     * that wouldn't work when StandardEnglishPluralizer is used.
+     *
+     * @param      string $relationName The name of the relation to initialize
+     * @return void
+     */
+    public function initRelation($relationName)
+    {
+        if ('CustomerContact' == $relationName) {
+            return $this->initCustomerContacts();
+        }
+    }
+
+    /**
+     * Clears out the collCustomerContacts collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addCustomerContacts()
+     */
+    public function clearCustomerContacts()
+    {
+        $this->collCustomerContacts = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collCustomerContacts collection loaded partially.
+     */
+    public function resetPartialCustomerContacts($v = true)
+    {
+        $this->collCustomerContactsPartial = $v;
+    }
+
+    /**
+     * Initializes the collCustomerContacts collection.
+     *
+     * By default this just sets the collCustomerContacts collection to an empty array (like clearcollCustomerContacts());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initCustomerContacts($overrideExisting = true)
+    {
+        if (null !== $this->collCustomerContacts && !$overrideExisting) {
+            return;
+        }
+
+        $collectionClassName = CustomerContactTableMap::getTableMap()->getCollectionClassName();
+
+        $this->collCustomerContacts = new $collectionClassName;
+        $this->collCustomerContacts->setModel('\DataModels\DataModels\CustomerContact');
+    }
+
+    /**
+     * Gets an array of ChildCustomerContact objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildCustomer is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildCustomerContact[] List of ChildCustomerContact objects
+     * @throws PropelException
+     */
+    public function getCustomerContacts(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collCustomerContactsPartial && !$this->isNew();
+        if (null === $this->collCustomerContacts || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collCustomerContacts) {
+                // return empty collection
+                $this->initCustomerContacts();
+            } else {
+                $collCustomerContacts = ChildCustomerContactQuery::create(null, $criteria)
+                    ->filterByCustomer($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collCustomerContactsPartial && count($collCustomerContacts)) {
+                        $this->initCustomerContacts(false);
+
+                        foreach ($collCustomerContacts as $obj) {
+                            if (false == $this->collCustomerContacts->contains($obj)) {
+                                $this->collCustomerContacts->append($obj);
+                            }
+                        }
+
+                        $this->collCustomerContactsPartial = true;
+                    }
+
+                    return $collCustomerContacts;
+                }
+
+                if ($partial && $this->collCustomerContacts) {
+                    foreach ($this->collCustomerContacts as $obj) {
+                        if ($obj->isNew()) {
+                            $collCustomerContacts[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collCustomerContacts = $collCustomerContacts;
+                $this->collCustomerContactsPartial = false;
+            }
+        }
+
+        return $this->collCustomerContacts;
+    }
+
+    /**
+     * Sets a collection of ChildCustomerContact objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $customerContacts A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return $this|ChildCustomer The current object (for fluent API support)
+     */
+    public function setCustomerContacts(Collection $customerContacts, ConnectionInterface $con = null)
+    {
+        /** @var ChildCustomerContact[] $customerContactsToDelete */
+        $customerContactsToDelete = $this->getCustomerContacts(new Criteria(), $con)->diff($customerContacts);
+
+
+        $this->customerContactsScheduledForDeletion = $customerContactsToDelete;
+
+        foreach ($customerContactsToDelete as $customerContactRemoved) {
+            $customerContactRemoved->setCustomer(null);
+        }
+
+        $this->collCustomerContacts = null;
+        foreach ($customerContacts as $customerContact) {
+            $this->addCustomerContact($customerContact);
+        }
+
+        $this->collCustomerContacts = $customerContacts;
+        $this->collCustomerContactsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related CustomerContact objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related CustomerContact objects.
+     * @throws PropelException
+     */
+    public function countCustomerContacts(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collCustomerContactsPartial && !$this->isNew();
+        if (null === $this->collCustomerContacts || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collCustomerContacts) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getCustomerContacts());
+            }
+
+            $query = ChildCustomerContactQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByCustomer($this)
+                ->count($con);
+        }
+
+        return count($this->collCustomerContacts);
+    }
+
+    /**
+     * Method called to associate a ChildCustomerContact object to this object
+     * through the ChildCustomerContact foreign key attribute.
+     *
+     * @param  ChildCustomerContact $l ChildCustomerContact
+     * @return $this|\DataModels\DataModels\Customer The current object (for fluent API support)
+     */
+    public function addCustomerContact(ChildCustomerContact $l)
+    {
+        if ($this->collCustomerContacts === null) {
+            $this->initCustomerContacts();
+            $this->collCustomerContactsPartial = true;
+        }
+
+        if (!$this->collCustomerContacts->contains($l)) {
+            $this->doAddCustomerContact($l);
+
+            if ($this->customerContactsScheduledForDeletion and $this->customerContactsScheduledForDeletion->contains($l)) {
+                $this->customerContactsScheduledForDeletion->remove($this->customerContactsScheduledForDeletion->search($l));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ChildCustomerContact $customerContact The ChildCustomerContact object to add.
+     */
+    protected function doAddCustomerContact(ChildCustomerContact $customerContact)
+    {
+        $this->collCustomerContacts[]= $customerContact;
+        $customerContact->setCustomer($this);
+    }
+
+    /**
+     * @param  ChildCustomerContact $customerContact The ChildCustomerContact object to remove.
+     * @return $this|ChildCustomer The current object (for fluent API support)
+     */
+    public function removeCustomerContact(ChildCustomerContact $customerContact)
+    {
+        if ($this->getCustomerContacts()->contains($customerContact)) {
+            $pos = $this->collCustomerContacts->search($customerContact);
+            $this->collCustomerContacts->remove($pos);
+            if (null === $this->customerContactsScheduledForDeletion) {
+                $this->customerContactsScheduledForDeletion = clone $this->collCustomerContacts;
+                $this->customerContactsScheduledForDeletion->clear();
+            }
+            $this->customerContactsScheduledForDeletion[]= $customerContact;
+            $customerContact->setCustomer(null);
+        }
+
+        return $this;
     }
 
     /**
@@ -1128,8 +1438,14 @@ abstract class Customer implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collCustomerContacts) {
+                foreach ($this->collCustomerContacts as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
+        $this->collCustomerContacts = null;
     }
 
     /**

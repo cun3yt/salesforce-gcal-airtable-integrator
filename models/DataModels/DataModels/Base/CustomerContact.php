@@ -4,7 +4,9 @@ namespace DataModels\DataModels\Base;
 
 use \Exception;
 use \PDO;
+use DataModels\DataModels\Customer as ChildCustomer;
 use DataModels\DataModels\CustomerContactQuery as ChildCustomerContactQuery;
+use DataModels\DataModels\CustomerQuery as ChildCustomerQuery;
 use DataModels\DataModels\Map\CustomerContactTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -67,6 +69,13 @@ abstract class CustomerContact implements ActiveRecordInterface
     protected $id;
 
     /**
+     * The value for the customer_id field.
+     *
+     * @var        int
+     */
+    protected $customer_id;
+
+    /**
      * The value for the name field.
      *
      * @var        string
@@ -93,6 +102,11 @@ abstract class CustomerContact implements ActiveRecordInterface
      * @var        string
      */
     protected $email;
+
+    /**
+     * @var        ChildCustomer
+     */
+    protected $aCustomer;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -338,6 +352,16 @@ abstract class CustomerContact implements ActiveRecordInterface
     }
 
     /**
+     * Get the [customer_id] column value.
+     *
+     * @return int
+     */
+    public function getCustomerId()
+    {
+        return $this->customer_id;
+    }
+
+    /**
      * Get the [name] column value.
      *
      * @return string
@@ -396,6 +420,30 @@ abstract class CustomerContact implements ActiveRecordInterface
 
         return $this;
     } // setId()
+
+    /**
+     * Set the value of [customer_id] column.
+     *
+     * @param int $v new value
+     * @return $this|\DataModels\DataModels\CustomerContact The current object (for fluent API support)
+     */
+    public function setCustomerId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->customer_id !== $v) {
+            $this->customer_id = $v;
+            $this->modifiedColumns[CustomerContactTableMap::COL_CUSTOMER_ID] = true;
+        }
+
+        if ($this->aCustomer !== null && $this->aCustomer->getId() !== $v) {
+            $this->aCustomer = null;
+        }
+
+        return $this;
+    } // setCustomerId()
 
     /**
      * Set the value of [name] column.
@@ -516,16 +564,19 @@ abstract class CustomerContact implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : CustomerContactTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : CustomerContactTableMap::translateFieldName('Name', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : CustomerContactTableMap::translateFieldName('CustomerId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->customer_id = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : CustomerContactTableMap::translateFieldName('Name', TableMap::TYPE_PHPNAME, $indexType)];
             $this->name = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : CustomerContactTableMap::translateFieldName('Surname', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : CustomerContactTableMap::translateFieldName('Surname', TableMap::TYPE_PHPNAME, $indexType)];
             $this->surname = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : CustomerContactTableMap::translateFieldName('Title', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : CustomerContactTableMap::translateFieldName('Title', TableMap::TYPE_PHPNAME, $indexType)];
             $this->title = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : CustomerContactTableMap::translateFieldName('Email', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : CustomerContactTableMap::translateFieldName('Email', TableMap::TYPE_PHPNAME, $indexType)];
             $this->email = (null !== $col) ? (string) $col : null;
             $this->resetModified();
 
@@ -535,7 +586,7 @@ abstract class CustomerContact implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 5; // 5 = CustomerContactTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 6; // 6 = CustomerContactTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\DataModels\\DataModels\\CustomerContact'), 0, $e);
@@ -557,6 +608,9 @@ abstract class CustomerContact implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
+        if ($this->aCustomer !== null && $this->customer_id !== $this->aCustomer->getId()) {
+            $this->aCustomer = null;
+        }
     } // ensureConsistency
 
     /**
@@ -596,6 +650,7 @@ abstract class CustomerContact implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
+            $this->aCustomer = null;
         } // if (deep)
     }
 
@@ -699,6 +754,18 @@ abstract class CustomerContact implements ActiveRecordInterface
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their corresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aCustomer !== null) {
+                if ($this->aCustomer->isModified() || $this->aCustomer->isNew()) {
+                    $affectedRows += $this->aCustomer->save($con);
+                }
+                $this->setCustomer($this->aCustomer);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -748,6 +815,9 @@ abstract class CustomerContact implements ActiveRecordInterface
         if ($this->isColumnModified(CustomerContactTableMap::COL_ID)) {
             $modifiedColumns[':p' . $index++]  = 'id';
         }
+        if ($this->isColumnModified(CustomerContactTableMap::COL_CUSTOMER_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'customer_id';
+        }
         if ($this->isColumnModified(CustomerContactTableMap::COL_NAME)) {
             $modifiedColumns[':p' . $index++]  = 'name';
         }
@@ -773,6 +843,9 @@ abstract class CustomerContact implements ActiveRecordInterface
                 switch ($columnName) {
                     case 'id':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
+                        break;
+                    case 'customer_id':
+                        $stmt->bindValue($identifier, $this->customer_id, PDO::PARAM_INT);
                         break;
                     case 'name':
                         $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
@@ -845,15 +918,18 @@ abstract class CustomerContact implements ActiveRecordInterface
                 return $this->getId();
                 break;
             case 1:
-                return $this->getName();
+                return $this->getCustomerId();
                 break;
             case 2:
-                return $this->getSurname();
+                return $this->getName();
                 break;
             case 3:
-                return $this->getTitle();
+                return $this->getSurname();
                 break;
             case 4:
+                return $this->getTitle();
+                break;
+            case 5:
                 return $this->getEmail();
                 break;
             default:
@@ -873,10 +949,11 @@ abstract class CustomerContact implements ActiveRecordInterface
      *                    Defaults to TableMap::TYPE_PHPNAME.
      * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
      * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
+     * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
      *
      * @return array an associative array containing the field names (as keys) and field values
      */
-    public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array())
+    public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
 
         if (isset($alreadyDumpedObjects['CustomerContact'][$this->hashCode()])) {
@@ -886,16 +963,34 @@ abstract class CustomerContact implements ActiveRecordInterface
         $keys = CustomerContactTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getName(),
-            $keys[2] => $this->getSurname(),
-            $keys[3] => $this->getTitle(),
-            $keys[4] => $this->getEmail(),
+            $keys[1] => $this->getCustomerId(),
+            $keys[2] => $this->getName(),
+            $keys[3] => $this->getSurname(),
+            $keys[4] => $this->getTitle(),
+            $keys[5] => $this->getEmail(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
             $result[$key] = $virtualColumn;
         }
 
+        if ($includeForeignObjects) {
+            if (null !== $this->aCustomer) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'customer';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'customer';
+                        break;
+                    default:
+                        $key = 'Customer';
+                }
+
+                $result[$key] = $this->aCustomer->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+        }
 
         return $result;
     }
@@ -933,15 +1028,18 @@ abstract class CustomerContact implements ActiveRecordInterface
                 $this->setId($value);
                 break;
             case 1:
-                $this->setName($value);
+                $this->setCustomerId($value);
                 break;
             case 2:
-                $this->setSurname($value);
+                $this->setName($value);
                 break;
             case 3:
-                $this->setTitle($value);
+                $this->setSurname($value);
                 break;
             case 4:
+                $this->setTitle($value);
+                break;
+            case 5:
                 $this->setEmail($value);
                 break;
         } // switch()
@@ -974,16 +1072,19 @@ abstract class CustomerContact implements ActiveRecordInterface
             $this->setId($arr[$keys[0]]);
         }
         if (array_key_exists($keys[1], $arr)) {
-            $this->setName($arr[$keys[1]]);
+            $this->setCustomerId($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
-            $this->setSurname($arr[$keys[2]]);
+            $this->setName($arr[$keys[2]]);
         }
         if (array_key_exists($keys[3], $arr)) {
-            $this->setTitle($arr[$keys[3]]);
+            $this->setSurname($arr[$keys[3]]);
         }
         if (array_key_exists($keys[4], $arr)) {
-            $this->setEmail($arr[$keys[4]]);
+            $this->setTitle($arr[$keys[4]]);
+        }
+        if (array_key_exists($keys[5], $arr)) {
+            $this->setEmail($arr[$keys[5]]);
         }
     }
 
@@ -1028,6 +1129,9 @@ abstract class CustomerContact implements ActiveRecordInterface
 
         if ($this->isColumnModified(CustomerContactTableMap::COL_ID)) {
             $criteria->add(CustomerContactTableMap::COL_ID, $this->id);
+        }
+        if ($this->isColumnModified(CustomerContactTableMap::COL_CUSTOMER_ID)) {
+            $criteria->add(CustomerContactTableMap::COL_CUSTOMER_ID, $this->customer_id);
         }
         if ($this->isColumnModified(CustomerContactTableMap::COL_NAME)) {
             $criteria->add(CustomerContactTableMap::COL_NAME, $this->name);
@@ -1127,6 +1231,7 @@ abstract class CustomerContact implements ActiveRecordInterface
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
+        $copyObj->setCustomerId($this->getCustomerId());
         $copyObj->setName($this->getName());
         $copyObj->setSurname($this->getSurname());
         $copyObj->setTitle($this->getTitle());
@@ -1160,13 +1265,68 @@ abstract class CustomerContact implements ActiveRecordInterface
     }
 
     /**
+     * Declares an association between this object and a ChildCustomer object.
+     *
+     * @param  ChildCustomer $v
+     * @return $this|\DataModels\DataModels\CustomerContact The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setCustomer(ChildCustomer $v = null)
+    {
+        if ($v === null) {
+            $this->setCustomerId(NULL);
+        } else {
+            $this->setCustomerId($v->getId());
+        }
+
+        $this->aCustomer = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildCustomer object, it will not be re-added.
+        if ($v !== null) {
+            $v->addCustomerContact($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildCustomer object
+     *
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildCustomer The associated ChildCustomer object.
+     * @throws PropelException
+     */
+    public function getCustomer(ConnectionInterface $con = null)
+    {
+        if ($this->aCustomer === null && ($this->customer_id !== null)) {
+            $this->aCustomer = ChildCustomerQuery::create()->findPk($this->customer_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aCustomer->addCustomerContacts($this);
+             */
+        }
+
+        return $this->aCustomer;
+    }
+
+    /**
      * Clears the current object, sets all attributes to their default values and removes
      * outgoing references as well as back-references (from other objects to this one. Results probably in a database
      * change of those foreign objects when you call `save` there).
      */
     public function clear()
     {
+        if (null !== $this->aCustomer) {
+            $this->aCustomer->removeCustomerContact($this);
+        }
         $this->id = null;
+        $this->customer_id = null;
         $this->name = null;
         $this->surname = null;
         $this->title = null;
@@ -1191,6 +1351,7 @@ abstract class CustomerContact implements ActiveRecordInterface
         if ($deep) {
         } // if ($deep)
 
+        $this->aCustomer = null;
     }
 
     /**

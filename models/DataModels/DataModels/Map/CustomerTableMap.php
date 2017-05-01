@@ -153,6 +153,13 @@ class CustomerTableMap extends TableMap
      */
     public function buildRelations()
     {
+        $this->addRelation('CustomerContact', '\\DataModels\\DataModels\\CustomerContact', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':customer_id',
+    1 => ':id',
+  ),
+), null, null, 'CustomerContacts', false);
     } // buildRelations()
 
     /**

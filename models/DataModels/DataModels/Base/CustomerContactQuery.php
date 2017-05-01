@@ -10,6 +10,7 @@ use DataModels\DataModels\Map\CustomerContactTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Propel\Runtime\ActiveQuery\ModelJoin;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
@@ -20,12 +21,14 @@ use Propel\Runtime\Exception\PropelException;
  *
  *
  * @method     ChildCustomerContactQuery orderById($order = Criteria::ASC) Order by the id column
+ * @method     ChildCustomerContactQuery orderByCustomerId($order = Criteria::ASC) Order by the customer_id column
  * @method     ChildCustomerContactQuery orderByName($order = Criteria::ASC) Order by the name column
  * @method     ChildCustomerContactQuery orderBySurname($order = Criteria::ASC) Order by the surname column
  * @method     ChildCustomerContactQuery orderByTitle($order = Criteria::ASC) Order by the title column
  * @method     ChildCustomerContactQuery orderByEmail($order = Criteria::ASC) Order by the email column
  *
  * @method     ChildCustomerContactQuery groupById() Group by the id column
+ * @method     ChildCustomerContactQuery groupByCustomerId() Group by the customer_id column
  * @method     ChildCustomerContactQuery groupByName() Group by the name column
  * @method     ChildCustomerContactQuery groupBySurname() Group by the surname column
  * @method     ChildCustomerContactQuery groupByTitle() Group by the title column
@@ -39,10 +42,23 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildCustomerContactQuery rightJoinWith($relation) Adds a RIGHT JOIN clause and with to the query
  * @method     ChildCustomerContactQuery innerJoinWith($relation) Adds a INNER JOIN clause and with to the query
  *
+ * @method     ChildCustomerContactQuery leftJoinCustomer($relationAlias = null) Adds a LEFT JOIN clause to the query using the Customer relation
+ * @method     ChildCustomerContactQuery rightJoinCustomer($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Customer relation
+ * @method     ChildCustomerContactQuery innerJoinCustomer($relationAlias = null) Adds a INNER JOIN clause to the query using the Customer relation
+ *
+ * @method     ChildCustomerContactQuery joinWithCustomer($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the Customer relation
+ *
+ * @method     ChildCustomerContactQuery leftJoinWithCustomer() Adds a LEFT JOIN clause and with to the query using the Customer relation
+ * @method     ChildCustomerContactQuery rightJoinWithCustomer() Adds a RIGHT JOIN clause and with to the query using the Customer relation
+ * @method     ChildCustomerContactQuery innerJoinWithCustomer() Adds a INNER JOIN clause and with to the query using the Customer relation
+ *
+ * @method     \DataModels\DataModels\CustomerQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ *
  * @method     ChildCustomerContact findOne(ConnectionInterface $con = null) Return the first ChildCustomerContact matching the query
  * @method     ChildCustomerContact findOneOrCreate(ConnectionInterface $con = null) Return the first ChildCustomerContact matching the query, or a new ChildCustomerContact object populated from the query conditions when no match is found
  *
  * @method     ChildCustomerContact findOneById(int $id) Return the first ChildCustomerContact filtered by the id column
+ * @method     ChildCustomerContact findOneByCustomerId(int $customer_id) Return the first ChildCustomerContact filtered by the customer_id column
  * @method     ChildCustomerContact findOneByName(string $name) Return the first ChildCustomerContact filtered by the name column
  * @method     ChildCustomerContact findOneBySurname(string $surname) Return the first ChildCustomerContact filtered by the surname column
  * @method     ChildCustomerContact findOneByTitle(string $title) Return the first ChildCustomerContact filtered by the title column
@@ -52,6 +68,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildCustomerContact requireOne(ConnectionInterface $con = null) Return the first ChildCustomerContact matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildCustomerContact requireOneById(int $id) Return the first ChildCustomerContact filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildCustomerContact requireOneByCustomerId(int $customer_id) Return the first ChildCustomerContact filtered by the customer_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildCustomerContact requireOneByName(string $name) Return the first ChildCustomerContact filtered by the name column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildCustomerContact requireOneBySurname(string $surname) Return the first ChildCustomerContact filtered by the surname column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildCustomerContact requireOneByTitle(string $title) Return the first ChildCustomerContact filtered by the title column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -59,6 +76,7 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildCustomerContact[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildCustomerContact objects based on current ModelCriteria
  * @method     ChildCustomerContact[]|ObjectCollection findById(int $id) Return ChildCustomerContact objects filtered by the id column
+ * @method     ChildCustomerContact[]|ObjectCollection findByCustomerId(int $customer_id) Return ChildCustomerContact objects filtered by the customer_id column
  * @method     ChildCustomerContact[]|ObjectCollection findByName(string $name) Return ChildCustomerContact objects filtered by the name column
  * @method     ChildCustomerContact[]|ObjectCollection findBySurname(string $surname) Return ChildCustomerContact objects filtered by the surname column
  * @method     ChildCustomerContact[]|ObjectCollection findByTitle(string $title) Return ChildCustomerContact objects filtered by the title column
@@ -161,7 +179,7 @@ abstract class CustomerContactQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, name, surname, title, email FROM customer_contact WHERE id = :p0';
+        $sql = 'SELECT id, customer_id, name, surname, title, email FROM customer_contact WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -293,6 +311,49 @@ abstract class CustomerContactQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the customer_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByCustomerId(1234); // WHERE customer_id = 1234
+     * $query->filterByCustomerId(array(12, 34)); // WHERE customer_id IN (12, 34)
+     * $query->filterByCustomerId(array('min' => 12)); // WHERE customer_id > 12
+     * </code>
+     *
+     * @see       filterByCustomer()
+     *
+     * @param     mixed $customerId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildCustomerContactQuery The current query, for fluid interface
+     */
+    public function filterByCustomerId($customerId = null, $comparison = null)
+    {
+        if (is_array($customerId)) {
+            $useMinMax = false;
+            if (isset($customerId['min'])) {
+                $this->addUsingAlias(CustomerContactTableMap::COL_CUSTOMER_ID, $customerId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($customerId['max'])) {
+                $this->addUsingAlias(CustomerContactTableMap::COL_CUSTOMER_ID, $customerId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(CustomerContactTableMap::COL_CUSTOMER_ID, $customerId, $comparison);
+    }
+
+    /**
      * Filter the query on the name column
      *
      * Example usage:
@@ -390,6 +451,83 @@ abstract class CustomerContactQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CustomerContactTableMap::COL_EMAIL, $email, $comparison);
+    }
+
+    /**
+     * Filter the query by a related \DataModels\DataModels\Customer object
+     *
+     * @param \DataModels\DataModels\Customer|ObjectCollection $customer The related object(s) to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return ChildCustomerContactQuery The current query, for fluid interface
+     */
+    public function filterByCustomer($customer, $comparison = null)
+    {
+        if ($customer instanceof \DataModels\DataModels\Customer) {
+            return $this
+                ->addUsingAlias(CustomerContactTableMap::COL_CUSTOMER_ID, $customer->getId(), $comparison);
+        } elseif ($customer instanceof ObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(CustomerContactTableMap::COL_CUSTOMER_ID, $customer->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByCustomer() only accepts arguments of type \DataModels\DataModels\Customer or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Customer relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildCustomerContactQuery The current query, for fluid interface
+     */
+    public function joinCustomer($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Customer');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Customer');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Customer relation Customer object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \DataModels\DataModels\CustomerQuery A secondary query class using the current class as primary query
+     */
+    public function useCustomerQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinCustomer($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Customer', '\DataModels\DataModels\CustomerQuery');
     }
 
     /**

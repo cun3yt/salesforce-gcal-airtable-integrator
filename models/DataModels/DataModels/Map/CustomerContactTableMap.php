@@ -59,7 +59,7 @@ class CustomerContactTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 5;
+    const NUM_COLUMNS = 6;
 
     /**
      * The number of lazy-loaded columns
@@ -69,12 +69,17 @@ class CustomerContactTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 5;
+    const NUM_HYDRATE_COLUMNS = 6;
 
     /**
      * the column name for the id field
      */
     const COL_ID = 'customer_contact.id';
+
+    /**
+     * the column name for the customer_id field
+     */
+    const COL_CUSTOMER_ID = 'customer_contact.customer_id';
 
     /**
      * the column name for the name field
@@ -108,11 +113,11 @@ class CustomerContactTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Name', 'Surname', 'Title', 'Email', ),
-        self::TYPE_CAMELNAME     => array('id', 'name', 'surname', 'title', 'email', ),
-        self::TYPE_COLNAME       => array(CustomerContactTableMap::COL_ID, CustomerContactTableMap::COL_NAME, CustomerContactTableMap::COL_SURNAME, CustomerContactTableMap::COL_TITLE, CustomerContactTableMap::COL_EMAIL, ),
-        self::TYPE_FIELDNAME     => array('id', 'name', 'surname', 'title', 'email', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
+        self::TYPE_PHPNAME       => array('Id', 'CustomerId', 'Name', 'Surname', 'Title', 'Email', ),
+        self::TYPE_CAMELNAME     => array('id', 'customerId', 'name', 'surname', 'title', 'email', ),
+        self::TYPE_COLNAME       => array(CustomerContactTableMap::COL_ID, CustomerContactTableMap::COL_CUSTOMER_ID, CustomerContactTableMap::COL_NAME, CustomerContactTableMap::COL_SURNAME, CustomerContactTableMap::COL_TITLE, CustomerContactTableMap::COL_EMAIL, ),
+        self::TYPE_FIELDNAME     => array('id', 'customer_id', 'name', 'surname', 'title', 'email', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -122,11 +127,11 @@ class CustomerContactTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Name' => 1, 'Surname' => 2, 'Title' => 3, 'Email' => 4, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'name' => 1, 'surname' => 2, 'title' => 3, 'email' => 4, ),
-        self::TYPE_COLNAME       => array(CustomerContactTableMap::COL_ID => 0, CustomerContactTableMap::COL_NAME => 1, CustomerContactTableMap::COL_SURNAME => 2, CustomerContactTableMap::COL_TITLE => 3, CustomerContactTableMap::COL_EMAIL => 4, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'name' => 1, 'surname' => 2, 'title' => 3, 'email' => 4, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'CustomerId' => 1, 'Name' => 2, 'Surname' => 3, 'Title' => 4, 'Email' => 5, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'customerId' => 1, 'name' => 2, 'surname' => 3, 'title' => 4, 'email' => 5, ),
+        self::TYPE_COLNAME       => array(CustomerContactTableMap::COL_ID => 0, CustomerContactTableMap::COL_CUSTOMER_ID => 1, CustomerContactTableMap::COL_NAME => 2, CustomerContactTableMap::COL_SURNAME => 3, CustomerContactTableMap::COL_TITLE => 4, CustomerContactTableMap::COL_EMAIL => 5, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'customer_id' => 1, 'name' => 2, 'surname' => 3, 'title' => 4, 'email' => 5, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -148,6 +153,7 @@ class CustomerContactTableMap extends TableMap
         $this->setPrimaryKeyMethodInfo('customer_contact_id_seq');
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
+        $this->addForeignKey('customer_id', 'CustomerId', 'INTEGER', 'customer', 'id', false, null, null);
         $this->addColumn('name', 'Name', 'VARCHAR', false, 255, null);
         $this->addColumn('surname', 'Surname', 'VARCHAR', false, 255, null);
         $this->addColumn('title', 'Title', 'VARCHAR', false, 127, null);
@@ -159,6 +165,13 @@ class CustomerContactTableMap extends TableMap
      */
     public function buildRelations()
     {
+        $this->addRelation('Customer', '\\DataModels\\DataModels\\Customer', RelationMap::MANY_TO_ONE, array (
+  0 =>
+  array (
+    0 => ':customer_id',
+    1 => ':id',
+  ),
+), null, null, null, false);
     } // buildRelations()
 
     /**
@@ -303,12 +316,14 @@ class CustomerContactTableMap extends TableMap
     {
         if (null === $alias) {
             $criteria->addSelectColumn(CustomerContactTableMap::COL_ID);
+            $criteria->addSelectColumn(CustomerContactTableMap::COL_CUSTOMER_ID);
             $criteria->addSelectColumn(CustomerContactTableMap::COL_NAME);
             $criteria->addSelectColumn(CustomerContactTableMap::COL_SURNAME);
             $criteria->addSelectColumn(CustomerContactTableMap::COL_TITLE);
             $criteria->addSelectColumn(CustomerContactTableMap::COL_EMAIL);
         } else {
             $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.customer_id');
             $criteria->addSelectColumn($alias . '.name');
             $criteria->addSelectColumn($alias . '.surname');
             $criteria->addSelectColumn($alias . '.title');
