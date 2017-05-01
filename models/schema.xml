@@ -61,7 +61,7 @@
   <table name="customer_contact" idMethod="native" phpName="CustomerContact" namespace="DataModels">
     <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
 
-    <column name="customer_id" phpName="Customer" type="INTEGER"/>
+    <column name="customer_id" phpName="CustomerId" type="INTEGER"/>
 
     <column name="name" phpName="Name" type="VARCHAR" size="255"/>
     <column name="surname" phpName="Surname" type="VARCHAR" size="255"/>

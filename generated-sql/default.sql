@@ -149,6 +149,7 @@ DROP TABLE IF EXISTS "customer_contact" CASCADE;
 CREATE TABLE "customer_contact"
 (
     "id" serial NOT NULL,
+    "customer_id" INTEGER,
     "name" VARCHAR(255),
     "surname" VARCHAR(255),
     "title" VARCHAR(127),
@@ -297,5 +298,9 @@ CREATE TABLE "opportunity_stage"
     "stage" VARCHAR(255),
     PRIMARY KEY ("id")
 );
+
+ALTER TABLE "customer_contact" ADD CONSTRAINT "customer_contact_fk_7e8f3e"
+    FOREIGN KEY ("customer_id")
+    REFERENCES "customer" ("id");
 
 COMMIT;
