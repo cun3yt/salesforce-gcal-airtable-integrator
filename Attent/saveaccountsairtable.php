@@ -1,4 +1,4 @@
-<?php
+<?
 error_reporting(~E_WARNING && ~E_NOTICE);
 session_start();
 require_once 'config.php';
@@ -49,9 +49,7 @@ function fnGetSalesUser() {
 
 $strClientDomain = $strClientDomainName;
 $arrGcalUser = fnGetProcessAccounts();
-//print("<pre>");
-//print_r($arrGcalUser);
-//exit;
+
 function fnGetProcessAccounts() {
     global $strAirtableBase, $strAirtableApiKey, $strAirtableBaseEndpoint;
     echo "--" . $strDate = strtotime(date("Y-m-d"));
@@ -69,32 +67,25 @@ function fnGetProcessAccounts() {
     curl_setopt($ch, CURLOPT_URL, $url);
     //execute post
     $result = curl_exec($ch);//exit;
+
     if (!$result) {
         echo 'error:' . curl_error($ch);
         return false;
-    } else {
-        $arrResponse = json_decode($result, true);
-        //print("<pre>");
-        //print_r($arrResponse);
-        //exit;
-        if (isset($arrResponse['records']) && (count($arrResponse['records']) > 0)) {
-            $arrSUser = $arrResponse['records'];
-            return $arrSUser;
-        } else {
-            return false;
-        }
     }
+
+    $arrResponse = json_decode($result, true);
+
+    if(isset($arrResponse['records']) && (count($arrResponse['records']) > 0)) {
+        $arrSUser = $arrResponse['records'];
+        return $arrSUser;
+    }
+
+    return false;
 }
 
 if (is_array($arrGcalUser) && (count($arrGcalUser) > 0)) {
-    //print("<pre>");
-    //print_r($arrGcalUser);
-    //exit;
     $intFrCnt = 0;
     foreach ($arrGcalUser as $arrUser) {
-        //print("<pre>");
-        //print_r($arrUser);
-        //continue;
         $arrUpdatedIds = array();
         $arrAccDomains = array();
         $arrProcessIds = array();
@@ -241,6 +232,7 @@ if (is_array($arrGcalUser) && (count($arrGcalUser) > 0)) {
 }
 function fnCheckIfAccountHistoryToBeInserted($arrAccountHistory = array()) {
     global $strAirtableBase, $strAirtableApiKey, $strAirtableBaseEndpoint;
+
     if (is_array($arrAccountHistory) && (count($arrAccountHistory) > 0)) {
         $base = $strAirtableBase;
         $table = 'Account%20History';
@@ -271,156 +263,164 @@ function fnCheckIfAccountHistoryToBeInserted($arrAccountHistory = array()) {
             $strBcity = $arrSUser[0]['fields']['Billing City'];
             if ($strEmployees != $arrAccountHistory[0]['NumberOfEmployees']) {
                 return "1";
+            } else if ($strBcity != $arrAccountHistory[0]['BillingCity']) {
+                return "1";
             } else {
-                if ($strBcity != $arrAccountHistory[0]['BillingCity']) {
-                    return "1";
-                } else {
-                    return $arrSUser[0]['id'];
-                }
+                return $arrSUser[0]['id'];
             }
-        } else {
-            return "1";
         }
-    } else {
-        return "1";
     }
+
+    return "1";
 }
 
 function fnUpdateAccountProcessedRecord($strRecId) {
     global $strAirtableBase, $strAirtableApiKey, $strAirtableBaseEndpoint;
-    if ($strRecId) {
-        $api_key = 'keyOhmYh5N0z83L5F';
-        $base = $strAirtableBase;
-        $table = 'Meeting%20History';
-        $strApiKey = $strAirtableApiKey;
-        $airtable_url = 'https://api.airtable.com/v0/' . $base . '/' . $table;
-        $url = $strAirtableBaseEndpoint . $base . '/' . $table . '/' . $strRecId;
-        $authorization = "Authorization: Bearer " . $strApiKey;
-        $arrFields['fields']['account_processed'] = "processed";
-        if (is_array($strAId) && (count($strAId) > 0)) {
-            $arrFields['fields']['accountno'] = implode(",", $strAId);
-        }
-        $srtF = json_encode($arrFields);
-        $curl = curl_init($url);
-        // Accept any server (peer) certificate on dev envs
-        curl_setopt($curl, CURLOPT_HEADER, false);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PATCH');
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $srtF);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-type: application/json", $authorization));
-        $info = curl_getinfo($curl);
-        $response = curl_exec($curl);
-        if (!$response) {
-            echo curl_error($curl);
-        }
-        curl_close($curl);
-        $jsonResponse = json_decode($response, true);
-        if (is_array($jsonResponse) && (count($jsonResponse) > 0)) {
-            return true;
-        } else {
-            return false;
-        }
-    } else {
+
+    if (!$strRecId) {
         return false;
     }
+
+    $api_key = 'keyOhmYh5N0z83L5F';
+    $base = $strAirtableBase;
+    $table = 'Meeting%20History';
+    $strApiKey = $strAirtableApiKey;
+    $airtable_url = 'https://api.airtable.com/v0/' . $base . '/' . $table;
+    $url = $strAirtableBaseEndpoint . $base . '/' . $table . '/' . $strRecId;
+    $authorization = "Authorization: Bearer " . $strApiKey;
+    $arrFields['fields']['account_processed'] = "processed";
+    if (is_array($strAId) && (count($strAId) > 0)) {
+        $arrFields['fields']['accountno'] = implode(",", $strAId);
+    }
+    $srtF = json_encode($arrFields);
+    $curl = curl_init($url);
+    // Accept any server (peer) certificate on dev envs
+    curl_setopt($curl, CURLOPT_HEADER, false);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PATCH');
+    curl_setopt($curl, CURLOPT_POSTFIELDS, $srtF);
+    curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-type: application/json", $authorization));
+    $info = curl_getinfo($curl);
+    $response = curl_exec($curl);
+
+    if (!$response) {
+        echo curl_error($curl);
+    }
+
+    curl_close($curl);
+    $jsonResponse = json_decode($response, true);
+
+    if (is_array($jsonResponse) && (count($jsonResponse) > 0)) {
+        return true;
+    }
+
+    return false;
 }
 
 function fnUpdateAccountRecord($strRecId, $strId, $strAId) {
     global $strAirtableBase, $strAirtableApiKey, $strAirtableBaseEndpoint;
-    if ($strRecId) {
-        $base = $strAirtableBase;
-        $table = 'Meeting%20History';
-        $strApiKey = $strAirtableApiKey;
-        $url = $strAirtableBaseEndpoint . $base . '/' . $table . '/' . $strRecId;
-        $authorization = "Authorization: Bearer " . $strApiKey;
-        $arrFields['fields']['Account'] = $strId;
-        $arrFields['fields']['account_processed'] = "mapped";
-        if (is_array($strAId) && (count($strAId) > 0)) {
-            $arrFields['fields']['accountno'] = implode(",", $strAId);
-        }
-        $srtF = json_encode($arrFields);
-        $curl = curl_init($url);
-        // Accept any server (peer) certificate on dev envs
-        curl_setopt($curl, CURLOPT_HEADER, false);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PATCH');
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $srtF);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-type: application/json", $authorization));
-        $info = curl_getinfo($curl);
-        $response = curl_exec($curl);
-        if (!$response) {
-            echo curl_error($curl);
-        }
-        curl_close($curl);
-        $jsonResponse = json_decode($response, true);
-        if (is_array($jsonResponse) && (count($jsonResponse) > 0)) {
-            return true;
-        } else {
-            return false;
-        }
-    } else {
+
+    if(!$strRecId) {
         return false;
     }
+
+    $base = $strAirtableBase;
+    $table = 'Meeting%20History';
+    $strApiKey = $strAirtableApiKey;
+    $url = $strAirtableBaseEndpoint . $base . '/' . $table . '/' . $strRecId;
+    $authorization = "Authorization: Bearer " . $strApiKey;
+    $arrFields['fields']['Account'] = $strId;
+    $arrFields['fields']['account_processed'] = "mapped";
+
+    if(is_array($strAId) && (count($strAId) > 0)) {
+        $arrFields['fields']['accountno'] = implode(",", $strAId);
+    }
+
+    $srtF = json_encode($arrFields);
+    $curl = curl_init($url);
+    // Accept any server (peer) certificate on dev envs
+    curl_setopt($curl, CURLOPT_HEADER, false);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PATCH');
+    curl_setopt($curl, CURLOPT_POSTFIELDS, $srtF);
+    curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-type: application/json", $authorization));
+    $info = curl_getinfo($curl);
+    $response = curl_exec($curl);
+
+    if(!$response) {
+        echo curl_error($curl);
+    }
+
+    curl_close($curl);
+    $jsonResponse = json_decode($response, true);
+
+    if(is_array($jsonResponse) && (count($jsonResponse) > 0)) {
+        return true;
+    }
+
+    return false;
 }
 
 function fnGetContactDetailFromSf($instance_url, $access_token, $strEmail = "") {
-    if ($strEmail) {
-        $query = "SELECT Name, Id, Email, Title, AccountId from Contact WHERE Email = '" . $strEmail . "' LIMIT 1";
-        $url = "$instance_url/services/data/v20.0/query?q=" . urlencode($query);
-        $curl = curl_init($url);
-        curl_setopt($curl, CURLOPT_HEADER, false);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array("Authorization: OAuth $access_token"));
-        $json_response = curl_exec($curl);
-        if (!$json_response) {
-            echo "--error---" . curl_error($curl);
-        }
-        curl_close($curl);
-        $response = json_decode($json_response, true);
-        return $response;
-    } else {
+    if(!$strEmail) {
         return false;
     }
+
+    $query = "SELECT Name, Id, Email, Title, AccountId from Contact WHERE Email = '" . $strEmail . "' LIMIT 1";
+    $url = "$instance_url/services/data/v20.0/query?q=" . urlencode($query);
+    $curl = curl_init($url);
+    curl_setopt($curl, CURLOPT_HEADER, false);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl, CURLOPT_HTTPHEADER, array("Authorization: OAuth $access_token"));
+    $json_response = curl_exec($curl);
+    if (!$json_response) {
+        echo "--error---" . curl_error($curl);
+    }
+    curl_close($curl);
+    $response = json_decode($json_response, true);
+    return $response;
 }
 
 function fnGetContactDetail($strEmail = "") {
     global $strAirtableBase, $strAirtableApiKey, $strAirtableBaseEndpoint;
-    if ($strEmail) {
-        $base = $strAirtableBase;
-        $table = 'Attendees%20in%20SFDC';
-        $strApiKey = $strAirtableApiKey;
-        $url = $strAirtableBaseEndpoint . $base . '/' . $table;
-        $url .= '?filterByFormula=(' . rawurlencode("{Email}='" . $strEmail . "'") . ')';
-        echo "--" . $url;
-        $authorization = "Authorization: Bearer " . $strApiKey;
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_HTTPGET, 1);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', $authorization));
-        //set the url, number of POST vars, POST data
-        curl_setopt($ch, CURLOPT_URL, $url);
-        //execute post
-        $result = curl_exec($ch);
-        if (!$result) {
-            echo 'error:' . curl_error($ch);
-            return false;
-        } else {
-            $arrResponse = json_decode($result, true);
-            if (isset($arrResponse['records']) && (count($arrResponse['records']) > 0)) {
-                $arrSUser = $arrResponse['records'];
-                return $arrSUser;
-            } else {
-                return false;
-            }
-        }
-    } else {
+
+    if(!$strEmail) {
         return false;
     }
+
+    $base = $strAirtableBase;
+    $table = 'Attendees%20in%20SFDC';
+    $strApiKey = $strAirtableApiKey;
+    $url = $strAirtableBaseEndpoint . $base . '/' . $table;
+    $url .= '?filterByFormula=(' . rawurlencode("{Email}='" . $strEmail . "'") . ')';
+    echo "--" . $url;
+    $authorization = "Authorization: Bearer " . $strApiKey;
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_HTTPGET, 1);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', $authorization));
+    //set the url, number of POST vars, POST data
+    curl_setopt($ch, CURLOPT_URL, $url);
+    //execute post
+    $result = curl_exec($ch);
+
+    if(!$result) {
+        echo 'error:' . curl_error($ch);
+        return false;
+    }
+
+    $arrResponse = json_decode($result, true);
+    if(isset($arrResponse['records']) && (count($arrResponse['records']) > 0)) {
+        $arrSUser = $arrResponse['records'];
+        return $arrSUser;
+    }
+    return false;
 }
 
 function fnInsertAccount($arrAccountHistory = array(), $strDomain = "") {
     global $strAirtableBase, $strAirtableApiKey, $strAirtableBaseEndpoint;
+
     if (is_array($arrAccountHistory) && (count($arrAccountHistory) > 0)) {
         $base = $strAirtableBase;
         $table = 'Accounts';
@@ -448,59 +448,37 @@ function fnInsertAccount($arrAccountHistory = array(), $strDomain = "") {
         $response = curl_exec($curl);
         curl_close($curl);
         $jsonResponse = json_decode($response, true);
+
         if (is_array($jsonResponse) && (count($jsonResponse) > 0)) {
             return $jsonResponse;
-        } else {
-            return false;
         }
-    } else {
         return false;
     }
+
+    return false;
 }
 
 function fnInsertAccountHistory($arrAccountHistory = array(), $strRecId) {
     global $strAirtableBase, $strAirtableApiKey, $strAirtableBaseEndpoint;
-    if (is_array($arrAccountHistory) && (count($arrAccountHistory) > 0)) {
+    if(is_array($arrAccountHistory) && (count($arrAccountHistory) > 0)) {
         $base = $strAirtableBase;
         $table = 'Account%20History';
         $strApiKey = $strAirtableApiKey;
         $url = $strAirtableBaseEndpoint . $base . '/' . $table;
         $authorization = "Authorization: Bearer " . $strApiKey;
-        if ($strRecId) {
+        if($strRecId) {
             $arrFields['fields']['Account ID'] = array($strRecId);
         }
-        if ($arrAccountHistory[0]['Name']) {
+        if($arrAccountHistory[0]['Name']) {
             $arrFields['fields']['Account Name'] = $arrAccountHistory[0]['Name'];
         }
-        if ($arrAccountHistory[0]['NumberOfEmployees']) {
+        if($arrAccountHistory[0]['NumberOfEmployees']) {
             $arrFields['fields']['# Employees'] = $arrAccountHistory[0]['NumberOfEmployees'];
         }
-        if ($arrAccountHistory[0]['BillingCity']) {
+        if($arrAccountHistory[0]['BillingCity']) {
             $arrFields['fields']['Billing City'] = $arrAccountHistory[0]['BillingCity'];
         }
-        //		if($arrAccountHistory[0]['ARR__c'])
-        //		{
-        //			$arrFields['fields']['ARR'] = $arrAccountHistory[0]['ARR__c'];
-        //		}
-        //
-        //		if($arrAccountHistory[0]['Billing_Cycle__c'])
-        //		{
-        //			$arrFields['fields']['Billing Cycle'] = $arrAccountHistory[0]['Billing_Cycle__c'];
-        //		}
-        //
-        //		if($arrAccountHistory[0]['Account_Status__c'])
-        //		{
-        //			$arrFields['fields']['Account Status'] = $arrAccountHistory[0]['Account_Status__c'];
-        //		}
-        //
-        //		if($arrAccountHistory[0]['Subscription_End_Date__c'])
-        //		{
-        //			$arrFields['fields']['Renewal Date'] = date("m/d/Y",strtotime($arrAccountHistory[0]['Subscription_End_Date__c']));
-        //		}
-        //print("<pre>");
-        //print_r($arrFields);
         $srtF = json_encode($arrFields);
-        //exit;
         $curl = curl_init($url);
         // Accept any server (peer) certificate on dev envs
         curl_setopt($curl, CURLOPT_HEADER, false);
@@ -510,131 +488,132 @@ function fnInsertAccountHistory($arrAccountHistory = array(), $strRecId) {
         curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-type: application/json", $authorization));
         $info = curl_getinfo($curl);
         echo "---" . $response = curl_exec($curl);
-        if (!$response) {
+
+        if(!$response) {
             echo curl_error($curl);
             return false;
-        } else {
-            curl_close($curl);
-            $jsonResponse = json_decode($response, true);
-            if (is_array($jsonResponse) && (count($jsonResponse) > 0)) {
-                return $jsonResponse;
-            } else {
-                return false;
-            }
         }
-    } else {
+
+        curl_close($curl);
+        $jsonResponse = json_decode($response, true);
+        if(is_array($jsonResponse) && (count($jsonResponse) > 0)) {
+            return $jsonResponse;
+        }
         return false;
     }
+    return false;
 }
 
 function fnGetAccountDetailFromSf($instance_url, $access_token, $strAccDomain = "") {
-    if ($strAccDomain) {
-        $query = "SELECT Name, Id, NumberOfEmployees, BillingCity from Account WHERE Website LIKE '%" . $strAccDomain . "%' ORDER BY lastmodifieddate DESC LIMIT 1";
-        $url = "$instance_url/services/data/v20.0/query?q=" . urlencode($query);
-        $curl = curl_init($url);
-        curl_setopt($curl, CURLOPT_HEADER, false);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array("Authorization: OAuth $access_token"));
-        $json_response = curl_exec($curl);
-        if (!$json_response) {
-            echo "--error---" . curl_error($curl);
-        }
-        curl_close($curl);
-        $response = json_decode($json_response, true);
-        return $response;
-    } else {
+    if(!$strAccDomain) {
         return false;
     }
+
+    $query = "SELECT Name, Id, NumberOfEmployees, BillingCity from Account WHERE Website LIKE '%" . $strAccDomain . "%' ORDER BY lastmodifieddate DESC LIMIT 1";
+    $url = "$instance_url/services/data/v20.0/query?q=" . urlencode($query);
+    $curl = curl_init($url);
+    curl_setopt($curl, CURLOPT_HEADER, false);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl, CURLOPT_HTTPHEADER, array("Authorization: OAuth $access_token"));
+    $json_response = curl_exec($curl);
+    if (!$json_response) {
+        echo "--error---" . curl_error($curl);
+    }
+    curl_close($curl);
+    $response = json_decode($json_response, true);
+    return $response;
 }
 
 function fnGetAccountDetailFromSfId($instance_url, $access_token, $strId = "") {
-    if ($strId) {
-        $query = "SELECT Name, Id, NumberOfEmployees, BillingCity, AnnualRevenue from Account WHERE Id = '" . $strId . "' LIMIT 1";
-        $url = "$instance_url/services/data/v20.0/query?q=" . urlencode($query);
-        $curl = curl_init($url);
-        curl_setopt($curl, CURLOPT_HEADER, false);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array("Authorization: OAuth $access_token"));
-        $json_response = curl_exec($curl);
-        if (!$json_response) {
-            echo "--error---" . curl_error($curl);
-        }
-        curl_close($curl);
-        $response = json_decode($json_response, true);
-        return $response;
-    } else {
+    if(!$strId) {
         return false;
     }
+
+    $query = "SELECT Name, Id, NumberOfEmployees, BillingCity, AnnualRevenue from Account WHERE Id = '" . $strId . "' LIMIT 1";
+    $url = "$instance_url/services/data/v20.0/query?q=" . urlencode($query);
+    $curl = curl_init($url);
+    curl_setopt($curl, CURLOPT_HEADER, false);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl, CURLOPT_HTTPHEADER, array("Authorization: OAuth $access_token"));
+    $json_response = curl_exec($curl);
+    if (!$json_response) {
+        echo "--error---" . curl_error($curl);
+    }
+    curl_close($curl);
+    $response = json_decode($json_response, true);
+    return $response;
 }
 
 function fnGetAccountDetailByName($strAccName = "") {
     global $strAirtableBase, $strAirtableApiKey, $strAirtableBaseEndpoint;
-    if ($strAccName) {
-        $base = $strAirtableBase;
-        $table = 'Accounts';
-        $strApiKey = $strAirtableApiKey;
-        $url = $strAirtableBaseEndpoint . $base . '/' . $table;
-        $url .= '?filterByFormula=(' . rawurlencode("{Account}='" . $strAccName . "'") . ')';
-        $authorization = "Authorization: Bearer " . $strApiKey;
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_HTTPGET, 1);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', $authorization));
-        //set the url, number of POST vars, POST data
-        curl_setopt($ch, CURLOPT_URL, $url);
-        //execute post
-        $result = curl_exec($ch);
-        if (!$result) {
-            echo 'error:' . curl_error($ch);
-            return false;
-        } else {
-            $arrResponse = json_decode($result, true);
-            if (isset($arrResponse['records']) && (count($arrResponse['records']) > 0)) {
-                $arrSUser = $arrResponse['records'];
-                return $arrSUser;
-            } else {
-                return false;
-            }
-        }
-    } else {
+
+    if(!$strAccName) {
         return false;
     }
+
+    $base = $strAirtableBase;
+    $table = 'Accounts';
+    $strApiKey = $strAirtableApiKey;
+    $url = $strAirtableBaseEndpoint . $base . '/' . $table;
+    $url .= '?filterByFormula=(' . rawurlencode("{Account}='" . $strAccName . "'") . ')';
+    $authorization = "Authorization: Bearer " . $strApiKey;
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_HTTPGET, 1);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', $authorization));
+    //set the url, number of POST vars, POST data
+    curl_setopt($ch, CURLOPT_URL, $url);
+    //execute post
+    $result = curl_exec($ch);
+
+    if(!$result) {
+        echo 'error:' . curl_error($ch);
+        return false;
+    }
+
+    $arrResponse = json_decode($result, true);
+
+    if (isset($arrResponse['records']) && (count($arrResponse['records']) > 0)) {
+        $arrSUser = $arrResponse['records'];
+        return $arrSUser;
+    }
+
+    return false;
 }
 
 function fnGetAccountDetail($strAccDomain = "") {
     global $strAirtableBase, $strAirtableApiKey, $strAirtableBaseEndpoint;
-    if ($strAccDomain) {
-        $base = $strAirtableBase;
-        $table = 'Accounts';
-        $strApiKey = $strAirtableApiKey;
-        $url = $strAirtableBaseEndpoint . $base . '/' . $table;
-        $url .= '?filterByFormula=(' . rawurlencode("{Account Domain}='" . $strAccDomain . "'") . ')';
-        $authorization = "Authorization: Bearer " . $strApiKey;
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_HTTPGET, 1);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', $authorization));
-        //set the url, number of POST vars, POST data
-        curl_setopt($ch, CURLOPT_URL, $url);
-        //execute post
-        $result = curl_exec($ch);
-        if (!$result) {
-            echo 'error:' . curl_error($ch);
-            return false;
-        } else {
-            $arrResponse = json_decode($result, true);
-            if (isset($arrResponse['records']) && (count($arrResponse['records']) > 0)) {
-                $arrSUser = $arrResponse['records'];
-                return $arrSUser;
-            } else {
-                return false;
-            }
-        }
-    } else {
+
+    if(!$strAccDomain) {
         return false;
     }
-}
 
-?>
+    $base = $strAirtableBase;
+    $table = 'Accounts';
+    $strApiKey = $strAirtableApiKey;
+    $url = $strAirtableBaseEndpoint . $base . '/' . $table;
+    $url .= '?filterByFormula=(' . rawurlencode("{Account Domain}='" . $strAccDomain . "'") . ')';
+    $authorization = "Authorization: Bearer " . $strApiKey;
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_HTTPGET, 1);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', $authorization));
+    curl_setopt($ch, CURLOPT_URL, $url);
+
+    $result = curl_exec($ch);
+
+    if (!$result) {
+        echo 'error:' . curl_error($ch);
+        return false;
+    }
+
+    $arrResponse = json_decode($result, true);
+    if (isset($arrResponse['records']) && (count($arrResponse['records']) > 0)) {
+        $arrSUser = $arrResponse['records'];
+        return $arrSUser;
+    }
+
+    return false;
+}

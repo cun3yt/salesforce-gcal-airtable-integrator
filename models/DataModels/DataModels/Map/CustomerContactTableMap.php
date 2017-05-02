@@ -172,6 +172,13 @@ class CustomerContactTableMap extends TableMap
     1 => ':id',
   ),
 ), null, null, null, false);
+        $this->addRelation('CustomerContactIntegration', '\\DataModels\\DataModels\\CustomerContactIntegration', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':customer_contact_id',
+    1 => ':id',
+  ),
+), null, null, 'CustomerContactIntegrations', false);
     } // buildRelations()
 
     /**

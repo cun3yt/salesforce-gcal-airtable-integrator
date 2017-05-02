@@ -78,6 +78,10 @@
     <column name="type" phpName="Type" type="VARCHAR" size="255"/>
     <column name="status" phpName="Status" type="VARCHAR" size="255"/>
     <column name="data" phpName="Data" type="VARCHAR"/>
+
+    <foreign-key foreignTable="customer_contact" onDelete="none" onUpdate="none">
+      <reference local="customer_contact_id" foreign="id" />
+    </foreign-key>
   </table>
   <table name="meeting" idMethod="native" phpName="Meeting" namespace="DataModels">
     <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>

@@ -4,7 +4,9 @@ namespace DataModels\DataModels\Base;
 
 use \Exception;
 use \PDO;
+use DataModels\DataModels\CustomerContact as ChildCustomerContact;
 use DataModels\DataModels\CustomerContactIntegrationQuery as ChildCustomerContactIntegrationQuery;
+use DataModels\DataModels\CustomerContactQuery as ChildCustomerContactQuery;
 use DataModels\DataModels\Map\CustomerContactIntegrationTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -93,6 +95,11 @@ abstract class CustomerContactIntegration implements ActiveRecordInterface
      * @var        string
      */
     protected $data;
+
+    /**
+     * @var        ChildCustomerContact
+     */
+    protected $aCustomerContact;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -414,6 +421,10 @@ abstract class CustomerContactIntegration implements ActiveRecordInterface
             $this->modifiedColumns[CustomerContactIntegrationTableMap::COL_CUSTOMER_CONTACT_ID] = true;
         }
 
+        if ($this->aCustomerContact !== null && $this->aCustomerContact->getId() !== $v) {
+            $this->aCustomerContact = null;
+        }
+
         return $this;
     } // setCustomerContactId()
 
@@ -557,6 +568,9 @@ abstract class CustomerContactIntegration implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
+        if ($this->aCustomerContact !== null && $this->customer_contact_id !== $this->aCustomerContact->getId()) {
+            $this->aCustomerContact = null;
+        }
     } // ensureConsistency
 
     /**
@@ -596,6 +610,7 @@ abstract class CustomerContactIntegration implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
+            $this->aCustomerContact = null;
         } // if (deep)
     }
 
@@ -698,6 +713,18 @@ abstract class CustomerContactIntegration implements ActiveRecordInterface
         $affectedRows = 0; // initialize var to track total num of affected rows
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
+
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their corresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aCustomerContact !== null) {
+                if ($this->aCustomerContact->isModified() || $this->aCustomerContact->isNew()) {
+                    $affectedRows += $this->aCustomerContact->save($con);
+                }
+                $this->setCustomerContact($this->aCustomerContact);
+            }
 
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
@@ -873,10 +900,11 @@ abstract class CustomerContactIntegration implements ActiveRecordInterface
      *                    Defaults to TableMap::TYPE_PHPNAME.
      * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
      * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
+     * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
      *
      * @return array an associative array containing the field names (as keys) and field values
      */
-    public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array())
+    public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
 
         if (isset($alreadyDumpedObjects['CustomerContactIntegration'][$this->hashCode()])) {
@@ -896,6 +924,23 @@ abstract class CustomerContactIntegration implements ActiveRecordInterface
             $result[$key] = $virtualColumn;
         }
 
+        if ($includeForeignObjects) {
+            if (null !== $this->aCustomerContact) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'customerContact';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'customer_contact';
+                        break;
+                    default:
+                        $key = 'CustomerContact';
+                }
+
+                $result[$key] = $this->aCustomerContact->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+        }
 
         return $result;
     }
@@ -1160,12 +1205,66 @@ abstract class CustomerContactIntegration implements ActiveRecordInterface
     }
 
     /**
+     * Declares an association between this object and a ChildCustomerContact object.
+     *
+     * @param  ChildCustomerContact $v
+     * @return $this|\DataModels\DataModels\CustomerContactIntegration The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setCustomerContact(ChildCustomerContact $v = null)
+    {
+        if ($v === null) {
+            $this->setCustomerContactId(NULL);
+        } else {
+            $this->setCustomerContactId($v->getId());
+        }
+
+        $this->aCustomerContact = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildCustomerContact object, it will not be re-added.
+        if ($v !== null) {
+            $v->addCustomerContactIntegration($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildCustomerContact object
+     *
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildCustomerContact The associated ChildCustomerContact object.
+     * @throws PropelException
+     */
+    public function getCustomerContact(ConnectionInterface $con = null)
+    {
+        if ($this->aCustomerContact === null && ($this->customer_contact_id !== null)) {
+            $this->aCustomerContact = ChildCustomerContactQuery::create()->findPk($this->customer_contact_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aCustomerContact->addCustomerContactIntegrations($this);
+             */
+        }
+
+        return $this->aCustomerContact;
+    }
+
+    /**
      * Clears the current object, sets all attributes to their default values and removes
      * outgoing references as well as back-references (from other objects to this one. Results probably in a database
      * change of those foreign objects when you call `save` there).
      */
     public function clear()
     {
+        if (null !== $this->aCustomerContact) {
+            $this->aCustomerContact->removeCustomerContactIntegration($this);
+        }
         $this->id = null;
         $this->customer_contact_id = null;
         $this->type = null;
@@ -1191,6 +1290,7 @@ abstract class CustomerContactIntegration implements ActiveRecordInterface
         if ($deep) {
         } // if ($deep)
 
+        $this->aCustomerContact = null;
     }
 
     /**

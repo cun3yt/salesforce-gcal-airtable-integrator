@@ -1,14 +1,20 @@
 <?
 error_reporting(~E_NOTICE && ~E_DEPRECATED);
 session_start();
+
+require_once('../libraries/Helpers.php');
+
 require_once('config.php');
 $arrCalData = $_SESSION['calendardata'];
 $arrUData = $_SESSION['userdata'];
 $_SESSION['currentclient'] = $strClient;
 $_SESSION['currentclientfoldername'] = $strClientFolderName;
 
+list($customer, $contacts) = Helpers::loadCustomerData($strClientDomainName);
+
 if(is_array($arrUData) && (count($arrUData)>0)) {
-	foreach($arrUData as $strUValKey => $strUVal) {
+
+    foreach($arrUData as $strUValKey => $strUVal) {
 		$isRecPresent = fnCheckGcalAccountAlreadyPresent($strUVal);
         $record['utoken'] = $strUValKey;
         $record['uemail'] = $strUVal;
@@ -17,149 +23,136 @@ if(is_array($arrUData) && (count($arrUData)>0)) {
         if(!$isRecPresent) {
 			fnSaveGcalAccount($record);
 		}
-		else {
-			fnUpdateUserTokenData($isRecPresent,$record);
-		}
+
+        fnUpdateUserTokenData($isRecPresent,$record);
 	}
 	
 	unset($_SESSION['calendardata']);
 	unset($_SESSION['userdata']);
 }
 
-$arrGcalUser = fnGetGcalUser();
+$calendarIntegrations = Helpers::getIntegrations($customer);
 $arrSalesUser = fnGetSalesUser();
 
 function fnUpdateUserTokenData($strRecId,$arrRecord = array()) {
 	global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
-	
-	if($strRecId) {
-		$base = $strAirtableBase;
-		$table = 'gaccounts';
-		$strApiKey = $strAirtableApiKey;
-		
-		$url = $strAirtableBaseEndpoint.$base.'/'.$table.'/'.$strRecId;
 
-		$authorization = "Authorization: Bearer ".$strApiKey;
-		$arrFields['fields']['user_token'] = $arrRecord['utoken'];
-		$arrFields['fields']['status'] = $arrRecord['status'];
-		
-		$srtF = json_encode($arrFields);
-		$curl = curl_init($url);
-		// Accept any server (peer) certificate on dev envs
-		curl_setopt($curl, CURLOPT_HEADER, false);
-		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PATCH');
-		curl_setopt($curl, CURLOPT_POSTFIELDS, $srtF);
-		curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-type: application/json",$authorization));
-		$info = curl_getinfo($curl);
-		$response = curl_exec($curl);
-		
-		if(!$response) {
-			echo curl_error($curl);
-		}
-		curl_close($curl);
-		$jsonResponse =  json_decode($response,true);
-		return (is_array($jsonResponse) && (count($jsonResponse)>0));
-	}
-	else {
-		return false;
-	}
+    if(!$strRecId) {
+        return false;
+    }
+
+    $base = $strAirtableBase;
+    $table = 'gaccounts';
+    $strApiKey = $strAirtableApiKey;
+
+    $url = $strAirtableBaseEndpoint.$base.'/'.$table.'/'.$strRecId;
+
+    $authorization = "Authorization: Bearer ".$strApiKey;
+    $arrFields['fields']['user_token'] = $arrRecord['utoken'];
+    $arrFields['fields']['status'] = $arrRecord['status'];
+
+    $srtF = json_encode($arrFields);
+    $curl = curl_init($url);
+    // Accept any server (peer) certificate on dev envs
+    curl_setopt($curl, CURLOPT_HEADER, false);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PATCH');
+    curl_setopt($curl, CURLOPT_POSTFIELDS, $srtF);
+    curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-type: application/json",$authorization));
+    $info = curl_getinfo($curl);
+    $response = curl_exec($curl);
+
+    if(!$response) {
+        echo curl_error($curl);
+    }
+
+    curl_close($curl);
+    $jsonResponse =  json_decode($response,true);
+
+    return (is_array($jsonResponse) && (count($jsonResponse)>0));
 }
 
 function fnSaveGcalAccount($arrRecord = array()) {
 	global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
-	
-	if(is_array($arrRecord) && (count($arrRecord)>0)) {
-		$base = $strAirtableBase;
-		$table = 'gaccounts';
-		$strApiKey = $strAirtableApiKey;
-		
-		$url = $strAirtableBaseEndpoint. $base . '/' . $table;
 
-		$authorization = "Authorization: Bearer ".$strApiKey;
-		if($arrRecord['uemail'])
-		{
-			$arrFields['fields']['user_email'] = $arrRecord['uemail'];
-		}
-		
-		if($arrRecord['utoken'])
-		{
-			$arrFields['fields']['user_token'] = $arrRecord['utoken'];
-		}
+    if( !(is_array($arrRecord) && (count($arrRecord)>0)) ) {
+        return false;
+    }
 
-		$arrFields['fields']['status'] = "active";
-		$arrFields['fields']['sync_data'] = "1";
-		$srtF = json_encode($arrFields);
-		$curl = curl_init($url);
-		// Accept any server (peer) certificate on dev envs
-		curl_setopt($curl, CURLOPT_HEADER, false);
-		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($curl, CURLOPT_POST, true);
-		curl_setopt($curl, CURLOPT_POSTFIELDS, $srtF);
-		curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-type: application/json",$authorization));
-		$info = curl_getinfo($curl);
-		$response = curl_exec($curl);
-		curl_close($curl);
-		$jsonResponse =  json_decode($response,true);
-		return (is_array($jsonResponse) && (count($jsonResponse)>0));
-	}
-	else { return false; }
+    $base = $strAirtableBase;
+    $table = 'gaccounts';
+    $strApiKey = $strAirtableApiKey;
+
+    $url = $strAirtableBaseEndpoint. $base . '/' . $table;
+
+    $authorization = "Authorization: Bearer ".$strApiKey;
+    if($arrRecord['uemail']) {
+        $arrFields['fields']['user_email'] = $arrRecord['uemail'];
+    }
+
+    if($arrRecord['utoken']) {
+        $arrFields['fields']['user_token'] = $arrRecord['utoken'];
+    }
+
+    $arrFields['fields']['status'] = "active";
+    $arrFields['fields']['sync_data'] = "1";
+    $srtF = json_encode($arrFields);
+    $curl = curl_init($url);
+    // Accept any server (peer) certificate on dev envs
+    curl_setopt($curl, CURLOPT_HEADER, false);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl, CURLOPT_POST, true);
+    curl_setopt($curl, CURLOPT_POSTFIELDS, $srtF);
+    curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-type: application/json",$authorization));
+    $info = curl_getinfo($curl);
+    $response = curl_exec($curl);
+    curl_close($curl);
+    $jsonResponse =  json_decode($response,true);
+
+    return (is_array($jsonResponse) && (count($jsonResponse)>0));
 }
 
 function fnCheckGcalAccountAlreadyPresent($strEmail = "") {
 	global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
-	
-	if($strEmail) {
-		$base = $strAirtableBase;
-		$table = 'gaccounts';
-		$strApiKey = $strAirtableApiKey;
-		$url = $strAirtableBaseEndpoint.$base.'/'.$table;
-		$url .= "?filterByFormula=(user_email='".$strEmail."')";
-		$authorization = "Authorization: Bearer ".$strApiKey;
-		//echo $url;exit;
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_HTTPGET, 1);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
-		//set the url, number of POST vars, POST data
-		curl_setopt($ch,CURLOPT_URL, $url);
 
-		//execute post
-		$result = curl_exec($ch);
-		if(!$result){
-		    return true;
-		} else {
-			$arrResponse = json_decode($result,true);
-			if(is_array($arrResponse) && (count($arrResponse)>0)) {
-				$arrRecords = $arrResponse['records'];
-				if(is_array($arrRecords) && (count($arrRecords)>0)) {
-					return $arrRecords[0]['id'];
-				} else {
-					return false;
-				}
-			} else {
-			  return true;	
-			}
-		}
-	}
+    if(!$strEmail) {
+        return false;
+    }
+
+    $base = $strAirtableBase;
+    $table = 'gaccounts';
+    $strApiKey = $strAirtableApiKey;
+    $url = $strAirtableBaseEndpoint.$base.'/'.$table;
+    $url .= "?filterByFormula=(user_email='".$strEmail."')";
+    $authorization = "Authorization: Bearer ".$strApiKey;
+    //echo $url;exit;
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_HTTPGET, 1);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
+    //set the url, number of POST vars, POST data
+    curl_setopt($ch,CURLOPT_URL, $url);
+
+    //execute post
+    $result = curl_exec($ch);
+
+    if(!$result){
+        return true;
+    }
+
+    $arrResponse = json_decode($result,true);
+
+    if(is_array($arrResponse) && (count($arrResponse)>0)) {
+        $arrRecords = $arrResponse['records'];
+        if(is_array($arrRecords) && (count($arrRecords)>0)) {
+            return $arrRecords[0]['id'];
+        }
+    }
+
+    return true;
 }
 
-use DataModels\DataModels\CustomerContactIntegrationQuery as IntegrationQuery;
-use DataModels\DataModels\CustomerContactIntegration as Integration;
-
-/**
- * Sample function using Propel ORM
- *
- * @todo @WIP
- *
- * @return array|Integration|mixed
- */
-function fnGetGcalUserDB() {
-    $q = new IntegrationQuery();
-    $integration = $q->findPk(1);
-    return $integration;
-}
 
 function fnGetGcalUser() {
 	global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
@@ -182,15 +175,16 @@ function fnGetGcalUser() {
 	if(!$result) {
 		echo 'error:' . curl_error($ch);
 		return false;
-	} else {
-		$arrResponse = json_decode($result,true);
-		if(isset($arrResponse['records']) && (count($arrResponse['records'])>0)) {
-			$arrSUser = $arrResponse['records'];
-			return $arrSUser;
-		} else {
-			return false;
-		}
 	}
+
+	$arrResponse = json_decode($result,true);
+
+	if(isset($arrResponse['records']) && (count($arrResponse['records'])>0)) {
+        $arrSUser = $arrResponse['records'];
+        return $arrSUser;
+    }
+
+    return false;
 }
 
 function fnGetSalesUser() {
@@ -211,19 +205,21 @@ function fnGetSalesUser() {
 
 	//execute post
 	$result = curl_exec($ch);
+
 	if(!$result) {
 		echo 'error:' . curl_error($ch);
 		return false;
-	} else {
-		$arrResponse = json_decode($result,true);
-		if(isset($arrResponse['records']) && (count($arrResponse['records'])>0)) {
-			$arrSUser = $arrResponse['records'];
-			return $arrSUser;
-		} else {
-			return false;
-		}
 	}
-}	
+
+    $arrResponse = json_decode($result,true);
+
+    if(isset($arrResponse['records']) && (count($arrResponse['records'])>0)) {
+        $arrSUser = $arrResponse['records'];
+        return $arrSUser;
+    }
+
+    return false;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -324,40 +320,21 @@ function fnGetSalesUser() {
 <div class="main">
 		<div class="heading"></div>
 		<div class="content">
-			<?
-				if(is_array($arrGcalUser) && (count($arrGcalUser)>0))
-				{
-					$intFrCnt = 0;
-					foreach($arrGcalUser as $arrUser)
-					{
-						$arrUserDet = $arrUser['fields'];
-						$intFrCnt++;
-						$strUserName = "User".$intUser;
-						$strUserEmail = $arrUserDet['user_email'];
-						$strStatus = $arrUserDet['status'];
-						$arrUserDetail = explode("@",$strUserEmail);
-						?>
-							<div class="box" id="<? echo $intUser; ?>">
-								<div class="box-content">
-									<div class="title"><img src="img/callendor.png" >Calendar</div>
-									<p><? echo $arrUserDetail[0]; ?></p>
-									<?
-										if($strStatus == "expired")
-										{
-											?>
-												<a href="http://ec2-34-210-36-40.us-west-2.compute.amazonaws.com/gcal/testcalnews.php"><button type="button" class="setting-btn">Activate</button></a>
-											<?
-										}
-									?>
-									<!--<button type="button" class="disable-btn">Disable</button>
-									<button type="button" class="setting-btn">Setting</button>-->
-								</div>
-							</div>
-						<?
-					}
-				}
-			?>		
-			<div class="calendor-btn"><a href="http://ec2-34-210-36-40.us-west-2.compute.amazonaws.com/gcal/testcalnews.php"><button type="button" class="add-button">Add Calender</button></a></div>
+			<? foreach($calendarIntegrations as $integration) { ?>
+                <div class="box">
+                    <div class="box-content">
+                        <div class="title"><img src="img/callendor.png">Calendar</div>
+                        <? $contact = $integration->getCustomerContact(); ?>
+                        <p><? echo $contact->getName(); ?></p>
+                        <p><? echo $contact->getSurname(); ?></p>
+                        <p><? echo $contact->getEmail(); ?></p>
+                        <? if($integration->getStatus() == "expired") { ?>
+                            <a href="<?=Helpers::generateLink("gcal/testcalnews.php")?>"><button type="button" class="setting-btn">Activate</button></a>
+                        <? } ?>
+                    </div>
+                </div>
+            <? } ?>
+			<div class="calendor-btn"><a href="<?=Helpers::generateLink("gcal/testcalnews.php")?>"><button type="button" class="add-button">Add Calendar</button></a></div>
 		</div>
 		
 		<div class="heading"></div>
@@ -365,8 +342,8 @@ function fnGetSalesUser() {
 			<?
 				if(is_array($arrSalesUser) && (count($arrSalesUser)>0)) {
 					$intFrCnt = 0;
-					foreach($arrSalesUser as $arrUser) {
-						$strStatus = $arrUser['fields']['status'];
+					foreach($arrSalesUser as $integration) {
+						$strStatus = $integration['fields']['status'];
 						$intFrCnt++;
 						?>
 							<div class="box" id="<? echo $intUser; ?>">
@@ -377,7 +354,9 @@ function fnGetSalesUser() {
 										{
 											?>
 												<p>&nbsp;</p>
-												<a href="http://ec2-34-210-36-40.us-west-2.compute.amazonaws.com/resttest/oauth.php"><button type="button" class="setting-btn">Reconnect</button></a>
+                                                <a href="<?=Helpers::generateLink("resttest/oauth.php")?>">
+												    <button type="button" class="setting-btn">Reconnect</button>
+                                                </a>
 											<?
 										}
 										else
@@ -391,11 +370,13 @@ function fnGetSalesUser() {
 							</div>
 						<?
 					}
-				}
-				else
-				{
+				} else {
 					?>
-						<div class="calendor-btn"><a href="http://ec2-34-210-36-40.us-west-2.compute.amazonaws.com/resttest/oauth.php"><button type="button" class="add-button">Login with Salesforce </button></a></div>
+						<div class="calendor-btn">
+                            <a href="<?=Helpers::generateLink("resttest/oauth.php")?>">
+                                <button type="button" class="add-button">Login with Salesforce </button>
+                            </a>
+                        </div>
 					<?
 				}
 			?>

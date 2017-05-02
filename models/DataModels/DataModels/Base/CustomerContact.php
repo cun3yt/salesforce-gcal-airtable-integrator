@@ -5,14 +5,19 @@ namespace DataModels\DataModels\Base;
 use \Exception;
 use \PDO;
 use DataModels\DataModels\Customer as ChildCustomer;
+use DataModels\DataModels\CustomerContact as ChildCustomerContact;
+use DataModels\DataModels\CustomerContactIntegration as ChildCustomerContactIntegration;
+use DataModels\DataModels\CustomerContactIntegrationQuery as ChildCustomerContactIntegrationQuery;
 use DataModels\DataModels\CustomerContactQuery as ChildCustomerContactQuery;
 use DataModels\DataModels\CustomerQuery as ChildCustomerQuery;
+use DataModels\DataModels\Map\CustomerContactIntegrationTableMap;
 use DataModels\DataModels\Map\CustomerContactTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
+use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\BadMethodCallException;
 use Propel\Runtime\Exception\LogicException;
@@ -109,12 +114,24 @@ abstract class CustomerContact implements ActiveRecordInterface
     protected $aCustomer;
 
     /**
+     * @var        ObjectCollection|ChildCustomerContactIntegration[] Collection to store aggregation of ChildCustomerContactIntegration objects.
+     */
+    protected $collCustomerContactIntegrations;
+    protected $collCustomerContactIntegrationsPartial;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      *
      * @var boolean
      */
     protected $alreadyInSave = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildCustomerContactIntegration[]
+     */
+    protected $customerContactIntegrationsScheduledForDeletion = null;
 
     /**
      * Initializes internal state of DataModels\DataModels\Base\CustomerContact object.
@@ -651,6 +668,8 @@ abstract class CustomerContact implements ActiveRecordInterface
         if ($deep) {  // also de-associate any related objects?
 
             $this->aCustomer = null;
+            $this->collCustomerContactIntegrations = null;
+
         } // if (deep)
     }
 
@@ -775,6 +794,24 @@ abstract class CustomerContact implements ActiveRecordInterface
                     $affectedRows += $this->doUpdate($con);
                 }
                 $this->resetModified();
+            }
+
+            if ($this->customerContactIntegrationsScheduledForDeletion !== null) {
+                if (!$this->customerContactIntegrationsScheduledForDeletion->isEmpty()) {
+                    foreach ($this->customerContactIntegrationsScheduledForDeletion as $customerContactIntegration) {
+                        // need to save related object because we set the relation to null
+                        $customerContactIntegration->save($con);
+                    }
+                    $this->customerContactIntegrationsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collCustomerContactIntegrations !== null) {
+                foreach ($this->collCustomerContactIntegrations as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
             }
 
             $this->alreadyInSave = false;
@@ -989,6 +1026,21 @@ abstract class CustomerContact implements ActiveRecordInterface
                 }
 
                 $result[$key] = $this->aCustomer->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->collCustomerContactIntegrations) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'customerContactIntegrations';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'customer_contact_integrations';
+                        break;
+                    default:
+                        $key = 'CustomerContactIntegrations';
+                }
+
+                $result[$key] = $this->collCustomerContactIntegrations->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1236,6 +1288,20 @@ abstract class CustomerContact implements ActiveRecordInterface
         $copyObj->setSurname($this->getSurname());
         $copyObj->setTitle($this->getTitle());
         $copyObj->setEmail($this->getEmail());
+
+        if ($deepCopy) {
+            // important: temporarily setNew(false) because this affects the behavior of
+            // the getter/setter methods for fkey referrer objects.
+            $copyObj->setNew(false);
+
+            foreach ($this->getCustomerContactIntegrations() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addCustomerContactIntegration($relObj->copy($deepCopy));
+                }
+            }
+
+        } // if ($deepCopy)
+
         if ($makeNew) {
             $copyObj->setNew(true);
             $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
@@ -1315,6 +1381,247 @@ abstract class CustomerContact implements ActiveRecordInterface
         return $this->aCustomer;
     }
 
+
+    /**
+     * Initializes a collection based on the name of a relation.
+     * Avoids crafting an 'init[$relationName]s' method name
+     * that wouldn't work when StandardEnglishPluralizer is used.
+     *
+     * @param      string $relationName The name of the relation to initialize
+     * @return void
+     */
+    public function initRelation($relationName)
+    {
+        if ('CustomerContactIntegration' == $relationName) {
+            return $this->initCustomerContactIntegrations();
+        }
+    }
+
+    /**
+     * Clears out the collCustomerContactIntegrations collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addCustomerContactIntegrations()
+     */
+    public function clearCustomerContactIntegrations()
+    {
+        $this->collCustomerContactIntegrations = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collCustomerContactIntegrations collection loaded partially.
+     */
+    public function resetPartialCustomerContactIntegrations($v = true)
+    {
+        $this->collCustomerContactIntegrationsPartial = $v;
+    }
+
+    /**
+     * Initializes the collCustomerContactIntegrations collection.
+     *
+     * By default this just sets the collCustomerContactIntegrations collection to an empty array (like clearcollCustomerContactIntegrations());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initCustomerContactIntegrations($overrideExisting = true)
+    {
+        if (null !== $this->collCustomerContactIntegrations && !$overrideExisting) {
+            return;
+        }
+
+        $collectionClassName = CustomerContactIntegrationTableMap::getTableMap()->getCollectionClassName();
+
+        $this->collCustomerContactIntegrations = new $collectionClassName;
+        $this->collCustomerContactIntegrations->setModel('\DataModels\DataModels\CustomerContactIntegration');
+    }
+
+    /**
+     * Gets an array of ChildCustomerContactIntegration objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildCustomerContact is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildCustomerContactIntegration[] List of ChildCustomerContactIntegration objects
+     * @throws PropelException
+     */
+    public function getCustomerContactIntegrations(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collCustomerContactIntegrationsPartial && !$this->isNew();
+        if (null === $this->collCustomerContactIntegrations || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collCustomerContactIntegrations) {
+                // return empty collection
+                $this->initCustomerContactIntegrations();
+            } else {
+                $collCustomerContactIntegrations = ChildCustomerContactIntegrationQuery::create(null, $criteria)
+                    ->filterByCustomerContact($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collCustomerContactIntegrationsPartial && count($collCustomerContactIntegrations)) {
+                        $this->initCustomerContactIntegrations(false);
+
+                        foreach ($collCustomerContactIntegrations as $obj) {
+                            if (false == $this->collCustomerContactIntegrations->contains($obj)) {
+                                $this->collCustomerContactIntegrations->append($obj);
+                            }
+                        }
+
+                        $this->collCustomerContactIntegrationsPartial = true;
+                    }
+
+                    return $collCustomerContactIntegrations;
+                }
+
+                if ($partial && $this->collCustomerContactIntegrations) {
+                    foreach ($this->collCustomerContactIntegrations as $obj) {
+                        if ($obj->isNew()) {
+                            $collCustomerContactIntegrations[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collCustomerContactIntegrations = $collCustomerContactIntegrations;
+                $this->collCustomerContactIntegrationsPartial = false;
+            }
+        }
+
+        return $this->collCustomerContactIntegrations;
+    }
+
+    /**
+     * Sets a collection of ChildCustomerContactIntegration objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $customerContactIntegrations A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return $this|ChildCustomerContact The current object (for fluent API support)
+     */
+    public function setCustomerContactIntegrations(Collection $customerContactIntegrations, ConnectionInterface $con = null)
+    {
+        /** @var ChildCustomerContactIntegration[] $customerContactIntegrationsToDelete */
+        $customerContactIntegrationsToDelete = $this->getCustomerContactIntegrations(new Criteria(), $con)->diff($customerContactIntegrations);
+
+
+        $this->customerContactIntegrationsScheduledForDeletion = $customerContactIntegrationsToDelete;
+
+        foreach ($customerContactIntegrationsToDelete as $customerContactIntegrationRemoved) {
+            $customerContactIntegrationRemoved->setCustomerContact(null);
+        }
+
+        $this->collCustomerContactIntegrations = null;
+        foreach ($customerContactIntegrations as $customerContactIntegration) {
+            $this->addCustomerContactIntegration($customerContactIntegration);
+        }
+
+        $this->collCustomerContactIntegrations = $customerContactIntegrations;
+        $this->collCustomerContactIntegrationsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related CustomerContactIntegration objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related CustomerContactIntegration objects.
+     * @throws PropelException
+     */
+    public function countCustomerContactIntegrations(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collCustomerContactIntegrationsPartial && !$this->isNew();
+        if (null === $this->collCustomerContactIntegrations || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collCustomerContactIntegrations) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getCustomerContactIntegrations());
+            }
+
+            $query = ChildCustomerContactIntegrationQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByCustomerContact($this)
+                ->count($con);
+        }
+
+        return count($this->collCustomerContactIntegrations);
+    }
+
+    /**
+     * Method called to associate a ChildCustomerContactIntegration object to this object
+     * through the ChildCustomerContactIntegration foreign key attribute.
+     *
+     * @param  ChildCustomerContactIntegration $l ChildCustomerContactIntegration
+     * @return $this|\DataModels\DataModels\CustomerContact The current object (for fluent API support)
+     */
+    public function addCustomerContactIntegration(ChildCustomerContactIntegration $l)
+    {
+        if ($this->collCustomerContactIntegrations === null) {
+            $this->initCustomerContactIntegrations();
+            $this->collCustomerContactIntegrationsPartial = true;
+        }
+
+        if (!$this->collCustomerContactIntegrations->contains($l)) {
+            $this->doAddCustomerContactIntegration($l);
+
+            if ($this->customerContactIntegrationsScheduledForDeletion and $this->customerContactIntegrationsScheduledForDeletion->contains($l)) {
+                $this->customerContactIntegrationsScheduledForDeletion->remove($this->customerContactIntegrationsScheduledForDeletion->search($l));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ChildCustomerContactIntegration $customerContactIntegration The ChildCustomerContactIntegration object to add.
+     */
+    protected function doAddCustomerContactIntegration(ChildCustomerContactIntegration $customerContactIntegration)
+    {
+        $this->collCustomerContactIntegrations[]= $customerContactIntegration;
+        $customerContactIntegration->setCustomerContact($this);
+    }
+
+    /**
+     * @param  ChildCustomerContactIntegration $customerContactIntegration The ChildCustomerContactIntegration object to remove.
+     * @return $this|ChildCustomerContact The current object (for fluent API support)
+     */
+    public function removeCustomerContactIntegration(ChildCustomerContactIntegration $customerContactIntegration)
+    {
+        if ($this->getCustomerContactIntegrations()->contains($customerContactIntegration)) {
+            $pos = $this->collCustomerContactIntegrations->search($customerContactIntegration);
+            $this->collCustomerContactIntegrations->remove($pos);
+            if (null === $this->customerContactIntegrationsScheduledForDeletion) {
+                $this->customerContactIntegrationsScheduledForDeletion = clone $this->collCustomerContactIntegrations;
+                $this->customerContactIntegrationsScheduledForDeletion->clear();
+            }
+            $this->customerContactIntegrationsScheduledForDeletion[]= $customerContactIntegration;
+            $customerContactIntegration->setCustomerContact(null);
+        }
+
+        return $this;
+    }
+
     /**
      * Clears the current object, sets all attributes to their default values and removes
      * outgoing references as well as back-references (from other objects to this one. Results probably in a database
@@ -1349,8 +1656,14 @@ abstract class CustomerContact implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collCustomerContactIntegrations) {
+                foreach ($this->collCustomerContactIntegrations as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
+        $this->collCustomerContactIntegrations = null;
         $this->aCustomer = null;
     }
 

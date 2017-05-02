@@ -52,7 +52,17 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildCustomerContactQuery rightJoinWithCustomer() Adds a RIGHT JOIN clause and with to the query using the Customer relation
  * @method     ChildCustomerContactQuery innerJoinWithCustomer() Adds a INNER JOIN clause and with to the query using the Customer relation
  *
- * @method     \DataModels\DataModels\CustomerQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     ChildCustomerContactQuery leftJoinCustomerContactIntegration($relationAlias = null) Adds a LEFT JOIN clause to the query using the CustomerContactIntegration relation
+ * @method     ChildCustomerContactQuery rightJoinCustomerContactIntegration($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CustomerContactIntegration relation
+ * @method     ChildCustomerContactQuery innerJoinCustomerContactIntegration($relationAlias = null) Adds a INNER JOIN clause to the query using the CustomerContactIntegration relation
+ *
+ * @method     ChildCustomerContactQuery joinWithCustomerContactIntegration($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the CustomerContactIntegration relation
+ *
+ * @method     ChildCustomerContactQuery leftJoinWithCustomerContactIntegration() Adds a LEFT JOIN clause and with to the query using the CustomerContactIntegration relation
+ * @method     ChildCustomerContactQuery rightJoinWithCustomerContactIntegration() Adds a RIGHT JOIN clause and with to the query using the CustomerContactIntegration relation
+ * @method     ChildCustomerContactQuery innerJoinWithCustomerContactIntegration() Adds a INNER JOIN clause and with to the query using the CustomerContactIntegration relation
+ *
+ * @method     \DataModels\DataModels\CustomerQuery|\DataModels\DataModels\CustomerContactIntegrationQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildCustomerContact findOne(ConnectionInterface $con = null) Return the first ChildCustomerContact matching the query
  * @method     ChildCustomerContact findOneOrCreate(ConnectionInterface $con = null) Return the first ChildCustomerContact matching the query, or a new ChildCustomerContact object populated from the query conditions when no match is found
@@ -528,6 +538,79 @@ abstract class CustomerContactQuery extends ModelCriteria
         return $this
             ->joinCustomer($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Customer', '\DataModels\DataModels\CustomerQuery');
+    }
+
+    /**
+     * Filter the query by a related \DataModels\DataModels\CustomerContactIntegration object
+     *
+     * @param \DataModels\DataModels\CustomerContactIntegration|ObjectCollection $customerContactIntegration the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCustomerContactQuery The current query, for fluid interface
+     */
+    public function filterByCustomerContactIntegration($customerContactIntegration, $comparison = null)
+    {
+        if ($customerContactIntegration instanceof \DataModels\DataModels\CustomerContactIntegration) {
+            return $this
+                ->addUsingAlias(CustomerContactTableMap::COL_ID, $customerContactIntegration->getCustomerContactId(), $comparison);
+        } elseif ($customerContactIntegration instanceof ObjectCollection) {
+            return $this
+                ->useCustomerContactIntegrationQuery()
+                ->filterByPrimaryKeys($customerContactIntegration->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByCustomerContactIntegration() only accepts arguments of type \DataModels\DataModels\CustomerContactIntegration or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the CustomerContactIntegration relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildCustomerContactQuery The current query, for fluid interface
+     */
+    public function joinCustomerContactIntegration($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('CustomerContactIntegration');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'CustomerContactIntegration');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the CustomerContactIntegration relation CustomerContactIntegration object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \DataModels\DataModels\CustomerContactIntegrationQuery A secondary query class using the current class as primary query
+     */
+    public function useCustomerContactIntegrationQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinCustomerContactIntegration($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CustomerContactIntegration', '\DataModels\DataModels\CustomerContactIntegrationQuery');
     }
 
     /**

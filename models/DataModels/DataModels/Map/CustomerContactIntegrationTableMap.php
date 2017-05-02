@@ -148,7 +148,7 @@ class CustomerContactIntegrationTableMap extends TableMap
         $this->setPrimaryKeyMethodInfo('customer_contact_integration_id_seq');
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('customer_contact_id', 'CustomerContactId', 'INTEGER', false, null, null);
+        $this->addForeignKey('customer_contact_id', 'CustomerContactId', 'INTEGER', 'customer_contact', 'id', false, null, null);
         $this->addColumn('type', 'Type', 'VARCHAR', false, 255, null);
         $this->addColumn('status', 'Status', 'VARCHAR', false, 255, null);
         $this->addColumn('data', 'Data', 'VARCHAR', false, null, null);
@@ -159,6 +159,13 @@ class CustomerContactIntegrationTableMap extends TableMap
      */
     public function buildRelations()
     {
+        $this->addRelation('CustomerContact', '\\DataModels\\DataModels\\CustomerContact', RelationMap::MANY_TO_ONE, array (
+  0 =>
+  array (
+    0 => ':customer_contact_id',
+    1 => ':id',
+  ),
+), null, null, null, false);
     } // buildRelations()
 
     /**

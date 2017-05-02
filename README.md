@@ -17,9 +17,10 @@ and present it in Airtable document.
 
 ## Migrations
 
-### Database Change to Migration Generation
-* `vendor/propel/propel/bin/propel diff --schema-dir models`
+### Database Change to Migration Class Generation & Model Generation
+* `./propel diff --schema-dir models`
+* `./propel model:build --schema-dir=models --output-dir=models`
 
 ### Application of Migrations
-* `vendor/propel/propel/bin/propel migrate`
+* `./propel migrate`
 * [More info on Migration](http://propelorm.org/documentation/09-migrations.html)
