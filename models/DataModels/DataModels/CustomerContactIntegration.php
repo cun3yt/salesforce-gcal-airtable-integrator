@@ -16,5 +16,8 @@ use DataModels\DataModels\Base\CustomerContactIntegration as BaseCustomerContact
  */
 class CustomerContactIntegration extends BaseCustomerContactIntegration
 {
+    const GCAL = 'gcal';
+    const SFDC = 'sfdc';
 
+    const STATUS_ACTIVE = 'active';
 }

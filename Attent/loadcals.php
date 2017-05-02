@@ -5,26 +5,24 @@ session_start();
 require_once('config.php');
 require_once('../libraries/Helpers.php');
 
-$arrCalData = $_SESSION['calendardata'];
-$arrUData = $_SESSION['userdata'];
+$userDataArray = $_SESSION['userdata'];
 $_SESSION['currentclient'] = $strClient;
 $_SESSION['currentclientfoldername'] = $strClientFolderName;
 
 list($customer, $contacts) = Helpers::loadCustomerData($strClientDomainName);
 
-if(is_array($arrUData) && (count($arrUData)>0)) {
-
-    foreach($arrUData as $strUValKey => $strUVal) {
-		$isRecPresent = fnCheckGcalAccountAlreadyPresent($strUVal);
-        $record['utoken'] = $strUValKey;
-        $record['uemail'] = $strUVal;
+if(is_array($userDataArray) && (count($userDataArray)>0)) {
+    foreach($userDataArray as $token => $emailAddress) {
+		$isAccountPresent = Helpers::isGCalAccountPresent($customer, $emailAddress);
+        $record['utoken'] = $token;
+        $record['uemail'] = $emailAddress;
         $record['status'] = "active";
 
-        if(!$isRecPresent) {
-			fnSaveGcalAccount($record);
-		}
-
-        fnUpdateUserTokenData($isRecPresent,$record);
+        if(!$isAccountPresent) {
+            Helpers::createGCalAccount($customer, $emailAddress, $record);
+		} else {
+            Helpers::updateGCalAccountUserToken($customer, $emailAddress, $token);
+        }
 	}
 	
 	unset($_SESSION['calendardata']);
@@ -32,126 +30,9 @@ if(is_array($arrUData) && (count($arrUData)>0)) {
 }
 
 $calendarIntegrations = Helpers::getIntegrations($customer);
-$arrSalesUser = Helpers::fnGetSalesUser();
 
-function fnUpdateUserTokenData($strRecId,$arrRecord = array()) {
-	global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
-
-    if(!$strRecId) {
-        return false;
-    }
-
-    $base = $strAirtableBase;
-    $table = 'gaccounts';
-    $strApiKey = $strAirtableApiKey;
-
-    $url = $strAirtableBaseEndpoint.$base.'/'.$table.'/'.$strRecId;
-
-    $authorization = "Authorization: Bearer ".$strApiKey;
-    $arrFields['fields']['user_token'] = $arrRecord['utoken'];
-    $arrFields['fields']['status'] = $arrRecord['status'];
-
-    $srtF = json_encode($arrFields);
-    $curl = curl_init($url);
-    // Accept any server (peer) certificate on dev envs
-    curl_setopt($curl, CURLOPT_HEADER, false);
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PATCH');
-    curl_setopt($curl, CURLOPT_POSTFIELDS, $srtF);
-    curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-type: application/json",$authorization));
-    $info = curl_getinfo($curl);
-    $response = curl_exec($curl);
-
-    if(!$response) {
-        echo curl_error($curl);
-    }
-
-    curl_close($curl);
-    $jsonResponse =  json_decode($response,true);
-
-    return (is_array($jsonResponse) && (count($jsonResponse)>0));
-}
-
-function fnSaveGcalAccount($arrRecord = array()) {
-	global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
-
-    if( !(is_array($arrRecord) && (count($arrRecord)>0)) ) {
-        return false;
-    }
-
-    $base = $strAirtableBase;
-    $table = 'gaccounts';
-    $strApiKey = $strAirtableApiKey;
-
-    $url = $strAirtableBaseEndpoint. $base . '/' . $table;
-
-    $authorization = "Authorization: Bearer ".$strApiKey;
-    if($arrRecord['uemail']) {
-        $arrFields['fields']['user_email'] = $arrRecord['uemail'];
-    }
-
-    if($arrRecord['utoken']) {
-        $arrFields['fields']['user_token'] = $arrRecord['utoken'];
-    }
-
-    $arrFields['fields']['status'] = "active";
-    $arrFields['fields']['sync_data'] = "1";
-    $srtF = json_encode($arrFields);
-    $curl = curl_init($url);
-    // Accept any server (peer) certificate on dev envs
-    curl_setopt($curl, CURLOPT_HEADER, false);
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($curl, CURLOPT_POST, true);
-    curl_setopt($curl, CURLOPT_POSTFIELDS, $srtF);
-    curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-type: application/json",$authorization));
-    $info = curl_getinfo($curl);
-    $response = curl_exec($curl);
-    curl_close($curl);
-    $jsonResponse =  json_decode($response,true);
-
-    return (is_array($jsonResponse) && (count($jsonResponse)>0));
-}
-
-function fnCheckGcalAccountAlreadyPresent($strEmail = "") {
-	global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
-
-    if(!$strEmail) {
-        return false;
-    }
-
-    $base = $strAirtableBase;
-    $table = 'gaccounts';
-    $strApiKey = $strAirtableApiKey;
-    $url = $strAirtableBaseEndpoint.$base.'/'.$table;
-    $url .= "?filterByFormula=(user_email='".$strEmail."')";
-    $authorization = "Authorization: Bearer ".$strApiKey;
-    //echo $url;exit;
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_HTTPGET, 1);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
-    //set the url, number of POST vars, POST data
-    curl_setopt($ch,CURLOPT_URL, $url);
-
-    //execute post
-    $result = curl_exec($ch);
-
-    if(!$result){
-        return true;
-    }
-
-    $arrResponse = json_decode($result,true);
-
-    if(is_array($arrResponse) && (count($arrResponse)>0)) {
-        $arrRecords = $arrResponse['records'];
-        if(is_array($arrRecords) && (count($arrRecords)>0)) {
-            return $arrRecords[0]['id'];
-        }
-    }
-
-    return true;
-}
+$arrSalesUser = array();
+$SFDCIntegrations = Helpers::getIntegrations($customer, \DataModels\DataModels\CustomerContactIntegration::SFDC);
 
 ?>
 <!DOCTYPE html>
@@ -267,52 +148,39 @@ function fnCheckGcalAccountAlreadyPresent($strEmail = "") {
                     </div>
                 </div>
             <? } ?>
-			<div class="calendor-btn"><a href="<?=Helpers::generateLink("gcal/testcalnews.php")?>"><button type="button" class="add-button">Add Calendar</button></a></div>
+			<div class="calendor-btn">
+                <a href="<?=Helpers::generateLink("gcal/testcalnews.php")?>">
+                    <button type="button" class="add-button">Add Calendar</button>
+                </a>
+            </div>
 		</div>
 		
 		<div class="heading"></div>
 		<div class="content">
-			<?
-				if(is_array($arrSalesUser) && (count($arrSalesUser)>0)) {
-					$intFrCnt = 0;
-					foreach($arrSalesUser as $integration) {
-						$strStatus = $integration['fields']['status'];
-						$intFrCnt++;
-						?>
-							<div class="box" id="<? echo $intUser; ?>">
-								<div class="box-content">
-									<div class="title">Salesforce</div>
-									<?
-										if($strStatus == "expired")
-										{
-											?>
-												<p>&nbsp;</p>
-                                                <a href="<?=Helpers::generateLink("resttest/oauth.php")?>">
-												    <button type="button" class="setting-btn">Reconnect</button>
-                                                </a>
-											<?
-										}
-										else
-										{
-											?>
-												<p>Account Connected</p>
-											<?
-										}
-									?>
-								</div>
-							</div>
-						<?
-					}
-				} else {
-					?>
-						<div class="calendor-btn">
-                            <a href="<?=Helpers::generateLink("resttest/oauth.php")?>">
-                                <button type="button" class="add-button">Login with Salesforce </button>
-                            </a>
+
+            <? if(count($SFDCIntegrations) > 0) { ?>
+                <? foreach($SFDCIntegrations as $integration) { ?>
+                    <div class="box">
+                        <div class="box-content">
+                            <div class="title">Salesforce</div>
+                            <? if($integration->getStatus() == "expired") { ?>
+                                <p>&nbsp;</p>
+                                <a href="<?=Helpers::generateLink("resttest/oauth.php")?>">
+                                    <button type="button" class="setting-btn">Reconnect</button>
+                                </a>
+                            <? } else { ?>
+                                <p>Account Connected</p>
+                            <? } ?>
                         </div>
-					<?
-				}
-			?>
+                    </div>
+                <? } ?>
+            <? } else {?>
+                <div class="calendor-btn">
+                    <a href="<?=Helpers::generateLink("resttest/oauth.php")?>">
+                        <button type="button" class="add-button">Connect Your SFDC Account</button>
+                    </a>
+                </div>
+            <? } ?>
 		</div>
 	</div>
 </body>
