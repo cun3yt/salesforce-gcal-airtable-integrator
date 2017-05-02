@@ -2,9 +2,9 @@
 error_reporting(~E_NOTICE && ~E_DEPRECATED);
 session_start();
 
+require_once('config.php');
 require_once('../libraries/Helpers.php');
 
-require_once('config.php');
 $arrCalData = $_SESSION['calendardata'];
 $arrUData = $_SESSION['userdata'];
 $_SESSION['currentclient'] = $strClient;
@@ -32,7 +32,7 @@ if(is_array($arrUData) && (count($arrUData)>0)) {
 }
 
 $calendarIntegrations = Helpers::getIntegrations($customer);
-$arrSalesUser = fnGetSalesUser();
+$arrSalesUser = Helpers::fnGetSalesUser();
 
 function fnUpdateUserTokenData($strRecId,$arrRecord = array()) {
 	global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
@@ -153,73 +153,6 @@ function fnCheckGcalAccountAlreadyPresent($strEmail = "") {
     return true;
 }
 
-
-function fnGetGcalUser() {
-	global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
-	
-	$base = $strAirtableBase;
-	$table = 'gaccounts';
-	$strApiKey = $strAirtableApiKey;
-	$url = $strAirtableBaseEndpoint.$base.'/'.$table;
-	$authorization = "Authorization: Bearer ".$strApiKey;
-	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_HTTPGET, 1);
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-	curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-	curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
-	//set the url, number of POST vars, POST data
-	curl_setopt($ch,CURLOPT_URL, $url);
-
-	//execute post
-	$result = curl_exec($ch);
-	if(!$result) {
-		echo 'error:' . curl_error($ch);
-		return false;
-	}
-
-	$arrResponse = json_decode($result,true);
-
-	if(isset($arrResponse['records']) && (count($arrResponse['records'])>0)) {
-        $arrSUser = $arrResponse['records'];
-        return $arrSUser;
-    }
-
-    return false;
-}
-
-function fnGetSalesUser() {
-	global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
-	
-	$base = $strAirtableBase;
-	$table = 'salesuser';
-	$strApiKey = $strAirtableApiKey;
-	$url = $strAirtableBaseEndpoint.$base.'/'.$table;
-	$authorization = "Authorization: Bearer ".$strApiKey;
-	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_HTTPGET, 1);
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-	curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-	curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
-	//set the url, number of POST vars, POST data
-	curl_setopt($ch,CURLOPT_URL, $url);
-
-	//execute post
-	$result = curl_exec($ch);
-
-	if(!$result) {
-		echo 'error:' . curl_error($ch);
-		return false;
-	}
-
-    $arrResponse = json_decode($result,true);
-
-    if(isset($arrResponse['records']) && (count($arrResponse['records'])>0)) {
-        $arrSUser = $arrResponse['records'];
-        return $arrSUser;
-    }
-
-    return false;
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">

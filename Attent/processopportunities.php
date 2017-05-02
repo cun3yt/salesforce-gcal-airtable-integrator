@@ -3,11 +3,14 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(~E_WARNING && ~E_NOTICE);
 session_start();
-require_once 'config.php';
+
+require_once('config.php');
+require_once('../libraries/Helpers.php');
+
 $access_token = "";
 $instance_url = "";
 $strRecordId = "";
-$arrSalesUser = fnGetSalesUser();
+$arrSalesUser = Helpers::fnGetSalesUser();
 if (is_array($arrSalesUser) && (count($arrSalesUser) > 0)) {
     $arrSalesTokenDetail = $arrSalesUser[0]['fields'];
     if (is_array($arrSalesTokenDetail) && (count($arrSalesTokenDetail) > 0)) {
@@ -84,43 +87,6 @@ if (is_array($arrGcalUser) && (count($arrGcalUser) > 0)) {
             }
         }
     }
-}
-
-/**
- * Return Customer's Sales Person
- *
- * @return array | bool
- */
-function fnGetSalesUser() {
-    global $strAirtableBase, $strAirtableApiKey, $strAirtableBaseEndpoint;
-    $base = $strAirtableBase;
-    $table = 'salesuser';
-    $strApiKey = $strAirtableApiKey;
-    $url = $strAirtableBaseEndpoint . $base . '/' . $table;
-    $authorization = "Authorization: Bearer " . $strApiKey;
-
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_HTTPGET, 1);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', $authorization));
-    //set the url, number of POST vars, POST data
-    curl_setopt($ch, CURLOPT_URL, $url);
-    //execute post
-    $result = curl_exec($ch);
-    if(!$result) {
-        echo 'error:' . curl_error($ch);
-        return false;
-    }
-
-    $arrResponse = json_decode($result, true);
-
-    if(isset($arrResponse['records']) && (count($arrResponse['records']) > 0)) {
-        $arrSUser = $arrResponse['records'];
-        return $arrSUser;
-    }
-
-    return false;
 }
 
 function fnGetProcessAccounts() {

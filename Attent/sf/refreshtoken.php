@@ -1,7 +1,10 @@
 <?
 require_once '../../resttest/config.php';
+
 require_once '../config.php';
-$arrSalesUser = fnGetSalesUser();
+require_once('../libraries/Helpers.php');
+
+$arrSalesUser = Helpers::fnGetSalesUser();
 $access_token = "";
 $instance_url = "";
 $strRecordId = "";
@@ -16,40 +19,6 @@ if(is_array($arrSalesUser) && (count($arrSalesUser)>0)) {
 		$strRecordId = $arrSalesUser[0]['id'];
 		$strEm = $arrSalesTokenDetail['email'];
 	}
-}
-
-function fnGetSalesUser() {
-	global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
-
-	$base = $strAirtableBase;
-	$table = 'salesuser';
-	$strApiKey = $strAirtableApiKey;
-	$url = $strAirtableBaseEndpoint.$base.'/'.$table;
-	$authorization = "Authorization: Bearer ".$strApiKey;
-	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_HTTPGET, 1);
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-	curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-	curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
-	//set the url, number of POST vars, POST data
-	curl_setopt($ch,CURLOPT_URL, $url);
-
-	//execute post
-	$result = curl_exec($ch);
-
-	if(!$result) {
-		echo 'error:' . curl_error($ch);
-		return false;
-	}
-
-    $arrResponse = json_decode($result,true);
-
-    if(isset($arrResponse['records']) && (count($arrResponse['records'])>0)) {
-        $arrSUser = $arrResponse['records'];
-        return $arrSUser;
-    }
-
-    return false;
 }
 
 if($access_token) {

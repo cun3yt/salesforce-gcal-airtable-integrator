@@ -45,4 +45,37 @@ class Helpers {
     static function generateLink($path) {
         return BASE_URL . "{$path}";
     }
+
+    static function fnGetSalesUser() {
+        global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
+
+        $base = $strAirtableBase;
+        $table = 'salesuser';
+        $strApiKey = $strAirtableApiKey;
+        $url = $strAirtableBaseEndpoint.$base.'/'.$table;
+        $authorization = "Authorization: Bearer ".$strApiKey;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_HTTPGET, 1);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
+        curl_setopt($ch,CURLOPT_URL, $url);
+
+        $result = curl_exec($ch);
+
+        if(!$result) {
+            echo 'error:' . curl_error($ch);
+            return false;
+        }
+
+        $arrResponse = json_decode($result,true);
+
+        if(isset($arrResponse['records']) && (count($arrResponse['records'])>0)) {
+            $arrSUser = $arrResponse['records'];
+            return $arrSUser;
+        }
+
+        return false;
+    }
+
 }
