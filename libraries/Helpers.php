@@ -87,14 +87,14 @@ class Helpers {
      *
      * @param Customer $customer
      * @param $emailAddress
-     * @return bool
+     * @return null | CustomerContactIntegration
      */
-    static function isGCalAccountPresent(Customer $customer, $emailAddress) {
+    static function getGCalAccountIfPresent(Customer $customer, $emailAddress) {
         $contactQ = new CustomerContactQuery();
         $contactSet = $contactQ->filterByEmail($emailAddress)->filterByCustomer($customer);
 
         if($contactSet->count() <= 0) {
-            return false;
+            return NULL;
         }
 
         $contact = $contactSet[0];
@@ -102,21 +102,33 @@ class Helpers {
         $integrationQ = new CustomerContactIntegrationQuery();
         $integrationSet = $integrationQ->filterByCustomerContact($contact)->filterByType(CustomerContactIntegration::GCAL);
 
-        return $integrationSet->count() >= 1;
+        $integration = NULL;
+
+        if($integrationSet->count() <= 0) { return NULL; }
+
+        if($integrationSet->count() >= 2) {
+            trigger_error("getGCalAccountIfPresent fetches more than 1 integration", E_USER_WARNING);
+        }
+
+        return $integrationSet[0];
     }
 
     /**
      * Re-writing user's token data for GCal
      *
      * This function is replacing "fnUpdateUserTokenData()"
+     *
+     * @param CustomerContactIntegration $gCalIntegration
+     * @param $token
+     * @return CustomerContactIntegration
      */
-    static function updateGCalAccountUserToken(Customer $customer, $emailAddress, $token) {
-//        $jsonData = json_decode($integration->getData());
-//        $jsonData->
+    static function updateGCalAccountUserToken(CustomerContactIntegration $gCalIntegration, $token) {
+        $gCalIntegration
+            ->setStatus(CustomerContactIntegration::STATUS_ACTIVE)
+            ->setData($token)
+            ->save();
 
-        
-
-        throw new Exception("NOT IMPLEMENTED YET!");
+        return $gCalIntegration;
     }
 
     static function fnUpdateUserTokenData($strRecId,$arrRecord = array()) {
@@ -161,7 +173,7 @@ class Helpers {
     /**
      * Returning if Google Cal Account Exists in AirTable
      *
-     * @deprecated Use isGCalAccountPresent() instead of this fn
+     * @deprecated Use getGCalAccountPresent() instead of this fn
      * @param string $strEmail
      * @return bool
      */

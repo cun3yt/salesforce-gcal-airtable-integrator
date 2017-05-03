@@ -13,15 +13,16 @@ list($customer, $contacts) = Helpers::loadCustomerData($strClientDomainName);
 
 if(is_array($userDataArray) && (count($userDataArray)>0)) {
     foreach($userDataArray as $token => $emailAddress) {
-		$isAccountPresent = Helpers::isGCalAccountPresent($customer, $emailAddress);
+        $gCalAccount = Helpers::getGCalAccountIfPresent($customer, $emailAddress);
+
         $record['utoken'] = $token;
         $record['uemail'] = $emailAddress;
         $record['status'] = "active";
 
-        if(!$isAccountPresent) {
+        if(!$gCalAccount) {
             Helpers::createGCalAccount($customer, $emailAddress, $record);
 		} else {
-            Helpers::updateGCalAccountUserToken($customer, $emailAddress, $token);
+            Helpers::updateGCalAccountUserToken($gCalAccount, $token);
         }
 	}
 	
