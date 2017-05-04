@@ -11,7 +11,7 @@
 error_reporting(~E_NOTICE && ~E_DEPRECATED);
 session_start();
 // setting and loading the dependencies for google api to work
-require_once '/var/www/html/gcal/vendor/autoload.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/gcal/vendor/autoload.php';
 // we need to include config file so as to get set customer environment for refreshing customer google calendar account
 require_once 'config.php';
 // we will inform script about the client domain, so that while processing system knows about the client domain and work accordingly.
@@ -19,7 +19,7 @@ $strClientDomain = $strClientDomainName;
 $strPersonalDomain = implode(",",$arrPersonalDoamin);
 
 $client = new Google_Client();
-$client->setAuthConfig('/var/www/html/gcal/15FiveCal.json');
+$client->setAuthConfig($_SERVER['DOCUMENT_ROOT'].'/gcal/15FiveCal.json');
 $client->addScope(array(Google_Service_Calendar::CALENDAR));
 $guzzleClient = new \GuzzleHttp\Client(array( 'curl' => array( CURLOPT_SSL_VERIFYPEER => false, ), ));
 $client->setHttpClient($guzzleClient);

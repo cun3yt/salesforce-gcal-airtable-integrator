@@ -1,12 +1,12 @@
 <?
 error_reporting(~E_NOTICE && ~E_DEPRECATED);
 session_start();
-require_once '/var/www/html/gcal/vendor/autoload.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/gcal/vendor/autoload.php';
 require_once 'config.php';
 $strClientDomain = $strClientDomainName;
-$strPersonalDomain = implode(",",$arrPersonalDoamin);
+$strPersonalDomain = implode(",",$arrPersonalDomain);
 $client = new Google_Client();
-$client->setAuthConfig('/var/www/html/gcal/15FiveCal.json');
+$client->setAuthConfig($googleCalAPICredentialFile);
 $client->addScope(array(Google_Service_Calendar::CALENDAR));
 $guzzleClient = new \GuzzleHttp\Client(array( 'curl' => array( CURLOPT_SSL_VERIFYPEER => false, ), ));
 $client->setHttpClient($guzzleClient);

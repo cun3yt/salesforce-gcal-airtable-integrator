@@ -75,10 +75,7 @@ function refreshtoken($instance_url, $access_token,$strEmail = "") {
     curl_close($curl);
 
     $response = json_decode($json_response, true);
-	print("<pre>");
-	print_r($response);
-	//exit;
-	
+
 	if(is_array($response) && (count($response)>0)) {
 		if(isset($response['error'])) {
 			if($response['error_description'] == "expired access/refresh token") {

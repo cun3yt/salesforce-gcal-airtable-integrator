@@ -1,5 +1,5 @@
-<?php
-require_once 'config.php';
+<?
+require_once('config.php');
 session_start();
 $strCurrentClient = $_SESSION['currentclient'];
 $strCurrentClientFolderName = $_SESSION['currentclientfoldername'];
@@ -35,10 +35,6 @@ curl_close($curl);
 
 $response = json_decode($json_response, true);
 
-//print("<pre>");
-//print_r($response);
-//exit;
-
 $access_token = $response['access_token'];
 $instance_url = $response['instance_url'];
 
@@ -50,10 +46,7 @@ if (!isset($instance_url) || $instance_url == "") {
     die("Error - instance URL missing from response!");
 }
 
-//$_SESSION['access_token'] = $access_token;
-//$_SESSION['instance_url'] = $instance_url;
 $_SESSION['arraccess'] = $response;
 
-//header( 'Location: savetokens.php' ) ;
-header( 'Location: http://ec2-34-210-36-40.us-west-2.compute.amazonaws.com/'.$strCurrentClientFolderName.'/sf/savetokens.php' ) ;
-?>
+$headerLocation = Helpers::generateLink("{$strCurrentClientFolderName}/sf/savetokens.php");
+header("Location: {$headerLocation}");

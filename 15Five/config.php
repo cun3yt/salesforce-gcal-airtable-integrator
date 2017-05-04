@@ -1,9 +1,11 @@
 <?php
 /*
-*
 * This file is basically responsible setting up client space, configuring client specific parameters.
 */
 error_reporting(~E_NOTICE && ~E_DEPRECATED);
+
+require_once($_SERVER['DOCUMENT_ROOT']."/global-config.php");
+
 session_start();
 
 $strClient = "15Five"; // This is the name of the client;
@@ -24,10 +26,8 @@ $strAirtableBaseName = "Meetings";
 // This is airtable api end point, this will be found in the airtable account, usually this will not change.
 $strAirtableBaseEndpoint = 'https://api.airtable.com/v0/';
 
-
 // This is about letting the system know for this client about the current personal accounts, which are needed to flag meeting as other.
 $arrPersonalDoamin = array("gmail.com","yahoo.com","yahoo.co.in","aol.com","att.net","comcast.net","facebook.com","gmail.com","gmx.com","googlemail.com","google.com","hotmail.com","hotmail.co.uk","mac.com","me.com","mail.com","msn.com","live.com","sbcglobal.net","verizon.net","yahoo.com","yahoo.co.uk","rediif.com");
 
 // This is about letting the system know about some attendee email domain that should be considered as junk and should not be considered for processing.
 $arrBannedDomains = array("resource.calendar.google.com");
-?>
