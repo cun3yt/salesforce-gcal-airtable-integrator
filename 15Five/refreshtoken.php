@@ -11,7 +11,7 @@ require_once $_SERVER['DOCUMENT_ROOT'].'/gcal/vendor/autoload.php';
 // we need to include config file so as to get set customer environment for refreshing customer google calendar account
 require_once 'config.php';
 $client = new Google_Client();
-$client->setAuthConfig($_SERVER['DOCUMENT_ROOT'].'/gcal/15FiveCal.json');
+$client->setAuthConfig($googleCalAPICredentialFile);
 $client->addScope(array(Google_Service_Calendar::CALENDAR));
 $guzzleClient = new \GuzzleHttp\Client(array( 'curl' => array( CURLOPT_SSL_VERIFYPEER => false, ), ));
 $client->setHttpClient($guzzleClient);

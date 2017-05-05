@@ -8,7 +8,7 @@ $strToken = "";
 require_once $_SERVER['DOCUMENT_ROOT'].'/gcal/vendor/autoload.php';
 
 $client = new Google_Client();
-$client->setAuthConfig($_SERVER['DOCUMENT_ROOT'].'/gcal/15FiveCal.json');
+$client->setAuthConfig($googleCalAPICredentialFile);
 $client->addScope(array(Google_Service_Calendar::CALENDAR,"https://www.googleapis.com/auth/contacts.readonly","https://www.googleapis.com/auth/userinfo.profile"));
 $guzzleClient = new \GuzzleHttp\Client(array( 'curl' => array( CURLOPT_SSL_VERIFYPEER => false, ), ));
 $client->setHttpClient($guzzleClient);

@@ -7,7 +7,7 @@
 */
 
 // setting and loading the dependencies for google api to work
-require_once '../../resttest/config.php';
+require_once '../../salesforce/config.php';
 // we need to include config file so as to get set customer environment for refreshing customer google calendar account
 require_once '../config.php';
 // Get the registerd salesforce oAuth access entry from customer's airtable base

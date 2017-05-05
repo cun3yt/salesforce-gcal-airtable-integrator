@@ -8,6 +8,8 @@ require_once($_SERVER['DOCUMENT_ROOT']."/global-config.php");
 
 session_start();
 
+$googleCalAPICredentialFile = $_SERVER['DOCUMENT_ROOT'] . '/config/google_api_credential_15five_domain.json';
+
 $strClient = "15Five"; // This is the name of the client;
 $strClientFolderName = '15Five'; // This is the folder name where your customer instance should be, this is case sensitve;
 

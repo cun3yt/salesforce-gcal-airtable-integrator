@@ -1,5 +1,5 @@
 <?
-require_once '../../resttest/config.php';
+require_once '../../salesforce/config.php';
 
 require_once '../config.php';
 require_once('../libraries/Helpers.php');

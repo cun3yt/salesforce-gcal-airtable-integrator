@@ -166,7 +166,7 @@ $SFDCIntegrations = Helpers::getIntegrations($customer, \DataModels\DataModels\C
                             <div class="title">Salesforce</div>
                             <? if($integration->getStatus() == "expired") { ?>
                                 <p>&nbsp;</p>
-                                <a href="<?=Helpers::generateLink("resttest/oauth.php")?>">
+                                <a href="<?=Helpers::generateLink("salesforce/oauth.php")?>">
                                     <button type="button" class="setting-btn">Reconnect</button>
                                 </a>
                             <? } else { ?>
@@ -177,7 +177,7 @@ $SFDCIntegrations = Helpers::getIntegrations($customer, \DataModels\DataModels\C
                 <? } ?>
             <? } else {?>
                 <div class="calendor-btn">
-                    <a href="<?=Helpers::generateLink("resttest/oauth.php")?>">
+                    <a href="<?=Helpers::generateLink("salesforce/oauth.php")?>">
                         <button type="button" class="add-button">Connect Your SFDC Account</button>
                     </a>
                 </div>

@@ -542,7 +542,7 @@ Salesforce account.
 											
 											?>
 												<p>&nbsp;</p>
-												<a href="http://ec2-34-210-36-40.us-west-2.compute.amazonaws.com/resttest/oauth.php"><button type="button" class="setting-btn">Reconnect</button></a>
+												<a href="http://ec2-34-210-36-40.us-west-2.compute.amazonaws.com/salesforce/oauth.php"><button type="button" class="setting-btn">Reconnect</button></a>
 											<?php
 										}
 										else
@@ -567,7 +567,7 @@ Salesforce account.
 					// we show login with salesforce button only if there are no salesforce account connected
 					// This button redirects to third party file from where OAuth for salesforce is taken care of.
 					?>
-						<div class="calendor-btn"><a href="http://ec2-34-210-36-40.us-west-2.compute.amazonaws.com/resttest/oauth.php"><button type="button" class="add-button">Login with Salesforce </button></a></div>
+						<div class="calendor-btn"><a href="http://ec2-34-210-36-40.us-west-2.compute.amazonaws.com/salesforce/oauth.php"><button type="button" class="add-button">Login with Salesforce </button></a></div>
 					<?php
 				}
 			?>
