@@ -27,6 +27,6 @@ if (!isset($_GET['code'])) {
 	$_SESSION['access_token'] = $client->getAccessToken();
 ?>
 	<script type="text/javascript">
-		window.location = "<?=BASE_URL."/gcal/testcalnews.php"?>";
+		window.location = "<?=BASE_URL."/gcal/add_new_gcal.php"?>";
 	</script>
 <? }
