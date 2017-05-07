@@ -40,9 +40,8 @@ class Helpers {
         $contacts = $customer->getCustomerContacts();
         $integrations = array();
 
-        $q = new CustomerContactIntegrationQuery();
-
         foreach($contacts as $contact) {
+            $q = new CustomerContactIntegrationQuery();
             $collection = $q->filterByCustomerContact($contact)->filterByType($integrationType)->find();
             $integrations = array_merge($integrations, $collection->getArrayCopy());
         }
