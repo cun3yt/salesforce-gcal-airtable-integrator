@@ -7,6 +7,8 @@ session_start();
 require_once('config.php');
 require_once('../libraries/Helpers.php');
 
+Helpers::setDebugParam($isDebugActive);
+
 $access_token = "";
 $instance_url = "";
 $strRecordId = "";

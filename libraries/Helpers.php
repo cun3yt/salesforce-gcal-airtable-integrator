@@ -189,7 +189,11 @@ class Helpers {
         die();
     }
 
-    static function setDebugParam($active = true) {
+    static function setDebugParam($active = false) {
+        if(!$active) {
+            return;
+        }
+
         if( isset($_GET['XDEBUG_SESSION_START']) ) {
             $_SESSION['XDEBUG_SESSION_START'] = $_GET['XDEBUG_SESSION_START'];
         } else if( isset($_SESSION['XDEBUG_SESSION_START']) && $_SESSION['XDEBUG_SESSION_START'] ) {

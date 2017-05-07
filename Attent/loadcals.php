@@ -4,6 +4,8 @@ error_reporting(~E_NOTICE && ~E_DEPRECATED);
 require_once('config.php');
 require_once('../libraries/Helpers.php');
 
+Helpers::setDebugParam($isDebugActive);
+
 $userDataArray = $_SESSION['userdata'];
 
 list($customer, $contacts) = Helpers::loadCustomerData($strClientDomainName);
