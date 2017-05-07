@@ -1,12 +1,10 @@
 <?
 error_reporting(~E_NOTICE && ~E_DEPRECATED);
-session_start();
 
 require_once('config.php');
 require_once('../libraries/Helpers.php');
 
 $userDataArray = $_SESSION['userdata'];
-$_SESSION['currentclientfoldername'] = $strClientFolderName;
 
 list($customer, $contacts) = Helpers::loadCustomerData($strClientDomainName);
 

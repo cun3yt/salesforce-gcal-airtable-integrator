@@ -4,6 +4,7 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/generated-conf/config.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/global-config.php');
 session_start();
+
 $googleCalAPICredentialFile = $_SERVER['DOCUMENT_ROOT'] . '/config/google_api_credential_15five_domain.json';
 $strClient = "Attent";
 $strClientFolderName = 'Attent';
@@ -17,3 +18,5 @@ $arrPersonalDomain = array("gmail.com", "yahoo.com", "yahoo.co.in", "aol.com", "
     "mac.com", "me.com", "mail.com", "msn.com", "live.com", "sbcglobal.net", "verizon.net", "yahoo.com",
     "yahoo.co.uk", "rediif.com");
 $arrBannedDomains = array("resource.calendar.google.com");
+
+$_SESSION['currentclientfoldername'] = $strClientFolderName;
