@@ -28,18 +28,15 @@ if (is_array($strTok) && (count($strTok)>0)) {
     $client->setAccessToken($strTok);
     $service = new Google_Service_Calendar($client);
     $calendarList = $service->calendarList->listCalendarList();
-
-    if(is_array($calendarList->getItems()) && (count($calendarList->getItems())>0)) {
+    if (is_array($calendarList->getItems()) && (count($calendarList->getItems()) > 0)) {
         $strUserId = "";
         $intUsrCnt = 0;
         $arrUserData = array();
-
-        foreach($calendarList->getItems() as $calendar) {
-            if( !($calendar->id) ) {
+        foreach ($calendarList->getItems() as $calendar) {
+            if (!($calendar->id)) {
                 continue;
             }
-
-            if($calendar->primary == "1") {
+            if ($calendar->primary == "1") {
                 $strUserId = $calendar->id;
                 $arrUserData[json_encode($strTok)] = $calendar->id;
             }
@@ -49,12 +46,6 @@ if (is_array($strTok) && (count($strTok)>0)) {
     }
     unset($_SESSION['access_token']);
     unset($_SESSION['userid']);
-    ?>
-    <script type="text/javascript">
-        window.location.href = "<?=Helpers::generateLink("{$strCurrentClientFolderName}/loadcals.php")?>";
-    </script>
-<? } else {?>
-    <script type="text/javascript">
-        window.location = "<?=Helpers::generateLink("gcal/getaccesss.php")?>";
-    </script>
-<? }
+}
+
+Helpers::redirect(Helpers::generateLink("{$strCurrentClientFolderName}/loadcals.php"));
