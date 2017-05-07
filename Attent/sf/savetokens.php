@@ -2,7 +2,6 @@
 error_reporting(~E_WARNING && ~E_NOTICE);
 session_start();
 require_once '../config.php';
-$strCurrentClient = $_SESSION['currentclient'];
 $strCurrentClientFolderName = $_SESSION['currentclientfoldername'];
 
 if(is_array($_SESSION['arraccess']) && (count($_SESSION['arraccess'])>0)) {
