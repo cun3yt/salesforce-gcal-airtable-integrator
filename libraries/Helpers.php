@@ -179,4 +179,31 @@ class Helpers {
         return false;
     }
 
+    /**
+     * @param string $url
+     */
+    static function redirect($url) {
+        ob_start();
+        header("Location: {$url}");
+        ob_end_flush();
+        die();
+    }
+
+    static function setDebugParam($active = true) {
+        if( isset($_GET['XDEBUG_SESSION_START']) ) {
+            $_SESSION['XDEBUG_SESSION_START'] = $_GET['XDEBUG_SESSION_START'];
+        } else if( isset($_SESSION['XDEBUG_SESSION_START']) && $_SESSION['XDEBUG_SESSION_START'] ) {
+            $url = "http://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
+
+            $redirectUrl = "";
+
+            if( strpos($url, '?') === false ) {
+                $redirectUrl = "{$url}?XDEBUG_SESSION_START={$_SESSION['XDEBUG_SESSION_START']}";
+            } else {
+                $redirectUrl = "{$url}&XDEBUG_SESSION_START={$_SESSION['XDEBUG_SESSION_START']}";
+            }
+
+            self::redirect($redirectUrl);
+        }
+    }
 }
