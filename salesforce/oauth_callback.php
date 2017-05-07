@@ -1,7 +1,6 @@
 <?
 require_once('config.php');
 session_start();
-$strCurrentClient = $_SESSION['currentclient'];
 $strCurrentClientFolderName = $_SESSION['currentclientfoldername'];
 $token_url = LOGIN_URI . "/services/oauth2/token";
 

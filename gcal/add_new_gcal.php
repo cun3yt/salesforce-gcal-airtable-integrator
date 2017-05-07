@@ -2,7 +2,6 @@
 error_reporting(~E_NOTICE && ~E_DEPRECATED);
 require_once('./config.php');
 session_start();
-$strCurrentClient = $_SESSION['currentclient'];
 $strCurrentClientFolderName = $_SESSION['currentclientfoldername'];
 $strToken = "";
 require_once $_SERVER['DOCUMENT_ROOT'].'/gcal/vendor/autoload.php';

@@ -6,7 +6,6 @@ require_once('config.php');
 require_once('../libraries/Helpers.php');
 
 $userDataArray = $_SESSION['userdata'];
-$_SESSION['currentclient'] = $strClient;
 $_SESSION['currentclientfoldername'] = $strClientFolderName;
 
 list($customer, $contacts) = Helpers::loadCustomerData($strClientDomainName);

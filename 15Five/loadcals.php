@@ -16,7 +16,7 @@ require_once('config.php');
 * System looks up the current checkpoint in its temporary storage and identifies the correct place or callback URL with this * information for further processing,  .
 * When system comes back with help of call back url through session variables, it process further and stores current clients * google access or salesforce access to their own airtable base.
 */
-$_SESSION['currentclient'] = $strClient;
+
 $_SESSION['currentclientfoldername'] = $strClientFolderName;
 
 /*

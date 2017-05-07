@@ -9,7 +9,6 @@ session_start();
 // we need to include config file so as to get set customer environment for refreshing customer google calendar account
 require_once '../config.php';
 // we will inform script about the currrent client domain, so that while processing system knows about the client and work accordingly.
-$strCurrentClient = $_SESSION['currentclient'];
 $strCurrentClientFolderName = $_SESSION['currentclientfoldername'];
 
 
