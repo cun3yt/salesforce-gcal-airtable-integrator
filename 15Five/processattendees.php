@@ -137,14 +137,10 @@ if(is_array($arrGcalUser) && (count($arrGcalUser)>0))
 									$isUpdatedAccountHistory = fnInsertContactHistory($arrAccountDetailSF['records'],$arrAccountDetail[0]['id']);
 									$arrUpdatedIds[] = $isUpdatedAccountHistory['id']; // noting the attendee history record created so as to mapp it with the meeting record for lookup
 								}
-								//$boolUpdateAccount = fnUpdateAccountRecord($strARecId,$arrAccountDetailSF['records'][0]['Name'],$isUpdatedAccountHistory['id']);
 							}
 							else
 							{
-								//$arrOppHIds[] = $IsToBeInserted;
 								$arrUpdatedIds[] = $IsToBeInserted; // noting the attendee history record created so as to mapp it with the meeting record for lookup
-								
-								//$boolUpdateAccount = fnUpdateAccountRecord($strARecId,$arrAccountDetailSF['records'][0]['Name'],$IsToBeInserted);
 							}
 						}
 						else
@@ -154,7 +150,6 @@ if(is_array($arrGcalUser) && (count($arrGcalUser)>0))
 					}
 					else
 					{
-						//echo "No Account Present";
 						continue;
 					}
 				}
