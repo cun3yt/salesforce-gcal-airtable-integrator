@@ -333,47 +333,35 @@ function fnGetProcessAccounts()
 {
 	global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
 	
-	echo "--".$strDate = strtotime(date("Y-m-d"));
+	$strDate = strtotime(date("Y-m-d"));
 	$base = $strAirtableBase;
 	$table = 'Meeting%20History';
 	$strApiKey = $strAirtableApiKey;
 	$url = $strAirtableBaseEndpoint.$base.'/'.$table."?maxRecords=5&view=".rawurlencode("opportunity_not_processed");
 	$url .= '&filterByFormula=('.rawurlencode("{meetingprocesstime}<='".$strDate."'").')';
 		
-	echo "--".$url; 
 	$authorization = "Authorization: Bearer ".$strApiKey;
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_HTTPGET, 1);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 	curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 	curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
-	//set the url, number of POST vars, POST data
 	curl_setopt($ch,CURLOPT_URL, $url);
 
-	//execute post
 	$result = curl_exec($ch);
-	if(!$result)
-	{
+	if(!$result) {
 		echo 'error:' . curl_error($ch);
 		return false;
 	}
-	else
-	{
-		$arrResponse = json_decode($result,true);
-		//print("<pre>");
-		//print_r($arrResponse);
-		//exit;
-		
-		if(isset($arrResponse['records']) && (count($arrResponse['records'])>0))
-		{
-			$arrSUser = $arrResponse['records'];
-			return $arrSUser;
-		}
-		else
-		{
-			return false;
-		}
-	}
+
+	$arrResponse = json_decode($result,true);
+
+    if(isset($arrResponse['records']) && (count($arrResponse['records'])>0)) {
+        $arrSUser = $arrResponse['records'];
+        return $arrSUser;
+    }
+
+    return false;
 }
 
 

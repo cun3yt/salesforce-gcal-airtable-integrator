@@ -269,10 +269,7 @@ function fnGetProcessAccounts()
 	else
 	{
 		$arrResponse = json_decode($result,true);
-		//print("<pre>");
-		//print_r($arrResponse);
-		//exit;
-		
+
 		if(isset($arrResponse['records']) && (count($arrResponse['records'])>0))
 		{
 			$arrSUser = $arrResponse['records'];
