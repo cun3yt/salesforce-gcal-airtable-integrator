@@ -20,4 +20,5 @@ class CustomerContactIntegration extends BaseCustomerContactIntegration
     const SFDC = 'sfdc';
 
     const STATUS_ACTIVE = 'active';
+    const STATUS_EXPIRED = 'expired';
 }

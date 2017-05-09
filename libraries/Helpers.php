@@ -7,6 +7,8 @@ use DataModels\DataModels\CustomerContactIntegrationQuery as CustomerContactInte
 use DataModels\DataModels\CustomerContactIntegration as CustomerContactIntegration;
 use DataModels\DataModels\CustomerContactQuery as CustomerContactQuery;
 use DataModels\DataModels\CustomerContact as CustomerContact;
+use DataModels\DataModels\MeetingQuery as MeetingQuery;
+use DataModels\DataModels\Meeting as Meeting;
 
 class Helpers {
     /**
@@ -29,7 +31,7 @@ class Helpers {
     }
 
     /**
-     * Replaces "fnGetSalesUser"
+     * Replaces "fnGetSalesUser" & "fnGetGcalUser" functions
      *
      * @param Customer $customer
      * @param string $integrationType
@@ -648,8 +650,12 @@ class Helpers {
         return false;
     }
 
+
+
     /**
      * Function to connect to airtable base and get customers gcals OAuth acceess
+     *
+     * @deprecated Use getIntegrations() function instead
      *
      * @return bool
      */
@@ -685,8 +691,44 @@ class Helpers {
     }
 
     /**
+     * Use this function instead of fnGetLatestMeetsForUser() function
+     *
+     * @param Customer $customer
+     * @param $emailAddress
+     * @return Meeting|null
+     */
+    static function getLastMeetingInDBForEmailAddress(Customer $customer, $emailAddress) {
+        if(!$emailAddress) {
+            return NULL;
+        }
+
+        $customerContact = CustomerContact::findByCustomerAndEmailAddress($customer, $emailAddress);
+
+        if(!$customerContact) {
+            return NULL;
+        }
+
+        $meetingAttendee = $customerContact->getMeetingAttendee();
+
+        if(!$meetingAttendee) {
+            return NULL;
+        }
+
+        $q = new MeetingQuery();
+        $meetingSet = $q->filterByEventOwnerId($meetingAttendee->getId())->orderByEventDatetime()->limit(1);
+
+        if($meetingSet->count() <= 0) { return NULL; }
+
+        return $meetingSet[0];
+    }
+
+    /**
      * Function to connect to airtable base latest record for the passed email address
      * System uses the Meetingsreverse view of airtable for this processing
+     *
+     * @deprecated use getLastMeetingInDBForEmailAddress() instead
+     * @param $strEmail
+     * @return bool
      */
     static function fnGetLatestMeetsForUser($strEmail) {
         global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
@@ -900,8 +942,9 @@ class Helpers {
     }
 
     /**
-     * Function to set access record as expire when access token gets expired
+     * Setting access record as expired
      *
+     * @deprecated use CustomerContactIntegration::setStatus() function instead
      * @param string $strEmail
      * @return bool
      */

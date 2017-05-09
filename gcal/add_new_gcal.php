@@ -24,28 +24,30 @@ $client->setIncludeGrantedScopes(true);
 
 $strTok = $strToken ? $strToken : $_SESSION['access_token'];
 
-if (is_array($strTok) && (count($strTok)>0)) {
-    $client->setAccessToken($strTok);
-    $service = new Google_Service_Calendar($client);
-    $calendarList = $service->calendarList->listCalendarList();
-    if (is_array($calendarList->getItems()) && (count($calendarList->getItems()) > 0)) {
-        $strUserId = "";
-        $intUsrCnt = 0;
-        $arrUserData = array();
-        foreach ($calendarList->getItems() as $calendar) {
-            if (!($calendar->id)) {
-                continue;
-            }
-            if ($calendar->primary == "1") {
-                $strUserId = $calendar->id;
-                $arrUserData[json_encode($strTok)] = $calendar->id;
-            }
-            $calendarId = $calendar->id;
-            $_SESSION['userdata'] = $arrUserData;
-        }
-    }
-    unset($_SESSION['access_token']);
-    unset($_SESSION['userid']);
+if( !(is_array($strTok) && (count($strTok)>0)) ) {
+    Helpers::redirect(Helpers::generateLink("gcal/getaccess.php"));
 }
+
+$client->setAccessToken($strTok);
+$service = new Google_Service_Calendar($client);
+$calendarList = $service->calendarList->listCalendarList();
+if (is_array($calendarList->getItems()) && (count($calendarList->getItems()) > 0)) {
+    $strUserId = "";
+    $intUsrCnt = 0;
+    $arrUserData = array();
+    foreach ($calendarList->getItems() as $calendar) {
+        if (!($calendar->id)) {
+            continue;
+        }
+        if ($calendar->primary == "1") {
+            $strUserId = $calendar->id;
+            $arrUserData[json_encode($strTok)] = $calendar->id;
+        }
+        $calendarId = $calendar->id;
+        $_SESSION['userdata'] = $arrUserData;
+    }
+}
+unset($_SESSION['access_token']);
+unset($_SESSION['userid']);
 
 Helpers::redirect(Helpers::generateLink("{$strCurrentClientFolderName}/loadcals.php"));
