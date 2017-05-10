@@ -1,12 +1,11 @@
 <?
 /**
- * This file is responsible to use calenderemail data from the meeting record and
- * change it into more meaning form like Name for better understanding.
+ * This file is responsible to use calender-email data from the meeting record and
+ * change it into more meaning form (like Name) for better understanding.
  *
- * System does not update the calendaremail just used and gets the formatted information
- * and puts it other column in meeting history airtable base.
+ * System does not update the calendar-email just uses it and gets the formatted
+ * information and puts it other column in meeting history airtable table.
  */
-
 error_reporting(~E_NOTICE && ~E_DEPRECATED);
 session_start();
 require_once('config.php');
