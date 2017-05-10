@@ -13,14 +13,15 @@
  * For every event or meeting pulled from google calendar system will derive
  * the meeting opportunity processing time,
  * which will be (meeting date + 3days) and add this time in the meeting history table
- *
  */
+
 error_reporting(~E_NOTICE && ~E_DEPRECATED);
 session_start();
 
 const DateFormat = 'Y-m-d';
 const DateTimeFormat = 'Y-m-d H:i:s';
 
+use DataModels\DataModels\Meeting as Meeting;
 use DataModels\DataModels\CustomerContactIntegration as CustomerContactIntegration;
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/gcal/vendor/autoload.php');
@@ -90,6 +91,7 @@ foreach($calendarIntegrations as $integration) {
             } else {
                 $eventDateTime = strtotime($lastMeeting->getEventDatetime());
                 $date = (strtotime($date) <= $eventDateTime) ? $date : date(DateFormat, $eventDateTime);
+                unset($eventDateTime);
             }
 
             $calendarId = $calendar->id;
@@ -100,112 +102,102 @@ foreach($calendarIntegrations as $integration) {
               'singleEvents' => TRUE
             );
 
-            $results = $service->events->listEvents($calendarId, $optParams);
+            $events = $service->events->listEvents($calendarId, $optParams); // @todo $results better named "meetings" or "events"
 
-            if( !(is_array($results->getItems()) && (count($results->getItems())>0)) ) {
+            if( !(is_array($events->getItems()) && (count($events->getItems())>0)) ) {
                 continue;
             }
 
-            $intFrCnt = 0;
-            $calTimeZone = $results->timeZone; // Calendar Timezone
+            $calTimeZone = $events->timeZone; // Calendar Timezone
 
             date_default_timezone_set($calTimeZone); // Setting default timezone
 
-            $arrResultData = array();
+            foreach ($events->getItems() as $event) {
+                $resultData = array();
 
-            foreach ($results->getItems() as $event) {
+                $eventDatetime = $event->start->dateTime;
 
-                // ================================ @todo Continue!! ================
-
-                $strEventId = $calendar->id."_".$event->id;
-                $eventDateStr = $event->start->dateTime;
-
-                if(empty($eventDateStr)) { // All-day event
-                    $eventDateStr = $event->start->date;
+                if(empty($eventDatetime)) { // All-day event
+                    $eventDatetime = $event->start->date;
                 }
 
-                $temp_timezone = $event->start->timeZone;   // If the event has a special timezone
+                $tempTimezone = $event->start->timeZone;   // If the event has a special timezone
 
                 // If there is no timezone
-                $timezone = empty($temp_timezone) ? new DateTimeZone($calTimeZone) : new DateTimeZone($temp_timezone);
+                $timezone = empty($tempTimezone) ? new DateTimeZone($calTimeZone) : new DateTimeZone($tempTimezone);
 
-                $eventdate = new DateTime($eventDateStr,$timezone);
-                $newmonth = $eventdate->format("M");    // Converting to legible month
-                $newday = $eventdate->format("j");      // Converting to legible day
-                $arrEventCreator = (array) $event->creator;
-                $arrEventAttendees = array();
-                $strInternalDomain = "Internal";
-                $arrResultData[$intFrCnt]['eventid'] = $event->id;
-                $arrResultData[$intFrCnt]['eventdate'] = $newday;
-                $arrResultData[$intFrCnt]['eventmonth'] = $newmonth;
-                $arrResultData[$intFrCnt]['eventsummary'] = $event->getSummary();
-                $arrResultData[$intFrCnt]['eventdescription'] = $event->description;
-                $arrResultData[$intFrCnt]['calendarid'] = $calendar->id;
-                $arrResultData[$intFrCnt]['userid'] = $strUserId;
+                $eventDate = new DateTime($eventDatetime,$timezone);
+                $creator = $event->getCreator();
+                $eventAttendeesList = array();
+                $eventType = "Internal";
+                $resultData['eventid'] = $event->id; // +++
+                $resultData['userid'] = $strUserId;
 
-                $strStardDate = date(DateTimeFormat,strtotime($eventdate->format("Y")."-".$eventdate->format("m")."-".$eventdate->format("d")));
-                $arrResultData[$intFrCnt]['startdate'] = $strStardDate;
-                if($strStardDate) {
-                    $inDForm = date(DateFormat,strtotime($strStardDate))." 00:00:00";
-                    $strStartTime = strtotime($inDForm);
-                    $strProcessTime = strtotime("+7 day", $strStartTime);
-                    $arrResultData[$intFrCnt]['processtime'] = $strProcessTime;
+                $startDate = date(DateTimeFormat,strtotime($eventDate->format("Y")."-".$eventDate->format("m")."-".$eventDate->format("d")));
+                $resultData['startdate'] = $startDate;
+                if($startDate) {
+                    $inDForm = date(DateFormat,strtotime($startDate))." 00:00:00";
+                    $startTime = strtotime($inDForm);
+                    $processTime = strtotime("+7 day", $startTime);
+                    $resultData['processtime'] = $processTime;
                 }
 
-                if(is_array($arrEventCreator) && (count($arrEventCreator)>0)) {
-                    if($arrEventCreator['email']) {
-                        $arrResultData[$intFrCnt]['ceatedbyemail'] = $arrEventCreator['email'];
+                $resultData['ceatedbyemail'] = $creator ? $creator->getEmail() : "";
+                $resultData['createdByName'] = $creator ? $creator->getDisplayName() : "";
+
+                // ----------
+                $outsideDomain = "";
+                foreach($event->getAttendees() as $attendee) {
+                    $attendeeEmail = $attendee->getEmail();
+                    $domain = substr(strrchr($attendeeEmail, "@"), 1);
+
+                    $eventAttendeesList[] = $attendeeEmail;
+
+                    if($domain == $strClientDomainName) {
+                        continue;
                     }
 
-                    if($arrEventCreator['displayName']) {
-                        $arrResultData[$intFrCnt]['creayedbyname'] = $arrEventCreator['displayName'];
+                    if(in_array($domain, $personalEmailDomains)) {
+                        $outsideDomain .= "1,";
+                    } else {
+                        $eventType = "External";
+                        $outsideDomain .= "0,";
                     }
                 }
+                $resultData['attendeesemail'] = implode(",",$eventAttendeesList);
+                // ----------
 
-                if(is_array($event->attendees) && (count($event->attendees)>0)) {
-                    $strOtherDomain = "";
+                if($outsideDomain && (stripos($outsideDomain, "0") === false)) {
+                    $eventType = "Other";
+                }
 
-                    foreach($event->attendees as $arrAttendee) {
-                        $domain = substr(strrchr($arrAttendee['email'], "@"), 1);
+                $resultData['meetingtype'] = $eventType;
 
-                        if($domain != $strClientDomainName) {
+                if($event->getSummary()) {
+                    if( !(is_array($eventAttendeesList) && (count($eventAttendeesList)>0)) ) {
+                        continue;
+                    }
 
-                            if(in_array($domain, $personalEmailDomains)) {
-                                $strOtherDomain .= "1,";
-                            } else {
-                                $strInternalDomain = "External";
-                                $strOtherDomain .= "0,";
-                            }
+                    $meeting = Helpers::getMeetingIfExists($event);
+                    // @todo what about changes to the event? Id check will not show the difference!
+
+                    if(!$meeting) {
+                        $meeting = new Meeting();
+                        $meeting->setEventId($event->getId())
+                            ->setName($event->getSummary())
+                            ->setEventDatetime($eventDate)
+                            ->setAdditionalData(json_encode(array('calendarId' => $calendarId)))
+                            ->setEventType($eventType);
+
+                        if($event->getDescription()) {
+                            $meeting->setEventDescription($event->getDescription());
                         }
 
-                        $arrEventAttendees[] = $arrAttendee['email'];
-                    }
-                    $arrResultData[$intFrCnt]['attendeesemail'] = implode(",",$arrEventAttendees);
-                }
-
-                if($strOtherDomain) {
-                    $pos2 = stripos($strOtherDomain, "0");
-                    if($pos2 === false) {
-                        $arrResultData[$intFrCnt]['meetingtype'] = "Other";
-                    }
-                    else {
-                        $arrResultData[$intFrCnt]['meetingtype'] = $strInternalDomain;
-                    }
-                } else {
-                    $arrResultData[$intFrCnt]['meetingtype'] = $strInternalDomain;
-                }
-
-                if($arrResultData[$intFrCnt]['eventsummary']) {
-                    if(is_array($arrEventAttendees) && (count($arrEventAttendees)>0)) {
-                        $isAttPresent = Helpers::fnCheckMeetingAlreadyPresent($arrResultData[$intFrCnt]);
-
-                        if(!$isAttPresent) {
-                            $isAttendeesSaved = Helpers::fnSaveAirtableMeetings($arrResultData[$intFrCnt]);
-                        }
-
-                        $intFrCnt++;
+                        $meeting->save();
                     }
                 }
+
+                unset($resultData);
             }
         }
     } catch(Exception $e) {
@@ -219,7 +211,7 @@ foreach($calendarIntegrations as $integration) {
             $contactEmailAddress = $integration->getCustomerContact()->getEmail();
             $integration->setStatus(CustomerContactIntegration::STATUS_EXPIRED);
             $integration->save();
-//            Helpers::fnSendAccountExpirationMail($contactEmailAddress);
+            Helpers::sendAccountExpirationMail($contactEmailAddress);
         }
     }
 }

@@ -771,12 +771,34 @@ class Helpers {
     }
 
     /**
+     * Replaced fnCheckMeetingAlreadyPresent()
+     *
+     * @param Google_Service_Calendar_Event $event
+     * @return Meeting|null
+     */
+    static function getMeetingIfExists(Google_Service_Calendar_Event $event) {
+        $mq = new MeetingQuery();
+        $meetings = $mq->findByEventId($event->id);
+
+        if($meetings->count() <= 0) {
+            return NULL;
+        }
+
+        if($meetings->count() > 1) {
+            trigger_error(__FUNCTION__ . " more than 1 meetings is found with event_id: {$event->id}", E_WARNING);
+        }
+
+        return $meetings[0];
+    }
+
+    /**
      * Function to check if meet already present in airtable meeting history table
      * It takes gcal eventid as parameter to check
      * Returns true if found false otherwise
      *
      * @param array $arrRecord
      * @return bool
+     * @deprecated use getMeetingIfExists() function instead
      */
     static function fnCheckMeetingAlreadyPresent($arrRecord = array()) {
         global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
@@ -799,7 +821,7 @@ class Helpers {
         //set the url, number of POST vars, POST data
         curl_setopt($ch,CURLOPT_URL, $url);
 
-        echo "--".$result = curl_exec($ch);
+        $result = curl_exec($ch);
 
         if(!$result) {
             return true;
@@ -816,11 +838,12 @@ class Helpers {
     }
 
     /**
-     * Function to save google meets into airtable meeting history table
+     * Function to save google meeting into airtable meeting history table
      * It takes event record as input parameter and returns the created record as reposne or false otherwise
      *
      * @param array $arrRecord
      * @return bool
+     * @deprecated use new Meeting instance instead (look at "synccaldata.php")
      */
     static function fnSaveAirtableMeetings($arrRecord = array()) {
         global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
@@ -848,8 +871,8 @@ class Helpers {
             $arrFields['fields']['calendaremail'] = $arrRecord['calendarid'];
         }
 
-        if($arrRecord['creayedbyname']) {
-            $arrFields['fields']['Created By'] = $arrRecord['creayedbyname'];
+        if($arrRecord['createdByName']) {
+            $arrFields['fields']['Created By'] = $arrRecord['createdByName'];
         }
 
         if($arrRecord['ceatedbyemail']) {
@@ -996,7 +1019,7 @@ class Helpers {
      * @param string $strEmail
      * @return bool
      */
-    static function fnSendAccountExpirationMail($strEmail = "") {
+    static function sendAccountExpirationMail($strEmail = "") {
         global $strClientFolderName,$strFromEmailAddress,$strSmtpHost,$strSmtpUsername,$strSmtpPassword,$strSmtpPPort;
 
         if(!$strEmail) {
@@ -1174,4 +1197,47 @@ class Helpers {
         $jsonResponse =  json_decode($response,true);
         return (is_array($jsonResponse) && (count($jsonResponse)>0));
     }
+
+    /**
+     * Function to connect to airtable base and update google calendar access details
+     * It take 1 parameter as the updated token and 1 as the record if where token is to be updated
+     * On success it returns true otherwise false
+     *
+     * @param $strToken
+     * @param $strRecId
+     * @return bool
+     * @deprecated use CustomerContactIntegrator instance functions instead!
+     */
+    function fnUpdateAccessTokenSalesUser($strToken,$strRecId) {
+        global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
+
+        if(!$strToken) {
+            return false;
+        }
+
+        $base = $strAirtableBase;
+        $table = 'gaccounts';
+        $strApiKey = $strAirtableApiKey;
+        $url = $strAirtableBaseEndpoint.$base.'/'.$table.'/'.$strRecId;
+
+        $authorization = "Authorization: Bearer ".$strApiKey;
+        $arrFields['fields']['user_token'] = $strToken;
+
+        $srtF = json_encode($arrFields);
+        $curl = curl_init($url);
+        // Accept any server (peer) certificate on dev envs
+        curl_setopt($curl, CURLOPT_HEADER, false);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PATCH');
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $srtF);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-type: application/json",$authorization));
+        $info = curl_getinfo($curl);
+        $response = curl_exec($curl);
+        curl_close($curl);
+        $jsonResponse =  json_decode($response,true);
+        print("<pre>");
+        print_r($jsonResponse);
+        return (is_array($jsonResponse) && (count($jsonResponse)>0));
+    }
+
 }

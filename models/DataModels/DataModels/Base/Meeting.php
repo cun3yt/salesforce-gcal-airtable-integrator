@@ -69,6 +69,20 @@ abstract class Meeting implements ActiveRecordInterface
     protected $id;
 
     /**
+     * The value for the event_id field.
+     *
+     * @var        string
+     */
+    protected $event_id;
+
+    /**
+     * The value for the event_type field.
+     *
+     * @var        string
+     */
+    protected $event_type;
+
+    /**
      * The value for the name field.
      *
      * @var        string
@@ -375,6 +389,26 @@ abstract class Meeting implements ActiveRecordInterface
     }
 
     /**
+     * Get the [event_id] column value.
+     *
+     * @return string
+     */
+    public function getEventId()
+    {
+        return $this->event_id;
+    }
+
+    /**
+     * Get the [event_type] column value.
+     *
+     * @return string
+     */
+    public function getEventType()
+    {
+        return $this->event_type;
+    }
+
+    /**
      * Get the [name] column value.
      *
      * @return string
@@ -513,6 +547,46 @@ abstract class Meeting implements ActiveRecordInterface
 
         return $this;
     } // setId()
+
+    /**
+     * Set the value of [event_id] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\Meeting The current object (for fluent API support)
+     */
+    public function setEventId($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->event_id !== $v) {
+            $this->event_id = $v;
+            $this->modifiedColumns[MeetingTableMap::COL_EVENT_ID] = true;
+        }
+
+        return $this;
+    } // setEventId()
+
+    /**
+     * Set the value of [event_type] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\Meeting The current object (for fluent API support)
+     */
+    public function setEventType($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->event_type !== $v) {
+            $this->event_type = $v;
+            $this->modifiedColumns[MeetingTableMap::COL_EVENT_TYPE] = true;
+        }
+
+        return $this;
+    } // setEventType()
 
     /**
      * Set the value of [name] column.
@@ -733,31 +807,37 @@ abstract class Meeting implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : MeetingTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : MeetingTableMap::translateFieldName('Name', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : MeetingTableMap::translateFieldName('EventId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->event_id = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : MeetingTableMap::translateFieldName('EventType', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->event_type = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : MeetingTableMap::translateFieldName('Name', TableMap::TYPE_PHPNAME, $indexType)];
             $this->name = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : MeetingTableMap::translateFieldName('EventDatetime', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : MeetingTableMap::translateFieldName('EventDatetime', TableMap::TYPE_PHPNAME, $indexType)];
             $this->event_datetime = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : MeetingTableMap::translateFieldName('EventCreatorId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : MeetingTableMap::translateFieldName('EventCreatorId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->event_creator_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : MeetingTableMap::translateFieldName('EventOwnerId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : MeetingTableMap::translateFieldName('EventOwnerId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->event_owner_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : MeetingTableMap::translateFieldName('EventDescription', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : MeetingTableMap::translateFieldName('EventDescription', TableMap::TYPE_PHPNAME, $indexType)];
             $this->event_description = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : MeetingTableMap::translateFieldName('AccountId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : MeetingTableMap::translateFieldName('AccountId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->account_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : MeetingTableMap::translateFieldName('AdditionalData', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : MeetingTableMap::translateFieldName('AdditionalData', TableMap::TYPE_PHPNAME, $indexType)];
             $this->additional_data = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : MeetingTableMap::translateFieldName('Created', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : MeetingTableMap::translateFieldName('Created', TableMap::TYPE_PHPNAME, $indexType)];
             $this->created = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : MeetingTableMap::translateFieldName('Updated', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : MeetingTableMap::translateFieldName('Updated', TableMap::TYPE_PHPNAME, $indexType)];
             $this->updated = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
             $this->resetModified();
 
@@ -767,7 +847,7 @@ abstract class Meeting implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 10; // 10 = MeetingTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 12; // 12 = MeetingTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\DataModels\\DataModels\\Meeting'), 0, $e);
@@ -980,6 +1060,12 @@ abstract class Meeting implements ActiveRecordInterface
         if ($this->isColumnModified(MeetingTableMap::COL_ID)) {
             $modifiedColumns[':p' . $index++]  = 'id';
         }
+        if ($this->isColumnModified(MeetingTableMap::COL_EVENT_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'event_id';
+        }
+        if ($this->isColumnModified(MeetingTableMap::COL_EVENT_TYPE)) {
+            $modifiedColumns[':p' . $index++]  = 'event_type';
+        }
         if ($this->isColumnModified(MeetingTableMap::COL_NAME)) {
             $modifiedColumns[':p' . $index++]  = 'name';
         }
@@ -1020,6 +1106,12 @@ abstract class Meeting implements ActiveRecordInterface
                 switch ($columnName) {
                     case 'id':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
+                        break;
+                    case 'event_id':
+                        $stmt->bindValue($identifier, $this->event_id, PDO::PARAM_STR);
+                        break;
+                    case 'event_type':
+                        $stmt->bindValue($identifier, $this->event_type, PDO::PARAM_STR);
                         break;
                     case 'name':
                         $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
@@ -1107,30 +1199,36 @@ abstract class Meeting implements ActiveRecordInterface
                 return $this->getId();
                 break;
             case 1:
-                return $this->getName();
+                return $this->getEventId();
                 break;
             case 2:
-                return $this->getEventDatetime();
+                return $this->getEventType();
                 break;
             case 3:
-                return $this->getEventCreatorId();
+                return $this->getName();
                 break;
             case 4:
-                return $this->getEventOwnerId();
+                return $this->getEventDatetime();
                 break;
             case 5:
-                return $this->getEventDescription();
+                return $this->getEventCreatorId();
                 break;
             case 6:
-                return $this->getAccountId();
+                return $this->getEventOwnerId();
                 break;
             case 7:
-                return $this->getAdditionalData();
+                return $this->getEventDescription();
                 break;
             case 8:
-                return $this->getCreated();
+                return $this->getAccountId();
                 break;
             case 9:
+                return $this->getAdditionalData();
+                break;
+            case 10:
+                return $this->getCreated();
+                break;
+            case 11:
                 return $this->getUpdated();
                 break;
             default:
@@ -1163,26 +1261,28 @@ abstract class Meeting implements ActiveRecordInterface
         $keys = MeetingTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getName(),
-            $keys[2] => $this->getEventDatetime(),
-            $keys[3] => $this->getEventCreatorId(),
-            $keys[4] => $this->getEventOwnerId(),
-            $keys[5] => $this->getEventDescription(),
-            $keys[6] => $this->getAccountId(),
-            $keys[7] => $this->getAdditionalData(),
-            $keys[8] => $this->getCreated(),
-            $keys[9] => $this->getUpdated(),
+            $keys[1] => $this->getEventId(),
+            $keys[2] => $this->getEventType(),
+            $keys[3] => $this->getName(),
+            $keys[4] => $this->getEventDatetime(),
+            $keys[5] => $this->getEventCreatorId(),
+            $keys[6] => $this->getEventOwnerId(),
+            $keys[7] => $this->getEventDescription(),
+            $keys[8] => $this->getAccountId(),
+            $keys[9] => $this->getAdditionalData(),
+            $keys[10] => $this->getCreated(),
+            $keys[11] => $this->getUpdated(),
         );
-        if ($result[$keys[2]] instanceof \DateTime) {
-            $result[$keys[2]] = $result[$keys[2]]->format('c');
+        if ($result[$keys[4]] instanceof \DateTime) {
+            $result[$keys[4]] = $result[$keys[4]]->format('c');
         }
 
-        if ($result[$keys[8]] instanceof \DateTime) {
-            $result[$keys[8]] = $result[$keys[8]]->format('c');
+        if ($result[$keys[10]] instanceof \DateTime) {
+            $result[$keys[10]] = $result[$keys[10]]->format('c');
         }
 
-        if ($result[$keys[9]] instanceof \DateTime) {
-            $result[$keys[9]] = $result[$keys[9]]->format('c');
+        if ($result[$keys[11]] instanceof \DateTime) {
+            $result[$keys[11]] = $result[$keys[11]]->format('c');
         }
 
         $virtualColumns = $this->virtualColumns;
@@ -1227,30 +1327,36 @@ abstract class Meeting implements ActiveRecordInterface
                 $this->setId($value);
                 break;
             case 1:
-                $this->setName($value);
+                $this->setEventId($value);
                 break;
             case 2:
-                $this->setEventDatetime($value);
+                $this->setEventType($value);
                 break;
             case 3:
-                $this->setEventCreatorId($value);
+                $this->setName($value);
                 break;
             case 4:
-                $this->setEventOwnerId($value);
+                $this->setEventDatetime($value);
                 break;
             case 5:
-                $this->setEventDescription($value);
+                $this->setEventCreatorId($value);
                 break;
             case 6:
-                $this->setAccountId($value);
+                $this->setEventOwnerId($value);
                 break;
             case 7:
-                $this->setAdditionalData($value);
+                $this->setEventDescription($value);
                 break;
             case 8:
-                $this->setCreated($value);
+                $this->setAccountId($value);
                 break;
             case 9:
+                $this->setAdditionalData($value);
+                break;
+            case 10:
+                $this->setCreated($value);
+                break;
+            case 11:
                 $this->setUpdated($value);
                 break;
         } // switch()
@@ -1283,31 +1389,37 @@ abstract class Meeting implements ActiveRecordInterface
             $this->setId($arr[$keys[0]]);
         }
         if (array_key_exists($keys[1], $arr)) {
-            $this->setName($arr[$keys[1]]);
+            $this->setEventId($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
-            $this->setEventDatetime($arr[$keys[2]]);
+            $this->setEventType($arr[$keys[2]]);
         }
         if (array_key_exists($keys[3], $arr)) {
-            $this->setEventCreatorId($arr[$keys[3]]);
+            $this->setName($arr[$keys[3]]);
         }
         if (array_key_exists($keys[4], $arr)) {
-            $this->setEventOwnerId($arr[$keys[4]]);
+            $this->setEventDatetime($arr[$keys[4]]);
         }
         if (array_key_exists($keys[5], $arr)) {
-            $this->setEventDescription($arr[$keys[5]]);
+            $this->setEventCreatorId($arr[$keys[5]]);
         }
         if (array_key_exists($keys[6], $arr)) {
-            $this->setAccountId($arr[$keys[6]]);
+            $this->setEventOwnerId($arr[$keys[6]]);
         }
         if (array_key_exists($keys[7], $arr)) {
-            $this->setAdditionalData($arr[$keys[7]]);
+            $this->setEventDescription($arr[$keys[7]]);
         }
         if (array_key_exists($keys[8], $arr)) {
-            $this->setCreated($arr[$keys[8]]);
+            $this->setAccountId($arr[$keys[8]]);
         }
         if (array_key_exists($keys[9], $arr)) {
-            $this->setUpdated($arr[$keys[9]]);
+            $this->setAdditionalData($arr[$keys[9]]);
+        }
+        if (array_key_exists($keys[10], $arr)) {
+            $this->setCreated($arr[$keys[10]]);
+        }
+        if (array_key_exists($keys[11], $arr)) {
+            $this->setUpdated($arr[$keys[11]]);
         }
     }
 
@@ -1352,6 +1464,12 @@ abstract class Meeting implements ActiveRecordInterface
 
         if ($this->isColumnModified(MeetingTableMap::COL_ID)) {
             $criteria->add(MeetingTableMap::COL_ID, $this->id);
+        }
+        if ($this->isColumnModified(MeetingTableMap::COL_EVENT_ID)) {
+            $criteria->add(MeetingTableMap::COL_EVENT_ID, $this->event_id);
+        }
+        if ($this->isColumnModified(MeetingTableMap::COL_EVENT_TYPE)) {
+            $criteria->add(MeetingTableMap::COL_EVENT_TYPE, $this->event_type);
         }
         if ($this->isColumnModified(MeetingTableMap::COL_NAME)) {
             $criteria->add(MeetingTableMap::COL_NAME, $this->name);
@@ -1466,6 +1584,8 @@ abstract class Meeting implements ActiveRecordInterface
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
+        $copyObj->setEventId($this->getEventId());
+        $copyObj->setEventType($this->getEventType());
         $copyObj->setName($this->getName());
         $copyObj->setEventDatetime($this->getEventDatetime());
         $copyObj->setEventCreatorId($this->getEventCreatorId());
@@ -1511,6 +1631,8 @@ abstract class Meeting implements ActiveRecordInterface
     public function clear()
     {
         $this->id = null;
+        $this->event_id = null;
+        $this->event_type = null;
         $this->name = null;
         $this->event_datetime = null;
         $this->event_creator_id = null;

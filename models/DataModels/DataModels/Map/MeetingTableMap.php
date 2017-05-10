@@ -59,7 +59,7 @@ class MeetingTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 10;
+    const NUM_COLUMNS = 12;
 
     /**
      * The number of lazy-loaded columns
@@ -69,12 +69,22 @@ class MeetingTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 10;
+    const NUM_HYDRATE_COLUMNS = 12;
 
     /**
      * the column name for the id field
      */
     const COL_ID = 'meeting.id';
+
+    /**
+     * the column name for the event_id field
+     */
+    const COL_EVENT_ID = 'meeting.event_id';
+
+    /**
+     * the column name for the event_type field
+     */
+    const COL_EVENT_TYPE = 'meeting.event_type';
 
     /**
      * the column name for the name field
@@ -133,11 +143,11 @@ class MeetingTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Name', 'EventDatetime', 'EventCreatorId', 'EventOwnerId', 'EventDescription', 'AccountId', 'AdditionalData', 'Created', 'Updated', ),
-        self::TYPE_CAMELNAME     => array('id', 'name', 'eventDatetime', 'eventCreatorId', 'eventOwnerId', 'eventDescription', 'accountId', 'additionalData', 'created', 'updated', ),
-        self::TYPE_COLNAME       => array(MeetingTableMap::COL_ID, MeetingTableMap::COL_NAME, MeetingTableMap::COL_EVENT_DATETIME, MeetingTableMap::COL_EVENT_CREATOR_ID, MeetingTableMap::COL_EVENT_OWNER_ID, MeetingTableMap::COL_EVENT_DESCRIPTION, MeetingTableMap::COL_ACCOUNT_ID, MeetingTableMap::COL_ADDITIONAL_DATA, MeetingTableMap::COL_CREATED, MeetingTableMap::COL_UPDATED, ),
-        self::TYPE_FIELDNAME     => array('id', 'name', 'event_datetime', 'event_creator_id', 'event_owner_id', 'event_description', 'account_id', 'additional_data', 'created', 'updated', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
+        self::TYPE_PHPNAME       => array('Id', 'EventId', 'EventType', 'Name', 'EventDatetime', 'EventCreatorId', 'EventOwnerId', 'EventDescription', 'AccountId', 'AdditionalData', 'Created', 'Updated', ),
+        self::TYPE_CAMELNAME     => array('id', 'eventId', 'eventType', 'name', 'eventDatetime', 'eventCreatorId', 'eventOwnerId', 'eventDescription', 'accountId', 'additionalData', 'created', 'updated', ),
+        self::TYPE_COLNAME       => array(MeetingTableMap::COL_ID, MeetingTableMap::COL_EVENT_ID, MeetingTableMap::COL_EVENT_TYPE, MeetingTableMap::COL_NAME, MeetingTableMap::COL_EVENT_DATETIME, MeetingTableMap::COL_EVENT_CREATOR_ID, MeetingTableMap::COL_EVENT_OWNER_ID, MeetingTableMap::COL_EVENT_DESCRIPTION, MeetingTableMap::COL_ACCOUNT_ID, MeetingTableMap::COL_ADDITIONAL_DATA, MeetingTableMap::COL_CREATED, MeetingTableMap::COL_UPDATED, ),
+        self::TYPE_FIELDNAME     => array('id', 'event_id', 'event_type', 'name', 'event_datetime', 'event_creator_id', 'event_owner_id', 'event_description', 'account_id', 'additional_data', 'created', 'updated', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
     );
 
     /**
@@ -147,11 +157,11 @@ class MeetingTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Name' => 1, 'EventDatetime' => 2, 'EventCreatorId' => 3, 'EventOwnerId' => 4, 'EventDescription' => 5, 'AccountId' => 6, 'AdditionalData' => 7, 'Created' => 8, 'Updated' => 9, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'name' => 1, 'eventDatetime' => 2, 'eventCreatorId' => 3, 'eventOwnerId' => 4, 'eventDescription' => 5, 'accountId' => 6, 'additionalData' => 7, 'created' => 8, 'updated' => 9, ),
-        self::TYPE_COLNAME       => array(MeetingTableMap::COL_ID => 0, MeetingTableMap::COL_NAME => 1, MeetingTableMap::COL_EVENT_DATETIME => 2, MeetingTableMap::COL_EVENT_CREATOR_ID => 3, MeetingTableMap::COL_EVENT_OWNER_ID => 4, MeetingTableMap::COL_EVENT_DESCRIPTION => 5, MeetingTableMap::COL_ACCOUNT_ID => 6, MeetingTableMap::COL_ADDITIONAL_DATA => 7, MeetingTableMap::COL_CREATED => 8, MeetingTableMap::COL_UPDATED => 9, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'name' => 1, 'event_datetime' => 2, 'event_creator_id' => 3, 'event_owner_id' => 4, 'event_description' => 5, 'account_id' => 6, 'additional_data' => 7, 'created' => 8, 'updated' => 9, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'EventId' => 1, 'EventType' => 2, 'Name' => 3, 'EventDatetime' => 4, 'EventCreatorId' => 5, 'EventOwnerId' => 6, 'EventDescription' => 7, 'AccountId' => 8, 'AdditionalData' => 9, 'Created' => 10, 'Updated' => 11, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'eventId' => 1, 'eventType' => 2, 'name' => 3, 'eventDatetime' => 4, 'eventCreatorId' => 5, 'eventOwnerId' => 6, 'eventDescription' => 7, 'accountId' => 8, 'additionalData' => 9, 'created' => 10, 'updated' => 11, ),
+        self::TYPE_COLNAME       => array(MeetingTableMap::COL_ID => 0, MeetingTableMap::COL_EVENT_ID => 1, MeetingTableMap::COL_EVENT_TYPE => 2, MeetingTableMap::COL_NAME => 3, MeetingTableMap::COL_EVENT_DATETIME => 4, MeetingTableMap::COL_EVENT_CREATOR_ID => 5, MeetingTableMap::COL_EVENT_OWNER_ID => 6, MeetingTableMap::COL_EVENT_DESCRIPTION => 7, MeetingTableMap::COL_ACCOUNT_ID => 8, MeetingTableMap::COL_ADDITIONAL_DATA => 9, MeetingTableMap::COL_CREATED => 10, MeetingTableMap::COL_UPDATED => 11, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'event_id' => 1, 'event_type' => 2, 'name' => 3, 'event_datetime' => 4, 'event_creator_id' => 5, 'event_owner_id' => 6, 'event_description' => 7, 'account_id' => 8, 'additional_data' => 9, 'created' => 10, 'updated' => 11, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
     );
 
     /**
@@ -173,6 +183,8 @@ class MeetingTableMap extends TableMap
         $this->setPrimaryKeyMethodInfo('meeting_id_seq');
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
+        $this->addColumn('event_id', 'EventId', 'VARCHAR', false, 255, null);
+        $this->addColumn('event_type', 'EventType', 'VARCHAR', false, 16, null);
         $this->addColumn('name', 'Name', 'VARCHAR', false, 255, null);
         $this->addColumn('event_datetime', 'EventDatetime', 'TIMESTAMP', false, null, null);
         $this->addColumn('event_creator_id', 'EventCreatorId', 'INTEGER', false, null, null);
@@ -333,6 +345,8 @@ class MeetingTableMap extends TableMap
     {
         if (null === $alias) {
             $criteria->addSelectColumn(MeetingTableMap::COL_ID);
+            $criteria->addSelectColumn(MeetingTableMap::COL_EVENT_ID);
+            $criteria->addSelectColumn(MeetingTableMap::COL_EVENT_TYPE);
             $criteria->addSelectColumn(MeetingTableMap::COL_NAME);
             $criteria->addSelectColumn(MeetingTableMap::COL_EVENT_DATETIME);
             $criteria->addSelectColumn(MeetingTableMap::COL_EVENT_CREATOR_ID);
@@ -344,6 +358,8 @@ class MeetingTableMap extends TableMap
             $criteria->addSelectColumn(MeetingTableMap::COL_UPDATED);
         } else {
             $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.event_id');
+            $criteria->addSelectColumn($alias . '.event_type');
             $criteria->addSelectColumn($alias . '.name');
             $criteria->addSelectColumn($alias . '.event_datetime');
             $criteria->addSelectColumn($alias . '.event_creator_id');

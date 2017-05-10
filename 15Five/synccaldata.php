@@ -280,7 +280,7 @@ if(is_array($arrGcalUser) && (count($arrGcalUser)>0))
 												
 												if($arrEventCreator['displayName'])
 												{
-													$arrResultData[$intFrCnt]['creayedbyname'] = $arrEventCreator['displayName'];
+													$arrResultData[$intFrCnt]['createdByName'] = $arrEventCreator['displayName'];
 												}
 												
 											}
@@ -741,9 +741,9 @@ function fnSaveAirtableMeetings($arrRecord = array())
 			$arrFields['fields']['calendaremail'] = $arrRecord['calendarid'];
 		}
 		
-		if($arrRecord['creayedbyname'])
+		if($arrRecord['createdByName'])
 		{
-			$arrFields['fields']['Created By'] = $arrRecord['creayedbyname'];
+			$arrFields['fields']['Created By'] = $arrRecord['createdByName'];
 		}
 		
 		if($arrRecord['ceatedbyemail'])

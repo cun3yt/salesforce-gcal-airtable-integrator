@@ -85,6 +85,8 @@
   </table>
   <table name="meeting" idMethod="native" phpName="Meeting" namespace="DataModels">
     <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="event_id" phpName="EventId" type="VARCHAR" size="255"/>
+    <column name="event_type" phpName="EventType" type="VARCHAR" size="16"/>
     <column name="name" phpName="Name" type="VARCHAR" size="255"/>
     <column name="event_datetime" phpName="EventDatetime" type="TIMESTAMP"/>
     <column name="event_creator_id" phpName="EventCreatorId" type="INTEGER"/>

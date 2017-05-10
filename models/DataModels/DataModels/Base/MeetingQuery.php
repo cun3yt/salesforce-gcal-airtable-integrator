@@ -20,6 +20,8 @@ use Propel\Runtime\Exception\PropelException;
  *
  *
  * @method     ChildMeetingQuery orderById($order = Criteria::ASC) Order by the id column
+ * @method     ChildMeetingQuery orderByEventId($order = Criteria::ASC) Order by the event_id column
+ * @method     ChildMeetingQuery orderByEventType($order = Criteria::ASC) Order by the event_type column
  * @method     ChildMeetingQuery orderByName($order = Criteria::ASC) Order by the name column
  * @method     ChildMeetingQuery orderByEventDatetime($order = Criteria::ASC) Order by the event_datetime column
  * @method     ChildMeetingQuery orderByEventCreatorId($order = Criteria::ASC) Order by the event_creator_id column
@@ -31,6 +33,8 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildMeetingQuery orderByUpdated($order = Criteria::ASC) Order by the updated column
  *
  * @method     ChildMeetingQuery groupById() Group by the id column
+ * @method     ChildMeetingQuery groupByEventId() Group by the event_id column
+ * @method     ChildMeetingQuery groupByEventType() Group by the event_type column
  * @method     ChildMeetingQuery groupByName() Group by the name column
  * @method     ChildMeetingQuery groupByEventDatetime() Group by the event_datetime column
  * @method     ChildMeetingQuery groupByEventCreatorId() Group by the event_creator_id column
@@ -53,6 +57,8 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildMeeting findOneOrCreate(ConnectionInterface $con = null) Return the first ChildMeeting matching the query, or a new ChildMeeting object populated from the query conditions when no match is found
  *
  * @method     ChildMeeting findOneById(int $id) Return the first ChildMeeting filtered by the id column
+ * @method     ChildMeeting findOneByEventId(string $event_id) Return the first ChildMeeting filtered by the event_id column
+ * @method     ChildMeeting findOneByEventType(string $event_type) Return the first ChildMeeting filtered by the event_type column
  * @method     ChildMeeting findOneByName(string $name) Return the first ChildMeeting filtered by the name column
  * @method     ChildMeeting findOneByEventDatetime(string $event_datetime) Return the first ChildMeeting filtered by the event_datetime column
  * @method     ChildMeeting findOneByEventCreatorId(int $event_creator_id) Return the first ChildMeeting filtered by the event_creator_id column
@@ -67,6 +73,8 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildMeeting requireOne(ConnectionInterface $con = null) Return the first ChildMeeting matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildMeeting requireOneById(int $id) Return the first ChildMeeting filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildMeeting requireOneByEventId(string $event_id) Return the first ChildMeeting filtered by the event_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildMeeting requireOneByEventType(string $event_type) Return the first ChildMeeting filtered by the event_type column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildMeeting requireOneByName(string $name) Return the first ChildMeeting filtered by the name column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildMeeting requireOneByEventDatetime(string $event_datetime) Return the first ChildMeeting filtered by the event_datetime column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildMeeting requireOneByEventCreatorId(int $event_creator_id) Return the first ChildMeeting filtered by the event_creator_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -79,6 +87,8 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildMeeting[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildMeeting objects based on current ModelCriteria
  * @method     ChildMeeting[]|ObjectCollection findById(int $id) Return ChildMeeting objects filtered by the id column
+ * @method     ChildMeeting[]|ObjectCollection findByEventId(string $event_id) Return ChildMeeting objects filtered by the event_id column
+ * @method     ChildMeeting[]|ObjectCollection findByEventType(string $event_type) Return ChildMeeting objects filtered by the event_type column
  * @method     ChildMeeting[]|ObjectCollection findByName(string $name) Return ChildMeeting objects filtered by the name column
  * @method     ChildMeeting[]|ObjectCollection findByEventDatetime(string $event_datetime) Return ChildMeeting objects filtered by the event_datetime column
  * @method     ChildMeeting[]|ObjectCollection findByEventCreatorId(int $event_creator_id) Return ChildMeeting objects filtered by the event_creator_id column
@@ -186,7 +196,7 @@ abstract class MeetingQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, name, event_datetime, event_creator_id, event_owner_id, event_description, account_id, additional_data, created, updated FROM meeting WHERE id = :p0';
+        $sql = 'SELECT id, event_id, event_type, name, event_datetime, event_creator_id, event_owner_id, event_description, account_id, additional_data, created, updated FROM meeting WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -315,6 +325,56 @@ abstract class MeetingQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(MeetingTableMap::COL_ID, $id, $comparison);
+    }
+
+    /**
+     * Filter the query on the event_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByEventId('fooValue');   // WHERE event_id = 'fooValue'
+     * $query->filterByEventId('%fooValue%', Criteria::LIKE); // WHERE event_id LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $eventId The value to use as filter.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildMeetingQuery The current query, for fluid interface
+     */
+    public function filterByEventId($eventId = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($eventId)) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(MeetingTableMap::COL_EVENT_ID, $eventId, $comparison);
+    }
+
+    /**
+     * Filter the query on the event_type column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByEventType('fooValue');   // WHERE event_type = 'fooValue'
+     * $query->filterByEventType('%fooValue%', Criteria::LIKE); // WHERE event_type LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $eventType The value to use as filter.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildMeetingQuery The current query, for fluid interface
+     */
+    public function filterByEventType($eventType = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($eventType)) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(MeetingTableMap::COL_EVENT_TYPE, $eventType, $comparison);
     }
 
     /**
