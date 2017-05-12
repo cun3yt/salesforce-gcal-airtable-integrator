@@ -76,7 +76,7 @@ if (is_array($arrGcalUser) && (count($arrGcalUser) > 0)) {
         foreach ($arrEmails as $strEm) {
             $domain = substr(strrchr($strEm, "@"), 1);
             if (strtolower($domain) != strtolower($strClientDomain)) {
-                if (!in_array(strtolower($domain), $arrBannedDomains)) {
+                if (!in_array(strtolower($domain), Helpers::getBannedDomains())) {
                     $intExterNameEmails++;
                     $arrDomainInfo = explode(".", $domain);
                     $strEmailDomain = $arrDomainInfo[0];

@@ -1070,12 +1070,13 @@ class Helpers {
 
 
     /**
-     * Function to connect to airtable base and get calenderaemail information from calendar_not_processed view of airtable on
-     * meeting history table
-     * System process such 50 records at one go
-     * it return record list on mactch other wise return false
+     * Function to connect to airtable base and get calenderaemail information from
+     * "calendar_not_processed" view of airtable on
+     * "meeting history table".
      *
-     * @return bool
+     * It processes 50 records at run.
+     *
+     * @return bool | array
      */
     static function fnGetProcessCalendar() {
         global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
@@ -1159,9 +1160,7 @@ class Helpers {
     }
 
     /**
-     * Function to connect to airtable base and update meeting history table with name
-     * It will take name which will be updated
-     * It will take meeting history table record id as another table where it will be updated
+     * Function to update meeting history table with (calendar) name via recordId.
      *
      * @param $strName
      * @param $strRecId
@@ -1240,4 +1239,20 @@ class Helpers {
         return (is_array($jsonResponse) && (count($jsonResponse)>0));
     }
 
+    /**
+     * @return array
+     */
+    static function getPersonalEmailDomains() {
+        return array("gmail.com", "yahoo.com", "yahoo.co.in", "aol.com", "att.net", "comcast.net",
+            "facebook.com", "gmail.com", "gmx.com", "googlemail.com", "google.com", "hotmail.com", "hotmail.co.uk",
+            "mac.com", "me.com", "mail.com", "msn.com", "live.com", "sbcglobal.net", "verizon.net", "yahoo.com",
+            "yahoo.co.uk", "rediif.com");
+    }
+
+    /**
+     * @return array
+     */
+    static function getBannedDomains() {
+        return array("resource.calendar.google.com");
+    }
 }

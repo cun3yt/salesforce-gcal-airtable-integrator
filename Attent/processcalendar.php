@@ -1,5 +1,8 @@
 <?
 /**
+ * @todo Transfer the responsibility to synccaldata with `event_owner_id` instead of `Name`.
+ * @todo Delete this file once synccaldata has the necessary data (see above).
+ *
  * This file is responsible to use calender-email data from the meeting record and
  * change it into more meaning form (like Name) for better understanding.
  *
@@ -14,12 +17,10 @@ require_once('../libraries/Helpers.php');
 
 Helpers::setDebugParam($isDebugActive);
 
-$strClientDomain = $strClientDomainName;
-$arrGcalUser = Helpers::fnGetProcessCalendar();
+list($customer, $contacts) = Helpers::loadCustomerData($strClientDomainName);
+$integrations = Helpers::getIntegrations($customer);
 
-if( !(is_array($arrGcalUser) && (count($arrGcalUser)>0)) ) {
-    exit;
-}
+$arrGcalUser = Helpers::fnGetProcessCalendar();
 
 /**
  * Now all the unprocessed calendar records, we have it in array
@@ -27,7 +28,7 @@ if( !(is_array($arrGcalUser) && (count($arrGcalUser)>0)) ) {
  * On match the name will be fetched from the people airtable base and than
  * Respective airtable record will be updated with name for the calendaremail
  */
-foreach($arrGcalUser as $arrUser) {
+foreach($integrations as $integration) {
     $strARecId = $arrUser['id'];
     $strEmail = $arrUser['fields']['calendaremail'];
 

@@ -10,6 +10,7 @@ use DataModels\DataModels\Map\MeetingAttendeeTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Propel\Runtime\ActiveQuery\ModelJoin;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
@@ -34,6 +35,28 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildMeetingAttendeeQuery leftJoinWith($relation) Adds a LEFT JOIN clause and with to the query
  * @method     ChildMeetingAttendeeQuery rightJoinWith($relation) Adds a RIGHT JOIN clause and with to the query
  * @method     ChildMeetingAttendeeQuery innerJoinWith($relation) Adds a INNER JOIN clause and with to the query
+ *
+ * @method     ChildMeetingAttendeeQuery leftJoinMeetingRelatedByEventOwnerId($relationAlias = null) Adds a LEFT JOIN clause to the query using the MeetingRelatedByEventOwnerId relation
+ * @method     ChildMeetingAttendeeQuery rightJoinMeetingRelatedByEventOwnerId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the MeetingRelatedByEventOwnerId relation
+ * @method     ChildMeetingAttendeeQuery innerJoinMeetingRelatedByEventOwnerId($relationAlias = null) Adds a INNER JOIN clause to the query using the MeetingRelatedByEventOwnerId relation
+ *
+ * @method     ChildMeetingAttendeeQuery joinWithMeetingRelatedByEventOwnerId($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the MeetingRelatedByEventOwnerId relation
+ *
+ * @method     ChildMeetingAttendeeQuery leftJoinWithMeetingRelatedByEventOwnerId() Adds a LEFT JOIN clause and with to the query using the MeetingRelatedByEventOwnerId relation
+ * @method     ChildMeetingAttendeeQuery rightJoinWithMeetingRelatedByEventOwnerId() Adds a RIGHT JOIN clause and with to the query using the MeetingRelatedByEventOwnerId relation
+ * @method     ChildMeetingAttendeeQuery innerJoinWithMeetingRelatedByEventOwnerId() Adds a INNER JOIN clause and with to the query using the MeetingRelatedByEventOwnerId relation
+ *
+ * @method     ChildMeetingAttendeeQuery leftJoinMeetingRelatedByEventCreatorId($relationAlias = null) Adds a LEFT JOIN clause to the query using the MeetingRelatedByEventCreatorId relation
+ * @method     ChildMeetingAttendeeQuery rightJoinMeetingRelatedByEventCreatorId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the MeetingRelatedByEventCreatorId relation
+ * @method     ChildMeetingAttendeeQuery innerJoinMeetingRelatedByEventCreatorId($relationAlias = null) Adds a INNER JOIN clause to the query using the MeetingRelatedByEventCreatorId relation
+ *
+ * @method     ChildMeetingAttendeeQuery joinWithMeetingRelatedByEventCreatorId($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the MeetingRelatedByEventCreatorId relation
+ *
+ * @method     ChildMeetingAttendeeQuery leftJoinWithMeetingRelatedByEventCreatorId() Adds a LEFT JOIN clause and with to the query using the MeetingRelatedByEventCreatorId relation
+ * @method     ChildMeetingAttendeeQuery rightJoinWithMeetingRelatedByEventCreatorId() Adds a RIGHT JOIN clause and with to the query using the MeetingRelatedByEventCreatorId relation
+ * @method     ChildMeetingAttendeeQuery innerJoinWithMeetingRelatedByEventCreatorId() Adds a INNER JOIN clause and with to the query using the MeetingRelatedByEventCreatorId relation
+ *
+ * @method     \DataModels\DataModels\MeetingQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildMeetingAttendee findOne(ConnectionInterface $con = null) Return the first ChildMeetingAttendee matching the query
  * @method     ChildMeetingAttendee findOneOrCreate(ConnectionInterface $con = null) Return the first ChildMeetingAttendee matching the query, or a new ChildMeetingAttendee object populated from the query conditions when no match is found
@@ -346,6 +369,152 @@ abstract class MeetingAttendeeQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(MeetingAttendeeTableMap::COL_REF_ID, $refId, $comparison);
+    }
+
+    /**
+     * Filter the query by a related \DataModels\DataModels\Meeting object
+     *
+     * @param \DataModels\DataModels\Meeting|ObjectCollection $meeting the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildMeetingAttendeeQuery The current query, for fluid interface
+     */
+    public function filterByMeetingRelatedByEventOwnerId($meeting, $comparison = null)
+    {
+        if ($meeting instanceof \DataModels\DataModels\Meeting) {
+            return $this
+                ->addUsingAlias(MeetingAttendeeTableMap::COL_ID, $meeting->getEventOwnerId(), $comparison);
+        } elseif ($meeting instanceof ObjectCollection) {
+            return $this
+                ->useMeetingRelatedByEventOwnerIdQuery()
+                ->filterByPrimaryKeys($meeting->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByMeetingRelatedByEventOwnerId() only accepts arguments of type \DataModels\DataModels\Meeting or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the MeetingRelatedByEventOwnerId relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildMeetingAttendeeQuery The current query, for fluid interface
+     */
+    public function joinMeetingRelatedByEventOwnerId($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('MeetingRelatedByEventOwnerId');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'MeetingRelatedByEventOwnerId');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the MeetingRelatedByEventOwnerId relation Meeting object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \DataModels\DataModels\MeetingQuery A secondary query class using the current class as primary query
+     */
+    public function useMeetingRelatedByEventOwnerIdQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinMeetingRelatedByEventOwnerId($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'MeetingRelatedByEventOwnerId', '\DataModels\DataModels\MeetingQuery');
+    }
+
+    /**
+     * Filter the query by a related \DataModels\DataModels\Meeting object
+     *
+     * @param \DataModels\DataModels\Meeting|ObjectCollection $meeting the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildMeetingAttendeeQuery The current query, for fluid interface
+     */
+    public function filterByMeetingRelatedByEventCreatorId($meeting, $comparison = null)
+    {
+        if ($meeting instanceof \DataModels\DataModels\Meeting) {
+            return $this
+                ->addUsingAlias(MeetingAttendeeTableMap::COL_ID, $meeting->getEventCreatorId(), $comparison);
+        } elseif ($meeting instanceof ObjectCollection) {
+            return $this
+                ->useMeetingRelatedByEventCreatorIdQuery()
+                ->filterByPrimaryKeys($meeting->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByMeetingRelatedByEventCreatorId() only accepts arguments of type \DataModels\DataModels\Meeting or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the MeetingRelatedByEventCreatorId relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildMeetingAttendeeQuery The current query, for fluid interface
+     */
+    public function joinMeetingRelatedByEventCreatorId($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('MeetingRelatedByEventCreatorId');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'MeetingRelatedByEventCreatorId');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the MeetingRelatedByEventCreatorId relation Meeting object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \DataModels\DataModels\MeetingQuery A secondary query class using the current class as primary query
+     */
+    public function useMeetingRelatedByEventCreatorIdQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinMeetingRelatedByEventCreatorId($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'MeetingRelatedByEventCreatorId', '\DataModels\DataModels\MeetingQuery');
     }
 
     /**

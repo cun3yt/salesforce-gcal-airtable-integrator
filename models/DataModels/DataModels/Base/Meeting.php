@@ -5,6 +5,9 @@ namespace DataModels\DataModels\Base;
 use \DateTime;
 use \Exception;
 use \PDO;
+use DataModels\DataModels\Meeting as ChildMeeting;
+use DataModels\DataModels\MeetingAttendee as ChildMeetingAttendee;
+use DataModels\DataModels\MeetingAttendeeQuery as ChildMeetingAttendeeQuery;
 use DataModels\DataModels\MeetingQuery as ChildMeetingQuery;
 use DataModels\DataModels\Map\MeetingTableMap;
 use Propel\Runtime\Propel;
@@ -132,18 +135,49 @@ abstract class Meeting implements ActiveRecordInterface
     protected $additional_data;
 
     /**
-     * The value for the created field.
+     * The value for the event_created_at field.
      *
      * @var        DateTime
      */
-    protected $created;
+    protected $event_created_at;
 
     /**
-     * The value for the updated field.
+     * The value for the event_updated_at field.
      *
      * @var        DateTime
      */
-    protected $updated;
+    protected $event_updated_at;
+
+    /**
+     * The value for the raw_data field.
+     *
+     * @var        string
+     */
+    protected $raw_data;
+
+    /**
+     * The value for the created_at field.
+     *
+     * @var        DateTime
+     */
+    protected $created_at;
+
+    /**
+     * The value for the updated_at field.
+     *
+     * @var        DateTime
+     */
+    protected $updated_at;
+
+    /**
+     * @var        ChildMeetingAttendee
+     */
+    protected $aEventOwner;
+
+    /**
+     * @var        ChildMeetingAttendee
+     */
+    protected $aEventCreator;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -489,7 +523,7 @@ abstract class Meeting implements ActiveRecordInterface
     }
 
     /**
-     * Get the [optionally formatted] temporal [created] column value.
+     * Get the [optionally formatted] temporal [event_created_at] column value.
      *
      *
      * @param      string $format The date/time format string (either date()-style or strftime()-style).
@@ -499,17 +533,17 @@ abstract class Meeting implements ActiveRecordInterface
      *
      * @throws PropelException - if unable to parse/validate the date/time value.
      */
-    public function getCreated($format = NULL)
+    public function getEventCreatedAt($format = NULL)
     {
         if ($format === null) {
-            return $this->created;
+            return $this->event_created_at;
         } else {
-            return $this->created instanceof \DateTimeInterface ? $this->created->format($format) : null;
+            return $this->event_created_at instanceof \DateTimeInterface ? $this->event_created_at->format($format) : null;
         }
     }
 
     /**
-     * Get the [optionally formatted] temporal [updated] column value.
+     * Get the [optionally formatted] temporal [event_updated_at] column value.
      *
      *
      * @param      string $format The date/time format string (either date()-style or strftime()-style).
@@ -519,12 +553,62 @@ abstract class Meeting implements ActiveRecordInterface
      *
      * @throws PropelException - if unable to parse/validate the date/time value.
      */
-    public function getUpdated($format = NULL)
+    public function getEventUpdatedAt($format = NULL)
     {
         if ($format === null) {
-            return $this->updated;
+            return $this->event_updated_at;
         } else {
-            return $this->updated instanceof \DateTimeInterface ? $this->updated->format($format) : null;
+            return $this->event_updated_at instanceof \DateTimeInterface ? $this->event_updated_at->format($format) : null;
+        }
+    }
+
+    /**
+     * Get the [raw_data] column value.
+     *
+     * @return string
+     */
+    public function getRawData()
+    {
+        return $this->raw_data;
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [created_at] column value.
+     *
+     *
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw DateTime object will be returned.
+     *
+     * @return string|DateTime Formatted date/time value as string or DateTime object (if format is NULL), NULL if column is NULL
+     *
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getCreatedAt($format = NULL)
+    {
+        if ($format === null) {
+            return $this->created_at;
+        } else {
+            return $this->created_at instanceof \DateTimeInterface ? $this->created_at->format($format) : null;
+        }
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [updated_at] column value.
+     *
+     *
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw DateTime object will be returned.
+     *
+     * @return string|DateTime Formatted date/time value as string or DateTime object (if format is NULL), NULL if column is NULL
+     *
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getUpdatedAt($format = NULL)
+    {
+        if ($format === null) {
+            return $this->updated_at;
+        } else {
+            return $this->updated_at instanceof \DateTimeInterface ? $this->updated_at->format($format) : null;
         }
     }
 
@@ -645,6 +729,10 @@ abstract class Meeting implements ActiveRecordInterface
             $this->modifiedColumns[MeetingTableMap::COL_EVENT_CREATOR_ID] = true;
         }
 
+        if ($this->aEventCreator !== null && $this->aEventCreator->getId() !== $v) {
+            $this->aEventCreator = null;
+        }
+
         return $this;
     } // setEventCreatorId()
 
@@ -663,6 +751,10 @@ abstract class Meeting implements ActiveRecordInterface
         if ($this->event_owner_id !== $v) {
             $this->event_owner_id = $v;
             $this->modifiedColumns[MeetingTableMap::COL_EVENT_OWNER_ID] = true;
+        }
+
+        if ($this->aEventOwner !== null && $this->aEventOwner->getId() !== $v) {
+            $this->aEventOwner = null;
         }
 
         return $this;
@@ -729,44 +821,104 @@ abstract class Meeting implements ActiveRecordInterface
     } // setAdditionalData()
 
     /**
-     * Sets the value of [created] column to a normalized version of the date/time value specified.
+     * Sets the value of [event_created_at] column to a normalized version of the date/time value specified.
      *
      * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
      *               Empty strings are treated as NULL.
      * @return $this|\DataModels\DataModels\Meeting The current object (for fluent API support)
      */
-    public function setCreated($v)
+    public function setEventCreatedAt($v)
     {
         $dt = PropelDateTime::newInstance($v, null, 'DateTime');
-        if ($this->created !== null || $dt !== null) {
-            if ($this->created === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->created->format("Y-m-d H:i:s.u")) {
-                $this->created = $dt === null ? null : clone $dt;
-                $this->modifiedColumns[MeetingTableMap::COL_CREATED] = true;
+        if ($this->event_created_at !== null || $dt !== null) {
+            if ($this->event_created_at === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->event_created_at->format("Y-m-d H:i:s.u")) {
+                $this->event_created_at = $dt === null ? null : clone $dt;
+                $this->modifiedColumns[MeetingTableMap::COL_EVENT_CREATED_AT] = true;
             }
         } // if either are not null
 
         return $this;
-    } // setCreated()
+    } // setEventCreatedAt()
 
     /**
-     * Sets the value of [updated] column to a normalized version of the date/time value specified.
+     * Sets the value of [event_updated_at] column to a normalized version of the date/time value specified.
      *
      * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
      *               Empty strings are treated as NULL.
      * @return $this|\DataModels\DataModels\Meeting The current object (for fluent API support)
      */
-    public function setUpdated($v)
+    public function setEventUpdatedAt($v)
     {
         $dt = PropelDateTime::newInstance($v, null, 'DateTime');
-        if ($this->updated !== null || $dt !== null) {
-            if ($this->updated === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->updated->format("Y-m-d H:i:s.u")) {
-                $this->updated = $dt === null ? null : clone $dt;
-                $this->modifiedColumns[MeetingTableMap::COL_UPDATED] = true;
+        if ($this->event_updated_at !== null || $dt !== null) {
+            if ($this->event_updated_at === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->event_updated_at->format("Y-m-d H:i:s.u")) {
+                $this->event_updated_at = $dt === null ? null : clone $dt;
+                $this->modifiedColumns[MeetingTableMap::COL_EVENT_UPDATED_AT] = true;
             }
         } // if either are not null
 
         return $this;
-    } // setUpdated()
+    } // setEventUpdatedAt()
+
+    /**
+     * Set the value of [raw_data] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\Meeting The current object (for fluent API support)
+     */
+    public function setRawData($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->raw_data !== $v) {
+            $this->raw_data = $v;
+            $this->modifiedColumns[MeetingTableMap::COL_RAW_DATA] = true;
+        }
+
+        return $this;
+    } // setRawData()
+
+    /**
+     * Sets the value of [created_at] column to a normalized version of the date/time value specified.
+     *
+     * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
+     *               Empty strings are treated as NULL.
+     * @return $this|\DataModels\DataModels\Meeting The current object (for fluent API support)
+     */
+    public function setCreatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->created_at !== null || $dt !== null) {
+            if ($this->created_at === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->created_at->format("Y-m-d H:i:s.u")) {
+                $this->created_at = $dt === null ? null : clone $dt;
+                $this->modifiedColumns[MeetingTableMap::COL_CREATED_AT] = true;
+            }
+        } // if either are not null
+
+        return $this;
+    } // setCreatedAt()
+
+    /**
+     * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
+     *
+     * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
+     *               Empty strings are treated as NULL.
+     * @return $this|\DataModels\DataModels\Meeting The current object (for fluent API support)
+     */
+    public function setUpdatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->updated_at !== null || $dt !== null) {
+            if ($this->updated_at === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->updated_at->format("Y-m-d H:i:s.u")) {
+                $this->updated_at = $dt === null ? null : clone $dt;
+                $this->modifiedColumns[MeetingTableMap::COL_UPDATED_AT] = true;
+            }
+        } // if either are not null
+
+        return $this;
+    } // setUpdatedAt()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -834,11 +986,20 @@ abstract class Meeting implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : MeetingTableMap::translateFieldName('AdditionalData', TableMap::TYPE_PHPNAME, $indexType)];
             $this->additional_data = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : MeetingTableMap::translateFieldName('Created', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->created = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : MeetingTableMap::translateFieldName('EventCreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->event_created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : MeetingTableMap::translateFieldName('Updated', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->updated = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : MeetingTableMap::translateFieldName('EventUpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->event_updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : MeetingTableMap::translateFieldName('RawData', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->raw_data = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : MeetingTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : MeetingTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -847,7 +1008,7 @@ abstract class Meeting implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 12; // 12 = MeetingTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 15; // 15 = MeetingTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\DataModels\\DataModels\\Meeting'), 0, $e);
@@ -869,6 +1030,12 @@ abstract class Meeting implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
+        if ($this->aEventCreator !== null && $this->event_creator_id !== $this->aEventCreator->getId()) {
+            $this->aEventCreator = null;
+        }
+        if ($this->aEventOwner !== null && $this->event_owner_id !== $this->aEventOwner->getId()) {
+            $this->aEventOwner = null;
+        }
     } // ensureConsistency
 
     /**
@@ -908,6 +1075,8 @@ abstract class Meeting implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
+            $this->aEventOwner = null;
+            $this->aEventCreator = null;
         } // if (deep)
     }
 
@@ -974,8 +1143,20 @@ abstract class Meeting implements ActiveRecordInterface
             $isInsert = $this->isNew();
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
+                // timestampable behavior
+
+                if (!$this->isColumnModified(MeetingTableMap::COL_CREATED_AT)) {
+                    $this->setCreatedAt(\Propel\Runtime\Util\PropelDateTime::createHighPrecision());
+                }
+                if (!$this->isColumnModified(MeetingTableMap::COL_UPDATED_AT)) {
+                    $this->setUpdatedAt(\Propel\Runtime\Util\PropelDateTime::createHighPrecision());
+                }
             } else {
                 $ret = $ret && $this->preUpdate($con);
+                // timestampable behavior
+                if ($this->isModified() && !$this->isColumnModified(MeetingTableMap::COL_UPDATED_AT)) {
+                    $this->setUpdatedAt(\Propel\Runtime\Util\PropelDateTime::createHighPrecision());
+                }
             }
             if ($ret) {
                 $affectedRows = $this->doSave($con);
@@ -1010,6 +1191,25 @@ abstract class Meeting implements ActiveRecordInterface
         $affectedRows = 0; // initialize var to track total num of affected rows
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
+
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their corresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aEventOwner !== null) {
+                if ($this->aEventOwner->isModified() || $this->aEventOwner->isNew()) {
+                    $affectedRows += $this->aEventOwner->save($con);
+                }
+                $this->setEventOwner($this->aEventOwner);
+            }
+
+            if ($this->aEventCreator !== null) {
+                if ($this->aEventCreator->isModified() || $this->aEventCreator->isNew()) {
+                    $affectedRows += $this->aEventCreator->save($con);
+                }
+                $this->setEventCreator($this->aEventCreator);
+            }
 
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
@@ -1087,11 +1287,20 @@ abstract class Meeting implements ActiveRecordInterface
         if ($this->isColumnModified(MeetingTableMap::COL_ADDITIONAL_DATA)) {
             $modifiedColumns[':p' . $index++]  = 'additional_data';
         }
-        if ($this->isColumnModified(MeetingTableMap::COL_CREATED)) {
-            $modifiedColumns[':p' . $index++]  = 'created';
+        if ($this->isColumnModified(MeetingTableMap::COL_EVENT_CREATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = 'event_created_at';
         }
-        if ($this->isColumnModified(MeetingTableMap::COL_UPDATED)) {
-            $modifiedColumns[':p' . $index++]  = 'updated';
+        if ($this->isColumnModified(MeetingTableMap::COL_EVENT_UPDATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = 'event_updated_at';
+        }
+        if ($this->isColumnModified(MeetingTableMap::COL_RAW_DATA)) {
+            $modifiedColumns[':p' . $index++]  = 'raw_data';
+        }
+        if ($this->isColumnModified(MeetingTableMap::COL_CREATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = 'created_at';
+        }
+        if ($this->isColumnModified(MeetingTableMap::COL_UPDATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = 'updated_at';
         }
 
         $sql = sprintf(
@@ -1134,11 +1343,20 @@ abstract class Meeting implements ActiveRecordInterface
                     case 'additional_data':
                         $stmt->bindValue($identifier, $this->additional_data, PDO::PARAM_STR);
                         break;
-                    case 'created':
-                        $stmt->bindValue($identifier, $this->created ? $this->created->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
+                    case 'event_created_at':
+                        $stmt->bindValue($identifier, $this->event_created_at ? $this->event_created_at->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
                         break;
-                    case 'updated':
-                        $stmt->bindValue($identifier, $this->updated ? $this->updated->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
+                    case 'event_updated_at':
+                        $stmt->bindValue($identifier, $this->event_updated_at ? $this->event_updated_at->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
+                        break;
+                    case 'raw_data':
+                        $stmt->bindValue($identifier, $this->raw_data, PDO::PARAM_STR);
+                        break;
+                    case 'created_at':
+                        $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
+                        break;
+                    case 'updated_at':
+                        $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -1226,10 +1444,19 @@ abstract class Meeting implements ActiveRecordInterface
                 return $this->getAdditionalData();
                 break;
             case 10:
-                return $this->getCreated();
+                return $this->getEventCreatedAt();
                 break;
             case 11:
-                return $this->getUpdated();
+                return $this->getEventUpdatedAt();
+                break;
+            case 12:
+                return $this->getRawData();
+                break;
+            case 13:
+                return $this->getCreatedAt();
+                break;
+            case 14:
+                return $this->getUpdatedAt();
                 break;
             default:
                 return null;
@@ -1248,10 +1475,11 @@ abstract class Meeting implements ActiveRecordInterface
      *                    Defaults to TableMap::TYPE_PHPNAME.
      * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
      * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
+     * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
      *
      * @return array an associative array containing the field names (as keys) and field values
      */
-    public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array())
+    public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
 
         if (isset($alreadyDumpedObjects['Meeting'][$this->hashCode()])) {
@@ -1270,8 +1498,11 @@ abstract class Meeting implements ActiveRecordInterface
             $keys[7] => $this->getEventDescription(),
             $keys[8] => $this->getAccountId(),
             $keys[9] => $this->getAdditionalData(),
-            $keys[10] => $this->getCreated(),
-            $keys[11] => $this->getUpdated(),
+            $keys[10] => $this->getEventCreatedAt(),
+            $keys[11] => $this->getEventUpdatedAt(),
+            $keys[12] => $this->getRawData(),
+            $keys[13] => $this->getCreatedAt(),
+            $keys[14] => $this->getUpdatedAt(),
         );
         if ($result[$keys[4]] instanceof \DateTime) {
             $result[$keys[4]] = $result[$keys[4]]->format('c');
@@ -1285,11 +1516,51 @@ abstract class Meeting implements ActiveRecordInterface
             $result[$keys[11]] = $result[$keys[11]]->format('c');
         }
 
+        if ($result[$keys[13]] instanceof \DateTime) {
+            $result[$keys[13]] = $result[$keys[13]]->format('c');
+        }
+
+        if ($result[$keys[14]] instanceof \DateTime) {
+            $result[$keys[14]] = $result[$keys[14]]->format('c');
+        }
+
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
             $result[$key] = $virtualColumn;
         }
 
+        if ($includeForeignObjects) {
+            if (null !== $this->aEventOwner) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'meetingAttendee';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'meeting_attendee';
+                        break;
+                    default:
+                        $key = 'EventOwner';
+                }
+
+                $result[$key] = $this->aEventOwner->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aEventCreator) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'meetingAttendee';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'meeting_attendee';
+                        break;
+                    default:
+                        $key = 'EventCreator';
+                }
+
+                $result[$key] = $this->aEventCreator->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+        }
 
         return $result;
     }
@@ -1354,10 +1625,19 @@ abstract class Meeting implements ActiveRecordInterface
                 $this->setAdditionalData($value);
                 break;
             case 10:
-                $this->setCreated($value);
+                $this->setEventCreatedAt($value);
                 break;
             case 11:
-                $this->setUpdated($value);
+                $this->setEventUpdatedAt($value);
+                break;
+            case 12:
+                $this->setRawData($value);
+                break;
+            case 13:
+                $this->setCreatedAt($value);
+                break;
+            case 14:
+                $this->setUpdatedAt($value);
                 break;
         } // switch()
 
@@ -1416,10 +1696,19 @@ abstract class Meeting implements ActiveRecordInterface
             $this->setAdditionalData($arr[$keys[9]]);
         }
         if (array_key_exists($keys[10], $arr)) {
-            $this->setCreated($arr[$keys[10]]);
+            $this->setEventCreatedAt($arr[$keys[10]]);
         }
         if (array_key_exists($keys[11], $arr)) {
-            $this->setUpdated($arr[$keys[11]]);
+            $this->setEventUpdatedAt($arr[$keys[11]]);
+        }
+        if (array_key_exists($keys[12], $arr)) {
+            $this->setRawData($arr[$keys[12]]);
+        }
+        if (array_key_exists($keys[13], $arr)) {
+            $this->setCreatedAt($arr[$keys[13]]);
+        }
+        if (array_key_exists($keys[14], $arr)) {
+            $this->setUpdatedAt($arr[$keys[14]]);
         }
     }
 
@@ -1492,11 +1781,20 @@ abstract class Meeting implements ActiveRecordInterface
         if ($this->isColumnModified(MeetingTableMap::COL_ADDITIONAL_DATA)) {
             $criteria->add(MeetingTableMap::COL_ADDITIONAL_DATA, $this->additional_data);
         }
-        if ($this->isColumnModified(MeetingTableMap::COL_CREATED)) {
-            $criteria->add(MeetingTableMap::COL_CREATED, $this->created);
+        if ($this->isColumnModified(MeetingTableMap::COL_EVENT_CREATED_AT)) {
+            $criteria->add(MeetingTableMap::COL_EVENT_CREATED_AT, $this->event_created_at);
         }
-        if ($this->isColumnModified(MeetingTableMap::COL_UPDATED)) {
-            $criteria->add(MeetingTableMap::COL_UPDATED, $this->updated);
+        if ($this->isColumnModified(MeetingTableMap::COL_EVENT_UPDATED_AT)) {
+            $criteria->add(MeetingTableMap::COL_EVENT_UPDATED_AT, $this->event_updated_at);
+        }
+        if ($this->isColumnModified(MeetingTableMap::COL_RAW_DATA)) {
+            $criteria->add(MeetingTableMap::COL_RAW_DATA, $this->raw_data);
+        }
+        if ($this->isColumnModified(MeetingTableMap::COL_CREATED_AT)) {
+            $criteria->add(MeetingTableMap::COL_CREATED_AT, $this->created_at);
+        }
+        if ($this->isColumnModified(MeetingTableMap::COL_UPDATED_AT)) {
+            $criteria->add(MeetingTableMap::COL_UPDATED_AT, $this->updated_at);
         }
 
         return $criteria;
@@ -1593,8 +1891,11 @@ abstract class Meeting implements ActiveRecordInterface
         $copyObj->setEventDescription($this->getEventDescription());
         $copyObj->setAccountId($this->getAccountId());
         $copyObj->setAdditionalData($this->getAdditionalData());
-        $copyObj->setCreated($this->getCreated());
-        $copyObj->setUpdated($this->getUpdated());
+        $copyObj->setEventCreatedAt($this->getEventCreatedAt());
+        $copyObj->setEventUpdatedAt($this->getEventUpdatedAt());
+        $copyObj->setRawData($this->getRawData());
+        $copyObj->setCreatedAt($this->getCreatedAt());
+        $copyObj->setUpdatedAt($this->getUpdatedAt());
         if ($makeNew) {
             $copyObj->setNew(true);
             $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
@@ -1624,12 +1925,120 @@ abstract class Meeting implements ActiveRecordInterface
     }
 
     /**
+     * Declares an association between this object and a ChildMeetingAttendee object.
+     *
+     * @param  ChildMeetingAttendee $v
+     * @return $this|\DataModels\DataModels\Meeting The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setEventOwner(ChildMeetingAttendee $v = null)
+    {
+        if ($v === null) {
+            $this->setEventOwnerId(NULL);
+        } else {
+            $this->setEventOwnerId($v->getId());
+        }
+
+        $this->aEventOwner = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildMeetingAttendee object, it will not be re-added.
+        if ($v !== null) {
+            $v->addMeetingRelatedByEventOwnerId($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildMeetingAttendee object
+     *
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildMeetingAttendee The associated ChildMeetingAttendee object.
+     * @throws PropelException
+     */
+    public function getEventOwner(ConnectionInterface $con = null)
+    {
+        if ($this->aEventOwner === null && ($this->event_owner_id !== null)) {
+            $this->aEventOwner = ChildMeetingAttendeeQuery::create()->findPk($this->event_owner_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aEventOwner->addMeetingsRelatedByEventOwnerId($this);
+             */
+        }
+
+        return $this->aEventOwner;
+    }
+
+    /**
+     * Declares an association between this object and a ChildMeetingAttendee object.
+     *
+     * @param  ChildMeetingAttendee $v
+     * @return $this|\DataModels\DataModels\Meeting The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setEventCreator(ChildMeetingAttendee $v = null)
+    {
+        if ($v === null) {
+            $this->setEventCreatorId(NULL);
+        } else {
+            $this->setEventCreatorId($v->getId());
+        }
+
+        $this->aEventCreator = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildMeetingAttendee object, it will not be re-added.
+        if ($v !== null) {
+            $v->addMeetingRelatedByEventCreatorId($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildMeetingAttendee object
+     *
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildMeetingAttendee The associated ChildMeetingAttendee object.
+     * @throws PropelException
+     */
+    public function getEventCreator(ConnectionInterface $con = null)
+    {
+        if ($this->aEventCreator === null && ($this->event_creator_id !== null)) {
+            $this->aEventCreator = ChildMeetingAttendeeQuery::create()->findPk($this->event_creator_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aEventCreator->addMeetingsRelatedByEventCreatorId($this);
+             */
+        }
+
+        return $this->aEventCreator;
+    }
+
+    /**
      * Clears the current object, sets all attributes to their default values and removes
      * outgoing references as well as back-references (from other objects to this one. Results probably in a database
      * change of those foreign objects when you call `save` there).
      */
     public function clear()
     {
+        if (null !== $this->aEventOwner) {
+            $this->aEventOwner->removeMeetingRelatedByEventOwnerId($this);
+        }
+        if (null !== $this->aEventCreator) {
+            $this->aEventCreator->removeMeetingRelatedByEventCreatorId($this);
+        }
         $this->id = null;
         $this->event_id = null;
         $this->event_type = null;
@@ -1640,8 +2049,11 @@ abstract class Meeting implements ActiveRecordInterface
         $this->event_description = null;
         $this->account_id = null;
         $this->additional_data = null;
-        $this->created = null;
-        $this->updated = null;
+        $this->event_created_at = null;
+        $this->event_updated_at = null;
+        $this->raw_data = null;
+        $this->created_at = null;
+        $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
         $this->resetModified();
@@ -1662,6 +2074,8 @@ abstract class Meeting implements ActiveRecordInterface
         if ($deep) {
         } // if ($deep)
 
+        $this->aEventOwner = null;
+        $this->aEventCreator = null;
     }
 
     /**
@@ -1672,6 +2086,20 @@ abstract class Meeting implements ActiveRecordInterface
     public function __toString()
     {
         return (string) $this->exportTo(MeetingTableMap::DEFAULT_STRING_FORMAT);
+    }
+
+    // timestampable behavior
+
+    /**
+     * Mark the current object so that the update date doesn't get updated during next save
+     *
+     * @return     $this|ChildMeeting The current object (for fluent API support)
+     */
+    public function keepUpdateDateUnchanged()
+    {
+        $this->modifiedColumns[MeetingTableMap::COL_UPDATED_AT] = true;
+
+        return $this;
     }
 
     /**

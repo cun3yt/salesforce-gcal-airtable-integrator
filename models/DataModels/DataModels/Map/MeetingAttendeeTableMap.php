@@ -147,6 +147,20 @@ class MeetingAttendeeTableMap extends TableMap
      */
     public function buildRelations()
     {
+        $this->addRelation('MeetingRelatedByEventOwnerId', '\\DataModels\\DataModels\\Meeting', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':event_owner_id',
+    1 => ':id',
+  ),
+), null, null, 'MeetingsRelatedByEventOwnerId', false);
+        $this->addRelation('MeetingRelatedByEventCreatorId', '\\DataModels\\DataModels\\Meeting', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':event_creator_id',
+    1 => ':id',
+  ),
+), null, null, 'MeetingsRelatedByEventCreatorId', false);
     } // buildRelations()
 
     /**

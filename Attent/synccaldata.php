@@ -23,27 +23,48 @@ const DateTimeFormat = 'Y-m-d H:i:s';
 
 use DataModels\DataModels\Meeting as Meeting;
 use DataModels\DataModels\CustomerContactIntegration as CustomerContactIntegration;
+use DataModels\DataModels\Customer as Customer;
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/gcal/vendor/autoload.php');
+use DataModels\DataModels\MeetingAttendee as MeetingAttendee;
+
 require_once('config.php');
-$client = new Google_Client();
-$client->setAuthConfig($googleCalAPICredentialFile);
-$client->addScope(array(Google_Service_Calendar::CALENDAR));
-$guzzleClient = new \GuzzleHttp\Client(array( 'curl' => array( CURLOPT_SSL_VERIFYPEER => false, ), ));
-$client->setHttpClient($guzzleClient);
-$client->setAccessType("offline");
+
+$client = setupGoogleAPIClient($googleCalAPICredentialFile);
 
 list($customer, $contacts) = Helpers::loadCustomerData($strClientDomainName);
 $calendarIntegrations = Helpers::getIntegrations($customer);
 
-// going through through the pulled google OAuth access record
 foreach($calendarIntegrations as $integration) {
+    processIntegrationCalendars($customer, $integration, $client);
+}
+
+/**
+ * @param string $googleCalAPICredentialFile
+ * @return Google_Client
+ */
+function setupGoogleAPIClient($googleCalAPICredentialFile) {
+    require_once($_SERVER['DOCUMENT_ROOT'].'/gcal/vendor/autoload.php');
+    $client = new Google_Client();
+    $client->setAuthConfig($googleCalAPICredentialFile);
+    $client->addScope(array(Google_Service_Calendar::CALENDAR));
+    $guzzleClient = new \GuzzleHttp\Client(array( 'curl' => array( CURLOPT_SSL_VERIFYPEER => false, ), ));
+    $client->setHttpClient($guzzleClient);
+    $client->setAccessType("offline");
+    return $client;
+}
+
+/**
+ * @param Customer $customer
+ * @param CustomerContactIntegration $integration
+ * @param Google_Client $client
+ */
+function processIntegrationCalendars(Customer $customer, CustomerContactIntegration $integration, Google_Client $client) {
     $integrationData = json_decode($integration->getData());
     $accessToken = $integrationData->access_token;
 
     if( !$accessToken ) {
         trigger_error("Access token doesn't exist!", E_USER_WARNING);
-        continue;
+        return;
     }
 
     $client->setAccessToken($accessToken);
@@ -54,151 +75,16 @@ foreach($calendarIntegrations as $integration) {
 
         if( !(is_array($calendarList->getItems()) && (count($calendarList->getItems())>0)) ) {
             trigger_error("Calendar list is doesn't have items", E_USER_WARNING);
-            continue;
+            return;
         }
 
-        $strUserId = "";
-
         foreach($calendarList->getItems() as $calendar) {
-            if( !($calendar->id) ) {
-                trigger_error("Calendar doesn't have an ID", E_USER_WARNING);
+            if( !isCalInCustomer($calendar, $customer) ) {
+                trigger_error("{$calendar->id} is not in Customer's domain: {$customer->getEmailDomain()}. 
+                    Checking the next calendar", E_WARNING);
                 continue;
             }
-
-            // filter all other calendar other than client domain
-            if(strpos($calendar->id, $strClientDomainName) === false) {
-                continue;
-            }
-
-            if($calendar->primary == "1") {
-                $strUserId = $calendar->id;
-            }
-
-            date_default_timezone_set($calendar->timeZone);
-
-            $date = date(DateFormat,strtotime(' -1 day'));
-            $nextMonthStart = date(DateFormat,strtotime('first day of +1 month'));
-            $yearStartFiscal = date("Y")."-"."01"."-"."01";
-
-            // get the latest meeting date in the DB and fetch all meets from that date ahead
-            // for current calendar fetch the latest meet present in DB so as to set the lower limit
-            // for further pulling calendar meets
-
-            $lastMeeting = Helpers::getLastMeetingInDBForEmailAddress($customer, $calendar->id);
-
-            if(!$lastMeeting) {
-                $date = date(DateFormat,strtotime($yearStartFiscal));
-            } else {
-                $eventDateTime = strtotime($lastMeeting->getEventDatetime());
-                $date = (strtotime($date) <= $eventDateTime) ? $date : date(DateFormat, $eventDateTime);
-                unset($eventDateTime);
-            }
-
-            $calendarId = $calendar->id;
-            $optParams = array(
-              'timeMin' => date('c',strtotime($date)),
-              'timeMax' => date('c',strtotime($nextMonthStart)),
-              'orderBy' => 'startTime',
-              'singleEvents' => TRUE
-            );
-
-            $events = $service->events->listEvents($calendarId, $optParams); // @todo $results better named "meetings" or "events"
-
-            if( !(is_array($events->getItems()) && (count($events->getItems())>0)) ) {
-                continue;
-            }
-
-            $calTimeZone = $events->timeZone; // Calendar Timezone
-
-            date_default_timezone_set($calTimeZone); // Setting default timezone
-
-            foreach ($events->getItems() as $event) {
-                $resultData = array();
-
-                $eventDatetime = $event->start->dateTime;
-
-                if(empty($eventDatetime)) { // All-day event
-                    $eventDatetime = $event->start->date;
-                }
-
-                $tempTimezone = $event->start->timeZone;   // If the event has a special timezone
-
-                // If there is no timezone
-                $timezone = empty($tempTimezone) ? new DateTimeZone($calTimeZone) : new DateTimeZone($tempTimezone);
-
-                $eventDate = new DateTime($eventDatetime,$timezone);
-                $creator = $event->getCreator();
-                $eventAttendeesList = array();
-                $eventType = "Internal";
-                $resultData['eventid'] = $event->id; // +++
-                $resultData['userid'] = $strUserId;
-
-                $startDate = date(DateTimeFormat,strtotime($eventDate->format("Y")."-".$eventDate->format("m")."-".$eventDate->format("d")));
-                $resultData['startdate'] = $startDate;
-                if($startDate) {
-                    $inDForm = date(DateFormat,strtotime($startDate))." 00:00:00";
-                    $startTime = strtotime($inDForm);
-                    $processTime = strtotime("+7 day", $startTime);
-                    $resultData['processtime'] = $processTime;
-                }
-
-                $resultData['ceatedbyemail'] = $creator ? $creator->getEmail() : "";
-                $resultData['createdByName'] = $creator ? $creator->getDisplayName() : "";
-
-                // ----------
-                $outsideDomain = "";
-                foreach($event->getAttendees() as $attendee) {
-                    $attendeeEmail = $attendee->getEmail();
-                    $domain = substr(strrchr($attendeeEmail, "@"), 1);
-
-                    $eventAttendeesList[] = $attendeeEmail;
-
-                    if($domain == $strClientDomainName) {
-                        continue;
-                    }
-
-                    if(in_array($domain, $personalEmailDomains)) {
-                        $outsideDomain .= "1,";
-                    } else {
-                        $eventType = "External";
-                        $outsideDomain .= "0,";
-                    }
-                }
-                $resultData['attendeesemail'] = implode(",",$eventAttendeesList);
-                // ----------
-
-                if($outsideDomain && (stripos($outsideDomain, "0") === false)) {
-                    $eventType = "Other";
-                }
-
-                $resultData['meetingtype'] = $eventType;
-
-                if($event->getSummary()) {
-                    if( !(is_array($eventAttendeesList) && (count($eventAttendeesList)>0)) ) {
-                        continue;
-                    }
-
-                    $meeting = Helpers::getMeetingIfExists($event);
-                    // @todo what about changes to the event? Id check will not show the difference!
-
-                    if(!$meeting) {
-                        $meeting = new Meeting();
-                        $meeting->setEventId($event->getId())
-                            ->setName($event->getSummary())
-                            ->setEventDatetime($eventDate)
-                            ->setAdditionalData(json_encode(array('calendarId' => $calendarId)))
-                            ->setEventType($eventType);
-
-                        if($event->getDescription()) {
-                            $meeting->setEventDescription($event->getDescription());
-                        }
-
-                        $meeting->save();
-                    }
-                }
-
-                unset($resultData);
-            }
+            processCalendar($customer, $service, $calendar);
         }
     } catch(Exception $e) {
         trigger_error("Exception is raised: " . $e->getMessage(), E_WARNING);
@@ -214,4 +100,188 @@ foreach($calendarIntegrations as $integration) {
             Helpers::sendAccountExpirationMail($contactEmailAddress);
         }
     }
+}
+
+/**
+ * @param Customer $customer
+ * @param $service
+ * @param $calendar
+ */
+function processCalendar(Customer $customer, $service, $calendar) {
+    $strUserId = "";
+    if( !($calendar->id) ) {
+        trigger_error("Calendar doesn't have an ID", E_USER_WARNING);
+        return;
+    }
+
+    // filter all other calendar other than client domain
+    if(strpos($calendar->id, $customer->getEmailDomain()) === false) {
+        return;
+    }
+
+    if($calendar->primary == "1") {
+        $strUserId = $calendar->id;
+    }
+
+    date_default_timezone_set($calendar->timeZone);
+
+    $date = date(DateFormat,strtotime(' -1 day'));
+    $nextMonthStart = date(DateFormat,strtotime('first day of +1 month'));
+    $yearStartFiscal = date("Y")."-"."01"."-"."01";
+
+    // get the latest meeting date in the DB and fetch all meets from that date ahead
+    // for current calendar fetch the latest meet present in DB so as to set the lower limit
+    // for further pulling calendar meets
+    $lastMeeting = Helpers::getLastMeetingInDBForEmailAddress($customer, $calendar->id);
+
+    if(!$lastMeeting) {
+        $date = date(DateFormat,strtotime($yearStartFiscal));
+    } else {
+        $eventDateTime = strtotime($lastMeeting->getEventDatetime());
+        $date = (strtotime($date) <= $eventDateTime) ? $date : date(DateFormat, $eventDateTime);
+        unset($eventDateTime);
+    }
+
+    $calendarId = $calendar->id;
+    $optParams = array(
+        'timeMin' => date('c',strtotime($date)),
+        'timeMax' => date('c',strtotime($nextMonthStart)),
+        'orderBy' => 'startTime',
+        'singleEvents' => TRUE
+    );
+
+    $events = $service->events->listEvents($calendarId, $optParams); // @todo $results better named "meetings" or "events"
+
+    if( !(is_array($events->getItems()) && (count($events->getItems())>0)) ) {
+        return;
+    }
+
+    $calTimeZone = $events->timeZone; // Calendar Timezone
+
+    date_default_timezone_set($calTimeZone); // Setting default timezone
+
+    foreach ($events->getItems() as $event) {
+        $resultData = array();
+
+        $eventDatetime = $event->start->dateTime;
+
+        if(empty($eventDatetime)) { // All-day event
+            $eventDatetime = $event->start->date;
+        }
+
+        $tempTimezone = $event->start->timeZone;   // If the event has a special timezone
+
+        // If there is no timezone
+        $timezone = empty($tempTimezone) ? new DateTimeZone($calTimeZone) : new DateTimeZone($tempTimezone);
+
+        $eventDate = new DateTime($eventDatetime,$timezone);
+        $creator = $event->getCreator();
+        $eventAttendeesList = array();
+        $eventType = "Internal";
+        $resultData['userid'] = $strUserId;
+
+        $startDate = date(DateTimeFormat,strtotime($eventDate->format("Y")."-".$eventDate->format("m")."-".$eventDate->format("d")));
+        $resultData['startdate'] = $startDate;
+        if($startDate) {
+            $inDForm = date(DateFormat,strtotime($startDate))." 00:00:00";
+            $startTime = strtotime($inDForm);
+            $processTime = strtotime("+7 day", $startTime);
+            $resultData['processtime'] = $processTime;
+        }
+
+        $resultData['ceatedbyemail'] = $creator ? $creator->getEmail() : "";
+        $resultData['createdByName'] = $creator ? $creator->getDisplayName() : "";
+
+        // ----------
+        $outsideDomain = "";
+        foreach($event->getAttendees() as $attendee) {
+            $attendeeEmail = $attendee->getEmail();
+            $domain = substr(strrchr($attendeeEmail, "@"), 1);
+
+            $eventAttendeesList[] = $attendeeEmail;
+
+            if($domain == $customer->getEmailDomain()) {
+                continue;
+            }
+
+            if(in_array($domain, Helpers::getPersonalEmailDomains() )) {
+                $outsideDomain .= "1,";
+            } else {
+                $eventType = "External";
+                $outsideDomain .= "0,";
+            }
+        }
+        $resultData['attendeesemail'] = implode(",",$eventAttendeesList);
+        // ----------
+
+        if($outsideDomain && (stripos($outsideDomain, "0") === false)) {
+            $eventType = "Other";
+        }
+
+        $resultData['meetingtype'] = $eventType;
+
+        if($event->getSummary()) {
+            if( !(is_array($eventAttendeesList) && (count($eventAttendeesList)>0)) ) {
+                continue;
+            }
+
+            $meeting = Helpers::getMeetingIfExists($event);
+            // @todo what about changes to the event? Id check will not show the difference!
+
+            // @todo Save attendee list to meeting_attendee, meeting_has_attendee, account, account_has_contact & contact tables.
+
+            if(!$meeting) {
+                saveNewMeeting($event, $calendarId, $eventDate, $eventType);
+            }
+        }
+
+        unset($resultData);
+    }
+}
+
+/**
+ * @param $event
+ * @param $calendarId
+ * @param $eventDate
+ * @param $eventType
+ * @return Meeting
+ */
+function saveNewMeeting($event, $calendarId, $eventDate, $eventType, $dryRun = true) {
+    $meeting = new Meeting();
+    $meeting->setEventId($event->getId())
+        ->setName($event->getSummary())
+        ->setEventDatetime($eventDate)
+        ->setAdditionalData(json_encode(array('calendarId' => $calendarId)))
+        ->setEventCreatedAt($event->getCreated())
+        ->setEventUpdatedAt($event->getUpdated())
+        ->setRawData(json_encode($event->toSimpleObject()))
+        ->setEventType($eventType);
+
+    if($desc = $event->getDescription()) {
+        $meeting->setEventDescription($desc);
+    }
+
+    /**
+     * Saving owner, attendees
+     *
+     * @todo less priority: propelorm's way of inheritance for (meeting_attendee <- ...) mapping
+     */
+
+    if(!$dryRun) {
+        $meeting->save();
+    } else {
+        echo "<pre>";
+        echo "DRY RUN SAVE";
+        var_dump(json_decode($meeting->exportTo('json')));
+        echo "</pre>";
+    }
+
+    // @todo Logging will be AWESOME!
+
+    return $meeting;
+}
+
+function isCalInCustomer(Google_Service_Calendar_CalendarListEntry $calendar, Customer $customer) {
+    list($identifier, $domain) = explode('@', $calendar->id);
+    return ($domain == $customer->getEmailDomain());
 }

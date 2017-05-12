@@ -3,6 +3,7 @@
 namespace DataModels\DataModels;
 
 use DataModels\DataModels\Base\CustomerContact as BaseCustomerContact;
+use DataModels\DataModels\CustomerContactQuery as CustomerContactQuery;
 
 /**
  * Skeleton subclass for representing a row from the 'customer_contact' table.
@@ -14,10 +15,17 @@ use DataModels\DataModels\Base\CustomerContact as BaseCustomerContact;
  * long as it does not already exist in the output directory.
  *
  */
-class CustomerContact extends BaseCustomerContact
+class CustomerContact extends BaseCustomerContact //implements IMeetingAttendee
 {
-    static function getMeetingAttendeeRefType() {
-        return 'customer_contact';
+    const MEETING_ATTENDEE_TYPE = 'CustomerContact';
+
+    public static function getType() {
+        return self::MEETING_ATTENDEE_TYPE;
+    }
+
+    public static function findInstance(int $id) {
+        $q = new CustomerContactQuery();
+        return $q->findById($id);
     }
 
     /**
@@ -43,7 +51,7 @@ class CustomerContact extends BaseCustomerContact
      */
     function getMeetingAttendee() {
         $q = new MeetingAttendeeQuery();
-        $attendeeSet = $q->filterByRefType(self::getMeetingAttendeeRefType())->filterByRefId($this->id);
+        $attendeeSet = $q->filterByRefType(self::getType())->filterByRefId($this->id)->find();
 
         if($attendeeSet->count() <= 0) { return NULL; }
 

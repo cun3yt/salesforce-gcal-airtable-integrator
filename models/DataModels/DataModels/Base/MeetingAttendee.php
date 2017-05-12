@@ -4,13 +4,18 @@ namespace DataModels\DataModels\Base;
 
 use \Exception;
 use \PDO;
+use DataModels\DataModels\Meeting as ChildMeeting;
+use DataModels\DataModels\MeetingAttendee as ChildMeetingAttendee;
 use DataModels\DataModels\MeetingAttendeeQuery as ChildMeetingAttendeeQuery;
+use DataModels\DataModels\MeetingQuery as ChildMeetingQuery;
 use DataModels\DataModels\Map\MeetingAttendeeTableMap;
+use DataModels\DataModels\Map\MeetingTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
+use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\BadMethodCallException;
 use Propel\Runtime\Exception\LogicException;
@@ -82,12 +87,36 @@ abstract class MeetingAttendee implements ActiveRecordInterface
     protected $ref_id;
 
     /**
+     * @var        ObjectCollection|ChildMeeting[] Collection to store aggregation of ChildMeeting objects.
+     */
+    protected $collMeetingsRelatedByEventOwnerId;
+    protected $collMeetingsRelatedByEventOwnerIdPartial;
+
+    /**
+     * @var        ObjectCollection|ChildMeeting[] Collection to store aggregation of ChildMeeting objects.
+     */
+    protected $collMeetingsRelatedByEventCreatorId;
+    protected $collMeetingsRelatedByEventCreatorIdPartial;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      *
      * @var boolean
      */
     protected $alreadyInSave = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildMeeting[]
+     */
+    protected $meetingsRelatedByEventOwnerIdScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildMeeting[]
+     */
+    protected $meetingsRelatedByEventCreatorIdScheduledForDeletion = null;
 
     /**
      * Applies default values to this object.
@@ -534,6 +563,10 @@ abstract class MeetingAttendee implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
+            $this->collMeetingsRelatedByEventOwnerId = null;
+
+            $this->collMeetingsRelatedByEventCreatorId = null;
+
         } // if (deep)
     }
 
@@ -646,6 +679,42 @@ abstract class MeetingAttendee implements ActiveRecordInterface
                     $affectedRows += $this->doUpdate($con);
                 }
                 $this->resetModified();
+            }
+
+            if ($this->meetingsRelatedByEventOwnerIdScheduledForDeletion !== null) {
+                if (!$this->meetingsRelatedByEventOwnerIdScheduledForDeletion->isEmpty()) {
+                    foreach ($this->meetingsRelatedByEventOwnerIdScheduledForDeletion as $meetingRelatedByEventOwnerId) {
+                        // need to save related object because we set the relation to null
+                        $meetingRelatedByEventOwnerId->save($con);
+                    }
+                    $this->meetingsRelatedByEventOwnerIdScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collMeetingsRelatedByEventOwnerId !== null) {
+                foreach ($this->collMeetingsRelatedByEventOwnerId as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->meetingsRelatedByEventCreatorIdScheduledForDeletion !== null) {
+                if (!$this->meetingsRelatedByEventCreatorIdScheduledForDeletion->isEmpty()) {
+                    foreach ($this->meetingsRelatedByEventCreatorIdScheduledForDeletion as $meetingRelatedByEventCreatorId) {
+                        // need to save related object because we set the relation to null
+                        $meetingRelatedByEventCreatorId->save($con);
+                    }
+                    $this->meetingsRelatedByEventCreatorIdScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collMeetingsRelatedByEventCreatorId !== null) {
+                foreach ($this->collMeetingsRelatedByEventCreatorId as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
             }
 
             $this->alreadyInSave = false;
@@ -793,10 +862,11 @@ abstract class MeetingAttendee implements ActiveRecordInterface
      *                    Defaults to TableMap::TYPE_PHPNAME.
      * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
      * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
+     * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
      *
      * @return array an associative array containing the field names (as keys) and field values
      */
-    public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array())
+    public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
 
         if (isset($alreadyDumpedObjects['MeetingAttendee'][$this->hashCode()])) {
@@ -814,6 +884,38 @@ abstract class MeetingAttendee implements ActiveRecordInterface
             $result[$key] = $virtualColumn;
         }
 
+        if ($includeForeignObjects) {
+            if (null !== $this->collMeetingsRelatedByEventOwnerId) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'meetings';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'meetings';
+                        break;
+                    default:
+                        $key = 'Meetings';
+                }
+
+                $result[$key] = $this->collMeetingsRelatedByEventOwnerId->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collMeetingsRelatedByEventCreatorId) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'meetings';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'meetings';
+                        break;
+                    default:
+                        $key = 'Meetings';
+                }
+
+                $result[$key] = $this->collMeetingsRelatedByEventCreatorId->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+        }
 
         return $result;
     }
@@ -1029,6 +1131,26 @@ abstract class MeetingAttendee implements ActiveRecordInterface
     {
         $copyObj->setRefType($this->getRefType());
         $copyObj->setRefId($this->getRefId());
+
+        if ($deepCopy) {
+            // important: temporarily setNew(false) because this affects the behavior of
+            // the getter/setter methods for fkey referrer objects.
+            $copyObj->setNew(false);
+
+            foreach ($this->getMeetingsRelatedByEventOwnerId() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addMeetingRelatedByEventOwnerId($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getMeetingsRelatedByEventCreatorId() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addMeetingRelatedByEventCreatorId($relObj->copy($deepCopy));
+                }
+            }
+
+        } // if ($deepCopy)
+
         if ($makeNew) {
             $copyObj->setNew(true);
             $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
@@ -1055,6 +1177,475 @@ abstract class MeetingAttendee implements ActiveRecordInterface
         $this->copyInto($copyObj, $deepCopy);
 
         return $copyObj;
+    }
+
+
+    /**
+     * Initializes a collection based on the name of a relation.
+     * Avoids crafting an 'init[$relationName]s' method name
+     * that wouldn't work when StandardEnglishPluralizer is used.
+     *
+     * @param      string $relationName The name of the relation to initialize
+     * @return void
+     */
+    public function initRelation($relationName)
+    {
+        if ('MeetingRelatedByEventOwnerId' == $relationName) {
+            return $this->initMeetingsRelatedByEventOwnerId();
+        }
+        if ('MeetingRelatedByEventCreatorId' == $relationName) {
+            return $this->initMeetingsRelatedByEventCreatorId();
+        }
+    }
+
+    /**
+     * Clears out the collMeetingsRelatedByEventOwnerId collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addMeetingsRelatedByEventOwnerId()
+     */
+    public function clearMeetingsRelatedByEventOwnerId()
+    {
+        $this->collMeetingsRelatedByEventOwnerId = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collMeetingsRelatedByEventOwnerId collection loaded partially.
+     */
+    public function resetPartialMeetingsRelatedByEventOwnerId($v = true)
+    {
+        $this->collMeetingsRelatedByEventOwnerIdPartial = $v;
+    }
+
+    /**
+     * Initializes the collMeetingsRelatedByEventOwnerId collection.
+     *
+     * By default this just sets the collMeetingsRelatedByEventOwnerId collection to an empty array (like clearcollMeetingsRelatedByEventOwnerId());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initMeetingsRelatedByEventOwnerId($overrideExisting = true)
+    {
+        if (null !== $this->collMeetingsRelatedByEventOwnerId && !$overrideExisting) {
+            return;
+        }
+
+        $collectionClassName = MeetingTableMap::getTableMap()->getCollectionClassName();
+
+        $this->collMeetingsRelatedByEventOwnerId = new $collectionClassName;
+        $this->collMeetingsRelatedByEventOwnerId->setModel('\DataModels\DataModels\Meeting');
+    }
+
+    /**
+     * Gets an array of ChildMeeting objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildMeetingAttendee is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildMeeting[] List of ChildMeeting objects
+     * @throws PropelException
+     */
+    public function getMeetingsRelatedByEventOwnerId(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collMeetingsRelatedByEventOwnerIdPartial && !$this->isNew();
+        if (null === $this->collMeetingsRelatedByEventOwnerId || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collMeetingsRelatedByEventOwnerId) {
+                // return empty collection
+                $this->initMeetingsRelatedByEventOwnerId();
+            } else {
+                $collMeetingsRelatedByEventOwnerId = ChildMeetingQuery::create(null, $criteria)
+                    ->filterByEventOwner($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collMeetingsRelatedByEventOwnerIdPartial && count($collMeetingsRelatedByEventOwnerId)) {
+                        $this->initMeetingsRelatedByEventOwnerId(false);
+
+                        foreach ($collMeetingsRelatedByEventOwnerId as $obj) {
+                            if (false == $this->collMeetingsRelatedByEventOwnerId->contains($obj)) {
+                                $this->collMeetingsRelatedByEventOwnerId->append($obj);
+                            }
+                        }
+
+                        $this->collMeetingsRelatedByEventOwnerIdPartial = true;
+                    }
+
+                    return $collMeetingsRelatedByEventOwnerId;
+                }
+
+                if ($partial && $this->collMeetingsRelatedByEventOwnerId) {
+                    foreach ($this->collMeetingsRelatedByEventOwnerId as $obj) {
+                        if ($obj->isNew()) {
+                            $collMeetingsRelatedByEventOwnerId[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collMeetingsRelatedByEventOwnerId = $collMeetingsRelatedByEventOwnerId;
+                $this->collMeetingsRelatedByEventOwnerIdPartial = false;
+            }
+        }
+
+        return $this->collMeetingsRelatedByEventOwnerId;
+    }
+
+    /**
+     * Sets a collection of ChildMeeting objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $meetingsRelatedByEventOwnerId A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return $this|ChildMeetingAttendee The current object (for fluent API support)
+     */
+    public function setMeetingsRelatedByEventOwnerId(Collection $meetingsRelatedByEventOwnerId, ConnectionInterface $con = null)
+    {
+        /** @var ChildMeeting[] $meetingsRelatedByEventOwnerIdToDelete */
+        $meetingsRelatedByEventOwnerIdToDelete = $this->getMeetingsRelatedByEventOwnerId(new Criteria(), $con)->diff($meetingsRelatedByEventOwnerId);
+
+
+        $this->meetingsRelatedByEventOwnerIdScheduledForDeletion = $meetingsRelatedByEventOwnerIdToDelete;
+
+        foreach ($meetingsRelatedByEventOwnerIdToDelete as $meetingRelatedByEventOwnerIdRemoved) {
+            $meetingRelatedByEventOwnerIdRemoved->setEventOwner(null);
+        }
+
+        $this->collMeetingsRelatedByEventOwnerId = null;
+        foreach ($meetingsRelatedByEventOwnerId as $meetingRelatedByEventOwnerId) {
+            $this->addMeetingRelatedByEventOwnerId($meetingRelatedByEventOwnerId);
+        }
+
+        $this->collMeetingsRelatedByEventOwnerId = $meetingsRelatedByEventOwnerId;
+        $this->collMeetingsRelatedByEventOwnerIdPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Meeting objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related Meeting objects.
+     * @throws PropelException
+     */
+    public function countMeetingsRelatedByEventOwnerId(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collMeetingsRelatedByEventOwnerIdPartial && !$this->isNew();
+        if (null === $this->collMeetingsRelatedByEventOwnerId || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collMeetingsRelatedByEventOwnerId) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getMeetingsRelatedByEventOwnerId());
+            }
+
+            $query = ChildMeetingQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByEventOwner($this)
+                ->count($con);
+        }
+
+        return count($this->collMeetingsRelatedByEventOwnerId);
+    }
+
+    /**
+     * Method called to associate a ChildMeeting object to this object
+     * through the ChildMeeting foreign key attribute.
+     *
+     * @param  ChildMeeting $l ChildMeeting
+     * @return $this|\DataModels\DataModels\MeetingAttendee The current object (for fluent API support)
+     */
+    public function addMeetingRelatedByEventOwnerId(ChildMeeting $l)
+    {
+        if ($this->collMeetingsRelatedByEventOwnerId === null) {
+            $this->initMeetingsRelatedByEventOwnerId();
+            $this->collMeetingsRelatedByEventOwnerIdPartial = true;
+        }
+
+        if (!$this->collMeetingsRelatedByEventOwnerId->contains($l)) {
+            $this->doAddMeetingRelatedByEventOwnerId($l);
+
+            if ($this->meetingsRelatedByEventOwnerIdScheduledForDeletion and $this->meetingsRelatedByEventOwnerIdScheduledForDeletion->contains($l)) {
+                $this->meetingsRelatedByEventOwnerIdScheduledForDeletion->remove($this->meetingsRelatedByEventOwnerIdScheduledForDeletion->search($l));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ChildMeeting $meetingRelatedByEventOwnerId The ChildMeeting object to add.
+     */
+    protected function doAddMeetingRelatedByEventOwnerId(ChildMeeting $meetingRelatedByEventOwnerId)
+    {
+        $this->collMeetingsRelatedByEventOwnerId[]= $meetingRelatedByEventOwnerId;
+        $meetingRelatedByEventOwnerId->setEventOwner($this);
+    }
+
+    /**
+     * @param  ChildMeeting $meetingRelatedByEventOwnerId The ChildMeeting object to remove.
+     * @return $this|ChildMeetingAttendee The current object (for fluent API support)
+     */
+    public function removeMeetingRelatedByEventOwnerId(ChildMeeting $meetingRelatedByEventOwnerId)
+    {
+        if ($this->getMeetingsRelatedByEventOwnerId()->contains($meetingRelatedByEventOwnerId)) {
+            $pos = $this->collMeetingsRelatedByEventOwnerId->search($meetingRelatedByEventOwnerId);
+            $this->collMeetingsRelatedByEventOwnerId->remove($pos);
+            if (null === $this->meetingsRelatedByEventOwnerIdScheduledForDeletion) {
+                $this->meetingsRelatedByEventOwnerIdScheduledForDeletion = clone $this->collMeetingsRelatedByEventOwnerId;
+                $this->meetingsRelatedByEventOwnerIdScheduledForDeletion->clear();
+            }
+            $this->meetingsRelatedByEventOwnerIdScheduledForDeletion[]= $meetingRelatedByEventOwnerId;
+            $meetingRelatedByEventOwnerId->setEventOwner(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Clears out the collMeetingsRelatedByEventCreatorId collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addMeetingsRelatedByEventCreatorId()
+     */
+    public function clearMeetingsRelatedByEventCreatorId()
+    {
+        $this->collMeetingsRelatedByEventCreatorId = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collMeetingsRelatedByEventCreatorId collection loaded partially.
+     */
+    public function resetPartialMeetingsRelatedByEventCreatorId($v = true)
+    {
+        $this->collMeetingsRelatedByEventCreatorIdPartial = $v;
+    }
+
+    /**
+     * Initializes the collMeetingsRelatedByEventCreatorId collection.
+     *
+     * By default this just sets the collMeetingsRelatedByEventCreatorId collection to an empty array (like clearcollMeetingsRelatedByEventCreatorId());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initMeetingsRelatedByEventCreatorId($overrideExisting = true)
+    {
+        if (null !== $this->collMeetingsRelatedByEventCreatorId && !$overrideExisting) {
+            return;
+        }
+
+        $collectionClassName = MeetingTableMap::getTableMap()->getCollectionClassName();
+
+        $this->collMeetingsRelatedByEventCreatorId = new $collectionClassName;
+        $this->collMeetingsRelatedByEventCreatorId->setModel('\DataModels\DataModels\Meeting');
+    }
+
+    /**
+     * Gets an array of ChildMeeting objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildMeetingAttendee is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildMeeting[] List of ChildMeeting objects
+     * @throws PropelException
+     */
+    public function getMeetingsRelatedByEventCreatorId(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collMeetingsRelatedByEventCreatorIdPartial && !$this->isNew();
+        if (null === $this->collMeetingsRelatedByEventCreatorId || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collMeetingsRelatedByEventCreatorId) {
+                // return empty collection
+                $this->initMeetingsRelatedByEventCreatorId();
+            } else {
+                $collMeetingsRelatedByEventCreatorId = ChildMeetingQuery::create(null, $criteria)
+                    ->filterByEventCreator($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collMeetingsRelatedByEventCreatorIdPartial && count($collMeetingsRelatedByEventCreatorId)) {
+                        $this->initMeetingsRelatedByEventCreatorId(false);
+
+                        foreach ($collMeetingsRelatedByEventCreatorId as $obj) {
+                            if (false == $this->collMeetingsRelatedByEventCreatorId->contains($obj)) {
+                                $this->collMeetingsRelatedByEventCreatorId->append($obj);
+                            }
+                        }
+
+                        $this->collMeetingsRelatedByEventCreatorIdPartial = true;
+                    }
+
+                    return $collMeetingsRelatedByEventCreatorId;
+                }
+
+                if ($partial && $this->collMeetingsRelatedByEventCreatorId) {
+                    foreach ($this->collMeetingsRelatedByEventCreatorId as $obj) {
+                        if ($obj->isNew()) {
+                            $collMeetingsRelatedByEventCreatorId[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collMeetingsRelatedByEventCreatorId = $collMeetingsRelatedByEventCreatorId;
+                $this->collMeetingsRelatedByEventCreatorIdPartial = false;
+            }
+        }
+
+        return $this->collMeetingsRelatedByEventCreatorId;
+    }
+
+    /**
+     * Sets a collection of ChildMeeting objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $meetingsRelatedByEventCreatorId A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return $this|ChildMeetingAttendee The current object (for fluent API support)
+     */
+    public function setMeetingsRelatedByEventCreatorId(Collection $meetingsRelatedByEventCreatorId, ConnectionInterface $con = null)
+    {
+        /** @var ChildMeeting[] $meetingsRelatedByEventCreatorIdToDelete */
+        $meetingsRelatedByEventCreatorIdToDelete = $this->getMeetingsRelatedByEventCreatorId(new Criteria(), $con)->diff($meetingsRelatedByEventCreatorId);
+
+
+        $this->meetingsRelatedByEventCreatorIdScheduledForDeletion = $meetingsRelatedByEventCreatorIdToDelete;
+
+        foreach ($meetingsRelatedByEventCreatorIdToDelete as $meetingRelatedByEventCreatorIdRemoved) {
+            $meetingRelatedByEventCreatorIdRemoved->setEventCreator(null);
+        }
+
+        $this->collMeetingsRelatedByEventCreatorId = null;
+        foreach ($meetingsRelatedByEventCreatorId as $meetingRelatedByEventCreatorId) {
+            $this->addMeetingRelatedByEventCreatorId($meetingRelatedByEventCreatorId);
+        }
+
+        $this->collMeetingsRelatedByEventCreatorId = $meetingsRelatedByEventCreatorId;
+        $this->collMeetingsRelatedByEventCreatorIdPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Meeting objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related Meeting objects.
+     * @throws PropelException
+     */
+    public function countMeetingsRelatedByEventCreatorId(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collMeetingsRelatedByEventCreatorIdPartial && !$this->isNew();
+        if (null === $this->collMeetingsRelatedByEventCreatorId || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collMeetingsRelatedByEventCreatorId) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getMeetingsRelatedByEventCreatorId());
+            }
+
+            $query = ChildMeetingQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByEventCreator($this)
+                ->count($con);
+        }
+
+        return count($this->collMeetingsRelatedByEventCreatorId);
+    }
+
+    /**
+     * Method called to associate a ChildMeeting object to this object
+     * through the ChildMeeting foreign key attribute.
+     *
+     * @param  ChildMeeting $l ChildMeeting
+     * @return $this|\DataModels\DataModels\MeetingAttendee The current object (for fluent API support)
+     */
+    public function addMeetingRelatedByEventCreatorId(ChildMeeting $l)
+    {
+        if ($this->collMeetingsRelatedByEventCreatorId === null) {
+            $this->initMeetingsRelatedByEventCreatorId();
+            $this->collMeetingsRelatedByEventCreatorIdPartial = true;
+        }
+
+        if (!$this->collMeetingsRelatedByEventCreatorId->contains($l)) {
+            $this->doAddMeetingRelatedByEventCreatorId($l);
+
+            if ($this->meetingsRelatedByEventCreatorIdScheduledForDeletion and $this->meetingsRelatedByEventCreatorIdScheduledForDeletion->contains($l)) {
+                $this->meetingsRelatedByEventCreatorIdScheduledForDeletion->remove($this->meetingsRelatedByEventCreatorIdScheduledForDeletion->search($l));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ChildMeeting $meetingRelatedByEventCreatorId The ChildMeeting object to add.
+     */
+    protected function doAddMeetingRelatedByEventCreatorId(ChildMeeting $meetingRelatedByEventCreatorId)
+    {
+        $this->collMeetingsRelatedByEventCreatorId[]= $meetingRelatedByEventCreatorId;
+        $meetingRelatedByEventCreatorId->setEventCreator($this);
+    }
+
+    /**
+     * @param  ChildMeeting $meetingRelatedByEventCreatorId The ChildMeeting object to remove.
+     * @return $this|ChildMeetingAttendee The current object (for fluent API support)
+     */
+    public function removeMeetingRelatedByEventCreatorId(ChildMeeting $meetingRelatedByEventCreatorId)
+    {
+        if ($this->getMeetingsRelatedByEventCreatorId()->contains($meetingRelatedByEventCreatorId)) {
+            $pos = $this->collMeetingsRelatedByEventCreatorId->search($meetingRelatedByEventCreatorId);
+            $this->collMeetingsRelatedByEventCreatorId->remove($pos);
+            if (null === $this->meetingsRelatedByEventCreatorIdScheduledForDeletion) {
+                $this->meetingsRelatedByEventCreatorIdScheduledForDeletion = clone $this->collMeetingsRelatedByEventCreatorId;
+                $this->meetingsRelatedByEventCreatorIdScheduledForDeletion->clear();
+            }
+            $this->meetingsRelatedByEventCreatorIdScheduledForDeletion[]= $meetingRelatedByEventCreatorId;
+            $meetingRelatedByEventCreatorId->setEventCreator(null);
+        }
+
+        return $this;
     }
 
     /**
@@ -1086,8 +1677,20 @@ abstract class MeetingAttendee implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collMeetingsRelatedByEventOwnerId) {
+                foreach ($this->collMeetingsRelatedByEventOwnerId as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collMeetingsRelatedByEventCreatorId) {
+                foreach ($this->collMeetingsRelatedByEventCreatorId as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
+        $this->collMeetingsRelatedByEventOwnerId = null;
+        $this->collMeetingsRelatedByEventCreatorId = null;
     }
 
     /**
