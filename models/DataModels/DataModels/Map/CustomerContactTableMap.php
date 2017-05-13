@@ -72,11 +72,6 @@ class CustomerContactTableMap extends TableMap
     const NUM_HYDRATE_COLUMNS = 6;
 
     /**
-     * the column name for the id field
-     */
-    const COL_ID = 'customer_contact.id';
-
-    /**
      * the column name for the customer_id field
      */
     const COL_CUSTOMER_ID = 'customer_contact.customer_id';
@@ -102,6 +97,11 @@ class CustomerContactTableMap extends TableMap
     const COL_EMAIL = 'customer_contact.email';
 
     /**
+     * the column name for the id field
+     */
+    const COL_ID = 'customer_contact.id';
+
+    /**
      * The default string format for model objects of the related table
      */
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -113,10 +113,10 @@ class CustomerContactTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'CustomerId', 'Name', 'Surname', 'Title', 'Email', ),
-        self::TYPE_CAMELNAME     => array('id', 'customerId', 'name', 'surname', 'title', 'email', ),
-        self::TYPE_COLNAME       => array(CustomerContactTableMap::COL_ID, CustomerContactTableMap::COL_CUSTOMER_ID, CustomerContactTableMap::COL_NAME, CustomerContactTableMap::COL_SURNAME, CustomerContactTableMap::COL_TITLE, CustomerContactTableMap::COL_EMAIL, ),
-        self::TYPE_FIELDNAME     => array('id', 'customer_id', 'name', 'surname', 'title', 'email', ),
+        self::TYPE_PHPNAME       => array('CustomerId', 'Name', 'Surname', 'Title', 'Email', 'Id', ),
+        self::TYPE_CAMELNAME     => array('customerId', 'name', 'surname', 'title', 'email', 'id', ),
+        self::TYPE_COLNAME       => array(CustomerContactTableMap::COL_CUSTOMER_ID, CustomerContactTableMap::COL_NAME, CustomerContactTableMap::COL_SURNAME, CustomerContactTableMap::COL_TITLE, CustomerContactTableMap::COL_EMAIL, CustomerContactTableMap::COL_ID, ),
+        self::TYPE_FIELDNAME     => array('customer_id', 'name', 'surname', 'title', 'email', 'id', ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
@@ -127,10 +127,10 @@ class CustomerContactTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'CustomerId' => 1, 'Name' => 2, 'Surname' => 3, 'Title' => 4, 'Email' => 5, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'customerId' => 1, 'name' => 2, 'surname' => 3, 'title' => 4, 'email' => 5, ),
-        self::TYPE_COLNAME       => array(CustomerContactTableMap::COL_ID => 0, CustomerContactTableMap::COL_CUSTOMER_ID => 1, CustomerContactTableMap::COL_NAME => 2, CustomerContactTableMap::COL_SURNAME => 3, CustomerContactTableMap::COL_TITLE => 4, CustomerContactTableMap::COL_EMAIL => 5, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'customer_id' => 1, 'name' => 2, 'surname' => 3, 'title' => 4, 'email' => 5, ),
+        self::TYPE_PHPNAME       => array('CustomerId' => 0, 'Name' => 1, 'Surname' => 2, 'Title' => 3, 'Email' => 4, 'Id' => 5, ),
+        self::TYPE_CAMELNAME     => array('customerId' => 0, 'name' => 1, 'surname' => 2, 'title' => 3, 'email' => 4, 'id' => 5, ),
+        self::TYPE_COLNAME       => array(CustomerContactTableMap::COL_CUSTOMER_ID => 0, CustomerContactTableMap::COL_NAME => 1, CustomerContactTableMap::COL_SURNAME => 2, CustomerContactTableMap::COL_TITLE => 3, CustomerContactTableMap::COL_EMAIL => 4, CustomerContactTableMap::COL_ID => 5, ),
+        self::TYPE_FIELDNAME     => array('customer_id' => 0, 'name' => 1, 'surname' => 2, 'title' => 3, 'email' => 4, 'id' => 5, ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
@@ -149,15 +149,14 @@ class CustomerContactTableMap extends TableMap
         $this->setIdentifierQuoting(false);
         $this->setClassName('\\DataModels\\DataModels\\CustomerContact');
         $this->setPackage('DataModels.DataModels');
-        $this->setUseIdGenerator(true);
-        $this->setPrimaryKeyMethodInfo('customer_contact_id_seq');
+        $this->setUseIdGenerator(false);
         // columns
-        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('customer_id', 'CustomerId', 'INTEGER', 'customer', 'id', false, null, null);
         $this->addColumn('name', 'Name', 'VARCHAR', false, 255, null);
         $this->addColumn('surname', 'Surname', 'VARCHAR', false, 255, null);
         $this->addColumn('title', 'Title', 'VARCHAR', false, 127, null);
         $this->addColumn('email', 'Email', 'VARCHAR', false, 255, null);
+        $this->addForeignPrimaryKey('id', 'Id', 'INTEGER' , 'meeting_attendee', 'id', true, null, null);
     } // initialize()
 
     /**
@@ -172,6 +171,13 @@ class CustomerContactTableMap extends TableMap
     1 => ':id',
   ),
 ), null, null, null, false);
+        $this->addRelation('MeetingAttendee', '\\DataModels\\DataModels\\MeetingAttendee', RelationMap::MANY_TO_ONE, array (
+  0 =>
+  array (
+    0 => ':id',
+    1 => ':id',
+  ),
+), 'CASCADE', null, null, false);
         $this->addRelation('CustomerContactIntegration', '\\DataModels\\DataModels\\CustomerContactIntegration', RelationMap::ONE_TO_MANY, array (
   0 =>
   array (
@@ -180,6 +186,19 @@ class CustomerContactTableMap extends TableMap
   ),
 ), null, null, 'CustomerContactIntegrations', false);
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'concrete_inheritance' => array('extends' => 'meeting_attendee', 'descendant_column' => 'descendant_class', 'copy_data_to_parent' => 'true', 'copy_data_to_child' => 'false', 'schema' => '', 'exclude_behaviors' => '', ),
+        );
+    } // getBehaviors()
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -197,11 +216,11 @@ class CustomerContactTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 5 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return null === $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+        return null === $row[TableMap::TYPE_NUM == $indexType ? 5 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 5 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 5 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 5 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 5 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
     }
 
     /**
@@ -220,7 +239,7 @@ class CustomerContactTableMap extends TableMap
     {
         return (int) $row[
             $indexType == TableMap::TYPE_NUM
-                ? 0 + $offset
+                ? 5 + $offset
                 : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
         ];
     }
@@ -322,19 +341,19 @@ class CustomerContactTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(CustomerContactTableMap::COL_ID);
             $criteria->addSelectColumn(CustomerContactTableMap::COL_CUSTOMER_ID);
             $criteria->addSelectColumn(CustomerContactTableMap::COL_NAME);
             $criteria->addSelectColumn(CustomerContactTableMap::COL_SURNAME);
             $criteria->addSelectColumn(CustomerContactTableMap::COL_TITLE);
             $criteria->addSelectColumn(CustomerContactTableMap::COL_EMAIL);
+            $criteria->addSelectColumn(CustomerContactTableMap::COL_ID);
         } else {
-            $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.customer_id');
             $criteria->addSelectColumn($alias . '.name');
             $criteria->addSelectColumn($alias . '.surname');
             $criteria->addSelectColumn($alias . '.title');
             $criteria->addSelectColumn($alias . '.email');
+            $criteria->addSelectColumn($alias . '.id');
         }
     }
 
@@ -432,10 +451,6 @@ class CustomerContactTableMap extends TableMap
             $criteria = clone $criteria; // rename for clarity
         } else {
             $criteria = $criteria->buildCriteria(); // build Criteria from CustomerContact object
-        }
-
-        if ($criteria->containsKey(CustomerContactTableMap::COL_ID) && $criteria->keyContainsValue(CustomerContactTableMap::COL_ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.CustomerContactTableMap::COL_ID.')');
         }
 
 

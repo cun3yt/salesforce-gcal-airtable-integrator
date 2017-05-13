@@ -24,3 +24,6 @@ and present it in Airtable document.
 ### Application of Migrations
 * `./propel migrate`
 * [More info on Migration](http://propelorm.org/documentation/09-migrations.html)
+
+### To Re-Load Composer Autoload 
+* `php ./composer.phar dump-autoload`

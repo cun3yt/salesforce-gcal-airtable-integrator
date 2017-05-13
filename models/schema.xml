@@ -32,8 +32,11 @@
     <column name="customer_id" phpName="CustomerId" type="INTEGER"/>
     <column name="stage" phpName="Stage" type="VARCHAR" size="255"/>
   </table>
-  <table name="contact" idMethod="native" phpName="Contact" namespace="DataModels">
-    <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+  <table name="contact" phpName="Contact" namespace="DataModels">
+    <behavior name="concrete_inheritance">
+      <parameter name="extends" value="meeting_attendee" />
+    </behavior>
+
     <column name="email" phpName="Email" type="VARCHAR" size="255"/>
     <column name="full_name" phpName="FullName" type="VARCHAR" size="255"/>
     <column name="account_id" phpName="AccountId" type="INTEGER"/>
@@ -53,8 +56,11 @@
     <column name="website" phpName="Website" type="VARCHAR" size="255"/>
     <column name="email_domain" phpName="EmailDomain" type="VARCHAR" size="255"/>
   </table>
-  <table name="customer_contact" idMethod="native" phpName="CustomerContact" namespace="DataModels">
-    <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+
+  <table name="customer_contact" phpName="CustomerContact" namespace="DataModels">
+    <behavior name="concrete_inheritance">
+      <parameter name="extends" value="meeting_attendee" />
+    </behavior>
 
     <column name="customer_id" phpName="CustomerId" type="INTEGER"/>
 
@@ -66,7 +72,9 @@
     <foreign-key foreignTable="customer" onDelete="none" onUpdate="none">
       <reference local="customer_id" foreign="id" />
     </foreign-key>
+
   </table>
+
   <table name="customer_contact_integration" idMethod="native" phpName="CustomerContactIntegration" namespace="DataModels">
     <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
     <column name="customer_contact_id" phpName="CustomerContactId" type="INTEGER"/>
@@ -103,20 +111,27 @@
     </foreign-key>
 
   </table>
-  <table name="meeting_attendee" idMethod="native" phpName="MeetingAttendee" namespace="DataModels">
-    <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-    <column name="ref_type" phpName="RefType" type="VARCHAR" size="50" defaultValue="&quot;contact&quot;"/>
-    <column name="ref_id" phpName="RefId" type="INTEGER"/>
+
+
+  <table name="meeting_attendee" phpName="MeetingAttendee" namespace="DataModels">
+    <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" />
   </table>
+
+
   <table name="meeting_has_account_history" idMethod="native" phpName="MeetingHasAccountHistory" namespace="DataModels">
     <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
     <column name="meeting_id" phpName="MeetingId" type="INTEGER"/>
     <column name="account_history_id" phpName="AccountHistoryId" type="INTEGER"/>
   </table>
-  <table name="meeting_has_attendee" idMethod="native" phpName="MeetingHasAttendee" namespace="DataModels">
-    <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-    <column name="meeting_id" phpName="MeetingId" type="INTEGER"/>
-    <column name="meeting_attendee_id" phpName="MeetingAttendeeId" type="INTEGER"/>
+  <table name="meeting_has_attendee" isCrossRef="true" namespace="DataModels">
+    <column name="meeting_id" type="INTEGER" primaryKey="true"/>
+    <column name="meeting_attendee_id" phpName="MeetingAttendeeId" type="INTEGER" primaryKey="true"/>
+    <foreign-key foreignTable="meeting">
+      <reference local="meeting_id" foreign="id"/>
+    </foreign-key>
+    <foreign-key foreignTable="meeting_attendee">
+      <reference local="meeting_attendee_id" foreign="id"/>
+    </foreign-key>
   </table>
   <table name="meeting_has_opportunity_history" idMethod="native" phpName="MeetingHasOpportunityHistory" namespace="DataModels">
     <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>

@@ -233,6 +233,14 @@ class MeetingTableMap extends TableMap
     1 => ':id',
   ),
 ), null, null, null, false);
+        $this->addRelation('MeetingHasAttendee', '\\DataModels\\DataModels\\MeetingHasAttendee', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':meeting_id',
+    1 => ':id',
+  ),
+), null, null, 'MeetingHasAttendees', false);
+        $this->addRelation('MeetingAttendee', '\\DataModels\\DataModels\\MeetingAttendee', RelationMap::MANY_TO_MANY, array(), null, null, 'MeetingAttendees');
     } // buildRelations()
 
     /**

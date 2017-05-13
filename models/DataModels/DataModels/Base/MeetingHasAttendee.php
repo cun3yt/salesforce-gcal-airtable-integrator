@@ -4,7 +4,11 @@ namespace DataModels\DataModels\Base;
 
 use \Exception;
 use \PDO;
+use DataModels\DataModels\Meeting as ChildMeeting;
+use DataModels\DataModels\MeetingAttendee as ChildMeetingAttendee;
+use DataModels\DataModels\MeetingAttendeeQuery as ChildMeetingAttendeeQuery;
 use DataModels\DataModels\MeetingHasAttendeeQuery as ChildMeetingHasAttendeeQuery;
+use DataModels\DataModels\MeetingQuery as ChildMeetingQuery;
 use DataModels\DataModels\Map\MeetingHasAttendeeTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -60,13 +64,6 @@ abstract class MeetingHasAttendee implements ActiveRecordInterface
     protected $virtualColumns = array();
 
     /**
-     * The value for the id field.
-     *
-     * @var        int
-     */
-    protected $id;
-
-    /**
      * The value for the meeting_id field.
      *
      * @var        int
@@ -79,6 +76,16 @@ abstract class MeetingHasAttendee implements ActiveRecordInterface
      * @var        int
      */
     protected $meeting_attendee_id;
+
+    /**
+     * @var        ChildMeeting
+     */
+    protected $aMeeting;
+
+    /**
+     * @var        ChildMeetingAttendee
+     */
+    protected $aMeetingAttendee;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -314,16 +321,6 @@ abstract class MeetingHasAttendee implements ActiveRecordInterface
     }
 
     /**
-     * Get the [id] column value.
-     *
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
      * Get the [meeting_id] column value.
      *
      * @return int
@@ -344,26 +341,6 @@ abstract class MeetingHasAttendee implements ActiveRecordInterface
     }
 
     /**
-     * Set the value of [id] column.
-     *
-     * @param int $v new value
-     * @return $this|\DataModels\DataModels\MeetingHasAttendee The current object (for fluent API support)
-     */
-    public function setId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->id !== $v) {
-            $this->id = $v;
-            $this->modifiedColumns[MeetingHasAttendeeTableMap::COL_ID] = true;
-        }
-
-        return $this;
-    } // setId()
-
-    /**
      * Set the value of [meeting_id] column.
      *
      * @param int $v new value
@@ -378,6 +355,10 @@ abstract class MeetingHasAttendee implements ActiveRecordInterface
         if ($this->meeting_id !== $v) {
             $this->meeting_id = $v;
             $this->modifiedColumns[MeetingHasAttendeeTableMap::COL_MEETING_ID] = true;
+        }
+
+        if ($this->aMeeting !== null && $this->aMeeting->getId() !== $v) {
+            $this->aMeeting = null;
         }
 
         return $this;
@@ -398,6 +379,10 @@ abstract class MeetingHasAttendee implements ActiveRecordInterface
         if ($this->meeting_attendee_id !== $v) {
             $this->meeting_attendee_id = $v;
             $this->modifiedColumns[MeetingHasAttendeeTableMap::COL_MEETING_ATTENDEE_ID] = true;
+        }
+
+        if ($this->aMeetingAttendee !== null && $this->aMeetingAttendee->getId() !== $v) {
+            $this->aMeetingAttendee = null;
         }
 
         return $this;
@@ -439,13 +424,10 @@ abstract class MeetingHasAttendee implements ActiveRecordInterface
     {
         try {
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : MeetingHasAttendeeTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->id = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : MeetingHasAttendeeTableMap::translateFieldName('MeetingId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : MeetingHasAttendeeTableMap::translateFieldName('MeetingId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->meeting_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : MeetingHasAttendeeTableMap::translateFieldName('MeetingAttendeeId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : MeetingHasAttendeeTableMap::translateFieldName('MeetingAttendeeId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->meeting_attendee_id = (null !== $col) ? (int) $col : null;
             $this->resetModified();
 
@@ -455,7 +437,7 @@ abstract class MeetingHasAttendee implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 3; // 3 = MeetingHasAttendeeTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 2; // 2 = MeetingHasAttendeeTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\DataModels\\DataModels\\MeetingHasAttendee'), 0, $e);
@@ -477,6 +459,12 @@ abstract class MeetingHasAttendee implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
+        if ($this->aMeeting !== null && $this->meeting_id !== $this->aMeeting->getId()) {
+            $this->aMeeting = null;
+        }
+        if ($this->aMeetingAttendee !== null && $this->meeting_attendee_id !== $this->aMeetingAttendee->getId()) {
+            $this->aMeetingAttendee = null;
+        }
     } // ensureConsistency
 
     /**
@@ -516,6 +504,8 @@ abstract class MeetingHasAttendee implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
+            $this->aMeeting = null;
+            $this->aMeetingAttendee = null;
         } // if (deep)
     }
 
@@ -619,6 +609,25 @@ abstract class MeetingHasAttendee implements ActiveRecordInterface
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their corresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aMeeting !== null) {
+                if ($this->aMeeting->isModified() || $this->aMeeting->isNew()) {
+                    $affectedRows += $this->aMeeting->save($con);
+                }
+                $this->setMeeting($this->aMeeting);
+            }
+
+            if ($this->aMeetingAttendee !== null) {
+                if ($this->aMeetingAttendee->isModified() || $this->aMeetingAttendee->isNew()) {
+                    $affectedRows += $this->aMeetingAttendee->save($con);
+                }
+                $this->setMeetingAttendee($this->aMeetingAttendee);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -650,24 +659,8 @@ abstract class MeetingHasAttendee implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[MeetingHasAttendeeTableMap::COL_ID] = true;
-        if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . MeetingHasAttendeeTableMap::COL_ID . ')');
-        }
-        if (null === $this->id) {
-            try {
-                $dataFetcher = $con->query("SELECT nextval('meeting_has_attendee_id_seq')");
-                $this->id = (int) $dataFetcher->fetchColumn();
-            } catch (Exception $e) {
-                throw new PropelException('Unable to get sequence id.', 0, $e);
-            }
-        }
-
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(MeetingHasAttendeeTableMap::COL_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'id';
-        }
         if ($this->isColumnModified(MeetingHasAttendeeTableMap::COL_MEETING_ID)) {
             $modifiedColumns[':p' . $index++]  = 'meeting_id';
         }
@@ -685,9 +678,6 @@ abstract class MeetingHasAttendee implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'id':
-                        $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
-                        break;
                     case 'meeting_id':
                         $stmt->bindValue($identifier, $this->meeting_id, PDO::PARAM_INT);
                         break;
@@ -750,12 +740,9 @@ abstract class MeetingHasAttendee implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                return $this->getId();
-                break;
-            case 1:
                 return $this->getMeetingId();
                 break;
-            case 2:
+            case 1:
                 return $this->getMeetingAttendeeId();
                 break;
             default:
@@ -775,10 +762,11 @@ abstract class MeetingHasAttendee implements ActiveRecordInterface
      *                    Defaults to TableMap::TYPE_PHPNAME.
      * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
      * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
+     * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
      *
      * @return array an associative array containing the field names (as keys) and field values
      */
-    public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array())
+    public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
 
         if (isset($alreadyDumpedObjects['MeetingHasAttendee'][$this->hashCode()])) {
@@ -787,15 +775,46 @@ abstract class MeetingHasAttendee implements ActiveRecordInterface
         $alreadyDumpedObjects['MeetingHasAttendee'][$this->hashCode()] = true;
         $keys = MeetingHasAttendeeTableMap::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getId(),
-            $keys[1] => $this->getMeetingId(),
-            $keys[2] => $this->getMeetingAttendeeId(),
+            $keys[0] => $this->getMeetingId(),
+            $keys[1] => $this->getMeetingAttendeeId(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
             $result[$key] = $virtualColumn;
         }
 
+        if ($includeForeignObjects) {
+            if (null !== $this->aMeeting) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'meeting';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'meeting';
+                        break;
+                    default:
+                        $key = 'Meeting';
+                }
+
+                $result[$key] = $this->aMeeting->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aMeetingAttendee) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'meetingAttendee';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'meeting_attendee';
+                        break;
+                    default:
+                        $key = 'MeetingAttendee';
+                }
+
+                $result[$key] = $this->aMeetingAttendee->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+        }
 
         return $result;
     }
@@ -830,12 +849,9 @@ abstract class MeetingHasAttendee implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                $this->setId($value);
-                break;
-            case 1:
                 $this->setMeetingId($value);
                 break;
-            case 2:
+            case 1:
                 $this->setMeetingAttendeeId($value);
                 break;
         } // switch()
@@ -865,13 +881,10 @@ abstract class MeetingHasAttendee implements ActiveRecordInterface
         $keys = MeetingHasAttendeeTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) {
-            $this->setId($arr[$keys[0]]);
+            $this->setMeetingId($arr[$keys[0]]);
         }
         if (array_key_exists($keys[1], $arr)) {
-            $this->setMeetingId($arr[$keys[1]]);
-        }
-        if (array_key_exists($keys[2], $arr)) {
-            $this->setMeetingAttendeeId($arr[$keys[2]]);
+            $this->setMeetingAttendeeId($arr[$keys[1]]);
         }
     }
 
@@ -914,9 +927,6 @@ abstract class MeetingHasAttendee implements ActiveRecordInterface
     {
         $criteria = new Criteria(MeetingHasAttendeeTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(MeetingHasAttendeeTableMap::COL_ID)) {
-            $criteria->add(MeetingHasAttendeeTableMap::COL_ID, $this->id);
-        }
         if ($this->isColumnModified(MeetingHasAttendeeTableMap::COL_MEETING_ID)) {
             $criteria->add(MeetingHasAttendeeTableMap::COL_MEETING_ID, $this->meeting_id);
         }
@@ -940,7 +950,8 @@ abstract class MeetingHasAttendee implements ActiveRecordInterface
     public function buildPkeyCriteria()
     {
         $criteria = ChildMeetingHasAttendeeQuery::create();
-        $criteria->add(MeetingHasAttendeeTableMap::COL_ID, $this->id);
+        $criteria->add(MeetingHasAttendeeTableMap::COL_MEETING_ID, $this->meeting_id);
+        $criteria->add(MeetingHasAttendeeTableMap::COL_MEETING_ATTENDEE_ID, $this->meeting_attendee_id);
 
         return $criteria;
     }
@@ -953,10 +964,25 @@ abstract class MeetingHasAttendee implements ActiveRecordInterface
      */
     public function hashCode()
     {
-        $validPk = null !== $this->getId();
+        $validPk = null !== $this->getMeetingId() &&
+            null !== $this->getMeetingAttendeeId();
 
-        $validPrimaryKeyFKs = 0;
+        $validPrimaryKeyFKs = 2;
         $primaryKeyFKs = [];
+
+        //relation meeting_has_attendee_fk_0f110d to table meeting
+        if ($this->aMeeting && $hash = spl_object_hash($this->aMeeting)) {
+            $primaryKeyFKs[] = $hash;
+        } else {
+            $validPrimaryKeyFKs = false;
+        }
+
+        //relation meeting_has_attendee_fk_932b1e to table meeting_attendee
+        if ($this->aMeetingAttendee && $hash = spl_object_hash($this->aMeetingAttendee)) {
+            $primaryKeyFKs[] = $hash;
+        } else {
+            $validPrimaryKeyFKs = false;
+        }
 
         if ($validPk) {
             return crc32(json_encode($this->getPrimaryKey(), JSON_UNESCAPED_UNICODE));
@@ -968,23 +994,29 @@ abstract class MeetingHasAttendee implements ActiveRecordInterface
     }
 
     /**
-     * Returns the primary key for this object (row).
-     * @return int
+     * Returns the composite primary key for this object.
+     * The array elements will be in same order as specified in XML.
+     * @return array
      */
     public function getPrimaryKey()
     {
-        return $this->getId();
+        $pks = array();
+        $pks[0] = $this->getMeetingId();
+        $pks[1] = $this->getMeetingAttendeeId();
+
+        return $pks;
     }
 
     /**
-     * Generic method to set the primary key (id column).
+     * Set the [composite] primary key.
      *
-     * @param       int $key Primary key.
+     * @param      array $keys The elements of the composite key (order must match the order in XML file).
      * @return void
      */
-    public function setPrimaryKey($key)
+    public function setPrimaryKey($keys)
     {
-        $this->setId($key);
+        $this->setMeetingId($keys[0]);
+        $this->setMeetingAttendeeId($keys[1]);
     }
 
     /**
@@ -993,7 +1025,7 @@ abstract class MeetingHasAttendee implements ActiveRecordInterface
      */
     public function isPrimaryKeyNull()
     {
-        return null === $this->getId();
+        return (null === $this->getMeetingId()) && (null === $this->getMeetingAttendeeId());
     }
 
     /**
@@ -1013,7 +1045,6 @@ abstract class MeetingHasAttendee implements ActiveRecordInterface
         $copyObj->setMeetingAttendeeId($this->getMeetingAttendeeId());
         if ($makeNew) {
             $copyObj->setNew(true);
-            $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
         }
     }
 
@@ -1040,13 +1071,120 @@ abstract class MeetingHasAttendee implements ActiveRecordInterface
     }
 
     /**
+     * Declares an association between this object and a ChildMeeting object.
+     *
+     * @param  ChildMeeting $v
+     * @return $this|\DataModels\DataModels\MeetingHasAttendee The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setMeeting(ChildMeeting $v = null)
+    {
+        if ($v === null) {
+            $this->setMeetingId(NULL);
+        } else {
+            $this->setMeetingId($v->getId());
+        }
+
+        $this->aMeeting = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildMeeting object, it will not be re-added.
+        if ($v !== null) {
+            $v->addMeetingHasAttendee($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildMeeting object
+     *
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildMeeting The associated ChildMeeting object.
+     * @throws PropelException
+     */
+    public function getMeeting(ConnectionInterface $con = null)
+    {
+        if ($this->aMeeting === null && ($this->meeting_id !== null)) {
+            $this->aMeeting = ChildMeetingQuery::create()->findPk($this->meeting_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aMeeting->addMeetingHasAttendees($this);
+             */
+        }
+
+        return $this->aMeeting;
+    }
+
+    /**
+     * Declares an association between this object and a ChildMeetingAttendee object.
+     *
+     * @param  ChildMeetingAttendee $v
+     * @return $this|\DataModels\DataModels\MeetingHasAttendee The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setMeetingAttendee(ChildMeetingAttendee $v = null)
+    {
+        if ($v === null) {
+            $this->setMeetingAttendeeId(NULL);
+        } else {
+            $this->setMeetingAttendeeId($v->getId());
+        }
+
+        $this->aMeetingAttendee = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildMeetingAttendee object, it will not be re-added.
+        if ($v !== null) {
+            $v->addMeetingHasAttendee($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildMeetingAttendee object
+     *
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildMeetingAttendee The associated ChildMeetingAttendee object.
+     * @throws PropelException
+     */
+    public function getMeetingAttendee(ConnectionInterface $con = null)
+    {
+        if ($this->aMeetingAttendee === null && ($this->meeting_attendee_id !== null)) {
+            $this->aMeetingAttendee = ChildMeetingAttendeeQuery::create()->findPk($this->meeting_attendee_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aMeetingAttendee->addMeetingHasAttendees($this);
+             */
+        }
+
+        return $this->aMeetingAttendee;
+    }
+
+    /**
      * Clears the current object, sets all attributes to their default values and removes
      * outgoing references as well as back-references (from other objects to this one. Results probably in a database
      * change of those foreign objects when you call `save` there).
      */
     public function clear()
     {
-        $this->id = null;
+        if (null !== $this->aMeeting) {
+            $this->aMeeting->removeMeetingHasAttendee($this);
+        }
+        if (null !== $this->aMeetingAttendee) {
+            $this->aMeetingAttendee->removeMeetingHasAttendee($this);
+        }
         $this->meeting_id = null;
         $this->meeting_attendee_id = null;
         $this->alreadyInSave = false;
@@ -1069,6 +1207,8 @@ abstract class MeetingHasAttendee implements ActiveRecordInterface
         if ($deep) {
         } // if ($deep)
 
+        $this->aMeeting = null;
+        $this->aMeetingAttendee = null;
     }
 
     /**

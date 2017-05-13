@@ -1068,49 +1068,6 @@ class Helpers {
         return true;
     }
 
-
-    /**
-     * Function to connect to airtable base and get calenderaemail information from
-     * "calendar_not_processed" view of airtable on
-     * "meeting history table".
-     *
-     * It processes 50 records at run.
-     *
-     * @return bool | array
-     */
-    static function fnGetProcessCalendar() {
-        global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
-
-        $base = $strAirtableBase;
-        $table = 'Meeting%20History';
-        $strApiKey = $strAirtableApiKey;
-        $url = $strAirtableBaseEndpoint.$base.'/'.$table."?maxRecords=50&view=".rawurlencode("calendar_not_processed");
-        $authorization = "Authorization: Bearer ".$strApiKey;
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_HTTPGET, 1);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
-        //set the url, number of POST vars, POST data
-        curl_setopt($ch,CURLOPT_URL, $url);
-
-        //execute post
-        $result = curl_exec($ch);
-        if(!$result) {
-            echo 'error:' . curl_error($ch);
-            return false;
-        }
-
-        $arrResponse = json_decode($result,true);
-
-        if(isset($arrResponse['records']) && (count($arrResponse['records'])>0)) {
-            $arrSUser = $arrResponse['records'];
-            return $arrSUser;
-        }
-
-        return false;
-    }
-
     /**
      * Function to connect to airtable base and looks up for the calendraemail in people table
      * On match found it will return the macthed record and user name detail for that email address other wise return false

@@ -6,6 +6,11 @@
         "propel/propel": "~2.0@dev"
     },
     "autoload": {
-        "classmap": ["models/DataModels/"]
+        "classmap": [
+            "models/DataModels/",
+            "models/DataModels/DataModels/",
+            "models/DataModels/DataModels/Base/",
+            "models/DataModels/DataModels/Map/"
+        ]
     }
 }

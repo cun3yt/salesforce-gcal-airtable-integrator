@@ -59,7 +59,7 @@ class MeetingAttendeeTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 3;
+    const NUM_COLUMNS = 2;
 
     /**
      * The number of lazy-loaded columns
@@ -69,7 +69,7 @@ class MeetingAttendeeTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 3;
+    const NUM_HYDRATE_COLUMNS = 2;
 
     /**
      * the column name for the id field
@@ -77,14 +77,9 @@ class MeetingAttendeeTableMap extends TableMap
     const COL_ID = 'meeting_attendee.id';
 
     /**
-     * the column name for the ref_type field
+     * the column name for the descendant_class field
      */
-    const COL_REF_TYPE = 'meeting_attendee.ref_type';
-
-    /**
-     * the column name for the ref_id field
-     */
-    const COL_REF_ID = 'meeting_attendee.ref_id';
+    const COL_DESCENDANT_CLASS = 'meeting_attendee.descendant_class';
 
     /**
      * The default string format for model objects of the related table
@@ -98,11 +93,11 @@ class MeetingAttendeeTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'RefType', 'RefId', ),
-        self::TYPE_CAMELNAME     => array('id', 'refType', 'refId', ),
-        self::TYPE_COLNAME       => array(MeetingAttendeeTableMap::COL_ID, MeetingAttendeeTableMap::COL_REF_TYPE, MeetingAttendeeTableMap::COL_REF_ID, ),
-        self::TYPE_FIELDNAME     => array('id', 'ref_type', 'ref_id', ),
-        self::TYPE_NUM           => array(0, 1, 2, )
+        self::TYPE_PHPNAME       => array('Id', 'DescendantClass', ),
+        self::TYPE_CAMELNAME     => array('id', 'descendantClass', ),
+        self::TYPE_COLNAME       => array(MeetingAttendeeTableMap::COL_ID, MeetingAttendeeTableMap::COL_DESCENDANT_CLASS, ),
+        self::TYPE_FIELDNAME     => array('id', 'descendant_class', ),
+        self::TYPE_NUM           => array(0, 1, )
     );
 
     /**
@@ -112,11 +107,11 @@ class MeetingAttendeeTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'RefType' => 1, 'RefId' => 2, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'refType' => 1, 'refId' => 2, ),
-        self::TYPE_COLNAME       => array(MeetingAttendeeTableMap::COL_ID => 0, MeetingAttendeeTableMap::COL_REF_TYPE => 1, MeetingAttendeeTableMap::COL_REF_ID => 2, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'ref_type' => 1, 'ref_id' => 2, ),
-        self::TYPE_NUM           => array(0, 1, 2, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'DescendantClass' => 1, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'descendantClass' => 1, ),
+        self::TYPE_COLNAME       => array(MeetingAttendeeTableMap::COL_ID => 0, MeetingAttendeeTableMap::COL_DESCENDANT_CLASS => 1, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'descendant_class' => 1, ),
+        self::TYPE_NUM           => array(0, 1, )
     );
 
     /**
@@ -138,8 +133,7 @@ class MeetingAttendeeTableMap extends TableMap
         $this->setPrimaryKeyMethodInfo('meeting_attendee_id_seq');
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('ref_type', 'RefType', 'VARCHAR', false, 50, '"contact"');
-        $this->addColumn('ref_id', 'RefId', 'INTEGER', false, null, null);
+        $this->addColumn('descendant_class', 'DescendantClass', 'VARCHAR', false, 100, null);
     } // initialize()
 
     /**
@@ -161,7 +155,52 @@ class MeetingAttendeeTableMap extends TableMap
     1 => ':id',
   ),
 ), null, null, 'MeetingsRelatedByEventCreatorId', false);
+        $this->addRelation('MeetingHasAttendee', '\\DataModels\\DataModels\\MeetingHasAttendee', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':meeting_attendee_id',
+    1 => ':id',
+  ),
+), null, null, 'MeetingHasAttendees', false);
+        $this->addRelation('Contact', '\\DataModels\\DataModels\\Contact', RelationMap::ONE_TO_ONE, array (
+  0 =>
+  array (
+    0 => ':id',
+    1 => ':id',
+  ),
+), 'CASCADE', null, null, false);
+        $this->addRelation('CustomerContact', '\\DataModels\\DataModels\\CustomerContact', RelationMap::ONE_TO_ONE, array (
+  0 =>
+  array (
+    0 => ':id',
+    1 => ':id',
+  ),
+), 'CASCADE', null, null, false);
+        $this->addRelation('Meeting', '\\DataModels\\DataModels\\Meeting', RelationMap::MANY_TO_MANY, array(), null, null, 'Meetings');
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'concrete_inheritance_parent' => array('descendant_column' => 'descendant_class', ),
+        );
+    } // getBehaviors()
+    /**
+     * Method to invalidate the instance pool of all tables related to meeting_attendee     * by a foreign key with ON DELETE CASCADE
+     */
+    public static function clearRelatedInstancePool()
+    {
+        // Invalidate objects in related instance pools,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        ContactTableMap::clearInstancePool();
+        CustomerContactTableMap::clearInstancePool();
+    }
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -305,12 +344,10 @@ class MeetingAttendeeTableMap extends TableMap
     {
         if (null === $alias) {
             $criteria->addSelectColumn(MeetingAttendeeTableMap::COL_ID);
-            $criteria->addSelectColumn(MeetingAttendeeTableMap::COL_REF_TYPE);
-            $criteria->addSelectColumn(MeetingAttendeeTableMap::COL_REF_ID);
+            $criteria->addSelectColumn(MeetingAttendeeTableMap::COL_DESCENDANT_CLASS);
         } else {
             $criteria->addSelectColumn($alias . '.id');
-            $criteria->addSelectColumn($alias . '.ref_type');
-            $criteria->addSelectColumn($alias . '.ref_id');
+            $criteria->addSelectColumn($alias . '.descendant_class');
         }
     }
 

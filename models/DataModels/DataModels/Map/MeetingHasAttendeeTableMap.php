@@ -59,7 +59,7 @@ class MeetingHasAttendeeTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 3;
+    const NUM_COLUMNS = 2;
 
     /**
      * The number of lazy-loaded columns
@@ -69,12 +69,7 @@ class MeetingHasAttendeeTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 3;
-
-    /**
-     * the column name for the id field
-     */
-    const COL_ID = 'meeting_has_attendee.id';
+    const NUM_HYDRATE_COLUMNS = 2;
 
     /**
      * the column name for the meeting_id field
@@ -98,11 +93,11 @@ class MeetingHasAttendeeTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'MeetingId', 'MeetingAttendeeId', ),
-        self::TYPE_CAMELNAME     => array('id', 'meetingId', 'meetingAttendeeId', ),
-        self::TYPE_COLNAME       => array(MeetingHasAttendeeTableMap::COL_ID, MeetingHasAttendeeTableMap::COL_MEETING_ID, MeetingHasAttendeeTableMap::COL_MEETING_ATTENDEE_ID, ),
-        self::TYPE_FIELDNAME     => array('id', 'meeting_id', 'meeting_attendee_id', ),
-        self::TYPE_NUM           => array(0, 1, 2, )
+        self::TYPE_PHPNAME       => array('MeetingId', 'MeetingAttendeeId', ),
+        self::TYPE_CAMELNAME     => array('meetingId', 'meetingAttendeeId', ),
+        self::TYPE_COLNAME       => array(MeetingHasAttendeeTableMap::COL_MEETING_ID, MeetingHasAttendeeTableMap::COL_MEETING_ATTENDEE_ID, ),
+        self::TYPE_FIELDNAME     => array('meeting_id', 'meeting_attendee_id', ),
+        self::TYPE_NUM           => array(0, 1, )
     );
 
     /**
@@ -112,11 +107,11 @@ class MeetingHasAttendeeTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'MeetingId' => 1, 'MeetingAttendeeId' => 2, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'meetingId' => 1, 'meetingAttendeeId' => 2, ),
-        self::TYPE_COLNAME       => array(MeetingHasAttendeeTableMap::COL_ID => 0, MeetingHasAttendeeTableMap::COL_MEETING_ID => 1, MeetingHasAttendeeTableMap::COL_MEETING_ATTENDEE_ID => 2, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'meeting_id' => 1, 'meeting_attendee_id' => 2, ),
-        self::TYPE_NUM           => array(0, 1, 2, )
+        self::TYPE_PHPNAME       => array('MeetingId' => 0, 'MeetingAttendeeId' => 1, ),
+        self::TYPE_CAMELNAME     => array('meetingId' => 0, 'meetingAttendeeId' => 1, ),
+        self::TYPE_COLNAME       => array(MeetingHasAttendeeTableMap::COL_MEETING_ID => 0, MeetingHasAttendeeTableMap::COL_MEETING_ATTENDEE_ID => 1, ),
+        self::TYPE_FIELDNAME     => array('meeting_id' => 0, 'meeting_attendee_id' => 1, ),
+        self::TYPE_NUM           => array(0, 1, )
     );
 
     /**
@@ -134,12 +129,11 @@ class MeetingHasAttendeeTableMap extends TableMap
         $this->setIdentifierQuoting(false);
         $this->setClassName('\\DataModels\\DataModels\\MeetingHasAttendee');
         $this->setPackage('DataModels.DataModels');
-        $this->setUseIdGenerator(true);
-        $this->setPrimaryKeyMethodInfo('meeting_has_attendee_id_seq');
+        $this->setUseIdGenerator(false);
+        $this->setIsCrossRef(true);
         // columns
-        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('meeting_id', 'MeetingId', 'INTEGER', false, null, null);
-        $this->addColumn('meeting_attendee_id', 'MeetingAttendeeId', 'INTEGER', false, null, null);
+        $this->addForeignPrimaryKey('meeting_id', 'MeetingId', 'INTEGER' , 'meeting', 'id', true, null, null);
+        $this->addForeignPrimaryKey('meeting_attendee_id', 'MeetingAttendeeId', 'INTEGER' , 'meeting_attendee', 'id', true, null, null);
     } // initialize()
 
     /**
@@ -147,7 +141,74 @@ class MeetingHasAttendeeTableMap extends TableMap
      */
     public function buildRelations()
     {
+        $this->addRelation('Meeting', '\\DataModels\\DataModels\\Meeting', RelationMap::MANY_TO_ONE, array (
+  0 =>
+  array (
+    0 => ':meeting_id',
+    1 => ':id',
+  ),
+), null, null, null, false);
+        $this->addRelation('MeetingAttendee', '\\DataModels\\DataModels\\MeetingAttendee', RelationMap::MANY_TO_ONE, array (
+  0 =>
+  array (
+    0 => ':meeting_attendee_id',
+    1 => ':id',
+  ),
+), null, null, null, false);
     } // buildRelations()
+
+    /**
+     * Adds an object to the instance pool.
+     *
+     * Propel keeps cached copies of objects in an instance pool when they are retrieved
+     * from the database. In some cases you may need to explicitly add objects
+     * to the cache in order to ensure that the same objects are always returned by find*()
+     * and findPk*() calls.
+     *
+     * @param \DataModels\DataModels\MeetingHasAttendee $obj A \DataModels\DataModels\MeetingHasAttendee object.
+     * @param string $key             (optional) key to use for instance map (for performance boost if key was already calculated externally).
+     */
+    public static function addInstanceToPool($obj, $key = null)
+    {
+        if (Propel::isInstancePoolingEnabled()) {
+            if (null === $key) {
+                $key = serialize([(null === $obj->getMeetingId() || is_scalar($obj->getMeetingId()) || is_callable([$obj->getMeetingId(), '__toString']) ? (string) $obj->getMeetingId() : $obj->getMeetingId()), (null === $obj->getMeetingAttendeeId() || is_scalar($obj->getMeetingAttendeeId()) || is_callable([$obj->getMeetingAttendeeId(), '__toString']) ? (string) $obj->getMeetingAttendeeId() : $obj->getMeetingAttendeeId())]);
+            } // if key === null
+            self::$instances[$key] = $obj;
+        }
+    }
+
+    /**
+     * Removes an object from the instance pool.
+     *
+     * Propel keeps cached copies of objects in an instance pool when they are retrieved
+     * from the database.  In some cases -- especially when you override doDelete
+     * methods in your stub classes -- you may need to explicitly remove objects
+     * from the cache in order to prevent returning objects that no longer exist.
+     *
+     * @param mixed $value A \DataModels\DataModels\MeetingHasAttendee object or a primary key value.
+     */
+    public static function removeInstanceFromPool($value)
+    {
+        if (Propel::isInstancePoolingEnabled() && null !== $value) {
+            if (is_object($value) && $value instanceof \DataModels\DataModels\MeetingHasAttendee) {
+                $key = serialize([(null === $value->getMeetingId() || is_scalar($value->getMeetingId()) || is_callable([$value->getMeetingId(), '__toString']) ? (string) $value->getMeetingId() : $value->getMeetingId()), (null === $value->getMeetingAttendeeId() || is_scalar($value->getMeetingAttendeeId()) || is_callable([$value->getMeetingAttendeeId(), '__toString']) ? (string) $value->getMeetingAttendeeId() : $value->getMeetingAttendeeId())]);
+
+            } elseif (is_array($value) && count($value) === 2) {
+                // assume we've been passed a primary key";
+                $key = serialize([(null === $value[0] || is_scalar($value[0]) || is_callable([$value[0], '__toString']) ? (string) $value[0] : $value[0]), (null === $value[1] || is_scalar($value[1]) || is_callable([$value[1], '__toString']) ? (string) $value[1] : $value[1])]);
+            } elseif ($value instanceof Criteria) {
+                self::$instances = [];
+
+                return;
+            } else {
+                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or \DataModels\DataModels\MeetingHasAttendee object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value, true)));
+                throw $e;
+            }
+
+            unset(self::$instances[$key]);
+        }
+    }
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -165,11 +226,11 @@ class MeetingHasAttendeeTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('MeetingId', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('MeetingAttendeeId', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return null === $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+        return serialize([(null === $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('MeetingId', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('MeetingId', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('MeetingId', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('MeetingId', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('MeetingId', TableMap::TYPE_PHPNAME, $indexType)]), (null === $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('MeetingAttendeeId', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('MeetingAttendeeId', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('MeetingAttendeeId', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('MeetingAttendeeId', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('MeetingAttendeeId', TableMap::TYPE_PHPNAME, $indexType)])]);
     }
 
     /**
@@ -186,11 +247,20 @@ class MeetingHasAttendeeTableMap extends TableMap
      */
     public static function getPrimaryKeyFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        return (int) $row[
+            $pks = [];
+
+        $pks[] = (int) $row[
             $indexType == TableMap::TYPE_NUM
                 ? 0 + $offset
-                : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
+                : self::translateFieldName('MeetingId', TableMap::TYPE_PHPNAME, $indexType)
         ];
+        $pks[] = (int) $row[
+            $indexType == TableMap::TYPE_NUM
+                ? 1 + $offset
+                : self::translateFieldName('MeetingAttendeeId', TableMap::TYPE_PHPNAME, $indexType)
+        ];
+
+        return $pks;
     }
 
     /**
@@ -290,11 +360,9 @@ class MeetingHasAttendeeTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(MeetingHasAttendeeTableMap::COL_ID);
             $criteria->addSelectColumn(MeetingHasAttendeeTableMap::COL_MEETING_ID);
             $criteria->addSelectColumn(MeetingHasAttendeeTableMap::COL_MEETING_ATTENDEE_ID);
         } else {
-            $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.meeting_id');
             $criteria->addSelectColumn($alias . '.meeting_attendee_id');
         }
@@ -348,7 +416,17 @@ class MeetingHasAttendeeTableMap extends TableMap
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
             $criteria = new Criteria(MeetingHasAttendeeTableMap::DATABASE_NAME);
-            $criteria->add(MeetingHasAttendeeTableMap::COL_ID, (array) $values, Criteria::IN);
+            // primary key is composite; we therefore, expect
+            // the primary key passed to be an array of pkey values
+            if (count($values) == count($values, COUNT_RECURSIVE)) {
+                // array is not multi-dimensional
+                $values = array($values);
+            }
+            foreach ($values as $value) {
+                $criterion = $criteria->getNewCriterion(MeetingHasAttendeeTableMap::COL_MEETING_ID, $value[0]);
+                $criterion->addAnd($criteria->getNewCriterion(MeetingHasAttendeeTableMap::COL_MEETING_ATTENDEE_ID, $value[1]));
+                $criteria->addOr($criterion);
+            }
         }
 
         $query = MeetingHasAttendeeQuery::create()->mergeWith($criteria);
@@ -394,10 +472,6 @@ class MeetingHasAttendeeTableMap extends TableMap
             $criteria = clone $criteria; // rename for clarity
         } else {
             $criteria = $criteria->buildCriteria(); // build Criteria from MeetingHasAttendee object
-        }
-
-        if ($criteria->containsKey(MeetingHasAttendeeTableMap::COL_ID) && $criteria->keyContainsValue(MeetingHasAttendeeTableMap::COL_ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.MeetingHasAttendeeTableMap::COL_ID.')');
         }
 
 

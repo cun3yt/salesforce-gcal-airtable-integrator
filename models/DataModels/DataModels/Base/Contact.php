@@ -5,6 +5,8 @@ namespace DataModels\DataModels\Base;
 use \Exception;
 use \PDO;
 use DataModels\DataModels\ContactQuery as ChildContactQuery;
+use DataModels\DataModels\MeetingAttendee as ChildMeetingAttendee;
+use DataModels\DataModels\MeetingAttendeeQuery as ChildMeetingAttendeeQuery;
 use DataModels\DataModels\Map\ContactTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -25,7 +27,7 @@ use Propel\Runtime\Parser\AbstractParser;
  *
  * @package    propel.generator.DataModels.DataModels.Base
  */
-abstract class Contact implements ActiveRecordInterface
+abstract class Contact extends ChildMeetingAttendee implements ActiveRecordInterface
 {
     /**
      * TableMap class name
@@ -58,13 +60,6 @@ abstract class Contact implements ActiveRecordInterface
      * @var array
      */
     protected $virtualColumns = array();
-
-    /**
-     * The value for the id field.
-     *
-     * @var        int
-     */
-    protected $id;
 
     /**
      * The value for the email field.
@@ -100,6 +95,18 @@ abstract class Contact implements ActiveRecordInterface
      * @var        string
      */
     protected $sfdc_contact_name;
+
+    /**
+     * The value for the id field.
+     *
+     * @var        int
+     */
+    protected $id;
+
+    /**
+     * @var        ChildMeetingAttendee
+     */
+    protected $aMeetingAttendee;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -335,16 +342,6 @@ abstract class Contact implements ActiveRecordInterface
     }
 
     /**
-     * Get the [id] column value.
-     *
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
      * Get the [email] column value.
      *
      * @return string
@@ -395,24 +392,14 @@ abstract class Contact implements ActiveRecordInterface
     }
 
     /**
-     * Set the value of [id] column.
+     * Get the [id] column value.
      *
-     * @param int $v new value
-     * @return $this|\DataModels\DataModels\Contact The current object (for fluent API support)
+     * @return int
      */
-    public function setId($v)
+    public function getId()
     {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->id !== $v) {
-            $this->id = $v;
-            $this->modifiedColumns[ContactTableMap::COL_ID] = true;
-        }
-
-        return $this;
-    } // setId()
+        return $this->id;
+    }
 
     /**
      * Set the value of [email] column.
@@ -515,6 +502,30 @@ abstract class Contact implements ActiveRecordInterface
     } // setSfdcContactName()
 
     /**
+     * Set the value of [id] column.
+     *
+     * @param int $v new value
+     * @return $this|\DataModels\DataModels\Contact The current object (for fluent API support)
+     */
+    public function setId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->id !== $v) {
+            $this->id = $v;
+            $this->modifiedColumns[ContactTableMap::COL_ID] = true;
+        }
+
+        if ($this->aMeetingAttendee !== null && $this->aMeetingAttendee->getId() !== $v) {
+            $this->aMeetingAttendee = null;
+        }
+
+        return $this;
+    } // setId()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -550,23 +561,23 @@ abstract class Contact implements ActiveRecordInterface
     {
         try {
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ContactTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->id = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ContactTableMap::translateFieldName('Email', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ContactTableMap::translateFieldName('Email', TableMap::TYPE_PHPNAME, $indexType)];
             $this->email = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ContactTableMap::translateFieldName('FullName', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ContactTableMap::translateFieldName('FullName', TableMap::TYPE_PHPNAME, $indexType)];
             $this->full_name = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ContactTableMap::translateFieldName('AccountId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ContactTableMap::translateFieldName('AccountId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->account_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ContactTableMap::translateFieldName('SfdcContactId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ContactTableMap::translateFieldName('SfdcContactId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->sfdc_contact_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ContactTableMap::translateFieldName('SfdcContactName', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ContactTableMap::translateFieldName('SfdcContactName', TableMap::TYPE_PHPNAME, $indexType)];
             $this->sfdc_contact_name = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ContactTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->id = (null !== $col) ? (int) $col : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -597,6 +608,9 @@ abstract class Contact implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
+        if ($this->aMeetingAttendee !== null && $this->id !== $this->aMeetingAttendee->getId()) {
+            $this->aMeetingAttendee = null;
+        }
     } // ensureConsistency
 
     /**
@@ -636,6 +650,7 @@ abstract class Contact implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
+            $this->aMeetingAttendee = null;
         } // if (deep)
     }
 
@@ -665,6 +680,9 @@ abstract class Contact implements ActiveRecordInterface
             if ($ret) {
                 $deleteQuery->delete($con);
                 $this->postDelete($con);
+                // concrete_inheritance behavior
+                $this->getParentOrCreate($con)->delete($con);
+
                 $this->setDeleted(true);
             }
         });
@@ -700,6 +718,11 @@ abstract class Contact implements ActiveRecordInterface
         return $con->transaction(function () use ($con) {
             $ret = $this->preSave($con);
             $isInsert = $this->isNew();
+            // concrete_inheritance behavior
+            $parent = $this->getSyncParent($con);
+            $parent->save($con);
+            $this->setPrimaryKey($parent->getPrimaryKey());
+
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
             } else {
@@ -739,6 +762,18 @@ abstract class Contact implements ActiveRecordInterface
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their corresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aMeetingAttendee !== null) {
+                if ($this->aMeetingAttendee->isModified() || $this->aMeetingAttendee->isNew()) {
+                    $affectedRows += $this->aMeetingAttendee->save($con);
+                }
+                $this->setMeetingAttendee($this->aMeetingAttendee);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -770,24 +805,8 @@ abstract class Contact implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[ContactTableMap::COL_ID] = true;
-        if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . ContactTableMap::COL_ID . ')');
-        }
-        if (null === $this->id) {
-            try {
-                $dataFetcher = $con->query("SELECT nextval('contact_id_seq')");
-                $this->id = (int) $dataFetcher->fetchColumn();
-            } catch (Exception $e) {
-                throw new PropelException('Unable to get sequence id.', 0, $e);
-            }
-        }
-
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(ContactTableMap::COL_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'id';
-        }
         if ($this->isColumnModified(ContactTableMap::COL_EMAIL)) {
             $modifiedColumns[':p' . $index++]  = 'email';
         }
@@ -803,6 +822,9 @@ abstract class Contact implements ActiveRecordInterface
         if ($this->isColumnModified(ContactTableMap::COL_SFDC_CONTACT_NAME)) {
             $modifiedColumns[':p' . $index++]  = 'sfdc_contact_name';
         }
+        if ($this->isColumnModified(ContactTableMap::COL_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'id';
+        }
 
         $sql = sprintf(
             'INSERT INTO contact (%s) VALUES (%s)',
@@ -814,9 +836,6 @@ abstract class Contact implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'id':
-                        $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
-                        break;
                     case 'email':
                         $stmt->bindValue($identifier, $this->email, PDO::PARAM_STR);
                         break;
@@ -831,6 +850,9 @@ abstract class Contact implements ActiveRecordInterface
                         break;
                     case 'sfdc_contact_name':
                         $stmt->bindValue($identifier, $this->sfdc_contact_name, PDO::PARAM_STR);
+                        break;
+                    case 'id':
+                        $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
                 }
             }
@@ -888,22 +910,22 @@ abstract class Contact implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                return $this->getId();
-                break;
-            case 1:
                 return $this->getEmail();
                 break;
-            case 2:
+            case 1:
                 return $this->getFullName();
                 break;
-            case 3:
+            case 2:
                 return $this->getAccountId();
                 break;
-            case 4:
+            case 3:
                 return $this->getSfdcContactId();
                 break;
-            case 5:
+            case 4:
                 return $this->getSfdcContactName();
+                break;
+            case 5:
+                return $this->getId();
                 break;
             default:
                 return null;
@@ -922,10 +944,11 @@ abstract class Contact implements ActiveRecordInterface
      *                    Defaults to TableMap::TYPE_PHPNAME.
      * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
      * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
+     * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
      *
      * @return array an associative array containing the field names (as keys) and field values
      */
-    public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array())
+    public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
 
         if (isset($alreadyDumpedObjects['Contact'][$this->hashCode()])) {
@@ -934,18 +957,35 @@ abstract class Contact implements ActiveRecordInterface
         $alreadyDumpedObjects['Contact'][$this->hashCode()] = true;
         $keys = ContactTableMap::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getId(),
-            $keys[1] => $this->getEmail(),
-            $keys[2] => $this->getFullName(),
-            $keys[3] => $this->getAccountId(),
-            $keys[4] => $this->getSfdcContactId(),
-            $keys[5] => $this->getSfdcContactName(),
+            $keys[0] => $this->getEmail(),
+            $keys[1] => $this->getFullName(),
+            $keys[2] => $this->getAccountId(),
+            $keys[3] => $this->getSfdcContactId(),
+            $keys[4] => $this->getSfdcContactName(),
+            $keys[5] => $this->getId(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
             $result[$key] = $virtualColumn;
         }
 
+        if ($includeForeignObjects) {
+            if (null !== $this->aMeetingAttendee) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'meetingAttendee';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'meeting_attendee';
+                        break;
+                    default:
+                        $key = 'MeetingAttendee';
+                }
+
+                $result[$key] = $this->aMeetingAttendee->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+        }
 
         return $result;
     }
@@ -980,22 +1020,22 @@ abstract class Contact implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                $this->setId($value);
-                break;
-            case 1:
                 $this->setEmail($value);
                 break;
-            case 2:
+            case 1:
                 $this->setFullName($value);
                 break;
-            case 3:
+            case 2:
                 $this->setAccountId($value);
                 break;
-            case 4:
+            case 3:
                 $this->setSfdcContactId($value);
                 break;
-            case 5:
+            case 4:
                 $this->setSfdcContactName($value);
+                break;
+            case 5:
+                $this->setId($value);
                 break;
         } // switch()
 
@@ -1024,22 +1064,22 @@ abstract class Contact implements ActiveRecordInterface
         $keys = ContactTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) {
-            $this->setId($arr[$keys[0]]);
+            $this->setEmail($arr[$keys[0]]);
         }
         if (array_key_exists($keys[1], $arr)) {
-            $this->setEmail($arr[$keys[1]]);
+            $this->setFullName($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
-            $this->setFullName($arr[$keys[2]]);
+            $this->setAccountId($arr[$keys[2]]);
         }
         if (array_key_exists($keys[3], $arr)) {
-            $this->setAccountId($arr[$keys[3]]);
+            $this->setSfdcContactId($arr[$keys[3]]);
         }
         if (array_key_exists($keys[4], $arr)) {
-            $this->setSfdcContactId($arr[$keys[4]]);
+            $this->setSfdcContactName($arr[$keys[4]]);
         }
         if (array_key_exists($keys[5], $arr)) {
-            $this->setSfdcContactName($arr[$keys[5]]);
+            $this->setId($arr[$keys[5]]);
         }
     }
 
@@ -1082,9 +1122,6 @@ abstract class Contact implements ActiveRecordInterface
     {
         $criteria = new Criteria(ContactTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(ContactTableMap::COL_ID)) {
-            $criteria->add(ContactTableMap::COL_ID, $this->id);
-        }
         if ($this->isColumnModified(ContactTableMap::COL_EMAIL)) {
             $criteria->add(ContactTableMap::COL_EMAIL, $this->email);
         }
@@ -1099,6 +1136,9 @@ abstract class Contact implements ActiveRecordInterface
         }
         if ($this->isColumnModified(ContactTableMap::COL_SFDC_CONTACT_NAME)) {
             $criteria->add(ContactTableMap::COL_SFDC_CONTACT_NAME, $this->sfdc_contact_name);
+        }
+        if ($this->isColumnModified(ContactTableMap::COL_ID)) {
+            $criteria->add(ContactTableMap::COL_ID, $this->id);
         }
 
         return $criteria;
@@ -1132,8 +1172,15 @@ abstract class Contact implements ActiveRecordInterface
     {
         $validPk = null !== $this->getId();
 
-        $validPrimaryKeyFKs = 0;
+        $validPrimaryKeyFKs = 1;
         $primaryKeyFKs = [];
+
+        //relation contact_fk_5860de to table meeting_attendee
+        if ($this->aMeetingAttendee && $hash = spl_object_hash($this->aMeetingAttendee)) {
+            $primaryKeyFKs[] = $hash;
+        } else {
+            $validPrimaryKeyFKs = false;
+        }
 
         if ($validPk) {
             return crc32(json_encode($this->getPrimaryKey(), JSON_UNESCAPED_UNICODE));
@@ -1191,9 +1238,9 @@ abstract class Contact implements ActiveRecordInterface
         $copyObj->setAccountId($this->getAccountId());
         $copyObj->setSfdcContactId($this->getSfdcContactId());
         $copyObj->setSfdcContactName($this->getSfdcContactName());
+        $copyObj->setId($this->getId());
         if ($makeNew) {
             $copyObj->setNew(true);
-            $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
         }
     }
 
@@ -1220,18 +1267,66 @@ abstract class Contact implements ActiveRecordInterface
     }
 
     /**
+     * Declares an association between this object and a ChildMeetingAttendee object.
+     *
+     * @param  ChildMeetingAttendee $v
+     * @return $this|\DataModels\DataModels\Contact The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setMeetingAttendee(ChildMeetingAttendee $v = null)
+    {
+        if ($v === null) {
+            $this->setId(NULL);
+        } else {
+            $this->setId($v->getId());
+        }
+
+        $this->aMeetingAttendee = $v;
+
+        // Add binding for other direction of this 1:1 relationship.
+        if ($v !== null) {
+            $v->setContact($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildMeetingAttendee object
+     *
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildMeetingAttendee The associated ChildMeetingAttendee object.
+     * @throws PropelException
+     */
+    public function getMeetingAttendee(ConnectionInterface $con = null)
+    {
+        if ($this->aMeetingAttendee === null && ($this->id !== null)) {
+            $this->aMeetingAttendee = ChildMeetingAttendeeQuery::create()->findPk($this->id, $con);
+            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
+            $this->aMeetingAttendee->setContact($this);
+        }
+
+        return $this->aMeetingAttendee;
+    }
+
+    /**
      * Clears the current object, sets all attributes to their default values and removes
      * outgoing references as well as back-references (from other objects to this one. Results probably in a database
      * change of those foreign objects when you call `save` there).
      */
     public function clear()
     {
-        $this->id = null;
+        if (null !== $this->aMeetingAttendee) {
+            $this->aMeetingAttendee->removeContact($this);
+        }
         $this->email = null;
         $this->full_name = null;
         $this->account_id = null;
         $this->sfdc_contact_id = null;
         $this->sfdc_contact_name = null;
+        $this->id = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
         $this->resetModified();
@@ -1252,6 +1347,7 @@ abstract class Contact implements ActiveRecordInterface
         if ($deep) {
         } // if ($deep)
 
+        $this->aMeetingAttendee = null;
     }
 
     /**
@@ -1262,6 +1358,49 @@ abstract class Contact implements ActiveRecordInterface
     public function __toString()
     {
         return (string) $this->exportTo(ContactTableMap::DEFAULT_STRING_FORMAT);
+    }
+
+    // concrete_inheritance behavior
+
+    /**
+     * Get or Create the parent ChildMeetingAttendee object of the current object
+     *
+     * @return    ChildMeetingAttendee The parent object
+     */
+    public function getParentOrCreate($con = null)
+    {
+        if ($this->isNew()) {
+            if ($this->isPrimaryKeyNull()) {
+                $parent = new ChildMeetingAttendee();
+                $parent->setDescendantClass('DataModels\DataModels\Contact');
+
+                return $parent;
+            } else {
+                $parent = \DataModels\DataModels\MeetingAttendeeQuery::create()->findPk($this->getPrimaryKey(), $con);
+                if (null === $parent || null !== $parent->getDescendantClass()) {
+                    $parent = new ChildMeetingAttendee();
+                    $parent->setPrimaryKey($this->getPrimaryKey());
+                    $parent->setDescendantClass('DataModels\DataModels\Contact');
+                }
+
+                return $parent;
+            }
+        } else {
+            return ChildMeetingAttendeeQuery::create()->findPk($this->getPrimaryKey(), $con);
+        }
+    }
+
+    /**
+     * Create or Update the parent MeetingAttendee object
+     * And return its primary key
+     *
+     * @return    int The primary key of the parent object
+     */
+    public function getSyncParent($con = null)
+    {
+        $parent = $this->getParentOrCreate($con);
+
+        return $parent;
     }
 
     /**

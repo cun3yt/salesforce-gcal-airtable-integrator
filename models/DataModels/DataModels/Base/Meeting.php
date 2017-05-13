@@ -8,13 +8,17 @@ use \PDO;
 use DataModels\DataModels\Meeting as ChildMeeting;
 use DataModels\DataModels\MeetingAttendee as ChildMeetingAttendee;
 use DataModels\DataModels\MeetingAttendeeQuery as ChildMeetingAttendeeQuery;
+use DataModels\DataModels\MeetingHasAttendee as ChildMeetingHasAttendee;
+use DataModels\DataModels\MeetingHasAttendeeQuery as ChildMeetingHasAttendeeQuery;
 use DataModels\DataModels\MeetingQuery as ChildMeetingQuery;
+use DataModels\DataModels\Map\MeetingHasAttendeeTableMap;
 use DataModels\DataModels\Map\MeetingTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
+use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\BadMethodCallException;
 use Propel\Runtime\Exception\LogicException;
@@ -180,12 +184,40 @@ abstract class Meeting implements ActiveRecordInterface
     protected $aEventCreator;
 
     /**
+     * @var        ObjectCollection|ChildMeetingHasAttendee[] Collection to store aggregation of ChildMeetingHasAttendee objects.
+     */
+    protected $collMeetingHasAttendees;
+    protected $collMeetingHasAttendeesPartial;
+
+    /**
+     * @var        ObjectCollection|ChildMeetingAttendee[] Cross Collection to store aggregation of ChildMeetingAttendee objects.
+     */
+    protected $collMeetingAttendees;
+
+    /**
+     * @var bool
+     */
+    protected $collMeetingAttendeesPartial;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      *
      * @var boolean
      */
     protected $alreadyInSave = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildMeetingAttendee[]
+     */
+    protected $meetingAttendeesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildMeetingHasAttendee[]
+     */
+    protected $meetingHasAttendeesScheduledForDeletion = null;
 
     /**
      * Initializes internal state of DataModels\DataModels\Base\Meeting object.
@@ -1077,6 +1109,9 @@ abstract class Meeting implements ActiveRecordInterface
 
             $this->aEventOwner = null;
             $this->aEventCreator = null;
+            $this->collMeetingHasAttendees = null;
+
+            $this->collMeetingAttendees = null;
         } // if (deep)
     }
 
@@ -1220,6 +1255,52 @@ abstract class Meeting implements ActiveRecordInterface
                     $affectedRows += $this->doUpdate($con);
                 }
                 $this->resetModified();
+            }
+
+            if ($this->meetingAttendeesScheduledForDeletion !== null) {
+                if (!$this->meetingAttendeesScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    foreach ($this->meetingAttendeesScheduledForDeletion as $entry) {
+                        $entryPk = [];
+
+                        $entryPk[0] = $this->getId();
+                        $entryPk[1] = $entry->getId();
+                        $pks[] = $entryPk;
+                    }
+
+                    \DataModels\DataModels\MeetingHasAttendeeQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+
+                    $this->meetingAttendeesScheduledForDeletion = null;
+                }
+
+            }
+
+            if ($this->collMeetingAttendees) {
+                foreach ($this->collMeetingAttendees as $meetingAttendee) {
+                    if (!$meetingAttendee->isDeleted() && ($meetingAttendee->isNew() || $meetingAttendee->isModified())) {
+                        $meetingAttendee->save($con);
+                    }
+                }
+            }
+
+
+            if ($this->meetingHasAttendeesScheduledForDeletion !== null) {
+                if (!$this->meetingHasAttendeesScheduledForDeletion->isEmpty()) {
+                    \DataModels\DataModels\MeetingHasAttendeeQuery::create()
+                        ->filterByPrimaryKeys($this->meetingHasAttendeesScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->meetingHasAttendeesScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collMeetingHasAttendees !== null) {
+                foreach ($this->collMeetingHasAttendees as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
             }
 
             $this->alreadyInSave = false;
@@ -1560,6 +1641,21 @@ abstract class Meeting implements ActiveRecordInterface
 
                 $result[$key] = $this->aEventCreator->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
+            if (null !== $this->collMeetingHasAttendees) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'meetingHasAttendees';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'meeting_has_attendees';
+                        break;
+                    default:
+                        $key = 'MeetingHasAttendees';
+                }
+
+                $result[$key] = $this->collMeetingHasAttendees->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
         }
 
         return $result;
@@ -1896,6 +1992,20 @@ abstract class Meeting implements ActiveRecordInterface
         $copyObj->setRawData($this->getRawData());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
+
+        if ($deepCopy) {
+            // important: temporarily setNew(false) because this affects the behavior of
+            // the getter/setter methods for fkey referrer objects.
+            $copyObj->setNew(false);
+
+            foreach ($this->getMeetingHasAttendees() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addMeetingHasAttendee($relObj->copy($deepCopy));
+                }
+            }
+
+        } // if ($deepCopy)
+
         if ($makeNew) {
             $copyObj->setNew(true);
             $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
@@ -2026,6 +2136,518 @@ abstract class Meeting implements ActiveRecordInterface
         return $this->aEventCreator;
     }
 
+
+    /**
+     * Initializes a collection based on the name of a relation.
+     * Avoids crafting an 'init[$relationName]s' method name
+     * that wouldn't work when StandardEnglishPluralizer is used.
+     *
+     * @param      string $relationName The name of the relation to initialize
+     * @return void
+     */
+    public function initRelation($relationName)
+    {
+        if ('MeetingHasAttendee' == $relationName) {
+            return $this->initMeetingHasAttendees();
+        }
+    }
+
+    /**
+     * Clears out the collMeetingHasAttendees collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addMeetingHasAttendees()
+     */
+    public function clearMeetingHasAttendees()
+    {
+        $this->collMeetingHasAttendees = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collMeetingHasAttendees collection loaded partially.
+     */
+    public function resetPartialMeetingHasAttendees($v = true)
+    {
+        $this->collMeetingHasAttendeesPartial = $v;
+    }
+
+    /**
+     * Initializes the collMeetingHasAttendees collection.
+     *
+     * By default this just sets the collMeetingHasAttendees collection to an empty array (like clearcollMeetingHasAttendees());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initMeetingHasAttendees($overrideExisting = true)
+    {
+        if (null !== $this->collMeetingHasAttendees && !$overrideExisting) {
+            return;
+        }
+
+        $collectionClassName = MeetingHasAttendeeTableMap::getTableMap()->getCollectionClassName();
+
+        $this->collMeetingHasAttendees = new $collectionClassName;
+        $this->collMeetingHasAttendees->setModel('\DataModels\DataModels\MeetingHasAttendee');
+    }
+
+    /**
+     * Gets an array of ChildMeetingHasAttendee objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildMeeting is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildMeetingHasAttendee[] List of ChildMeetingHasAttendee objects
+     * @throws PropelException
+     */
+    public function getMeetingHasAttendees(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collMeetingHasAttendeesPartial && !$this->isNew();
+        if (null === $this->collMeetingHasAttendees || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collMeetingHasAttendees) {
+                // return empty collection
+                $this->initMeetingHasAttendees();
+            } else {
+                $collMeetingHasAttendees = ChildMeetingHasAttendeeQuery::create(null, $criteria)
+                    ->filterByMeeting($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collMeetingHasAttendeesPartial && count($collMeetingHasAttendees)) {
+                        $this->initMeetingHasAttendees(false);
+
+                        foreach ($collMeetingHasAttendees as $obj) {
+                            if (false == $this->collMeetingHasAttendees->contains($obj)) {
+                                $this->collMeetingHasAttendees->append($obj);
+                            }
+                        }
+
+                        $this->collMeetingHasAttendeesPartial = true;
+                    }
+
+                    return $collMeetingHasAttendees;
+                }
+
+                if ($partial && $this->collMeetingHasAttendees) {
+                    foreach ($this->collMeetingHasAttendees as $obj) {
+                        if ($obj->isNew()) {
+                            $collMeetingHasAttendees[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collMeetingHasAttendees = $collMeetingHasAttendees;
+                $this->collMeetingHasAttendeesPartial = false;
+            }
+        }
+
+        return $this->collMeetingHasAttendees;
+    }
+
+    /**
+     * Sets a collection of ChildMeetingHasAttendee objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $meetingHasAttendees A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return $this|ChildMeeting The current object (for fluent API support)
+     */
+    public function setMeetingHasAttendees(Collection $meetingHasAttendees, ConnectionInterface $con = null)
+    {
+        /** @var ChildMeetingHasAttendee[] $meetingHasAttendeesToDelete */
+        $meetingHasAttendeesToDelete = $this->getMeetingHasAttendees(new Criteria(), $con)->diff($meetingHasAttendees);
+
+
+        //since at least one column in the foreign key is at the same time a PK
+        //we can not just set a PK to NULL in the lines below. We have to store
+        //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
+        $this->meetingHasAttendeesScheduledForDeletion = clone $meetingHasAttendeesToDelete;
+
+        foreach ($meetingHasAttendeesToDelete as $meetingHasAttendeeRemoved) {
+            $meetingHasAttendeeRemoved->setMeeting(null);
+        }
+
+        $this->collMeetingHasAttendees = null;
+        foreach ($meetingHasAttendees as $meetingHasAttendee) {
+            $this->addMeetingHasAttendee($meetingHasAttendee);
+        }
+
+        $this->collMeetingHasAttendees = $meetingHasAttendees;
+        $this->collMeetingHasAttendeesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related MeetingHasAttendee objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related MeetingHasAttendee objects.
+     * @throws PropelException
+     */
+    public function countMeetingHasAttendees(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collMeetingHasAttendeesPartial && !$this->isNew();
+        if (null === $this->collMeetingHasAttendees || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collMeetingHasAttendees) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getMeetingHasAttendees());
+            }
+
+            $query = ChildMeetingHasAttendeeQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByMeeting($this)
+                ->count($con);
+        }
+
+        return count($this->collMeetingHasAttendees);
+    }
+
+    /**
+     * Method called to associate a ChildMeetingHasAttendee object to this object
+     * through the ChildMeetingHasAttendee foreign key attribute.
+     *
+     * @param  ChildMeetingHasAttendee $l ChildMeetingHasAttendee
+     * @return $this|\DataModels\DataModels\Meeting The current object (for fluent API support)
+     */
+    public function addMeetingHasAttendee(ChildMeetingHasAttendee $l)
+    {
+        if ($this->collMeetingHasAttendees === null) {
+            $this->initMeetingHasAttendees();
+            $this->collMeetingHasAttendeesPartial = true;
+        }
+
+        if (!$this->collMeetingHasAttendees->contains($l)) {
+            $this->doAddMeetingHasAttendee($l);
+
+            if ($this->meetingHasAttendeesScheduledForDeletion and $this->meetingHasAttendeesScheduledForDeletion->contains($l)) {
+                $this->meetingHasAttendeesScheduledForDeletion->remove($this->meetingHasAttendeesScheduledForDeletion->search($l));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ChildMeetingHasAttendee $meetingHasAttendee The ChildMeetingHasAttendee object to add.
+     */
+    protected function doAddMeetingHasAttendee(ChildMeetingHasAttendee $meetingHasAttendee)
+    {
+        $this->collMeetingHasAttendees[]= $meetingHasAttendee;
+        $meetingHasAttendee->setMeeting($this);
+    }
+
+    /**
+     * @param  ChildMeetingHasAttendee $meetingHasAttendee The ChildMeetingHasAttendee object to remove.
+     * @return $this|ChildMeeting The current object (for fluent API support)
+     */
+    public function removeMeetingHasAttendee(ChildMeetingHasAttendee $meetingHasAttendee)
+    {
+        if ($this->getMeetingHasAttendees()->contains($meetingHasAttendee)) {
+            $pos = $this->collMeetingHasAttendees->search($meetingHasAttendee);
+            $this->collMeetingHasAttendees->remove($pos);
+            if (null === $this->meetingHasAttendeesScheduledForDeletion) {
+                $this->meetingHasAttendeesScheduledForDeletion = clone $this->collMeetingHasAttendees;
+                $this->meetingHasAttendeesScheduledForDeletion->clear();
+            }
+            $this->meetingHasAttendeesScheduledForDeletion[]= clone $meetingHasAttendee;
+            $meetingHasAttendee->setMeeting(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Meeting is new, it will return
+     * an empty collection; or if this Meeting has previously
+     * been saved, it will retrieve related MeetingHasAttendees from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Meeting.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return ObjectCollection|ChildMeetingHasAttendee[] List of ChildMeetingHasAttendee objects
+     */
+    public function getMeetingHasAttendeesJoinMeetingAttendee(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildMeetingHasAttendeeQuery::create(null, $criteria);
+        $query->joinWith('MeetingAttendee', $joinBehavior);
+
+        return $this->getMeetingHasAttendees($query, $con);
+    }
+
+    /**
+     * Clears out the collMeetingAttendees collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addMeetingAttendees()
+     */
+    public function clearMeetingAttendees()
+    {
+        $this->collMeetingAttendees = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Initializes the collMeetingAttendees crossRef collection.
+     *
+     * By default this just sets the collMeetingAttendees collection to an empty collection (like clearMeetingAttendees());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @return void
+     */
+    public function initMeetingAttendees()
+    {
+        $collectionClassName = MeetingHasAttendeeTableMap::getTableMap()->getCollectionClassName();
+
+        $this->collMeetingAttendees = new $collectionClassName;
+        $this->collMeetingAttendeesPartial = true;
+        $this->collMeetingAttendees->setModel('\DataModels\DataModels\MeetingAttendee');
+    }
+
+    /**
+     * Checks if the collMeetingAttendees collection is loaded.
+     *
+     * @return bool
+     */
+    public function isMeetingAttendeesLoaded()
+    {
+        return null !== $this->collMeetingAttendees;
+    }
+
+    /**
+     * Gets a collection of ChildMeetingAttendee objects related by a many-to-many relationship
+     * to the current object by way of the meeting_has_attendee cross-reference table.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildMeeting is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria Optional query object to filter the query
+     * @param      ConnectionInterface $con Optional connection object
+     *
+     * @return ObjectCollection|ChildMeetingAttendee[] List of ChildMeetingAttendee objects
+     */
+    public function getMeetingAttendees(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collMeetingAttendeesPartial && !$this->isNew();
+        if (null === $this->collMeetingAttendees || null !== $criteria || $partial) {
+            if ($this->isNew()) {
+                // return empty collection
+                if (null === $this->collMeetingAttendees) {
+                    $this->initMeetingAttendees();
+                }
+            } else {
+
+                $query = ChildMeetingAttendeeQuery::create(null, $criteria)
+                    ->filterByMeeting($this);
+                $collMeetingAttendees = $query->find($con);
+                if (null !== $criteria) {
+                    return $collMeetingAttendees;
+                }
+
+                if ($partial && $this->collMeetingAttendees) {
+                    //make sure that already added objects gets added to the list of the database.
+                    foreach ($this->collMeetingAttendees as $obj) {
+                        if (!$collMeetingAttendees->contains($obj)) {
+                            $collMeetingAttendees[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collMeetingAttendees = $collMeetingAttendees;
+                $this->collMeetingAttendeesPartial = false;
+            }
+        }
+
+        return $this->collMeetingAttendees;
+    }
+
+    /**
+     * Sets a collection of MeetingAttendee objects related by a many-to-many relationship
+     * to the current object by way of the meeting_has_attendee cross-reference table.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param  Collection $meetingAttendees A Propel collection.
+     * @param  ConnectionInterface $con Optional connection object
+     * @return $this|ChildMeeting The current object (for fluent API support)
+     */
+    public function setMeetingAttendees(Collection $meetingAttendees, ConnectionInterface $con = null)
+    {
+        $this->clearMeetingAttendees();
+        $currentMeetingAttendees = $this->getMeetingAttendees();
+
+        $meetingAttendeesScheduledForDeletion = $currentMeetingAttendees->diff($meetingAttendees);
+
+        foreach ($meetingAttendeesScheduledForDeletion as $toDelete) {
+            $this->removeMeetingAttendee($toDelete);
+        }
+
+        foreach ($meetingAttendees as $meetingAttendee) {
+            if (!$currentMeetingAttendees->contains($meetingAttendee)) {
+                $this->doAddMeetingAttendee($meetingAttendee);
+            }
+        }
+
+        $this->collMeetingAttendeesPartial = false;
+        $this->collMeetingAttendees = $meetingAttendees;
+
+        return $this;
+    }
+
+    /**
+     * Gets the number of MeetingAttendee objects related by a many-to-many relationship
+     * to the current object by way of the meeting_has_attendee cross-reference table.
+     *
+     * @param      Criteria $criteria Optional query object to filter the query
+     * @param      boolean $distinct Set to true to force count distinct
+     * @param      ConnectionInterface $con Optional connection object
+     *
+     * @return int the number of related MeetingAttendee objects
+     */
+    public function countMeetingAttendees(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collMeetingAttendeesPartial && !$this->isNew();
+        if (null === $this->collMeetingAttendees || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collMeetingAttendees) {
+                return 0;
+            } else {
+
+                if ($partial && !$criteria) {
+                    return count($this->getMeetingAttendees());
+                }
+
+                $query = ChildMeetingAttendeeQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByMeeting($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collMeetingAttendees);
+        }
+    }
+
+    /**
+     * Associate a ChildMeetingAttendee to this object
+     * through the meeting_has_attendee cross reference table.
+     *
+     * @param ChildMeetingAttendee $meetingAttendee
+     * @return ChildMeeting The current object (for fluent API support)
+     */
+    public function addMeetingAttendee(ChildMeetingAttendee $meetingAttendee)
+    {
+        if ($this->collMeetingAttendees === null) {
+            $this->initMeetingAttendees();
+        }
+
+        if (!$this->getMeetingAttendees()->contains($meetingAttendee)) {
+            // only add it if the **same** object is not already associated
+            $this->collMeetingAttendees->push($meetingAttendee);
+            $this->doAddMeetingAttendee($meetingAttendee);
+        }
+
+        return $this;
+    }
+
+    /**
+     *
+     * @param ChildMeetingAttendee $meetingAttendee
+     */
+    protected function doAddMeetingAttendee(ChildMeetingAttendee $meetingAttendee)
+    {
+        $meetingHasAttendee = new ChildMeetingHasAttendee();
+
+        $meetingHasAttendee->setMeetingAttendee($meetingAttendee);
+
+        $meetingHasAttendee->setMeeting($this);
+
+        $this->addMeetingHasAttendee($meetingHasAttendee);
+
+        // set the back reference to this object directly as using provided method either results
+        // in endless loop or in multiple relations
+        if (!$meetingAttendee->isMeetingsLoaded()) {
+            $meetingAttendee->initMeetings();
+            $meetingAttendee->getMeetings()->push($this);
+        } elseif (!$meetingAttendee->getMeetings()->contains($this)) {
+            $meetingAttendee->getMeetings()->push($this);
+        }
+
+    }
+
+    /**
+     * Remove meetingAttendee of this object
+     * through the meeting_has_attendee cross reference table.
+     *
+     * @param ChildMeetingAttendee $meetingAttendee
+     * @return ChildMeeting The current object (for fluent API support)
+     */
+    public function removeMeetingAttendee(ChildMeetingAttendee $meetingAttendee)
+    {
+        if ($this->getMeetingAttendees()->contains($meetingAttendee)) {
+            $meetingHasAttendee = new ChildMeetingHasAttendee();
+            $meetingHasAttendee->setMeetingAttendee($meetingAttendee);
+            if ($meetingAttendee->isMeetingsLoaded()) {
+                //remove the back reference if available
+                $meetingAttendee->getMeetings()->removeObject($this);
+            }
+
+            $meetingHasAttendee->setMeeting($this);
+            $this->removeMeetingHasAttendee(clone $meetingHasAttendee);
+            $meetingHasAttendee->clear();
+
+            $this->collMeetingAttendees->remove($this->collMeetingAttendees->search($meetingAttendee));
+
+            if (null === $this->meetingAttendeesScheduledForDeletion) {
+                $this->meetingAttendeesScheduledForDeletion = clone $this->collMeetingAttendees;
+                $this->meetingAttendeesScheduledForDeletion->clear();
+            }
+
+            $this->meetingAttendeesScheduledForDeletion->push($meetingAttendee);
+        }
+
+
+        return $this;
+    }
+
     /**
      * Clears the current object, sets all attributes to their default values and removes
      * outgoing references as well as back-references (from other objects to this one. Results probably in a database
@@ -2072,8 +2694,20 @@ abstract class Meeting implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collMeetingHasAttendees) {
+                foreach ($this->collMeetingHasAttendees as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collMeetingAttendees) {
+                foreach ($this->collMeetingAttendees as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
+        $this->collMeetingHasAttendees = null;
+        $this->collMeetingAttendees = null;
         $this->aEventOwner = null;
         $this->aEventCreator = null;
     }

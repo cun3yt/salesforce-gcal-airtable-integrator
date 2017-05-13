@@ -108,19 +108,9 @@ function processIntegrationCalendars(Customer $customer, CustomerContactIntegrat
  * @param $calendar
  */
 function processCalendar(Customer $customer, $service, $calendar) {
-    $strUserId = "";
     if( !($calendar->id) ) {
         trigger_error("Calendar doesn't have an ID", E_USER_WARNING);
         return;
-    }
-
-    // filter all other calendar other than client domain
-    if(strpos($calendar->id, $customer->getEmailDomain()) === false) {
-        return;
-    }
-
-    if($calendar->primary == "1") {
-        $strUserId = $calendar->id;
     }
 
     date_default_timezone_set($calendar->timeZone);
@@ -161,8 +151,6 @@ function processCalendar(Customer $customer, $service, $calendar) {
     date_default_timezone_set($calTimeZone); // Setting default timezone
 
     foreach ($events->getItems() as $event) {
-        $resultData = array();
-
         $eventDatetime = $event->start->dateTime;
 
         if(empty($eventDatetime)) { // All-day event
@@ -178,21 +166,14 @@ function processCalendar(Customer $customer, $service, $calendar) {
         $creator = $event->getCreator();
         $eventAttendeesList = array();
         $eventType = "Internal";
-        $resultData['userid'] = $strUserId;
 
         $startDate = date(DateTimeFormat,strtotime($eventDate->format("Y")."-".$eventDate->format("m")."-".$eventDate->format("d")));
-        $resultData['startdate'] = $startDate;
         if($startDate) {
             $inDForm = date(DateFormat,strtotime($startDate))." 00:00:00";
             $startTime = strtotime($inDForm);
             $processTime = strtotime("+7 day", $startTime);
-            $resultData['processtime'] = $processTime;
         }
 
-        $resultData['ceatedbyemail'] = $creator ? $creator->getEmail() : "";
-        $resultData['createdByName'] = $creator ? $creator->getDisplayName() : "";
-
-        // ----------
         $outsideDomain = "";
         foreach($event->getAttendees() as $attendee) {
             $attendeeEmail = $attendee->getEmail();
@@ -211,14 +192,10 @@ function processCalendar(Customer $customer, $service, $calendar) {
                 $outsideDomain .= "0,";
             }
         }
-        $resultData['attendeesemail'] = implode(",",$eventAttendeesList);
-        // ----------
 
         if($outsideDomain && (stripos($outsideDomain, "0") === false)) {
             $eventType = "Other";
         }
-
-        $resultData['meetingtype'] = $eventType;
 
         if($event->getSummary()) {
             if( !(is_array($eventAttendeesList) && (count($eventAttendeesList)>0)) ) {
@@ -231,22 +208,22 @@ function processCalendar(Customer $customer, $service, $calendar) {
             // @todo Save attendee list to meeting_attendee, meeting_has_attendee, account, account_has_contact & contact tables.
 
             if(!$meeting) {
-                saveNewMeeting($event, $calendarId, $eventDate, $eventType);
+                saveNewMeeting($customer, $event, $calendarId, $eventDate, $eventType);
             }
         }
-
-        unset($resultData);
     }
 }
 
 /**
+ * @param Customer $customer
  * @param $event
  * @param $calendarId
  * @param $eventDate
  * @param $eventType
+ * @param bool $dryRun
  * @return Meeting
  */
-function saveNewMeeting($event, $calendarId, $eventDate, $eventType, $dryRun = true) {
+function saveNewMeeting(Customer $customer, $event, $calendarId, $eventDate, $eventType, $dryRun = true) {
     $meeting = new Meeting();
     $meeting->setEventId($event->getId())
         ->setName($event->getSummary())
@@ -276,12 +253,76 @@ function saveNewMeeting($event, $calendarId, $eventDate, $eventType, $dryRun = t
         echo "</pre>";
     }
 
+    /**
+     * Save event creator
+     */
+    $eventCreator = $event->getCreator();
+    $creatorEmailAddress = $eventCreator->getEmail();
+    $meetingCreator = getOrSaveMeetingAttendee($customer, $creatorEmailAddress);
+    $meeting->setEventCreator($meetingCreator)
+        ->save();
+
+    /**
+     * Save event organizer
+     */
+    $eventOrganizer = $event->getOrganizer();
+    $organizerEmailAddress = $eventOrganizer->getEmail();
+    $meetingOwner = getOrSaveMeetingAttendee($customer, $organizerEmailAddress);
+    $meeting->setEventOwner($meetingOwner)
+        ->save();
+
+    /**
+     * Save Attendees
+     */
+    foreach($event->getAttendees() as $att) {
+        $emailAddress = $att->getEmail();
+        $attendee = getOrSaveMeetingAttendee($customer, $emailAddress);
+        $meeting->addMeetingAttendee($attendee);
+    }
+
+    $meeting->save();
+
     // @todo Logging will be AWESOME!
 
     return $meeting;
 }
 
+/**
+ * @param Customer $customer
+ * @param $attendeeEmailAddress
+ * @return \DataModels\DataModels\Contact|\DataModels\DataModels\MeetingAttendee
+ */
+function getOrSaveMeetingAttendee(Customer $customer, $attendeeEmailAddress) {
+    $creatorContact = NULL;
+
+    if (isEmailAddressInDomain($attendeeEmailAddress, $customer->getEmailDomain())) {
+        $q = new \DataModels\DataModels\CustomerContactQuery();
+        $customerContact = $q->findOneByEmail($attendeeEmailAddress);
+        if (!$customerContact) {
+            $customerContact = new \DataModels\DataModels\CustomerContact();
+            $customerContact->setEmail($attendeeEmailAddress)
+                ->setCustomer($customer)
+                ->save();
+        }
+        $creatorContact = $customerContact;
+    } else {
+        $q = new \DataModels\DataModels\ContactQuery();
+        $contact = $q->findOneByEmail($attendeeEmailAddress);
+        if (!$contact) {
+            $contact = new \DataModels\DataModels\Contact();
+            $contact->setEmail($attendeeEmailAddress)->save();
+        }
+        $creatorContact = $contact;
+    }
+
+    return $creatorContact;
+}
+
 function isCalInCustomer(Google_Service_Calendar_CalendarListEntry $calendar, Customer $customer) {
-    list($identifier, $domain) = explode('@', $calendar->id);
-    return ($domain == $customer->getEmailDomain());
+    return isEmailAddressInDomain($calendar->id, $customer->getEmailDomain());
+}
+
+function isEmailAddressInDomain($emailAddress, $domain) {
+    list($identifier, $emailDomain) = explode('@', $emailAddress);
+    return ($emailDomain == $domain);
 }

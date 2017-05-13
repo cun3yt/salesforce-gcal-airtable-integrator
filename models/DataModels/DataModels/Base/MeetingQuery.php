@@ -80,7 +80,17 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildMeetingQuery rightJoinWithEventCreator() Adds a RIGHT JOIN clause and with to the query using the EventCreator relation
  * @method     ChildMeetingQuery innerJoinWithEventCreator() Adds a INNER JOIN clause and with to the query using the EventCreator relation
  *
- * @method     \DataModels\DataModels\MeetingAttendeeQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     ChildMeetingQuery leftJoinMeetingHasAttendee($relationAlias = null) Adds a LEFT JOIN clause to the query using the MeetingHasAttendee relation
+ * @method     ChildMeetingQuery rightJoinMeetingHasAttendee($relationAlias = null) Adds a RIGHT JOIN clause to the query using the MeetingHasAttendee relation
+ * @method     ChildMeetingQuery innerJoinMeetingHasAttendee($relationAlias = null) Adds a INNER JOIN clause to the query using the MeetingHasAttendee relation
+ *
+ * @method     ChildMeetingQuery joinWithMeetingHasAttendee($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the MeetingHasAttendee relation
+ *
+ * @method     ChildMeetingQuery leftJoinWithMeetingHasAttendee() Adds a LEFT JOIN clause and with to the query using the MeetingHasAttendee relation
+ * @method     ChildMeetingQuery rightJoinWithMeetingHasAttendee() Adds a RIGHT JOIN clause and with to the query using the MeetingHasAttendee relation
+ * @method     ChildMeetingQuery innerJoinWithMeetingHasAttendee() Adds a INNER JOIN clause and with to the query using the MeetingHasAttendee relation
+ *
+ * @method     \DataModels\DataModels\MeetingAttendeeQuery|\DataModels\DataModels\MeetingHasAttendeeQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildMeeting findOne(ConnectionInterface $con = null) Return the first ChildMeeting matching the query
  * @method     ChildMeeting findOneOrCreate(ConnectionInterface $con = null) Return the first ChildMeeting matching the query, or a new ChildMeeting object populated from the query conditions when no match is found
@@ -1009,6 +1019,96 @@ abstract class MeetingQuery extends ModelCriteria
         return $this
             ->joinEventCreator($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'EventCreator', '\DataModels\DataModels\MeetingAttendeeQuery');
+    }
+
+    /**
+     * Filter the query by a related \DataModels\DataModels\MeetingHasAttendee object
+     *
+     * @param \DataModels\DataModels\MeetingHasAttendee|ObjectCollection $meetingHasAttendee the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildMeetingQuery The current query, for fluid interface
+     */
+    public function filterByMeetingHasAttendee($meetingHasAttendee, $comparison = null)
+    {
+        if ($meetingHasAttendee instanceof \DataModels\DataModels\MeetingHasAttendee) {
+            return $this
+                ->addUsingAlias(MeetingTableMap::COL_ID, $meetingHasAttendee->getMeetingId(), $comparison);
+        } elseif ($meetingHasAttendee instanceof ObjectCollection) {
+            return $this
+                ->useMeetingHasAttendeeQuery()
+                ->filterByPrimaryKeys($meetingHasAttendee->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByMeetingHasAttendee() only accepts arguments of type \DataModels\DataModels\MeetingHasAttendee or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the MeetingHasAttendee relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildMeetingQuery The current query, for fluid interface
+     */
+    public function joinMeetingHasAttendee($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('MeetingHasAttendee');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'MeetingHasAttendee');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the MeetingHasAttendee relation MeetingHasAttendee object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \DataModels\DataModels\MeetingHasAttendeeQuery A secondary query class using the current class as primary query
+     */
+    public function useMeetingHasAttendeeQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinMeetingHasAttendee($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'MeetingHasAttendee', '\DataModels\DataModels\MeetingHasAttendeeQuery');
+    }
+
+    /**
+     * Filter the query by a related MeetingAttendee object
+     * using the meeting_has_attendee table as cross reference
+     *
+     * @param MeetingAttendee $meetingAttendee the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildMeetingQuery The current query, for fluid interface
+     */
+    public function filterByMeetingAttendee($meetingAttendee, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useMeetingHasAttendeeQuery()
+            ->filterByMeetingAttendee($meetingAttendee, $comparison)
+            ->endUse();
     }
 
     /**
