@@ -1,6 +1,10 @@
 <?
 require_once('config.php');
 session_start();
+
+require_once('../libraries/Helpers.php');
+Helpers::setDebugParam($isDebugActive);
+
 $strCurrentClientFolderName = $_SESSION['currentclientfoldername'];
 $token_url = LOGIN_URI . "/services/oauth2/token";
 

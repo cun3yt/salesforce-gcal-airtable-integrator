@@ -61,13 +61,16 @@ class Helpers {
     /**
      * Creating a new GCal Account
      *
-     * This replaces "fnSaveGcalAccount"
+     * This replaces "fnSaveGcalAccount" & "fnUpdateSalesUser"
      *
      * @param Customer $customer
-     * @param $recordArray
+     * @param $emailAddress
+     * @param $data
+     * @param string $integrationType
      * @return CustomerContactIntegration
      */
-    static function createGCalAccount(Customer $customer, $emailAddress, $recordArray) {
+    static function createIntegrationAccount(Customer $customer, $emailAddress, $data,
+                                             $integrationType = CustomerContactIntegration::GCAL) {
         $contactQ = new CustomerContactQuery();
         $contactSet = $contactQ->filterByEmail($emailAddress)->filterByCustomer($customer);
 
@@ -83,25 +86,27 @@ class Helpers {
 
         $account = new CustomerContactIntegration();
 
-        $account->setType(CustomerContactIntegration::GCAL)
+        $account->setType($integrationType)
             ->setStatus(CustomerContactIntegration::STATUS_ACTIVE)
             ->setCustomerContact($contact)
-            ->setData($recordArray['utoken'])
+            ->setData($data)
             ->save();
 
         return $account;
     }
 
     /**
-     * Check if email address and associated GCal are present under the given customer
+     * Check if email address and associated Integration are present under the given customer
      *
      * This replaces "fnCheckGcalAccountAlreadyPresent"
      *
      * @param Customer $customer
      * @param $emailAddress
-     * @return null | CustomerContactIntegration
+     * @param string $integrationType
+     * @return CustomerContactIntegration|null
      */
-    static function getGCalAccountIfPresent(Customer $customer, $emailAddress) {
+    static function getIntegrationIfPresent(Customer $customer, $emailAddress,
+                                            $integrationType = CustomerContactIntegration::GCAL) {
         $contactQ = new CustomerContactQuery();
         $contactSet = $contactQ->filterByEmail($emailAddress)->filterByCustomer($customer)->find();
 
@@ -113,14 +118,14 @@ class Helpers {
 
         $integrationQ = new CustomerContactIntegrationQuery();
         $integrationSet = $integrationQ->filterByCustomerContact($contact)
-            ->filterByType(CustomerContactIntegration::GCAL)->find();
+            ->filterByType($integrationType)->find();
 
         $integration = NULL;
 
         if($integrationSet->count() <= 0) { return NULL; }
 
         if($integrationSet->count() >= 2) {
-            trigger_error("getGCalAccountIfPresent fetches more than 1 integration", E_USER_WARNING);
+            trigger_error(__FUNCTION__ . " fetches more than 1 integration", E_USER_WARNING);
         }
 
         return $integrationSet[0];
@@ -131,17 +136,17 @@ class Helpers {
      *
      * This function is replacing "fnUpdateUserTokenData()"
      *
-     * @param CustomerContactIntegration $gCalIntegration
-     * @param $token
+     * @param CustomerContactIntegration $integration
+     * @param $data
      * @return CustomerContactIntegration
      */
-    static function updateGCalAccountUserToken(CustomerContactIntegration $gCalIntegration, $token) {
-        $gCalIntegration
+    static function updateIntegrationAccountUserToken(CustomerContactIntegration $integration, $data) {
+        $integration
             ->setStatus(CustomerContactIntegration::STATUS_ACTIVE)
-            ->setData($token)
+            ->setData($data)
             ->save();
 
-        return $gCalIntegration;
+        return $integration;
     }
 
     /**
@@ -1195,6 +1200,189 @@ class Helpers {
         print_r($jsonResponse);
         return (is_array($jsonResponse) && (count($jsonResponse)>0));
     }
+
+    /**
+     * Returns user info from airtable if exists
+     *
+     * @deprecated use getIntegrationIfPresent() instead
+     * @param string $strEmail
+     * @return bool|array
+     */
+    static function fnCheckAlreadySavedSalesUser($strEmail = "") {
+        global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
+
+        if( !$strEmail ) {
+            return false;
+        }
+
+        $base = $strAirtableBase;
+        $table = 'salesuser';
+        $strApiKey = $strAirtableApiKey;
+        $url = $strAirtableBaseEndpoint.$base.'/'.$table;
+        $url .= '?filterByFormula=('.rawurlencode("{email}='".$strEmail."'").')';
+        $authorization = "Authorization: Bearer ".$strApiKey;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_HTTPGET, 1);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
+        curl_setopt($ch,CURLOPT_URL, $url);
+
+        $result = curl_exec($ch);
+
+        if(!$result) {
+            echo 'error:' . curl_error($ch);
+            return false;
+        }
+
+        $arrResponse = json_decode($result,true);
+
+        if( !(isset($arrResponse['records']) && (count($arrResponse['records'])>0)) ) {
+            return false;
+        }
+
+        return $arrResponse['records'];
+    }
+
+    /**
+     * Replaced "fnGetUserDetailFromSF()" function
+     *
+     * @param string $userUrl
+     * @param string $access_token
+     * @return null | mixed
+     */
+    static function getUserDetailFromSFDC($userUrl, $access_token) {
+        if( !$userUrl ) {
+            return NULL;
+        }
+
+        $url = $userUrl;
+
+        $curl = curl_init($url);
+        curl_setopt($curl, CURLOPT_HEADER, false);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array("Authorization: OAuth {$access_token}"));
+
+        $json_response = curl_exec($curl);
+
+        if(!$json_response) {
+            trigger_error("There is a curl_error: " . curl_error($curl), E_ERROR);
+        }
+
+        curl_close($curl);
+
+        $response = json_decode($json_response, true);
+        return $response;
+    }
+
+    static function fnSaveSalesUser($arrRecord = array()) {
+        global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
+        if(is_array($arrRecord) && (count($arrRecord)>0)) {
+            $base = $strAirtableBase;
+            $table = 'salesuser';
+            $strApiKey = $strAirtableApiKey;
+            $url = $strAirtableBaseEndpoint.$base.'/'.$table;
+
+            $authorization = "Authorization: Bearer ".$strApiKey;
+            if($arrRecord['accesstoken']) {
+                $arrFields['fields']['user_token'] = $arrRecord['accesstoken'];
+            }
+
+            if($arrRecord['tokendata']) {
+                $arrFields['fields']['salesuseraccesstoken'] = $arrRecord['tokendata'];
+            }
+            $arrFields['fields']['status'] = "active";
+            if($arrRecord['userid']) {
+                $arrFields['fields']['userid'] = $arrRecord['userid'];
+            }
+
+            if($arrRecord['email']) {
+                $arrFields['fields']['email'] = $arrRecord['email'];
+            }
+            $srtF = json_encode($arrFields);
+            $curl = curl_init($url);
+            // Accept any server (peer) certificate on dev envs
+            curl_setopt($curl, CURLOPT_HEADER, false);
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl, CURLOPT_POST, true);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, $srtF);
+            curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-type: application/json",$authorization));
+            $info = curl_getinfo($curl);
+            $response = curl_exec($curl);
+            curl_close($curl);
+            $jsonResponse =  json_decode($response,true);
+            if(is_array($jsonResponse) && (count($jsonResponse)>0)) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     *
+     * @deprecated this function is replaced by "createIntegrationAccount()" function
+     * @param $strRecId
+     * @param array $arrRecord
+     * @return bool
+     */
+    static function fnUpdateSalesUser($strRecId,$arrRecord = array()) {
+        global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
+
+        if(!$strRecId) {
+            return false;
+        }
+
+        $base = $strAirtableBase;
+        $table = 'salesuser';
+        $strApiKey = $strAirtableApiKey;
+        $url = $strAirtableBaseEndpoint.$base.'/'.$table.'/'.$strRecId;
+
+        $authorization = "Authorization: Bearer ".$strApiKey;
+
+        if($arrRecord['accesstoken']) {
+            $arrFields['fields']['user_token'] = $arrRecord['accesstoken'];
+        }
+
+        if($arrRecord['tokendata']) {
+            $arrFields['fields']['salesuseraccesstoken'] = $arrRecord['tokendata'];
+        }
+
+        $arrFields['fields']['status'] = "active";
+
+        if($arrRecord['userid']) {
+            $arrFields['fields']['userid'] = $arrRecord['userid'];
+        }
+
+        if($arrRecord['email']) {
+            $arrFields['fields']['email'] = $arrRecord['email'];
+        }
+
+        $srtF = json_encode($arrFields);
+        $curl = curl_init($url);
+
+        // Accept any server (peer) certificate on dev envs
+        curl_setopt($curl, CURLOPT_HEADER, false);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PATCH');
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $srtF);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-type: application/json",$authorization));
+        curl_getinfo($curl);
+
+        $response = curl_exec($curl);
+
+        if(!$response) {
+            echo curl_error($curl);
+        }
+
+        curl_close($curl);
+        $jsonResponse =  json_decode($response,true);
+
+        return is_array($jsonResponse) && (count($jsonResponse)>0);
+    }
+
 
     /**
      * @return array

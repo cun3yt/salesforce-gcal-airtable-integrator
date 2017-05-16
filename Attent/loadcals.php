@@ -12,16 +12,17 @@ list($customer, $contacts) = Helpers::loadCustomerData($strClientDomainName);
 
 if(is_array($userDataArray) && (count($userDataArray)>0)) {
     foreach($userDataArray as $token => $emailAddress) {
-        $gCalAccount = Helpers::getGCalAccountIfPresent($customer, $emailAddress);
+        $gCalAccount = Helpers::getIntegrationIfPresent($customer, $emailAddress);
 
         $record['utoken'] = $token;
         $record['uemail'] = $emailAddress;
         $record['status'] = "active";
 
         if(!$gCalAccount) {
-            Helpers::createGCalAccount($customer, $emailAddress, $record);
+            Helpers::createIntegrationAccount($customer, $emailAddress, $record['utoken'],
+                CustomerContactIntegration::GCAL);
 		} else {
-            Helpers::updateGCalAccountUserToken($gCalAccount, $token);
+            Helpers::updateIntegrationAccountUserToken($gCalAccount, $token);
         }
 	}
 	
