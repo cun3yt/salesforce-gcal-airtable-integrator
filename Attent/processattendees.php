@@ -7,7 +7,7 @@
 error_reporting(~E_WARNING && ~E_NOTICE);
 
 require_once('config.php');
-require_once('../libraries/Helpers.php');
+require_once("${_SERVER['DOCUMENT_ROOT']}/libraries/Helpers.php");
 
 use DataModels\DataModels\CustomerContactIntegration as CustomerContactIntegration;
 

@@ -11,7 +11,7 @@ error_reporting(~E_WARNING && ~E_NOTICE);
 session_start();
 
 require_once 'config.php';
-require_once('../libraries/Helpers.php');
+require_once("${_SERVER['DOCUMENT_ROOT']}/libraries/Helpers.php");
 
 Helpers::setDebugParam($isDebugActive);
 

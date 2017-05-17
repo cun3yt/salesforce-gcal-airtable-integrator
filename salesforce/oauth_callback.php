@@ -1,8 +1,8 @@
 <?
-require_once('config.php');
+require_once("${_SERVER['DOCUMENT_ROOT']}/salesforce/config.php");
 session_start();
 
-require_once('../libraries/Helpers.php');
+require_once("${_SERVER['DOCUMENT_ROOT']}/libraries/Helpers.php");
 Helpers::setDebugParam($isDebugActive);
 
 $strCurrentClientFolderName = $_SESSION['currentclientfoldername'];

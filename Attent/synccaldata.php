@@ -43,7 +43,7 @@ foreach($calendarIntegrations as $integration) {
  * @return Google_Client
  */
 function setupGoogleAPIClient($googleCalAPICredentialFile) {
-    require_once($_SERVER['DOCUMENT_ROOT'].'/gcal/vendor/autoload.php');
+    require_once("${_SERVER['DOCUMENT_ROOT']}/gcal/vendor/autoload.php");
     $client = new Google_Client();
     $client->setAuthConfig($googleCalAPICredentialFile);
     $client->addScope(array(Google_Service_Calendar::CALENDAR));

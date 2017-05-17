@@ -1,13 +1,13 @@
 <?
 error_reporting(~E_WARNING && ~E_NOTICE);
-require_once('../config.php');
-require_once('../libraries/Helpers.php');
-
-use DataModels\DataModels\CustomerContactIntegration as CustomerContactIntegration;
+require_once("${_SERVER['DOCUMENT_ROOT']}/Attent/config.php");
+require_once("${_SERVER['DOCUMENT_ROOT']}/libraries/Helpers.php");
 
 session_start();
 
 Helpers::setDebugParam($isDebugActive);
+
+use DataModels\DataModels\CustomerContactIntegration as CustomerContactIntegration;
 
 if( !(is_array($_SESSION['arraccess']) && (count($_SESSION['arraccess'])>0)) ) {
     trigger_error("The SFDC API access-related session variable is not set", E_WARNING);
