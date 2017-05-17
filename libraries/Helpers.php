@@ -1411,21 +1411,21 @@ class Helpers {
             $response['error_description'] == "expired access/refresh token") {
 
             Helpers::fnUpdatesSGstatus($strEmail);
-            Helpers::fnUpdateSalesAmidminForTokenExpiry($strEmail);
+            Helpers::fnSendEmailToSFDCAdminAboutTokenExpiry($strEmail);
 
             trigger_error("Admin for SFDC got an email for account token reset.", E_NOTICE);
             return false;
         }
 
         if($response['access_token']) {
-            return $response['access_token'];
+            return $response;
         }
 
         trigger_error("SFDC access token refreshing is not completed.", E_ERROR);
         return false;
     }
 
-    static function fnUpdateSalesAmidminForTokenExpiry($strEmail) {
+    static function fnSendEmailToSFDCAdminAboutTokenExpiry($strEmail) {
         global $strClientFolderName,$strFromEmailAddress,$strSmtpHost,$strSmtpUsername,$strSmtpPassword,$strSmtpPPort;
 
         if(!$strEmail) {

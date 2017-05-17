@@ -3,6 +3,7 @@ require_once '../../salesforce/config.php';
 
 require_once '../config.php';
 require_once("${_SERVER['DOCUMENT_ROOT']}/libraries/Helpers.php");
+Helpers::setDebugParam($isDebugActive);
 
 use DataModels\DataModels\CustomerContactIntegration as CustomerContactIntegration;
 
@@ -21,16 +22,20 @@ if( count($integrations) <= 0 ) {
 foreach($integrations as $integration) {
     $contact = $integration->getCustomerContact();
     $data = json_decode($integration->getData());
+    $tokenData = json_decode($data->tokendata);
     $emailAddress = $contact->getEmail();
-    $newAccessToken = Helpers::sfdcRefreshToken($data->refresh_token, $emailAddress);
+    $newTokenData = Helpers::sfdcRefreshToken($tokenData->refresh_token, $emailAddress);
 
-    if( !$newAccessToken ) {
+    if( !$newTokenData ) {
         trigger_error("New access token cannot be taken from SFDC, moving to the next contact integration", E_NOTICE);
         continue;
     }
 
-    $data = array_merge($data, $newAccessToken);
-    $integration->setData($data)
+    $tokenData = (object) array_merge((array)$tokenData, (array)$newTokenData);
+    $data->tokendata = $tokenData;
+    $data->accesstoken = $tokenData->access_token;
+
+    $integration->setData(json_encode($data))
         ->save();
 
     echo "{$emailAddress} has renewed SFDC access token now.";
