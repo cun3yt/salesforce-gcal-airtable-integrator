@@ -1,5 +1,5 @@
 <?
-require_once("../global-config.php");
+require_once("${_SERVER['DOCUMENT_ROOT']}/global-config.php");
 
 use DataModels\DataModels\CustomerQuery as CustomerQuery;
 use DataModels\DataModels\Customer as Customer;

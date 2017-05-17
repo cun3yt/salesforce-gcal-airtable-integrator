@@ -1,5 +1,5 @@
 <?
-require_once("../global-config.php");
+require_once("${_SERVER['DOCUMENT_ROOT']}/global-config.php");
 
 /**
  * The below app's owner is Techila. This part should be replaced with Attent's one below.
