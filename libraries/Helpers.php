@@ -913,7 +913,7 @@ class Helpers {
         curl_setopt($curl, CURLOPT_POSTFIELDS, $srtF);
         curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-type: application/json",$authorization));
         $info = curl_getinfo($curl);
-        echo "---".$response = curl_exec($curl);//exit;
+        $response = curl_exec($curl);
         curl_close($curl);
         $jsonResponse =  json_decode($response,true);
         return (is_array($jsonResponse) && (count($jsonResponse)>0));
