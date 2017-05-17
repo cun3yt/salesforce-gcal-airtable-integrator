@@ -15,4 +15,4 @@ if(is_file($overrideFile)) {
     include($overrideFile);
 }
 
-define(BASE_URL, $baseUrl);
+define("BASE_URL", $baseUrl);
