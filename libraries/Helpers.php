@@ -72,7 +72,7 @@ class Helpers {
     static function createIntegrationAccount(Customer $customer, $emailAddress, $data,
                                              $integrationType = CustomerContactIntegration::GCAL) {
         $contactQ = new CustomerContactQuery();
-        $contactSet = $contactQ->filterByEmail($emailAddress)->filterByCustomer($customer);
+        $contactSet = $contactQ->filterByEmail($emailAddress)->filterByCustomer($customer)->find();
 
         // If contact doesn't exist, create it
         if($contactSet->count() <= 0) {
@@ -89,7 +89,7 @@ class Helpers {
         $account->setType($integrationType)
             ->setStatus(CustomerContactIntegration::STATUS_ACTIVE)
             ->setCustomerContact($contact)
-            ->setData($data)
+            ->setData(json_encode($data))
             ->save();
 
         return $account;
