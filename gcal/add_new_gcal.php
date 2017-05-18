@@ -49,4 +49,4 @@ foreach ($calendarList->getItems() as $calendar) {
 unset($_SESSION['access_token']);
 unset($_SESSION['userid']);
 
-Helpers::redirect(Helpers::generateLink("{$strCurrentClientFolderName}/loadcals.php"));
+Helpers::redirect(Helpers::generateLink("{$strCurrentClientFolderName}/index.php"));

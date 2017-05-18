@@ -7,8 +7,10 @@
  *
  * @todo delete processcalendar.php entry on crontab
  */
-error_reporting(~E_WARNING && ~E_NOTICE);
-session_start();
+error_reporting(E_ALL);
+
+require_once("${_SERVER['DOCUMENT_ROOT']}/libraries/SessionSingleton.php");
+SessionSingleton::start();
 
 require_once 'config.php';
 require_once("${_SERVER['DOCUMENT_ROOT']}/libraries/Helpers.php");
@@ -29,7 +31,7 @@ list($customer, $contacts) = Helpers::loadCustomerData($strClientDomainName);
 $sfdcIntegrations = Helpers::getIntegrations($customer, CustomerContactIntegration::SFDC);
 
 if(count($sfdcIntegrations) <= 0) {
-    trigger_error("No SFDC integration is found in ".__FILE__, E_ERROR);
+    trigger_error("No SFDC integration is found in ".__FILE__, E_USER_ERROR);
     die;
 }
 

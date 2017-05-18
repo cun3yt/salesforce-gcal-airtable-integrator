@@ -4,7 +4,7 @@
 * salesforce and than mapping it within DB for easy lookup and reference.
 */
 
-error_reporting(~E_WARNING && ~E_NOTICE);
+error_reporting(E_ALL);
 
 require_once('config.php');
 require_once("${_SERVER['DOCUMENT_ROOT']}/libraries/Helpers.php");

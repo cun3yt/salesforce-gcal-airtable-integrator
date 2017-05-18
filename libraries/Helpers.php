@@ -89,7 +89,7 @@ class Helpers {
         $account->setType($integrationType)
             ->setStatus(CustomerContactIntegration::STATUS_ACTIVE)
             ->setCustomerContact($contact)
-            ->setData(json_encode($data))
+            ->setData($data)
             ->save();
 
         return $account;
@@ -720,11 +720,7 @@ class Helpers {
         }
 
         $q = new MeetingQuery();
-        $meetingSet = $q->filterByEventOwnerId($meetingAttendee->getId())->orderByEventDatetime()->limit(1);
-
-        if($meetingSet->count() <= 0) { return NULL; }
-
-        return $meetingSet[0];
+        return $q->filterByEventOwnerId($meetingAttendee->getId())->orderByEventDatetime()->findOne();
     }
 
     /**
@@ -1570,6 +1566,23 @@ class Helpers {
         return true;
     }
 
+    /**
+     * @param $googleCalAPICredentialFile
+     * @param bool $accessOffline
+     * @return Google_Client
+     */
+    static function setupGoogleAPIClient($googleCalAPICredentialFile, $accessOffline = false) {
+        require_once("${_SERVER['DOCUMENT_ROOT']}/gcal/vendor/autoload.php");
+        $client = new Google_Client();
+        $client->setAuthConfig($googleCalAPICredentialFile);
+        $client->addScope(array(Google_Service_Calendar::CALENDAR));
+        $guzzleClient = new \GuzzleHttp\Client(array( 'curl' => array( CURLOPT_SSL_VERIFYPEER => false, ), ));
+        $client->setHttpClient($guzzleClient);
+
+        if($accessOffline) { $client->setAccessType("offline"); }
+
+        return $client;
+    }
 
     /**
      * @return array

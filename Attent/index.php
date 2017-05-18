@@ -1,12 +1,13 @@
 <?
-error_reporting(~E_NOTICE && ~E_DEPRECATED);
+error_reporting(E_ALL);
 
 require_once('config.php');
-require_once("${_SERVER['DOCUMENT_ROOT']}/libraries/Helpers.php");
 
 Helpers::setDebugParam($isDebugActive);
 
-$userDataArray = $_SESSION['userdata'];
+use \DataModels\DataModels\CustomerContactIntegration as CustomerContactIntegration;
+
+$userDataArray = isset($_SESSION['userdata']) ? $_SESSION['userdata'] : null;
 
 list($customer, $contacts) = Helpers::loadCustomerData($strClientDomainName);
 
@@ -51,7 +52,7 @@ $SFDCIntegrations = Helpers::getIntegrations($customer, \DataModels\DataModels\C
                 <? foreach($calendarIntegrations as $integration) { ?>
                     <div class="box">
                         <div class="box-content">
-                            <div class="title"><img src="img/callendor.png">Calendar</div>
+                            <div class="title"><img src="img/calendar.png">Calendar</div>
                             <? $contact = $integration->getCustomerContact(); ?>
                             <p><? echo $contact->getName(); ?></p>
                             <p><? echo $contact->getSurname(); ?></p>

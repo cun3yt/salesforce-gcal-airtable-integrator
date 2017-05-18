@@ -4,6 +4,7 @@ namespace DataModels\DataModels;
 
 use DataModels\DataModels\Base\CustomerContact as BaseCustomerContact;
 use DataModels\DataModels\CustomerContactQuery as CustomerContactQuery;
+use Propel\Runtime\Connection\ConnectionInterface;
 
 /**
  * Skeleton subclass for representing a row from the 'customer_contact' table.
@@ -47,11 +48,13 @@ class CustomerContact extends BaseCustomerContact //implements IMeetingAttendee
     }
 
     /**
-     * @return MeetingAttendee|null
+     * @param ConnectionInterface|null $con
+     * @return null
      */
-    function getMeetingAttendee() {
+    public function getMeetingAttendee(ConnectionInterface $con = null) {
         $q = new MeetingAttendeeQuery();
-        $attendeeSet = $q->filterByRefType(self::getType())->filterByRefId($this->id)->find();
+
+        $attendeeSet = $q->findById($this->id);
 
         if($attendeeSet->count() <= 0) { return NULL; }
 

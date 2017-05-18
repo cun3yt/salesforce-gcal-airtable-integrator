@@ -1,16 +1,18 @@
 <?
-error_reporting(~E_WARNING && ~E_NOTICE);
+error_reporting(E_ALL);
+
+require_once("${_SERVER['DOCUMENT_ROOT']}/libraries/SessionSingleton.php");
+SessionSingleton::start();
+
 require_once("${_SERVER['DOCUMENT_ROOT']}/Attent/config.php");
 require_once("${_SERVER['DOCUMENT_ROOT']}/libraries/Helpers.php");
-
-session_start();
 
 Helpers::setDebugParam($isDebugActive);
 
 use DataModels\DataModels\CustomerContactIntegration as CustomerContactIntegration;
 
 if( !(is_array($_SESSION['arraccess']) && (count($_SESSION['arraccess'])>0)) ) {
-    trigger_error("The SFDC API access-related session variable is not set", E_WARNING);
+    trigger_error("The SFDC API access-related session variable is not set", E_USER_WARNING);
     die;
 }
 
@@ -48,5 +50,5 @@ if( !$hasDBWriteHappened ) {
     die;
 }
 
-$successfulRedirectUrl = Helpers::generateLink($strClientFolderName.'/loadcals.php');
+$successfulRedirectUrl = Helpers::generateLink($strClientFolderName.'/index.php');
 Helpers::redirect($successfulRedirectUrl);

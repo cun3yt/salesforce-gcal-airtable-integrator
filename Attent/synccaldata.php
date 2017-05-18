@@ -14,9 +14,10 @@
  * the meeting opportunity processing time,
  * which will be (meeting date + 3days) and add this time in the meeting history table
  */
+error_reporting(E_ALL);
 
-error_reporting(~E_NOTICE && ~E_DEPRECATED);
-session_start();
+require_once("${_SERVER['DOCUMENT_ROOT']}/libraries/SessionSingleton.php");
+SessionSingleton::start();
 
 const DateFormat = 'Y-m-d';
 const DateTimeFormat = 'Y-m-d H:i:s';
@@ -29,28 +30,18 @@ use DataModels\DataModels\MeetingAttendee as MeetingAttendee;
 
 require_once('config.php');
 
-$client = setupGoogleAPIClient($googleCalAPICredentialFile);
+$client = Helpers::setupGoogleAPIClient($googleCalAPICredentialFile, true);
 
 list($customer, $contacts) = Helpers::loadCustomerData($strClientDomainName);
 $calendarIntegrations = Helpers::getIntegrations($customer);
 
-foreach($calendarIntegrations as $integration) {
-    processIntegrationCalendars($customer, $integration, $client);
-}
-
 /**
- * @param string $googleCalAPICredentialFile
- * @return Google_Client
+ * @var $integration CustomerContactIntegration
  */
-function setupGoogleAPIClient($googleCalAPICredentialFile) {
-    require_once("${_SERVER['DOCUMENT_ROOT']}/gcal/vendor/autoload.php");
-    $client = new Google_Client();
-    $client->setAuthConfig($googleCalAPICredentialFile);
-    $client->addScope(array(Google_Service_Calendar::CALENDAR));
-    $guzzleClient = new \GuzzleHttp\Client(array( 'curl' => array( CURLOPT_SSL_VERIFYPEER => false, ), ));
-    $client->setHttpClient($guzzleClient);
-    $client->setAccessType("offline");
-    return $client;
+foreach($calendarIntegrations as $integration) {
+    $emailAddress = $integration->getCustomerContact()->getEmail();
+    echo "Processing calendars of {$emailAddress} <br/>";
+    processIntegrationCalendars($customer, $integration, $client);
 }
 
 /**
@@ -67,7 +58,7 @@ function processIntegrationCalendars(Customer $customer, CustomerContactIntegrat
         return;
     }
 
-    $client->setAccessToken($accessToken);
+    $client->setAccessToken($integration->getData());
     $service = new Google_Service_Calendar($client);
 
     try {
@@ -79,15 +70,16 @@ function processIntegrationCalendars(Customer $customer, CustomerContactIntegrat
         }
 
         foreach($calendarList->getItems() as $calendar) {
+            echo "Processing Calendar: {$calendar->id}<br/>";
             if( !isCalInCustomer($calendar, $customer) ) {
                 trigger_error("{$calendar->id} is not in Customer's domain: {$customer->getEmailDomain()}. 
-                    Checking the next calendar", E_WARNING);
+                    Checking the next calendar", E_USER_WARNING);
                 continue;
             }
             processCalendar($customer, $service, $calendar);
         }
     } catch(Exception $e) {
-        trigger_error("Exception is raised: " . $e->getMessage(), E_WARNING);
+        trigger_error("Exception raised: " . $e->getMessage(), E_USER_WARNING);
         $arrMessageDetails = json_decode($e->getMessage(),true);
 
         $updateFlag = is_array($arrMessageDetails) &&
@@ -127,8 +119,8 @@ function processCalendar(Customer $customer, $service, $calendar) {
     if(!$lastMeeting) {
         $date = date(DateFormat,strtotime($yearStartFiscal));
     } else {
-        $eventDateTime = strtotime($lastMeeting->getEventDatetime());
-        $date = (strtotime($date) <= $eventDateTime) ? $date : date(DateFormat, $eventDateTime);
+        $eventDateTime = $lastMeeting->getEventDatetime();
+        $date = (strtotime($date) <= $eventDateTime->format('U')) ? $date : $eventDateTime->format(DateFormat);
         unset($eventDateTime);
     }
 
@@ -140,7 +132,7 @@ function processCalendar(Customer $customer, $service, $calendar) {
         'singleEvents' => TRUE
     );
 
-    $events = $service->events->listEvents($calendarId, $optParams); // @todo $results better named "meetings" or "events"
+    $events = $service->events->listEvents($calendarId, $optParams);
 
     if( !(is_array($events->getItems()) && (count($events->getItems())>0)) ) {
         return;
@@ -203,9 +195,9 @@ function processCalendar(Customer $customer, $service, $calendar) {
             }
 
             $meeting = Helpers::getMeetingIfExists($event);
-            // @todo what about changes to the event? Id check will not show the difference!
+            // @todo what about changes/deletion to the event? Id check will not show the difference!
 
-            // @todo Save attendee list to meeting_attendee, meeting_has_attendee, account, account_has_contact & contact tables.
+            // @todo Assoc. attendee list with account, account_has_contact & contact tables.
 
             if(!$meeting) {
                 saveNewMeeting($customer, $event, $calendarId, $eventDate, $eventType);
@@ -220,10 +212,9 @@ function processCalendar(Customer $customer, $service, $calendar) {
  * @param $calendarId
  * @param $eventDate
  * @param $eventType
- * @param bool $dryRun
  * @return Meeting
  */
-function saveNewMeeting(Customer $customer, $event, $calendarId, $eventDate, $eventType, $dryRun = true) {
+function saveNewMeeting(Customer $customer, $event, $calendarId, $eventDate, $eventType) {
     $meeting = new Meeting();
     $meeting->setEventId($event->getId())
         ->setName($event->getSummary())
@@ -240,18 +231,11 @@ function saveNewMeeting(Customer $customer, $event, $calendarId, $eventDate, $ev
 
     /**
      * Saving owner, attendees
-     *
-     * @todo less priority: propelorm's way of inheritance for (meeting_attendee <- ...) mapping
      */
-
-    if(!$dryRun) {
-        $meeting->save();
-    } else {
-        echo "<pre>";
-        echo "DRY RUN SAVE";
-        var_dump(json_decode($meeting->exportTo('json')));
-        echo "</pre>";
-    }
+    $meeting->save();
+    echo "<pre>";
+    var_dump(json_decode($meeting->exportTo('json')));
+    echo "</pre>";
 
     /**
      * Save event creator

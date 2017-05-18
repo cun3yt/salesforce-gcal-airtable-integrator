@@ -1,7 +1,7 @@
 <?
-require_once '../../salesforce/config.php';
+require_once("${_SERVER['DOCUMENT_ROOT']}/salesforce/config.php");
+require_once("${_SERVER['DOCUMENT_ROOT']}/Attent/config.php");
 
-require_once '../config.php';
 require_once("${_SERVER['DOCUMENT_ROOT']}/libraries/Helpers.php");
 Helpers::setDebugParam($isDebugActive);
 
@@ -27,7 +27,8 @@ foreach($integrations as $integration) {
     $newTokenData = Helpers::sfdcRefreshToken($tokenData->refresh_token, $emailAddress);
 
     if( !$newTokenData ) {
-        trigger_error("New access token cannot be taken from SFDC, moving to the next contact integration", E_NOTICE);
+        trigger_error("New access token cannot be taken from SFDC, moving to the next contact integration",
+            E_USER_NOTICE);
         continue;
     }
 
