@@ -1226,7 +1226,7 @@ class Helpers {
      * @param string $strAccId
      * @return bool
      */
-    static function fnGetAccountDetail($strAccId = "") {
+    static function fnGetAccountDetailForAttendees($strAccId = "") {
         global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
 
         if(!$strAccId) {

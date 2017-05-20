@@ -110,7 +110,7 @@ foreach($arrGcalUser as $arrUser) {
                 continue;
             }
 
-            $arrAccDetail = Helpers::fnGetAccountDetail($arrAccountDetailSF['records'][0]['AccountId']);
+            $arrAccDetail = Helpers::fnGetAccountDetailForAttendees($arrAccountDetailSF['records'][0]['AccountId']);
             $arrUpdatedAccountHistory = Helpers::fnInsertContact($arrAccountDetailSF['records'],$arrAccDetail[0]['id']);
 
             if( !(is_array($arrUpdatedAccountHistory) && (count($arrUpdatedAccountHistory)>0)) ) {
