@@ -1053,6 +1053,16 @@ class Helpers {
         return $response;
     }
 
+    /**
+     * Function to flag meeting record as processed under opportunity_processed column in meeting history airtable
+     * Please not the flagg here is proccess and not yes, it gets sets only when for a given record there is no account or
+     * opprotunities detail found.
+     * It takes the meeting record id as a parameter and update the status on that record id of airtable
+     * return true or false
+     *
+     * @param $strRecId
+     * @return bool
+     */
     static function fnUpdateOppProcessedRecord($strRecId) {
         global $strAirtableBase, $strAirtableApiKey, $strAirtableBaseEndpoint;
 
@@ -1091,6 +1101,13 @@ class Helpers {
         }
     }
 
+    /**
+     * Function to check if the current oppprtunity history detail is different from the fetched opportunity details
+     * If found to be different system returns true otherwise returns existing record id for mapping.
+     *
+     * @param array $arrAccountHistory
+     * @return string
+     */
     static function fnCheckIfOppHistoryToBeInserted($arrAccountHistory = array()) {
         global $strAirtableBase, $strAirtableApiKey, $strAirtableBaseEndpoint;
         if (is_array($arrAccountHistory) && (count($arrAccountHistory) > 0)) {
