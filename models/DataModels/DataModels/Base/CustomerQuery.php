@@ -38,6 +38,16 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildCustomerQuery rightJoinWith($relation) Adds a RIGHT JOIN clause and with to the query
  * @method     ChildCustomerQuery innerJoinWith($relation) Adds a INNER JOIN clause and with to the query
  *
+ * @method     ChildCustomerQuery leftJoinContact($relationAlias = null) Adds a LEFT JOIN clause to the query using the Contact relation
+ * @method     ChildCustomerQuery rightJoinContact($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Contact relation
+ * @method     ChildCustomerQuery innerJoinContact($relationAlias = null) Adds a INNER JOIN clause to the query using the Contact relation
+ *
+ * @method     ChildCustomerQuery joinWithContact($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the Contact relation
+ *
+ * @method     ChildCustomerQuery leftJoinWithContact() Adds a LEFT JOIN clause and with to the query using the Contact relation
+ * @method     ChildCustomerQuery rightJoinWithContact() Adds a RIGHT JOIN clause and with to the query using the Contact relation
+ * @method     ChildCustomerQuery innerJoinWithContact() Adds a INNER JOIN clause and with to the query using the Contact relation
+ *
  * @method     ChildCustomerQuery leftJoinCustomerContact($relationAlias = null) Adds a LEFT JOIN clause to the query using the CustomerContact relation
  * @method     ChildCustomerQuery rightJoinCustomerContact($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CustomerContact relation
  * @method     ChildCustomerQuery innerJoinCustomerContact($relationAlias = null) Adds a INNER JOIN clause to the query using the CustomerContact relation
@@ -48,7 +58,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildCustomerQuery rightJoinWithCustomerContact() Adds a RIGHT JOIN clause and with to the query using the CustomerContact relation
  * @method     ChildCustomerQuery innerJoinWithCustomerContact() Adds a INNER JOIN clause and with to the query using the CustomerContact relation
  *
- * @method     \DataModels\DataModels\CustomerContactQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     \DataModels\DataModels\ContactQuery|\DataModels\DataModels\CustomerContactQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildCustomer findOne(ConnectionInterface $con = null) Return the first ChildCustomer matching the query
  * @method     ChildCustomer findOneOrCreate(ConnectionInterface $con = null) Return the first ChildCustomer matching the query, or a new ChildCustomer object populated from the query conditions when no match is found
@@ -373,6 +383,79 @@ abstract class CustomerQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CustomerTableMap::COL_EMAIL_DOMAIN, $emailDomain, $comparison);
+    }
+
+    /**
+     * Filter the query by a related \DataModels\DataModels\Contact object
+     *
+     * @param \DataModels\DataModels\Contact|ObjectCollection $contact the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCustomerQuery The current query, for fluid interface
+     */
+    public function filterByContact($contact, $comparison = null)
+    {
+        if ($contact instanceof \DataModels\DataModels\Contact) {
+            return $this
+                ->addUsingAlias(CustomerTableMap::COL_ID, $contact->getCustomerId(), $comparison);
+        } elseif ($contact instanceof ObjectCollection) {
+            return $this
+                ->useContactQuery()
+                ->filterByPrimaryKeys($contact->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByContact() only accepts arguments of type \DataModels\DataModels\Contact or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Contact relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildCustomerQuery The current query, for fluid interface
+     */
+    public function joinContact($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Contact');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Contact');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Contact relation Contact object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \DataModels\DataModels\ContactQuery A secondary query class using the current class as primary query
+     */
+    public function useContactQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinContact($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Contact', '\DataModels\DataModels\ContactQuery');
     }
 
     /**
