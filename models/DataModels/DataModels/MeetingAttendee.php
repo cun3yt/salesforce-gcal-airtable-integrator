@@ -16,12 +16,4 @@ use DataModels\DataModels\Base\MeetingAttendee as BaseMeetingAttendee;
  */
 class MeetingAttendee extends BaseMeetingAttendee
 {
-    /**
-     * @return IMeetingAttendee
-     */
-    public function loadInstance() {
-        $type = $this->getRefType();
-        $meetingInstance = ($type)::findInstace($this->getRefId());
-        return $meetingInstance;
-    }
 }

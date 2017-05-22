@@ -4,12 +4,12 @@ namespace DataModels\DataModels\Base;
 
 use \Exception;
 use \PDO;
+use DataModels\DataModels\Client as ChildClient;
 use DataModels\DataModels\ClientCalendarUser as ChildClientCalendarUser;
 use DataModels\DataModels\ClientCalendarUserOAuth as ChildClientCalendarUserOAuth;
 use DataModels\DataModels\ClientCalendarUserOAuthQuery as ChildClientCalendarUserOAuthQuery;
 use DataModels\DataModels\ClientCalendarUserQuery as ChildClientCalendarUserQuery;
-use DataModels\DataModels\InternalClient as ChildInternalClient;
-use DataModels\DataModels\InternalClientQuery as ChildInternalClientQuery;
+use DataModels\DataModels\ClientQuery as ChildClientQuery;
 use DataModels\DataModels\MeetingAttendee as ChildMeetingAttendee;
 use DataModels\DataModels\MeetingAttendeeQuery as ChildMeetingAttendeeQuery;
 use DataModels\DataModels\Map\ClientCalendarUserOAuthTableMap;
@@ -69,11 +69,11 @@ abstract class ClientCalendarUser extends ChildMeetingAttendee implements Active
     protected $virtualColumns = array();
 
     /**
-     * The value for the internal_client_id field.
+     * The value for the client_id field.
      *
      * @var        int
      */
-    protected $internal_client_id;
+    protected $client_id;
 
     /**
      * The value for the name field.
@@ -111,9 +111,9 @@ abstract class ClientCalendarUser extends ChildMeetingAttendee implements Active
     protected $id;
 
     /**
-     * @var        ChildInternalClient
+     * @var        ChildClient
      */
-    protected $aInternalClient;
+    protected $aClient;
 
     /**
      * @var        ChildMeetingAttendee
@@ -366,13 +366,13 @@ abstract class ClientCalendarUser extends ChildMeetingAttendee implements Active
     }
 
     /**
-     * Get the [internal_client_id] column value.
+     * Get the [client_id] column value.
      *
      * @return int
      */
-    public function getInternalClientId()
+    public function getClientId()
     {
-        return $this->internal_client_id;
+        return $this->client_id;
     }
 
     /**
@@ -426,28 +426,28 @@ abstract class ClientCalendarUser extends ChildMeetingAttendee implements Active
     }
 
     /**
-     * Set the value of [internal_client_id] column.
+     * Set the value of [client_id] column.
      *
      * @param int $v new value
      * @return $this|\DataModels\DataModels\ClientCalendarUser The current object (for fluent API support)
      */
-    public function setInternalClientId($v)
+    public function setClientId($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->internal_client_id !== $v) {
-            $this->internal_client_id = $v;
-            $this->modifiedColumns[ClientCalendarUserTableMap::COL_INTERNAL_CLIENT_ID] = true;
+        if ($this->client_id !== $v) {
+            $this->client_id = $v;
+            $this->modifiedColumns[ClientCalendarUserTableMap::COL_CLIENT_ID] = true;
         }
 
-        if ($this->aInternalClient !== null && $this->aInternalClient->getId() !== $v) {
-            $this->aInternalClient = null;
+        if ($this->aClient !== null && $this->aClient->getId() !== $v) {
+            $this->aClient = null;
         }
 
         return $this;
-    } // setInternalClientId()
+    } // setClientId()
 
     /**
      * Set the value of [name] column.
@@ -589,8 +589,8 @@ abstract class ClientCalendarUser extends ChildMeetingAttendee implements Active
     {
         try {
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ClientCalendarUserTableMap::translateFieldName('InternalClientId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->internal_client_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ClientCalendarUserTableMap::translateFieldName('ClientId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->client_id = (null !== $col) ? (int) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ClientCalendarUserTableMap::translateFieldName('Name', TableMap::TYPE_PHPNAME, $indexType)];
             $this->name = (null !== $col) ? (string) $col : null;
@@ -636,8 +636,8 @@ abstract class ClientCalendarUser extends ChildMeetingAttendee implements Active
      */
     public function ensureConsistency()
     {
-        if ($this->aInternalClient !== null && $this->internal_client_id !== $this->aInternalClient->getId()) {
-            $this->aInternalClient = null;
+        if ($this->aClient !== null && $this->client_id !== $this->aClient->getId()) {
+            $this->aClient = null;
         }
         if ($this->aMeetingAttendee !== null && $this->id !== $this->aMeetingAttendee->getId()) {
             $this->aMeetingAttendee = null;
@@ -681,7 +681,7 @@ abstract class ClientCalendarUser extends ChildMeetingAttendee implements Active
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aInternalClient = null;
+            $this->aClient = null;
             $this->aMeetingAttendee = null;
             $this->collClientCalendarUserOAuths = null;
 
@@ -801,11 +801,11 @@ abstract class ClientCalendarUser extends ChildMeetingAttendee implements Active
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aInternalClient !== null) {
-                if ($this->aInternalClient->isModified() || $this->aInternalClient->isNew()) {
-                    $affectedRows += $this->aInternalClient->save($con);
+            if ($this->aClient !== null) {
+                if ($this->aClient->isModified() || $this->aClient->isNew()) {
+                    $affectedRows += $this->aClient->save($con);
                 }
-                $this->setInternalClient($this->aInternalClient);
+                $this->setClient($this->aClient);
             }
 
             if ($this->aMeetingAttendee !== null) {
@@ -866,8 +866,8 @@ abstract class ClientCalendarUser extends ChildMeetingAttendee implements Active
 
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(ClientCalendarUserTableMap::COL_INTERNAL_CLIENT_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'internal_client_id';
+        if ($this->isColumnModified(ClientCalendarUserTableMap::COL_CLIENT_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'client_id';
         }
         if ($this->isColumnModified(ClientCalendarUserTableMap::COL_NAME)) {
             $modifiedColumns[':p' . $index++]  = 'name';
@@ -895,8 +895,8 @@ abstract class ClientCalendarUser extends ChildMeetingAttendee implements Active
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'internal_client_id':
-                        $stmt->bindValue($identifier, $this->internal_client_id, PDO::PARAM_INT);
+                    case 'client_id':
+                        $stmt->bindValue($identifier, $this->client_id, PDO::PARAM_INT);
                         break;
                     case 'name':
                         $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
@@ -969,7 +969,7 @@ abstract class ClientCalendarUser extends ChildMeetingAttendee implements Active
     {
         switch ($pos) {
             case 0:
-                return $this->getInternalClientId();
+                return $this->getClientId();
                 break;
             case 1:
                 return $this->getName();
@@ -1016,7 +1016,7 @@ abstract class ClientCalendarUser extends ChildMeetingAttendee implements Active
         $alreadyDumpedObjects['ClientCalendarUser'][$this->hashCode()] = true;
         $keys = ClientCalendarUserTableMap::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getInternalClientId(),
+            $keys[0] => $this->getClientId(),
             $keys[1] => $this->getName(),
             $keys[2] => $this->getSurname(),
             $keys[3] => $this->getTitle(),
@@ -1029,20 +1029,20 @@ abstract class ClientCalendarUser extends ChildMeetingAttendee implements Active
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->aInternalClient) {
+            if (null !== $this->aClient) {
 
                 switch ($keyType) {
                     case TableMap::TYPE_CAMELNAME:
-                        $key = 'internalClient';
+                        $key = 'client';
                         break;
                     case TableMap::TYPE_FIELDNAME:
-                        $key = 'internal_client';
+                        $key = 'client';
                         break;
                     default:
-                        $key = 'InternalClient';
+                        $key = 'Client';
                 }
 
-                $result[$key] = $this->aInternalClient->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+                $result[$key] = $this->aClient->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->aMeetingAttendee) {
 
@@ -1109,7 +1109,7 @@ abstract class ClientCalendarUser extends ChildMeetingAttendee implements Active
     {
         switch ($pos) {
             case 0:
-                $this->setInternalClientId($value);
+                $this->setClientId($value);
                 break;
             case 1:
                 $this->setName($value);
@@ -1153,7 +1153,7 @@ abstract class ClientCalendarUser extends ChildMeetingAttendee implements Active
         $keys = ClientCalendarUserTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) {
-            $this->setInternalClientId($arr[$keys[0]]);
+            $this->setClientId($arr[$keys[0]]);
         }
         if (array_key_exists($keys[1], $arr)) {
             $this->setName($arr[$keys[1]]);
@@ -1211,8 +1211,8 @@ abstract class ClientCalendarUser extends ChildMeetingAttendee implements Active
     {
         $criteria = new Criteria(ClientCalendarUserTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(ClientCalendarUserTableMap::COL_INTERNAL_CLIENT_ID)) {
-            $criteria->add(ClientCalendarUserTableMap::COL_INTERNAL_CLIENT_ID, $this->internal_client_id);
+        if ($this->isColumnModified(ClientCalendarUserTableMap::COL_CLIENT_ID)) {
+            $criteria->add(ClientCalendarUserTableMap::COL_CLIENT_ID, $this->client_id);
         }
         if ($this->isColumnModified(ClientCalendarUserTableMap::COL_NAME)) {
             $criteria->add(ClientCalendarUserTableMap::COL_NAME, $this->name);
@@ -1322,7 +1322,7 @@ abstract class ClientCalendarUser extends ChildMeetingAttendee implements Active
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setInternalClientId($this->getInternalClientId());
+        $copyObj->setClientId($this->getClientId());
         $copyObj->setName($this->getName());
         $copyObj->setSurname($this->getSurname());
         $copyObj->setTitle($this->getTitle());
@@ -1370,24 +1370,24 @@ abstract class ClientCalendarUser extends ChildMeetingAttendee implements Active
     }
 
     /**
-     * Declares an association between this object and a ChildInternalClient object.
+     * Declares an association between this object and a ChildClient object.
      *
-     * @param  ChildInternalClient $v
+     * @param  ChildClient $v
      * @return $this|\DataModels\DataModels\ClientCalendarUser The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setInternalClient(ChildInternalClient $v = null)
+    public function setClient(ChildClient $v = null)
     {
         if ($v === null) {
-            $this->setInternalClientId(NULL);
+            $this->setClientId(NULL);
         } else {
-            $this->setInternalClientId($v->getId());
+            $this->setClientId($v->getId());
         }
 
-        $this->aInternalClient = $v;
+        $this->aClient = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildInternalClient object, it will not be re-added.
+        // If this object has already been added to the ChildClient object, it will not be re-added.
         if ($v !== null) {
             $v->addClientCalendarUser($this);
         }
@@ -1398,26 +1398,26 @@ abstract class ClientCalendarUser extends ChildMeetingAttendee implements Active
 
 
     /**
-     * Get the associated ChildInternalClient object
+     * Get the associated ChildClient object
      *
      * @param  ConnectionInterface $con Optional Connection object.
-     * @return ChildInternalClient The associated ChildInternalClient object.
+     * @return ChildClient The associated ChildClient object.
      * @throws PropelException
      */
-    public function getInternalClient(ConnectionInterface $con = null)
+    public function getClient(ConnectionInterface $con = null)
     {
-        if ($this->aInternalClient === null && ($this->internal_client_id !== null)) {
-            $this->aInternalClient = ChildInternalClientQuery::create()->findPk($this->internal_client_id, $con);
+        if ($this->aClient === null && ($this->client_id !== null)) {
+            $this->aClient = ChildClientQuery::create()->findPk($this->client_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aInternalClient->addClientCalendarUsers($this);
+                $this->aClient->addClientCalendarUsers($this);
              */
         }
 
-        return $this->aInternalClient;
+        return $this->aClient;
     }
 
     /**
@@ -1713,13 +1713,13 @@ abstract class ClientCalendarUser extends ChildMeetingAttendee implements Active
      */
     public function clear()
     {
-        if (null !== $this->aInternalClient) {
-            $this->aInternalClient->removeClientCalendarUser($this);
+        if (null !== $this->aClient) {
+            $this->aClient->removeClientCalendarUser($this);
         }
         if (null !== $this->aMeetingAttendee) {
             $this->aMeetingAttendee->removeClientCalendarUser($this);
         }
-        $this->internal_client_id = null;
+        $this->client_id = null;
         $this->name = null;
         $this->surname = null;
         $this->title = null;
@@ -1751,7 +1751,7 @@ abstract class ClientCalendarUser extends ChildMeetingAttendee implements Active
         } // if ($deep)
 
         $this->collClientCalendarUserOAuths = null;
-        $this->aInternalClient = null;
+        $this->aClient = null;
         $this->aMeetingAttendee = null;
     }
 

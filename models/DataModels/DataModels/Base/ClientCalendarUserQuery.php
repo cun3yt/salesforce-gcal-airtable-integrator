@@ -21,14 +21,14 @@ use Propel\Runtime\Exception\PropelException;
  *
  *
  *
- * @method     ChildClientCalendarUserQuery orderByInternalClientId($order = Criteria::ASC) Order by the internal_client_id column
+ * @method     ChildClientCalendarUserQuery orderByClientId($order = Criteria::ASC) Order by the client_id column
  * @method     ChildClientCalendarUserQuery orderByName($order = Criteria::ASC) Order by the name column
  * @method     ChildClientCalendarUserQuery orderBySurname($order = Criteria::ASC) Order by the surname column
  * @method     ChildClientCalendarUserQuery orderByTitle($order = Criteria::ASC) Order by the title column
  * @method     ChildClientCalendarUserQuery orderByEmail($order = Criteria::ASC) Order by the email column
  * @method     ChildClientCalendarUserQuery orderById($order = Criteria::ASC) Order by the id column
  *
- * @method     ChildClientCalendarUserQuery groupByInternalClientId() Group by the internal_client_id column
+ * @method     ChildClientCalendarUserQuery groupByClientId() Group by the client_id column
  * @method     ChildClientCalendarUserQuery groupByName() Group by the name column
  * @method     ChildClientCalendarUserQuery groupBySurname() Group by the surname column
  * @method     ChildClientCalendarUserQuery groupByTitle() Group by the title column
@@ -43,15 +43,15 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildClientCalendarUserQuery rightJoinWith($relation) Adds a RIGHT JOIN clause and with to the query
  * @method     ChildClientCalendarUserQuery innerJoinWith($relation) Adds a INNER JOIN clause and with to the query
  *
- * @method     ChildClientCalendarUserQuery leftJoinInternalClient($relationAlias = null) Adds a LEFT JOIN clause to the query using the InternalClient relation
- * @method     ChildClientCalendarUserQuery rightJoinInternalClient($relationAlias = null) Adds a RIGHT JOIN clause to the query using the InternalClient relation
- * @method     ChildClientCalendarUserQuery innerJoinInternalClient($relationAlias = null) Adds a INNER JOIN clause to the query using the InternalClient relation
+ * @method     ChildClientCalendarUserQuery leftJoinClient($relationAlias = null) Adds a LEFT JOIN clause to the query using the Client relation
+ * @method     ChildClientCalendarUserQuery rightJoinClient($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Client relation
+ * @method     ChildClientCalendarUserQuery innerJoinClient($relationAlias = null) Adds a INNER JOIN clause to the query using the Client relation
  *
- * @method     ChildClientCalendarUserQuery joinWithInternalClient($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the InternalClient relation
+ * @method     ChildClientCalendarUserQuery joinWithClient($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the Client relation
  *
- * @method     ChildClientCalendarUserQuery leftJoinWithInternalClient() Adds a LEFT JOIN clause and with to the query using the InternalClient relation
- * @method     ChildClientCalendarUserQuery rightJoinWithInternalClient() Adds a RIGHT JOIN clause and with to the query using the InternalClient relation
- * @method     ChildClientCalendarUserQuery innerJoinWithInternalClient() Adds a INNER JOIN clause and with to the query using the InternalClient relation
+ * @method     ChildClientCalendarUserQuery leftJoinWithClient() Adds a LEFT JOIN clause and with to the query using the Client relation
+ * @method     ChildClientCalendarUserQuery rightJoinWithClient() Adds a RIGHT JOIN clause and with to the query using the Client relation
+ * @method     ChildClientCalendarUserQuery innerJoinWithClient() Adds a INNER JOIN clause and with to the query using the Client relation
  *
  * @method     ChildClientCalendarUserQuery leftJoinMeetingAttendee($relationAlias = null) Adds a LEFT JOIN clause to the query using the MeetingAttendee relation
  * @method     ChildClientCalendarUserQuery rightJoinMeetingAttendee($relationAlias = null) Adds a RIGHT JOIN clause to the query using the MeetingAttendee relation
@@ -73,12 +73,12 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildClientCalendarUserQuery rightJoinWithClientCalendarUserOAuth() Adds a RIGHT JOIN clause and with to the query using the ClientCalendarUserOAuth relation
  * @method     ChildClientCalendarUserQuery innerJoinWithClientCalendarUserOAuth() Adds a INNER JOIN clause and with to the query using the ClientCalendarUserOAuth relation
  *
- * @method     \DataModels\DataModels\InternalClientQuery|\DataModels\DataModels\MeetingAttendeeQuery|\DataModels\DataModels\ClientCalendarUserOAuthQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     \DataModels\DataModels\ClientQuery|\DataModels\DataModels\MeetingAttendeeQuery|\DataModels\DataModels\ClientCalendarUserOAuthQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildClientCalendarUser findOne(ConnectionInterface $con = null) Return the first ChildClientCalendarUser matching the query
  * @method     ChildClientCalendarUser findOneOrCreate(ConnectionInterface $con = null) Return the first ChildClientCalendarUser matching the query, or a new ChildClientCalendarUser object populated from the query conditions when no match is found
  *
- * @method     ChildClientCalendarUser findOneByInternalClientId(int $internal_client_id) Return the first ChildClientCalendarUser filtered by the internal_client_id column
+ * @method     ChildClientCalendarUser findOneByClientId(int $client_id) Return the first ChildClientCalendarUser filtered by the client_id column
  * @method     ChildClientCalendarUser findOneByName(string $name) Return the first ChildClientCalendarUser filtered by the name column
  * @method     ChildClientCalendarUser findOneBySurname(string $surname) Return the first ChildClientCalendarUser filtered by the surname column
  * @method     ChildClientCalendarUser findOneByTitle(string $title) Return the first ChildClientCalendarUser filtered by the title column
@@ -88,7 +88,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildClientCalendarUser requirePk($key, ConnectionInterface $con = null) Return the ChildClientCalendarUser by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildClientCalendarUser requireOne(ConnectionInterface $con = null) Return the first ChildClientCalendarUser matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
- * @method     ChildClientCalendarUser requireOneByInternalClientId(int $internal_client_id) Return the first ChildClientCalendarUser filtered by the internal_client_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildClientCalendarUser requireOneByClientId(int $client_id) Return the first ChildClientCalendarUser filtered by the client_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildClientCalendarUser requireOneByName(string $name) Return the first ChildClientCalendarUser filtered by the name column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildClientCalendarUser requireOneBySurname(string $surname) Return the first ChildClientCalendarUser filtered by the surname column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildClientCalendarUser requireOneByTitle(string $title) Return the first ChildClientCalendarUser filtered by the title column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -96,7 +96,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildClientCalendarUser requireOneById(int $id) Return the first ChildClientCalendarUser filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildClientCalendarUser[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildClientCalendarUser objects based on current ModelCriteria
- * @method     ChildClientCalendarUser[]|ObjectCollection findByInternalClientId(int $internal_client_id) Return ChildClientCalendarUser objects filtered by the internal_client_id column
+ * @method     ChildClientCalendarUser[]|ObjectCollection findByClientId(int $client_id) Return ChildClientCalendarUser objects filtered by the client_id column
  * @method     ChildClientCalendarUser[]|ObjectCollection findByName(string $name) Return ChildClientCalendarUser objects filtered by the name column
  * @method     ChildClientCalendarUser[]|ObjectCollection findBySurname(string $surname) Return ChildClientCalendarUser objects filtered by the surname column
  * @method     ChildClientCalendarUser[]|ObjectCollection findByTitle(string $title) Return ChildClientCalendarUser objects filtered by the title column
@@ -200,7 +200,7 @@ abstract class ClientCalendarUserQuery extends ChildMeetingAttendeeQuery
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT internal_client_id, name, surname, title, email, id FROM client_calendar_user WHERE id = :p0';
+        $sql = 'SELECT client_id, name, surname, title, email, id FROM client_calendar_user WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -291,18 +291,18 @@ abstract class ClientCalendarUserQuery extends ChildMeetingAttendeeQuery
     }
 
     /**
-     * Filter the query on the internal_client_id column
+     * Filter the query on the client_id column
      *
      * Example usage:
      * <code>
-     * $query->filterByInternalClientId(1234); // WHERE internal_client_id = 1234
-     * $query->filterByInternalClientId(array(12, 34)); // WHERE internal_client_id IN (12, 34)
-     * $query->filterByInternalClientId(array('min' => 12)); // WHERE internal_client_id > 12
+     * $query->filterByClientId(1234); // WHERE client_id = 1234
+     * $query->filterByClientId(array(12, 34)); // WHERE client_id IN (12, 34)
+     * $query->filterByClientId(array('min' => 12)); // WHERE client_id > 12
      * </code>
      *
-     * @see       filterByInternalClient()
+     * @see       filterByClient()
      *
-     * @param     mixed $internalClientId The value to use as filter.
+     * @param     mixed $clientId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
@@ -310,16 +310,16 @@ abstract class ClientCalendarUserQuery extends ChildMeetingAttendeeQuery
      *
      * @return $this|ChildClientCalendarUserQuery The current query, for fluid interface
      */
-    public function filterByInternalClientId($internalClientId = null, $comparison = null)
+    public function filterByClientId($clientId = null, $comparison = null)
     {
-        if (is_array($internalClientId)) {
+        if (is_array($clientId)) {
             $useMinMax = false;
-            if (isset($internalClientId['min'])) {
-                $this->addUsingAlias(ClientCalendarUserTableMap::COL_INTERNAL_CLIENT_ID, $internalClientId['min'], Criteria::GREATER_EQUAL);
+            if (isset($clientId['min'])) {
+                $this->addUsingAlias(ClientCalendarUserTableMap::COL_CLIENT_ID, $clientId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($internalClientId['max'])) {
-                $this->addUsingAlias(ClientCalendarUserTableMap::COL_INTERNAL_CLIENT_ID, $internalClientId['max'], Criteria::LESS_EQUAL);
+            if (isset($clientId['max'])) {
+                $this->addUsingAlias(ClientCalendarUserTableMap::COL_CLIENT_ID, $clientId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -330,7 +330,7 @@ abstract class ClientCalendarUserQuery extends ChildMeetingAttendeeQuery
             }
         }
 
-        return $this->addUsingAlias(ClientCalendarUserTableMap::COL_INTERNAL_CLIENT_ID, $internalClientId, $comparison);
+        return $this->addUsingAlias(ClientCalendarUserTableMap::COL_CLIENT_ID, $clientId, $comparison);
     }
 
     /**
@@ -477,44 +477,44 @@ abstract class ClientCalendarUserQuery extends ChildMeetingAttendeeQuery
     }
 
     /**
-     * Filter the query by a related \DataModels\DataModels\InternalClient object
+     * Filter the query by a related \DataModels\DataModels\Client object
      *
-     * @param \DataModels\DataModels\InternalClient|ObjectCollection $internalClient The related object(s) to use as filter
+     * @param \DataModels\DataModels\Client|ObjectCollection $client The related object(s) to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @throws \Propel\Runtime\Exception\PropelException
      *
      * @return ChildClientCalendarUserQuery The current query, for fluid interface
      */
-    public function filterByInternalClient($internalClient, $comparison = null)
+    public function filterByClient($client, $comparison = null)
     {
-        if ($internalClient instanceof \DataModels\DataModels\InternalClient) {
+        if ($client instanceof \DataModels\DataModels\Client) {
             return $this
-                ->addUsingAlias(ClientCalendarUserTableMap::COL_INTERNAL_CLIENT_ID, $internalClient->getId(), $comparison);
-        } elseif ($internalClient instanceof ObjectCollection) {
+                ->addUsingAlias(ClientCalendarUserTableMap::COL_CLIENT_ID, $client->getId(), $comparison);
+        } elseif ($client instanceof ObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(ClientCalendarUserTableMap::COL_INTERNAL_CLIENT_ID, $internalClient->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(ClientCalendarUserTableMap::COL_CLIENT_ID, $client->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByInternalClient() only accepts arguments of type \DataModels\DataModels\InternalClient or Collection');
+            throw new PropelException('filterByClient() only accepts arguments of type \DataModels\DataModels\Client or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the InternalClient relation
+     * Adds a JOIN clause to the query using the Client relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return $this|ChildClientCalendarUserQuery The current query, for fluid interface
      */
-    public function joinInternalClient($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinClient($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('InternalClient');
+        $relationMap = $tableMap->getRelation('Client');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -529,14 +529,14 @@ abstract class ClientCalendarUserQuery extends ChildMeetingAttendeeQuery
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'InternalClient');
+            $this->addJoinObject($join, 'Client');
         }
 
         return $this;
     }
 
     /**
-     * Use the InternalClient relation InternalClient object
+     * Use the Client relation Client object
      *
      * @see useQuery()
      *
@@ -544,13 +544,13 @@ abstract class ClientCalendarUserQuery extends ChildMeetingAttendeeQuery
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return \DataModels\DataModels\InternalClientQuery A secondary query class using the current class as primary query
+     * @return \DataModels\DataModels\ClientQuery A secondary query class using the current class as primary query
      */
-    public function useInternalClientQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useClientQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
-            ->joinInternalClient($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'InternalClient', '\DataModels\DataModels\InternalClientQuery');
+            ->joinClient($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Client', '\DataModels\DataModels\ClientQuery');
     }
 
     /**

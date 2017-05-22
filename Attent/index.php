@@ -5,25 +5,29 @@ require_once('config.php');
 
 Helpers::setDebugParam($isDebugActive);
 
-use \DataModels\DataModels\CustomerContactIntegration as CustomerContactIntegration;
+use DataModels\DataModels\ClientCalendarUserOAuth as ClientCalendarUserOAuth;
+use DataModels\DataModels\Client as Client;
 
 $userDataArray = isset($_SESSION['userdata']) ? $_SESSION['userdata'] : null;
 
-list($customer, $contacts) = Helpers::loadCustomerData($strClientDomainName);
+/**
+ * @var $client Client
+ */
+list($client, $calendarUsers) = Helpers::loadClientData($strClientDomainName);
 
 if(is_array($userDataArray) && (count($userDataArray)>0)) {
     foreach($userDataArray as $token => $emailAddress) {
-        $gCalAccount = Helpers::getIntegrationIfPresent($customer, $emailAddress);
+        $gCalAccount = Helpers::getOAuthIfPresent($client, $emailAddress);
 
         $record['utoken'] = $token;
         $record['uemail'] = $emailAddress;
         $record['status'] = "active";
 
         if(!$gCalAccount) {
-            Helpers::createIntegrationAccount($customer, $emailAddress, $record['utoken'],
-                CustomerContactIntegration::GCAL);
+            Helpers::createAuthAccount($client, $emailAddress, $record['utoken'],
+                ClientCalendarUserOAuth::GCAL);
 		} else {
-            Helpers::updateIntegrationAccountUserToken($gCalAccount, $token);
+            Helpers::updateAuthenticationToken($gCalAccount, $token);
         }
 	}
 	
@@ -31,10 +35,10 @@ if(is_array($userDataArray) && (count($userDataArray)>0)) {
 	unset($_SESSION['userdata']);
 }
 
-$calendarIntegrations = Helpers::getIntegrations($customer);
+$calendarAuths = Helpers::getAuthentications($client, ClientCalendarUserOAuth::GCAL);
 
 $arrSalesUser = array();
-$SFDCIntegrations = Helpers::getIntegrations($customer, \DataModels\DataModels\CustomerContactIntegration::SFDC);
+$SFDCAuths = Helpers::getAuthentications($client, ClientCalendarUserOAuth::SFDC);
 
 ?>
 <!DOCTYPE html>
@@ -49,15 +53,19 @@ $SFDCIntegrations = Helpers::getIntegrations($customer, \DataModels\DataModels\C
         <div class="main">
             <div class="heading"></div>
             <div class="content">
-                <? foreach($calendarIntegrations as $integration) { ?>
+                <?
+                /**
+                 * @var $auth ClientCalendarUserOAuth
+                 */
+                foreach($calendarAuths as $auth) { ?>
                     <div class="box">
                         <div class="box-content">
                             <div class="title"><img src="img/calendar.png">Calendar</div>
-                            <? $contact = $integration->getCustomerContact(); ?>
+                            <? $contact = $auth->getClientCalendarUser(); ?>
                             <p><? echo $contact->getName(); ?></p>
                             <p><? echo $contact->getSurname(); ?></p>
                             <p><? echo $contact->getEmail(); ?></p>
-                            <? if($integration->getStatus() == "expired") { ?>
+                            <? if($auth->getStatus() == ClientCalendarUserOAuth::STATUS_EXPIRED) { ?>
                                 <a href="<?=Helpers::generateLink("gcal/add_new_gcal.php")?>"><button type="button" class="setting-btn">Activate</button></a>
                             <? } ?>
                         </div>
@@ -73,12 +81,16 @@ $SFDCIntegrations = Helpers::getIntegrations($customer, \DataModels\DataModels\C
             <div class="heading"></div>
 
             <div class="content">
-                <? if(count($SFDCIntegrations) > 0) { ?>
-                    <? foreach($SFDCIntegrations as $integration) { ?>
+                <? if(count($SFDCAuths) > 0) { ?>
+                    <?
+                    /**
+                     * @var $auth ClientCalendarUserOAuth
+                     */
+                    foreach($SFDCAuths as $auth) { ?>
                         <div class="box">
                             <div class="box-content">
                                 <div class="title">Salesforce</div>
-                                <? if($integration->getStatus() == "expired") { ?>
+                                <? if($auth->getStatus() == ClientCalendarUserOAuth::STATUS_EXPIRED) { ?>
                                     <p>&nbsp;</p>
                                     <a href="<?=Helpers::generateLink("salesforce/oauth.php")?>">
                                         <button type="button" class="setting-btn">Reconnect</button>

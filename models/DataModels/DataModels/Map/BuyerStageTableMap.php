@@ -77,9 +77,9 @@ class BuyerStageTableMap extends TableMap
     const COL_ID = 'buyer_stage.id';
 
     /**
-     * the column name for the internal_client_id field
+     * the column name for the client_id field
      */
-    const COL_INTERNAL_CLIENT_ID = 'buyer_stage.internal_client_id';
+    const COL_CLIENT_ID = 'buyer_stage.client_id';
 
     /**
      * the column name for the stage field
@@ -98,10 +98,10 @@ class BuyerStageTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'InternalClientId', 'Stage', ),
-        self::TYPE_CAMELNAME     => array('id', 'internalClientId', 'stage', ),
-        self::TYPE_COLNAME       => array(BuyerStageTableMap::COL_ID, BuyerStageTableMap::COL_INTERNAL_CLIENT_ID, BuyerStageTableMap::COL_STAGE, ),
-        self::TYPE_FIELDNAME     => array('id', 'internal_client_id', 'stage', ),
+        self::TYPE_PHPNAME       => array('Id', 'ClientId', 'Stage', ),
+        self::TYPE_CAMELNAME     => array('id', 'clientId', 'stage', ),
+        self::TYPE_COLNAME       => array(BuyerStageTableMap::COL_ID, BuyerStageTableMap::COL_CLIENT_ID, BuyerStageTableMap::COL_STAGE, ),
+        self::TYPE_FIELDNAME     => array('id', 'client_id', 'stage', ),
         self::TYPE_NUM           => array(0, 1, 2, )
     );
 
@@ -112,10 +112,10 @@ class BuyerStageTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'InternalClientId' => 1, 'Stage' => 2, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'internalClientId' => 1, 'stage' => 2, ),
-        self::TYPE_COLNAME       => array(BuyerStageTableMap::COL_ID => 0, BuyerStageTableMap::COL_INTERNAL_CLIENT_ID => 1, BuyerStageTableMap::COL_STAGE => 2, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'internal_client_id' => 1, 'stage' => 2, ),
+        self::TYPE_PHPNAME       => array('Id' => 0, 'ClientId' => 1, 'Stage' => 2, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'clientId' => 1, 'stage' => 2, ),
+        self::TYPE_COLNAME       => array(BuyerStageTableMap::COL_ID => 0, BuyerStageTableMap::COL_CLIENT_ID => 1, BuyerStageTableMap::COL_STAGE => 2, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'client_id' => 1, 'stage' => 2, ),
         self::TYPE_NUM           => array(0, 1, 2, )
     );
 
@@ -138,7 +138,7 @@ class BuyerStageTableMap extends TableMap
         $this->setPrimaryKeyMethodInfo('buyer_stage_id_seq');
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('internal_client_id', 'InternalClientId', 'INTEGER', false, null, null);
+        $this->addColumn('client_id', 'ClientId', 'INTEGER', false, null, null);
         $this->addColumn('stage', 'Stage', 'VARCHAR', false, 255, null);
     } // initialize()
 
@@ -291,11 +291,11 @@ class BuyerStageTableMap extends TableMap
     {
         if (null === $alias) {
             $criteria->addSelectColumn(BuyerStageTableMap::COL_ID);
-            $criteria->addSelectColumn(BuyerStageTableMap::COL_INTERNAL_CLIENT_ID);
+            $criteria->addSelectColumn(BuyerStageTableMap::COL_CLIENT_ID);
             $criteria->addSelectColumn(BuyerStageTableMap::COL_STAGE);
         } else {
             $criteria->addSelectColumn($alias . '.id');
-            $criteria->addSelectColumn($alias . '.internal_client_id');
+            $criteria->addSelectColumn($alias . '.client_id');
             $criteria->addSelectColumn($alias . '.stage');
         }
     }

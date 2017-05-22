@@ -2,10 +2,10 @@
 
 namespace DataModels\DataModels;
 
-use DataModels\DataModels\Base\CustomerContactQuery as BaseCustomerContactQuery;
+use DataModels\DataModels\Base\ClientQuery as BaseClientQuery;
 
 /**
- * Skeleton subclass for performing query and update operations on the 'customer_contact' table.
+ * Skeleton subclass for performing query and update operations on the 'client' table.
  *
  *
  *
@@ -14,7 +14,7 @@ use DataModels\DataModels\Base\CustomerContactQuery as BaseCustomerContactQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class CustomerContactQuery extends BaseCustomerContactQuery
+class ClientQuery extends BaseClientQuery
 {
 
 }

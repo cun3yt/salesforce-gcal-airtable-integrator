@@ -67,11 +67,11 @@ abstract class OpportunityStage implements ActiveRecordInterface
     protected $id;
 
     /**
-     * The value for the internal_client_id field.
+     * The value for the client_id field.
      *
      * @var        string
      */
-    protected $internal_client_id;
+    protected $client_id;
 
     /**
      * The value for the stage field.
@@ -324,13 +324,13 @@ abstract class OpportunityStage implements ActiveRecordInterface
     }
 
     /**
-     * Get the [internal_client_id] column value.
+     * Get the [client_id] column value.
      *
      * @return string
      */
-    public function getInternalClientId()
+    public function getClientId()
     {
-        return $this->internal_client_id;
+        return $this->client_id;
     }
 
     /**
@@ -364,24 +364,24 @@ abstract class OpportunityStage implements ActiveRecordInterface
     } // setId()
 
     /**
-     * Set the value of [internal_client_id] column.
+     * Set the value of [client_id] column.
      *
      * @param string $v new value
      * @return $this|\DataModels\DataModels\OpportunityStage The current object (for fluent API support)
      */
-    public function setInternalClientId($v)
+    public function setClientId($v)
     {
         if ($v !== null) {
             $v = (string) $v;
         }
 
-        if ($this->internal_client_id !== $v) {
-            $this->internal_client_id = $v;
-            $this->modifiedColumns[OpportunityStageTableMap::COL_INTERNAL_CLIENT_ID] = true;
+        if ($this->client_id !== $v) {
+            $this->client_id = $v;
+            $this->modifiedColumns[OpportunityStageTableMap::COL_CLIENT_ID] = true;
         }
 
         return $this;
-    } // setInternalClientId()
+    } // setClientId()
 
     /**
      * Set the value of [stage] column.
@@ -442,8 +442,8 @@ abstract class OpportunityStage implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : OpportunityStageTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : OpportunityStageTableMap::translateFieldName('InternalClientId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->internal_client_id = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : OpportunityStageTableMap::translateFieldName('ClientId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->client_id = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : OpportunityStageTableMap::translateFieldName('Stage', TableMap::TYPE_PHPNAME, $indexType)];
             $this->stage = (null !== $col) ? (string) $col : null;
@@ -668,8 +668,8 @@ abstract class OpportunityStage implements ActiveRecordInterface
         if ($this->isColumnModified(OpportunityStageTableMap::COL_ID)) {
             $modifiedColumns[':p' . $index++]  = 'id';
         }
-        if ($this->isColumnModified(OpportunityStageTableMap::COL_INTERNAL_CLIENT_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'internal_client_id';
+        if ($this->isColumnModified(OpportunityStageTableMap::COL_CLIENT_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'client_id';
         }
         if ($this->isColumnModified(OpportunityStageTableMap::COL_STAGE)) {
             $modifiedColumns[':p' . $index++]  = 'stage';
@@ -688,8 +688,8 @@ abstract class OpportunityStage implements ActiveRecordInterface
                     case 'id':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case 'internal_client_id':
-                        $stmt->bindValue($identifier, $this->internal_client_id, PDO::PARAM_STR);
+                    case 'client_id':
+                        $stmt->bindValue($identifier, $this->client_id, PDO::PARAM_STR);
                         break;
                     case 'stage':
                         $stmt->bindValue($identifier, $this->stage, PDO::PARAM_STR);
@@ -753,7 +753,7 @@ abstract class OpportunityStage implements ActiveRecordInterface
                 return $this->getId();
                 break;
             case 1:
-                return $this->getInternalClientId();
+                return $this->getClientId();
                 break;
             case 2:
                 return $this->getStage();
@@ -788,7 +788,7 @@ abstract class OpportunityStage implements ActiveRecordInterface
         $keys = OpportunityStageTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getInternalClientId(),
+            $keys[1] => $this->getClientId(),
             $keys[2] => $this->getStage(),
         );
         $virtualColumns = $this->virtualColumns;
@@ -833,7 +833,7 @@ abstract class OpportunityStage implements ActiveRecordInterface
                 $this->setId($value);
                 break;
             case 1:
-                $this->setInternalClientId($value);
+                $this->setClientId($value);
                 break;
             case 2:
                 $this->setStage($value);
@@ -868,7 +868,7 @@ abstract class OpportunityStage implements ActiveRecordInterface
             $this->setId($arr[$keys[0]]);
         }
         if (array_key_exists($keys[1], $arr)) {
-            $this->setInternalClientId($arr[$keys[1]]);
+            $this->setClientId($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
             $this->setStage($arr[$keys[2]]);
@@ -917,8 +917,8 @@ abstract class OpportunityStage implements ActiveRecordInterface
         if ($this->isColumnModified(OpportunityStageTableMap::COL_ID)) {
             $criteria->add(OpportunityStageTableMap::COL_ID, $this->id);
         }
-        if ($this->isColumnModified(OpportunityStageTableMap::COL_INTERNAL_CLIENT_ID)) {
-            $criteria->add(OpportunityStageTableMap::COL_INTERNAL_CLIENT_ID, $this->internal_client_id);
+        if ($this->isColumnModified(OpportunityStageTableMap::COL_CLIENT_ID)) {
+            $criteria->add(OpportunityStageTableMap::COL_CLIENT_ID, $this->client_id);
         }
         if ($this->isColumnModified(OpportunityStageTableMap::COL_STAGE)) {
             $criteria->add(OpportunityStageTableMap::COL_STAGE, $this->stage);
@@ -1009,7 +1009,7 @@ abstract class OpportunityStage implements ActiveRecordInterface
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setInternalClientId($this->getInternalClientId());
+        $copyObj->setClientId($this->getClientId());
         $copyObj->setStage($this->getStage());
         if ($makeNew) {
             $copyObj->setNew(true);
@@ -1047,7 +1047,7 @@ abstract class OpportunityStage implements ActiveRecordInterface
     public function clear()
     {
         $this->id = null;
-        $this->internal_client_id = null;
+        $this->client_id = null;
         $this->stage = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();

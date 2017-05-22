@@ -9,21 +9,25 @@ error_reporting(E_ALL);
 require_once('config.php');
 require_once("${_SERVER['DOCUMENT_ROOT']}/libraries/Helpers.php");
 
-use DataModels\DataModels\CustomerContactIntegration as CustomerContactIntegration;
+use DataModels\DataModels\Client as Client;
+use DataModels\DataModels\ClientCalendarUserOAuth as ClientCalendarUserOAuth;
 
 Helpers::setDebugParam($isDebugActive);
 
 $access_token = "";
 $instance_url = "";
 
-list($customer, $contacts) = Helpers::loadCustomerData($strClientDomainName);
+/**
+ * @var $client Client
+ */
+list($client, $calendarUsers) = Helpers::loadClientData($strClientDomainName);
 
-$sfdcIntegration = Helpers::getIntegrations($customer, CustomerContactIntegration::SFDC);
+$sfdcAuths = Helpers::getAuthentications($client, ClientCalendarUserOAuth::SFDC);
 
-if(is_array($sfdcIntegration) && (count($sfdcIntegration)>0)) {
+if(count($sfdcAuths)>0) {
     // if we get salesforce OAuth access data we iterate and use the access data
     // and assign it out global variables declared.
-    $integrationDetails = json_decode($sfdcIntegration[0]->getData());
+    $integrationDetails = json_decode($sfdcAuths[0]->getData());
     $access_token = $integrationDetails->sfdc_access_token->access_token;
     $instance_url = $integrationDetails->sfdc_access_token->instance_url;
 }

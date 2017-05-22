@@ -7,47 +7,51 @@ error_reporting(E_ALL);
 require_once("${_SERVER['DOCUMENT_ROOT']}/libraries/SessionSingleton.php");
 SessionSingleton::start();
 
-use DataModels\DataModels\CustomerContact as CustomerContact;
-use DataModels\DataModels\CustomerContactIntegration as CustomerContactIntegration;
+use DataModels\DataModels\Client as Client;
+use DataModels\DataModels\ClientCalendarUser as ClientCalendarUser;
+use DataModels\DataModels\ClientCalendarUserOAuth as ClientCalendarUserOAuth;
 
 
 require_once('config.php');
 
-$client = Helpers::setupGoogleAPIClient($googleCalAPICredentialFile, false);
+$apiClient = Helpers::setupGoogleAPIClient($googleCalAPICredentialFile, false);
 
-list($customer, $contacts) = Helpers::loadCustomerData($strClientDomainName);
+/**
+ * @var $client Client
+ */
+list($client, $calendarUsers) = Helpers::loadClientData($strClientDomainName);
 
-$calendarIntegrations = Helpers::getIntegrations($customer, CustomerContactIntegration::GCAL);
+$calendarAuths = Helpers::getAuthentications($client, ClientCalendarUserOAuth::GCAL);
 
-foreach($calendarIntegrations as $integration) {
+foreach($calendarAuths as $auth) {
     /**
-     * @var $integration CustomerContactIntegration
-     * @var $customerContact CustomerContact
+     * @var $auth ClientCalendarUserOAuth
+     * @var $clientCalendarUser ClientCalendarUser
      */
-    $customerContact = $integration->getCustomerContact();
+    $clientCalendarUser = $auth->getClientCalendarUser();
 
-    $integrationData = json_decode($integration->getData());
+    $authData = json_decode($auth->getData());
 
     /**
-     * @todo below line must be like this: $client->setAccessToken($integration->getData());
+     * @todo below line must be like this: $apiClient->setAccessToken($integration->getData());
      */
-    $client->setAccessToken($integrationData->access_token);
-    $isTokenExpired = $client->isAccessTokenExpired();
+    $apiClient->setAccessToken($authData->access_token);
+    $isTokenExpired = $apiClient->isAccessTokenExpired();
 
     if(!$isTokenExpired) {
-        echo "Google Calendar Token has not expired for {$customerContact->getEmail()}, passing <br/>";
+        echo "Google Calendar Token has not expired for {$clientCalendarUser->getEmail()}, passing <br/>";
         continue;
     }
 
-    $refreshToken = $integrationData->refresh_token;
+    $refreshToken = $authData->refresh_token;
 
-    $newToken = $client->fetchAccessTokenWithRefreshToken($refreshToken);
-    $newToken = array_merge((array) $integrationData, $newToken);
+    $newToken = $apiClient->fetchAccessTokenWithRefreshToken($refreshToken);
+    $newToken = array_merge((array) $authData, $newToken);
 
-    $integration->setStatus(CustomerContactIntegration::STATUS_ACTIVE)
+    $auth->setStatus(ClientCalendarUserOAuth::STATUS_ACTIVE)
         ->setData(json_encode($newToken))
         ->save();
 
-    echo "Calendar access token is refreshed for {$customerContact->getEmail()} <br />";
+    echo "Calendar access token is refreshed for {$clientCalendarUser->getEmail()} <br />";
 }
 echo "All done!<br />";

@@ -6,10 +6,10 @@ use \Exception;
 use \PDO;
 use DataModels\DataModels\Account as ChildAccount;
 use DataModels\DataModels\AccountQuery as ChildAccountQuery;
+use DataModels\DataModels\Client as ChildClient;
+use DataModels\DataModels\ClientQuery as ChildClientQuery;
 use DataModels\DataModels\Contact as ChildContact;
 use DataModels\DataModels\ContactQuery as ChildContactQuery;
-use DataModels\DataModels\InternalClient as ChildInternalClient;
-use DataModels\DataModels\InternalClientQuery as ChildInternalClientQuery;
 use DataModels\DataModels\Map\AccountTableMap;
 use DataModels\DataModels\Map\ContactTableMap;
 use Propel\Runtime\Propel;
@@ -102,16 +102,16 @@ abstract class Account implements ActiveRecordInterface
     protected $sfdc_account_id;
 
     /**
-     * The value for the internal_client_id field.
+     * The value for the client_id field.
      *
      * @var        int
      */
-    protected $internal_client_id;
+    protected $client_id;
 
     /**
-     * @var        ChildInternalClient
+     * @var        ChildClient
      */
-    protected $aInternalClient;
+    protected $aClient;
 
     /**
      * @var        ObjectCollection|ChildContact[] Collection to store aggregation of ChildContact objects.
@@ -409,13 +409,13 @@ abstract class Account implements ActiveRecordInterface
     }
 
     /**
-     * Get the [internal_client_id] column value.
+     * Get the [client_id] column value.
      *
      * @return int
      */
-    public function getInternalClientId()
+    public function getClientId()
     {
-        return $this->internal_client_id;
+        return $this->client_id;
     }
 
     /**
@@ -519,28 +519,28 @@ abstract class Account implements ActiveRecordInterface
     } // setSfdcAccountId()
 
     /**
-     * Set the value of [internal_client_id] column.
+     * Set the value of [client_id] column.
      *
      * @param int $v new value
      * @return $this|\DataModels\DataModels\Account The current object (for fluent API support)
      */
-    public function setInternalClientId($v)
+    public function setClientId($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->internal_client_id !== $v) {
-            $this->internal_client_id = $v;
-            $this->modifiedColumns[AccountTableMap::COL_INTERNAL_CLIENT_ID] = true;
+        if ($this->client_id !== $v) {
+            $this->client_id = $v;
+            $this->modifiedColumns[AccountTableMap::COL_CLIENT_ID] = true;
         }
 
-        if ($this->aInternalClient !== null && $this->aInternalClient->getId() !== $v) {
-            $this->aInternalClient = null;
+        if ($this->aClient !== null && $this->aClient->getId() !== $v) {
+            $this->aClient = null;
         }
 
         return $this;
-    } // setInternalClientId()
+    } // setClientId()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -593,8 +593,8 @@ abstract class Account implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : AccountTableMap::translateFieldName('SfdcAccountId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->sfdc_account_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : AccountTableMap::translateFieldName('InternalClientId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->internal_client_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : AccountTableMap::translateFieldName('ClientId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->client_id = (null !== $col) ? (int) $col : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -625,8 +625,8 @@ abstract class Account implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
-        if ($this->aInternalClient !== null && $this->internal_client_id !== $this->aInternalClient->getId()) {
-            $this->aInternalClient = null;
+        if ($this->aClient !== null && $this->client_id !== $this->aClient->getId()) {
+            $this->aClient = null;
         }
     } // ensureConsistency
 
@@ -667,7 +667,7 @@ abstract class Account implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aInternalClient = null;
+            $this->aClient = null;
             $this->collContacts = null;
 
         } // if (deep)
@@ -778,11 +778,11 @@ abstract class Account implements ActiveRecordInterface
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aInternalClient !== null) {
-                if ($this->aInternalClient->isModified() || $this->aInternalClient->isNew()) {
-                    $affectedRows += $this->aInternalClient->save($con);
+            if ($this->aClient !== null) {
+                if ($this->aClient->isModified() || $this->aClient->isNew()) {
+                    $affectedRows += $this->aClient->save($con);
                 }
-                $this->setInternalClient($this->aInternalClient);
+                $this->setClient($this->aClient);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -864,8 +864,8 @@ abstract class Account implements ActiveRecordInterface
         if ($this->isColumnModified(AccountTableMap::COL_SFDC_ACCOUNT_ID)) {
             $modifiedColumns[':p' . $index++]  = 'sfdc_account_id';
         }
-        if ($this->isColumnModified(AccountTableMap::COL_INTERNAL_CLIENT_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'internal_client_id';
+        if ($this->isColumnModified(AccountTableMap::COL_CLIENT_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'client_id';
         }
 
         $sql = sprintf(
@@ -893,8 +893,8 @@ abstract class Account implements ActiveRecordInterface
                     case 'sfdc_account_id':
                         $stmt->bindValue($identifier, $this->sfdc_account_id, PDO::PARAM_INT);
                         break;
-                    case 'internal_client_id':
-                        $stmt->bindValue($identifier, $this->internal_client_id, PDO::PARAM_INT);
+                    case 'client_id':
+                        $stmt->bindValue($identifier, $this->client_id, PDO::PARAM_INT);
                         break;
                 }
             }
@@ -967,7 +967,7 @@ abstract class Account implements ActiveRecordInterface
                 return $this->getSfdcAccountId();
                 break;
             case 5:
-                return $this->getInternalClientId();
+                return $this->getClientId();
                 break;
             default:
                 return null;
@@ -1004,7 +1004,7 @@ abstract class Account implements ActiveRecordInterface
             $keys[2] => $this->getEmailDomain(),
             $keys[3] => $this->getWebsite(),
             $keys[4] => $this->getSfdcAccountId(),
-            $keys[5] => $this->getInternalClientId(),
+            $keys[5] => $this->getClientId(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1012,20 +1012,20 @@ abstract class Account implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->aInternalClient) {
+            if (null !== $this->aClient) {
 
                 switch ($keyType) {
                     case TableMap::TYPE_CAMELNAME:
-                        $key = 'internalClient';
+                        $key = 'client';
                         break;
                     case TableMap::TYPE_FIELDNAME:
-                        $key = 'internal_client';
+                        $key = 'client';
                         break;
                     default:
-                        $key = 'InternalClient';
+                        $key = 'Client';
                 }
 
-                $result[$key] = $this->aInternalClient->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+                $result[$key] = $this->aClient->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->collContacts) {
 
@@ -1092,7 +1092,7 @@ abstract class Account implements ActiveRecordInterface
                 $this->setSfdcAccountId($value);
                 break;
             case 5:
-                $this->setInternalClientId($value);
+                $this->setClientId($value);
                 break;
         } // switch()
 
@@ -1136,7 +1136,7 @@ abstract class Account implements ActiveRecordInterface
             $this->setSfdcAccountId($arr[$keys[4]]);
         }
         if (array_key_exists($keys[5], $arr)) {
-            $this->setInternalClientId($arr[$keys[5]]);
+            $this->setClientId($arr[$keys[5]]);
         }
     }
 
@@ -1194,8 +1194,8 @@ abstract class Account implements ActiveRecordInterface
         if ($this->isColumnModified(AccountTableMap::COL_SFDC_ACCOUNT_ID)) {
             $criteria->add(AccountTableMap::COL_SFDC_ACCOUNT_ID, $this->sfdc_account_id);
         }
-        if ($this->isColumnModified(AccountTableMap::COL_INTERNAL_CLIENT_ID)) {
-            $criteria->add(AccountTableMap::COL_INTERNAL_CLIENT_ID, $this->internal_client_id);
+        if ($this->isColumnModified(AccountTableMap::COL_CLIENT_ID)) {
+            $criteria->add(AccountTableMap::COL_CLIENT_ID, $this->client_id);
         }
 
         return $criteria;
@@ -1287,7 +1287,7 @@ abstract class Account implements ActiveRecordInterface
         $copyObj->setEmailDomain($this->getEmailDomain());
         $copyObj->setWebsite($this->getWebsite());
         $copyObj->setSfdcAccountId($this->getSfdcAccountId());
-        $copyObj->setInternalClientId($this->getInternalClientId());
+        $copyObj->setClientId($this->getClientId());
 
         if ($deepCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -1331,24 +1331,24 @@ abstract class Account implements ActiveRecordInterface
     }
 
     /**
-     * Declares an association between this object and a ChildInternalClient object.
+     * Declares an association between this object and a ChildClient object.
      *
-     * @param  ChildInternalClient $v
+     * @param  ChildClient $v
      * @return $this|\DataModels\DataModels\Account The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setInternalClient(ChildInternalClient $v = null)
+    public function setClient(ChildClient $v = null)
     {
         if ($v === null) {
-            $this->setInternalClientId(NULL);
+            $this->setClientId(NULL);
         } else {
-            $this->setInternalClientId($v->getId());
+            $this->setClientId($v->getId());
         }
 
-        $this->aInternalClient = $v;
+        $this->aClient = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildInternalClient object, it will not be re-added.
+        // If this object has already been added to the ChildClient object, it will not be re-added.
         if ($v !== null) {
             $v->addAccount($this);
         }
@@ -1359,26 +1359,26 @@ abstract class Account implements ActiveRecordInterface
 
 
     /**
-     * Get the associated ChildInternalClient object
+     * Get the associated ChildClient object
      *
      * @param  ConnectionInterface $con Optional Connection object.
-     * @return ChildInternalClient The associated ChildInternalClient object.
+     * @return ChildClient The associated ChildClient object.
      * @throws PropelException
      */
-    public function getInternalClient(ConnectionInterface $con = null)
+    public function getClient(ConnectionInterface $con = null)
     {
-        if ($this->aInternalClient === null && ($this->internal_client_id !== null)) {
-            $this->aInternalClient = ChildInternalClientQuery::create()->findPk($this->internal_client_id, $con);
+        if ($this->aClient === null && ($this->client_id !== null)) {
+            $this->aClient = ChildClientQuery::create()->findPk($this->client_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aInternalClient->addAccounts($this);
+                $this->aClient->addAccounts($this);
              */
         }
 
-        return $this->aInternalClient;
+        return $this->aClient;
     }
 
 
@@ -1654,15 +1654,15 @@ abstract class Account implements ActiveRecordInterface
      */
     public function clear()
     {
-        if (null !== $this->aInternalClient) {
-            $this->aInternalClient->removeAccount($this);
+        if (null !== $this->aClient) {
+            $this->aClient->removeAccount($this);
         }
         $this->id = null;
         $this->name = null;
         $this->email_domain = null;
         $this->website = null;
         $this->sfdc_account_id = null;
-        $this->internal_client_id = null;
+        $this->client_id = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
         $this->resetModified();
@@ -1689,7 +1689,7 @@ abstract class Account implements ActiveRecordInterface
         } // if ($deep)
 
         $this->collContacts = null;
-        $this->aInternalClient = null;
+        $this->aClient = null;
     }
 
     /**

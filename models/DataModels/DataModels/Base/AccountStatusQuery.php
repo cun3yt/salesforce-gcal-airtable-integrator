@@ -20,11 +20,11 @@ use Propel\Runtime\Exception\PropelException;
  *
  *
  * @method     ChildAccountStatusQuery orderById($order = Criteria::ASC) Order by the id column
- * @method     ChildAccountStatusQuery orderByInternalClientId($order = Criteria::ASC) Order by the internal_client column
+ * @method     ChildAccountStatusQuery orderByClientId($order = Criteria::ASC) Order by the client column
  * @method     ChildAccountStatusQuery orderByStatus($order = Criteria::ASC) Order by the status column
  *
  * @method     ChildAccountStatusQuery groupById() Group by the id column
- * @method     ChildAccountStatusQuery groupByInternalClientId() Group by the internal_client column
+ * @method     ChildAccountStatusQuery groupByClientId() Group by the client column
  * @method     ChildAccountStatusQuery groupByStatus() Group by the status column
  *
  * @method     ChildAccountStatusQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
@@ -39,19 +39,19 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccountStatus findOneOrCreate(ConnectionInterface $con = null) Return the first ChildAccountStatus matching the query, or a new ChildAccountStatus object populated from the query conditions when no match is found
  *
  * @method     ChildAccountStatus findOneById(int $id) Return the first ChildAccountStatus filtered by the id column
- * @method     ChildAccountStatus findOneByInternalClientId(int $internal_client) Return the first ChildAccountStatus filtered by the internal_client column
+ * @method     ChildAccountStatus findOneByClientId(int $client) Return the first ChildAccountStatus filtered by the client column
  * @method     ChildAccountStatus findOneByStatus(string $status) Return the first ChildAccountStatus filtered by the status column *
 
  * @method     ChildAccountStatus requirePk($key, ConnectionInterface $con = null) Return the ChildAccountStatus by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccountStatus requireOne(ConnectionInterface $con = null) Return the first ChildAccountStatus matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildAccountStatus requireOneById(int $id) Return the first ChildAccountStatus filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildAccountStatus requireOneByInternalClientId(int $internal_client) Return the first ChildAccountStatus filtered by the internal_client column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildAccountStatus requireOneByClientId(int $client) Return the first ChildAccountStatus filtered by the client column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccountStatus requireOneByStatus(string $status) Return the first ChildAccountStatus filtered by the status column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildAccountStatus[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildAccountStatus objects based on current ModelCriteria
  * @method     ChildAccountStatus[]|ObjectCollection findById(int $id) Return ChildAccountStatus objects filtered by the id column
- * @method     ChildAccountStatus[]|ObjectCollection findByInternalClientId(int $internal_client) Return ChildAccountStatus objects filtered by the internal_client column
+ * @method     ChildAccountStatus[]|ObjectCollection findByClientId(int $client) Return ChildAccountStatus objects filtered by the client column
  * @method     ChildAccountStatus[]|ObjectCollection findByStatus(string $status) Return ChildAccountStatus objects filtered by the status column
  * @method     ChildAccountStatus[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
  *
@@ -151,7 +151,7 @@ abstract class AccountStatusQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, internal_client, status FROM account_status WHERE id = :p0';
+        $sql = 'SELECT id, client, status FROM account_status WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -283,16 +283,16 @@ abstract class AccountStatusQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the internal_client column
+     * Filter the query on the client column
      *
      * Example usage:
      * <code>
-     * $query->filterByInternalClientId(1234); // WHERE internal_client = 1234
-     * $query->filterByInternalClientId(array(12, 34)); // WHERE internal_client IN (12, 34)
-     * $query->filterByInternalClientId(array('min' => 12)); // WHERE internal_client > 12
+     * $query->filterByClientId(1234); // WHERE client = 1234
+     * $query->filterByClientId(array(12, 34)); // WHERE client IN (12, 34)
+     * $query->filterByClientId(array('min' => 12)); // WHERE client > 12
      * </code>
      *
-     * @param     mixed $internalClientId The value to use as filter.
+     * @param     mixed $clientId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
@@ -300,16 +300,16 @@ abstract class AccountStatusQuery extends ModelCriteria
      *
      * @return $this|ChildAccountStatusQuery The current query, for fluid interface
      */
-    public function filterByInternalClientId($internalClientId = null, $comparison = null)
+    public function filterByClientId($clientId = null, $comparison = null)
     {
-        if (is_array($internalClientId)) {
+        if (is_array($clientId)) {
             $useMinMax = false;
-            if (isset($internalClientId['min'])) {
-                $this->addUsingAlias(AccountStatusTableMap::COL_INTERNAL_CLIENT, $internalClientId['min'], Criteria::GREATER_EQUAL);
+            if (isset($clientId['min'])) {
+                $this->addUsingAlias(AccountStatusTableMap::COL_CLIENT, $clientId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($internalClientId['max'])) {
-                $this->addUsingAlias(AccountStatusTableMap::COL_INTERNAL_CLIENT, $internalClientId['max'], Criteria::LESS_EQUAL);
+            if (isset($clientId['max'])) {
+                $this->addUsingAlias(AccountStatusTableMap::COL_CLIENT, $clientId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -320,7 +320,7 @@ abstract class AccountStatusQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(AccountStatusTableMap::COL_INTERNAL_CLIENT, $internalClientId, $comparison);
+        return $this->addUsingAlias(AccountStatusTableMap::COL_CLIENT, $clientId, $comparison);
     }
 
     /**

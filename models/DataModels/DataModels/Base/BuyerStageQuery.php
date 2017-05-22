@@ -20,11 +20,11 @@ use Propel\Runtime\Exception\PropelException;
  *
  *
  * @method     ChildBuyerStageQuery orderById($order = Criteria::ASC) Order by the id column
- * @method     ChildBuyerStageQuery orderByInternalClientId($order = Criteria::ASC) Order by the internal_client_id column
+ * @method     ChildBuyerStageQuery orderByClientId($order = Criteria::ASC) Order by the client_id column
  * @method     ChildBuyerStageQuery orderByStage($order = Criteria::ASC) Order by the stage column
  *
  * @method     ChildBuyerStageQuery groupById() Group by the id column
- * @method     ChildBuyerStageQuery groupByInternalClientId() Group by the internal_client_id column
+ * @method     ChildBuyerStageQuery groupByClientId() Group by the client_id column
  * @method     ChildBuyerStageQuery groupByStage() Group by the stage column
  *
  * @method     ChildBuyerStageQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
@@ -39,19 +39,19 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildBuyerStage findOneOrCreate(ConnectionInterface $con = null) Return the first ChildBuyerStage matching the query, or a new ChildBuyerStage object populated from the query conditions when no match is found
  *
  * @method     ChildBuyerStage findOneById(int $id) Return the first ChildBuyerStage filtered by the id column
- * @method     ChildBuyerStage findOneByInternalClientId(int $internal_client_id) Return the first ChildBuyerStage filtered by the internal_client_id column
+ * @method     ChildBuyerStage findOneByClientId(int $client_id) Return the first ChildBuyerStage filtered by the client_id column
  * @method     ChildBuyerStage findOneByStage(string $stage) Return the first ChildBuyerStage filtered by the stage column *
 
  * @method     ChildBuyerStage requirePk($key, ConnectionInterface $con = null) Return the ChildBuyerStage by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildBuyerStage requireOne(ConnectionInterface $con = null) Return the first ChildBuyerStage matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildBuyerStage requireOneById(int $id) Return the first ChildBuyerStage filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildBuyerStage requireOneByInternalClientId(int $internal_client_id) Return the first ChildBuyerStage filtered by the internal_client_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildBuyerStage requireOneByClientId(int $client_id) Return the first ChildBuyerStage filtered by the client_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildBuyerStage requireOneByStage(string $stage) Return the first ChildBuyerStage filtered by the stage column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildBuyerStage[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildBuyerStage objects based on current ModelCriteria
  * @method     ChildBuyerStage[]|ObjectCollection findById(int $id) Return ChildBuyerStage objects filtered by the id column
- * @method     ChildBuyerStage[]|ObjectCollection findByInternalClientId(int $internal_client_id) Return ChildBuyerStage objects filtered by the internal_client_id column
+ * @method     ChildBuyerStage[]|ObjectCollection findByClientId(int $client_id) Return ChildBuyerStage objects filtered by the client_id column
  * @method     ChildBuyerStage[]|ObjectCollection findByStage(string $stage) Return ChildBuyerStage objects filtered by the stage column
  * @method     ChildBuyerStage[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
  *
@@ -151,7 +151,7 @@ abstract class BuyerStageQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, internal_client_id, stage FROM buyer_stage WHERE id = :p0';
+        $sql = 'SELECT id, client_id, stage FROM buyer_stage WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -283,16 +283,16 @@ abstract class BuyerStageQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the internal_client_id column
+     * Filter the query on the client_id column
      *
      * Example usage:
      * <code>
-     * $query->filterByInternalClientId(1234); // WHERE internal_client_id = 1234
-     * $query->filterByInternalClientId(array(12, 34)); // WHERE internal_client_id IN (12, 34)
-     * $query->filterByInternalClientId(array('min' => 12)); // WHERE internal_client_id > 12
+     * $query->filterByClientId(1234); // WHERE client_id = 1234
+     * $query->filterByClientId(array(12, 34)); // WHERE client_id IN (12, 34)
+     * $query->filterByClientId(array('min' => 12)); // WHERE client_id > 12
      * </code>
      *
-     * @param     mixed $internalClientId The value to use as filter.
+     * @param     mixed $clientId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
@@ -300,16 +300,16 @@ abstract class BuyerStageQuery extends ModelCriteria
      *
      * @return $this|ChildBuyerStageQuery The current query, for fluid interface
      */
-    public function filterByInternalClientId($internalClientId = null, $comparison = null)
+    public function filterByClientId($clientId = null, $comparison = null)
     {
-        if (is_array($internalClientId)) {
+        if (is_array($clientId)) {
             $useMinMax = false;
-            if (isset($internalClientId['min'])) {
-                $this->addUsingAlias(BuyerStageTableMap::COL_INTERNAL_CLIENT_ID, $internalClientId['min'], Criteria::GREATER_EQUAL);
+            if (isset($clientId['min'])) {
+                $this->addUsingAlias(BuyerStageTableMap::COL_CLIENT_ID, $clientId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($internalClientId['max'])) {
-                $this->addUsingAlias(BuyerStageTableMap::COL_INTERNAL_CLIENT_ID, $internalClientId['max'], Criteria::LESS_EQUAL);
+            if (isset($clientId['max'])) {
+                $this->addUsingAlias(BuyerStageTableMap::COL_CLIENT_ID, $clientId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -320,7 +320,7 @@ abstract class BuyerStageQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(BuyerStageTableMap::COL_INTERNAL_CLIENT_ID, $internalClientId, $comparison);
+        return $this->addUsingAlias(BuyerStageTableMap::COL_CLIENT_ID, $clientId, $comparison);
     }
 
     /**

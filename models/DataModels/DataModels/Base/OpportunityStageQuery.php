@@ -20,11 +20,11 @@ use Propel\Runtime\Exception\PropelException;
  *
  *
  * @method     ChildOpportunityStageQuery orderById($order = Criteria::ASC) Order by the id column
- * @method     ChildOpportunityStageQuery orderByInternalClientId($order = Criteria::ASC) Order by the internal_client_id column
+ * @method     ChildOpportunityStageQuery orderByClientId($order = Criteria::ASC) Order by the client_id column
  * @method     ChildOpportunityStageQuery orderByStage($order = Criteria::ASC) Order by the stage column
  *
  * @method     ChildOpportunityStageQuery groupById() Group by the id column
- * @method     ChildOpportunityStageQuery groupByInternalClientId() Group by the internal_client_id column
+ * @method     ChildOpportunityStageQuery groupByClientId() Group by the client_id column
  * @method     ChildOpportunityStageQuery groupByStage() Group by the stage column
  *
  * @method     ChildOpportunityStageQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
@@ -39,19 +39,19 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildOpportunityStage findOneOrCreate(ConnectionInterface $con = null) Return the first ChildOpportunityStage matching the query, or a new ChildOpportunityStage object populated from the query conditions when no match is found
  *
  * @method     ChildOpportunityStage findOneById(int $id) Return the first ChildOpportunityStage filtered by the id column
- * @method     ChildOpportunityStage findOneByInternalClientId(string $internal_client_id) Return the first ChildOpportunityStage filtered by the internal_client_id column
+ * @method     ChildOpportunityStage findOneByClientId(string $client_id) Return the first ChildOpportunityStage filtered by the client_id column
  * @method     ChildOpportunityStage findOneByStage(string $stage) Return the first ChildOpportunityStage filtered by the stage column *
 
  * @method     ChildOpportunityStage requirePk($key, ConnectionInterface $con = null) Return the ChildOpportunityStage by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildOpportunityStage requireOne(ConnectionInterface $con = null) Return the first ChildOpportunityStage matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildOpportunityStage requireOneById(int $id) Return the first ChildOpportunityStage filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildOpportunityStage requireOneByInternalClientId(string $internal_client_id) Return the first ChildOpportunityStage filtered by the internal_client_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildOpportunityStage requireOneByClientId(string $client_id) Return the first ChildOpportunityStage filtered by the client_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildOpportunityStage requireOneByStage(string $stage) Return the first ChildOpportunityStage filtered by the stage column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildOpportunityStage[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildOpportunityStage objects based on current ModelCriteria
  * @method     ChildOpportunityStage[]|ObjectCollection findById(int $id) Return ChildOpportunityStage objects filtered by the id column
- * @method     ChildOpportunityStage[]|ObjectCollection findByInternalClientId(string $internal_client_id) Return ChildOpportunityStage objects filtered by the internal_client_id column
+ * @method     ChildOpportunityStage[]|ObjectCollection findByClientId(string $client_id) Return ChildOpportunityStage objects filtered by the client_id column
  * @method     ChildOpportunityStage[]|ObjectCollection findByStage(string $stage) Return ChildOpportunityStage objects filtered by the stage column
  * @method     ChildOpportunityStage[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
  *
@@ -151,7 +151,7 @@ abstract class OpportunityStageQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, internal_client_id, stage FROM opportunity_stage WHERE id = :p0';
+        $sql = 'SELECT id, client_id, stage FROM opportunity_stage WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -283,28 +283,28 @@ abstract class OpportunityStageQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the internal_client_id column
+     * Filter the query on the client_id column
      *
      * Example usage:
      * <code>
-     * $query->filterByInternalClientId('fooValue');   // WHERE internal_client_id = 'fooValue'
-     * $query->filterByInternalClientId('%fooValue%', Criteria::LIKE); // WHERE internal_client_id LIKE '%fooValue%'
+     * $query->filterByClientId('fooValue');   // WHERE client_id = 'fooValue'
+     * $query->filterByClientId('%fooValue%', Criteria::LIKE); // WHERE client_id LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $internalClientId The value to use as filter.
+     * @param     string $clientId The value to use as filter.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return $this|ChildOpportunityStageQuery The current query, for fluid interface
      */
-    public function filterByInternalClientId($internalClientId = null, $comparison = null)
+    public function filterByClientId($clientId = null, $comparison = null)
     {
         if (null === $comparison) {
-            if (is_array($internalClientId)) {
+            if (is_array($clientId)) {
                 $comparison = Criteria::IN;
             }
         }
 
-        return $this->addUsingAlias(OpportunityStageTableMap::COL_INTERNAL_CLIENT_ID, $internalClientId, $comparison);
+        return $this->addUsingAlias(OpportunityStageTableMap::COL_CLIENT_ID, $clientId, $comparison);
     }
 
     /**

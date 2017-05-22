@@ -9,7 +9,8 @@ require_once("${_SERVER['DOCUMENT_ROOT']}/libraries/Helpers.php");
 
 Helpers::setDebugParam($isDebugActive);
 
-use DataModels\DataModels\CustomerContactIntegration as CustomerContactIntegration;
+use DataModels\DataModels\ClientCalendarUserOAuth as ClientCalendarUserOAuth;
+use DataModels\DataModels\Client as Client;
 
 if( !(is_array($_SESSION['arraccess']) && (count($_SESSION['arraccess'])>0)) ) {
     trigger_error("The SFDC API access-related session variable is not set", E_USER_WARNING);
@@ -34,15 +35,18 @@ if($userDetails && isset($userDetails['email'])) {
 
 $sales['userid'] = end($userUrlDetail);
 
-list($customer, $contacts) = Helpers::loadCustomerData($strClientDomainName);
+/**
+ * @var $client Client
+ */
+list($client, $contacts) = Helpers::loadClientData($strClientDomainName);
 
-$integration = Helpers::getIntegrationIfPresent($customer, $sales['email'],
-    CustomerContactIntegration::SFDC);
+$authentication = Helpers::getOAuthIfPresent($client, $sales['email'],
+    ClientCalendarUserOAuth::SFDC);
 
-if($integration) {
-    $hasDBWriteHappened = Helpers::updateIntegrationAccountUserToken($integration, $sales);
+if($authentication) {
+    $hasDBWriteHappened = Helpers::updateAuthenticationToken($authentication, $sales);
 } else {
-    $hasDBWriteHappened = Helpers::createIntegrationAccount($customer, $sales['email'], $sales, CustomerContactIntegration::SFDC);
+    $hasDBWriteHappened = Helpers::createAuthAccount($client, $sales['email'], $sales, ClientCalendarUserOAuth::SFDC);
 }
 
 if( !$hasDBWriteHappened ) {

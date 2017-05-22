@@ -77,9 +77,9 @@ class BillingCycleTableMap extends TableMap
     const COL_ID = 'billing_cycle.id';
 
     /**
-     * the column name for the internal_client_id field
+     * the column name for the client_id field
      */
-    const COL_INTERNAL_CLIENT_ID = 'billing_cycle.internal_client_id';
+    const COL_CLIENT_ID = 'billing_cycle.client_id';
 
     /**
      * the column name for the type field
@@ -98,10 +98,10 @@ class BillingCycleTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'InternalClientId', 'Type', ),
-        self::TYPE_CAMELNAME     => array('id', 'internalClientId', 'type', ),
-        self::TYPE_COLNAME       => array(BillingCycleTableMap::COL_ID, BillingCycleTableMap::COL_INTERNAL_CLIENT_ID, BillingCycleTableMap::COL_TYPE, ),
-        self::TYPE_FIELDNAME     => array('id', 'internal_client_id', 'type', ),
+        self::TYPE_PHPNAME       => array('Id', 'ClientId', 'Type', ),
+        self::TYPE_CAMELNAME     => array('id', 'clientId', 'type', ),
+        self::TYPE_COLNAME       => array(BillingCycleTableMap::COL_ID, BillingCycleTableMap::COL_CLIENT_ID, BillingCycleTableMap::COL_TYPE, ),
+        self::TYPE_FIELDNAME     => array('id', 'client_id', 'type', ),
         self::TYPE_NUM           => array(0, 1, 2, )
     );
 
@@ -112,10 +112,10 @@ class BillingCycleTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'InternalClientId' => 1, 'Type' => 2, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'internalClientId' => 1, 'type' => 2, ),
-        self::TYPE_COLNAME       => array(BillingCycleTableMap::COL_ID => 0, BillingCycleTableMap::COL_INTERNAL_CLIENT_ID => 1, BillingCycleTableMap::COL_TYPE => 2, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'internal_client_id' => 1, 'type' => 2, ),
+        self::TYPE_PHPNAME       => array('Id' => 0, 'ClientId' => 1, 'Type' => 2, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'clientId' => 1, 'type' => 2, ),
+        self::TYPE_COLNAME       => array(BillingCycleTableMap::COL_ID => 0, BillingCycleTableMap::COL_CLIENT_ID => 1, BillingCycleTableMap::COL_TYPE => 2, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'client_id' => 1, 'type' => 2, ),
         self::TYPE_NUM           => array(0, 1, 2, )
     );
 
@@ -138,7 +138,7 @@ class BillingCycleTableMap extends TableMap
         $this->setPrimaryKeyMethodInfo('billing_cycle_id_seq');
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('internal_client_id', 'InternalClientId', 'INTEGER', false, null, null);
+        $this->addColumn('client_id', 'ClientId', 'INTEGER', false, null, null);
         $this->addColumn('type', 'Type', 'VARCHAR', false, 255, null);
     } // initialize()
 
@@ -291,11 +291,11 @@ class BillingCycleTableMap extends TableMap
     {
         if (null === $alias) {
             $criteria->addSelectColumn(BillingCycleTableMap::COL_ID);
-            $criteria->addSelectColumn(BillingCycleTableMap::COL_INTERNAL_CLIENT_ID);
+            $criteria->addSelectColumn(BillingCycleTableMap::COL_CLIENT_ID);
             $criteria->addSelectColumn(BillingCycleTableMap::COL_TYPE);
         } else {
             $criteria->addSelectColumn($alias . '.id');
-            $criteria->addSelectColumn($alias . '.internal_client_id');
+            $criteria->addSelectColumn($alias . '.client_id');
             $criteria->addSelectColumn($alias . '.type');
         }
     }

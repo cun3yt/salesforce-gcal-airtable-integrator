@@ -23,34 +23,37 @@ const DateFormat = 'Y-m-d';
 const DateTimeFormat = 'Y-m-d H:i:s';
 
 use DataModels\DataModels\Meeting as Meeting;
-use DataModels\DataModels\CustomerContactIntegration as CustomerContactIntegration;
-use DataModels\DataModels\Customer as Customer;
+use DataModels\DataModels\ClientCalendarUserOAuth as ClientCalendarUserOAuth;
+use DataModels\DataModels\Client as Client;
 
 use DataModels\DataModels\MeetingAttendee as MeetingAttendee;
 
 require_once('config.php');
 
-$client = Helpers::setupGoogleAPIClient($googleCalAPICredentialFile, true);
-
-list($customer, $contacts) = Helpers::loadCustomerData($strClientDomainName);
-$calendarIntegrations = Helpers::getIntegrations($customer);
+$apiClient = Helpers::setupGoogleAPIClient($googleCalAPICredentialFile, true);
 
 /**
- * @var $integration CustomerContactIntegration
+ * @var $client Client
  */
-foreach($calendarIntegrations as $integration) {
-    $emailAddress = $integration->getCustomerContact()->getEmail();
+list($client, $contacts) = Helpers::loadClientData($strClientDomainName);
+$calendarAuths = Helpers::getAuthentications($client);
+
+/**
+ * @var $auth ClientCalendarUserOAuth
+ */
+foreach($calendarAuths as $auth) {
+    $emailAddress = $auth->getClientCalendarUser()->getEmail();
     echo "Processing calendars of {$emailAddress} <br/>";
-    processIntegrationCalendars($customer, $integration, $client);
+    processCalendars($client, $auth, $apiClient);
 }
 
 /**
- * @param Customer $customer
- * @param CustomerContactIntegration $integration
- * @param Google_Client $client
+ * @param Client $client
+ * @param ClientCalendarUserOAuth $auth
+ * @param Google_Client $apiClient
  */
-function processIntegrationCalendars(Customer $customer, CustomerContactIntegration $integration, Google_Client $client) {
-    $integrationData = json_decode($integration->getData());
+function processCalendars(Client $client, ClientCalendarUserOAuth $auth, Google_Client $apiClient) {
+    $integrationData = json_decode($auth->getData());
     $accessToken = $integrationData->access_token;
 
     if( !$accessToken ) {
@@ -58,8 +61,8 @@ function processIntegrationCalendars(Customer $customer, CustomerContactIntegrat
         return;
     }
 
-    $client->setAccessToken($integration->getData());
-    $service = new Google_Service_Calendar($client);
+    $apiClient->setAccessToken($auth->getData());
+    $service = new Google_Service_Calendar($apiClient);
 
     try {
         $calendarList = $service->calendarList->listCalendarList();
@@ -71,12 +74,12 @@ function processIntegrationCalendars(Customer $customer, CustomerContactIntegrat
 
         foreach($calendarList->getItems() as $calendar) {
             echo "Processing Calendar: {$calendar->id}<br/>";
-            if( !isCalInCustomer($calendar, $customer) ) {
-                trigger_error("{$calendar->id} is not in Customer's domain: {$customer->getEmailDomain()}. 
+            if( !isCalInClient($calendar, $client) ) {
+                trigger_error("{$calendar->id} is not in the domain: {$client->getEmailDomain()}. 
                     Checking the next calendar", E_USER_WARNING);
                 continue;
             }
-            processCalendar($customer, $service, $calendar);
+            processCalendar($client, $service, $calendar);
         }
     } catch(Exception $e) {
         trigger_error("Exception raised: " . $e->getMessage(), E_USER_WARNING);
@@ -86,20 +89,20 @@ function processIntegrationCalendars(Customer $customer, CustomerContactIntegrat
             (count($arrMessageDetails)>0) && ($arrMessageDetails['error']['message'] == "Invalid Credentials");
 
         if($updateFlag) {
-            $contactEmailAddress = $integration->getCustomerContact()->getEmail();
-            $integration->setStatus(CustomerContactIntegration::STATUS_EXPIRED);
-            $integration->save();
+            $contactEmailAddress = $auth->getClientCalendarUser()->getEmail();
+            $auth->setStatus(ClientCalendarUserOAuth::STATUS_EXPIRED);
+            $auth->save();
             Helpers::sendAccountExpirationMail($contactEmailAddress);
         }
     }
 }
 
 /**
- * @param Customer $customer
+ * @param Client $client
  * @param $service
  * @param $calendar
  */
-function processCalendar(Customer $customer, $service, $calendar) {
+function processCalendar(Client $client, $service, $calendar) {
     if( !($calendar->id) ) {
         trigger_error("Calendar doesn't have an ID", E_USER_WARNING);
         return;
@@ -114,7 +117,7 @@ function processCalendar(Customer $customer, $service, $calendar) {
     // get the latest meeting date in the DB and fetch all meets from that date ahead
     // for current calendar fetch the latest meet present in DB so as to set the lower limit
     // for further pulling calendar meets
-    $lastMeeting = Helpers::getLastMeetingInDBForEmailAddress($customer, $calendar->id);
+    $lastMeeting = Helpers::getLastMeetingInDBForEmailAddress($client, $calendar->id);
 
     if(!$lastMeeting) {
         $date = date(DateFormat,strtotime($yearStartFiscal));
@@ -173,7 +176,7 @@ function processCalendar(Customer $customer, $service, $calendar) {
 
             $eventAttendeesList[] = $attendeeEmail;
 
-            if($domain == $customer->getEmailDomain()) {
+            if($domain == $client->getEmailDomain()) {
                 continue;
             }
 
@@ -197,24 +200,24 @@ function processCalendar(Customer $customer, $service, $calendar) {
             $meeting = Helpers::getMeetingIfExists($event);
             // @todo what about changes/deletion to the event? Id check will not show the difference!
 
-            // @todo Assoc. attendee list with account, account_has_contact & contact tables.
+            // @todo Assoc. attendee list to account, account_has_contact & contact tables.
 
             if(!$meeting) {
-                saveNewMeeting($customer, $event, $calendarId, $eventDate, $eventType);
+                saveNewMeeting($client, $event, $calendarId, $eventDate, $eventType);
             }
         }
     }
 }
 
 /**
- * @param Customer $customer
+ * @param Client $client
  * @param $event
  * @param $calendarId
  * @param $eventDate
  * @param $eventType
  * @return Meeting
  */
-function saveNewMeeting(Customer $customer, $event, $calendarId, $eventDate, $eventType) {
+function saveNewMeeting(Client $client, $event, $calendarId, $eventDate, $eventType) {
     $meeting = new Meeting();
     $meeting->setEventId($event->getId())
         ->setName($event->getSummary())
@@ -242,7 +245,7 @@ function saveNewMeeting(Customer $customer, $event, $calendarId, $eventDate, $ev
      */
     $eventCreator = $event->getCreator();
     $creatorEmailAddress = $eventCreator->getEmail();
-    $meetingCreator = getOrSaveMeetingAttendee($customer, $creatorEmailAddress);
+    $meetingCreator = getOrSaveMeetingAttendee($client, $creatorEmailAddress);
     $meeting->setEventCreator($meetingCreator)
         ->save();
 
@@ -251,7 +254,7 @@ function saveNewMeeting(Customer $customer, $event, $calendarId, $eventDate, $ev
      */
     $eventOrganizer = $event->getOrganizer();
     $organizerEmailAddress = $eventOrganizer->getEmail();
-    $meetingOwner = getOrSaveMeetingAttendee($customer, $organizerEmailAddress);
+    $meetingOwner = getOrSaveMeetingAttendee($client, $organizerEmailAddress);
     $meeting->setEventOwner($meetingOwner)
         ->save();
 
@@ -260,7 +263,7 @@ function saveNewMeeting(Customer $customer, $event, $calendarId, $eventDate, $ev
      */
     foreach($event->getAttendees() as $att) {
         $emailAddress = $att->getEmail();
-        $attendee = getOrSaveMeetingAttendee($customer, $emailAddress);
+        $attendee = getOrSaveMeetingAttendee($client, $emailAddress);
         $meeting->addMeetingAttendee($attendee);
     }
 
@@ -272,23 +275,23 @@ function saveNewMeeting(Customer $customer, $event, $calendarId, $eventDate, $ev
 }
 
 /**
- * @param Customer $customer
+ * @param Client $client
  * @param $attendeeEmailAddress
  * @return \DataModels\DataModels\Contact|\DataModels\DataModels\MeetingAttendee
  */
-function getOrSaveMeetingAttendee(Customer $customer, $attendeeEmailAddress) {
+function getOrSaveMeetingAttendee(Client $client, $attendeeEmailAddress) {
     $creatorContact = NULL;
 
-    if (isEmailAddressInDomain($attendeeEmailAddress, $customer->getEmailDomain())) {
-        $q = new \DataModels\DataModels\CustomerContactQuery();
-        $customerContact = $q->findOneByEmail($attendeeEmailAddress);
-        if (!$customerContact) {
-            $customerContact = new \DataModels\DataModels\CustomerContact();
-            $customerContact->setEmail($attendeeEmailAddress)
-                ->setCustomer($customer)
+    if (isEmailAddressInDomain($attendeeEmailAddress, $client->getEmailDomain())) {
+        $q = new \DataModels\DataModels\ClientCalendarUserQuery();
+        $clientCalendarUser = $q->findOneByEmail($attendeeEmailAddress);
+        if (!$clientCalendarUser) {
+            $clientCalendarUser = new \DataModels\DataModels\ClientCalendarUser();
+            $clientCalendarUser->setEmail($attendeeEmailAddress)
+                ->setClient($client)
                 ->save();
         }
-        $creatorContact = $customerContact;
+        $creatorContact = $clientCalendarUser;
     } else {
         $q = new \DataModels\DataModels\ContactQuery();
         $contact = $q->findOneByEmail($attendeeEmailAddress);
@@ -302,8 +305,8 @@ function getOrSaveMeetingAttendee(Customer $customer, $attendeeEmailAddress) {
     return $creatorContact;
 }
 
-function isCalInCustomer(Google_Service_Calendar_CalendarListEntry $calendar, Customer $customer) {
-    return isEmailAddressInDomain($calendar->id, $customer->getEmailDomain());
+function isCalInClient(Google_Service_Calendar_CalendarListEntry $calendar, Client $client) {
+    return isEmailAddressInDomain($calendar->id, $client->getEmailDomain());
 }
 
 function isEmailAddressInDomain($emailAddress, $domain) {

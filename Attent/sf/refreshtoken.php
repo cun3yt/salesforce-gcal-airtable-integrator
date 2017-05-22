@@ -5,29 +5,33 @@ require_once("${_SERVER['DOCUMENT_ROOT']}/Attent/config.php");
 require_once("${_SERVER['DOCUMENT_ROOT']}/libraries/Helpers.php");
 Helpers::setDebugParam($isDebugActive);
 
-use DataModels\DataModels\CustomerContactIntegration as CustomerContactIntegration;
+use DataModels\DataModels\ClientCalendarUserOAuth as ClientCalendarUserOAuth;
+use DataModels\DataModels\Client as Client;
 
-list($customer, $contacts) = Helpers::loadCustomerData($strClientDomainName);
+/**
+ * @var $client Client
+ */
+list($client, $calendarUsers) = Helpers::loadClientData($strClientDomainName);
 
-$integrations = Helpers::getIntegrations($customer, CustomerContactIntegration::SFDC);
+$SFDCAuths = Helpers::getAuthentications($client, ClientCalendarUserOAuth::SFDC);
 
-if( count($integrations) <= 0 ) {
-    trigger_error("SFDC Integration doesn't exist!");
+if( count($SFDCAuths) <= 0 ) {
+    trigger_error("No SFDC authentication exists!");
     die;
 }
 
 /**
- * @var $integration CustomerContactIntegration
+ * @var $auth ClientCalendarUserOAuth
  */
-foreach($integrations as $integration) {
-    $contact = $integration->getCustomerContact();
-    $data = json_decode($integration->getData());
+foreach($SFDCAuths as $auth) {
+    $calendarUser = $auth->getClientCalendarUser();
+    $data = json_decode($auth->getData());
     $tokenData = json_decode($data->tokendata);
-    $emailAddress = $contact->getEmail();
+    $emailAddress = $calendarUser->getEmail();
     $newTokenData = Helpers::sfdcRefreshToken($tokenData->refresh_token, $emailAddress);
 
     if( !$newTokenData ) {
-        trigger_error("New access token cannot be taken from SFDC, moving to the next contact integration",
+        trigger_error("New access token cannot be taken from SFDC, moving to the next user authentication",
             E_USER_NOTICE);
         continue;
     }
@@ -36,7 +40,7 @@ foreach($integrations as $integration) {
     $data->tokendata = $tokenData;
     $data->accesstoken = $tokenData->access_token;
 
-    $integration->setData(json_encode($data))
+    $auth->setData(json_encode($data))
         ->save();
 
     echo "{$emailAddress} has renewed SFDC access token now.";

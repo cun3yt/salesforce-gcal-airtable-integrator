@@ -2,10 +2,10 @@
 
 namespace DataModels\DataModels;
 
-use DataModels\DataModels\Base\Customer as BaseCustomer;
+use DataModels\DataModels\Base\Client as BaseClient;
 
 /**
- * Skeleton subclass for representing a row from the 'customer' table.
+ * Skeleton subclass for representing a row from the 'client' table.
  *
  *
  *
@@ -14,7 +14,7 @@ use DataModels\DataModels\Base\Customer as BaseCustomer;
  * long as it does not already exist in the output directory.
  *
  */
-class Customer extends BaseCustomer
+class Client extends BaseClient
 {
 
 }

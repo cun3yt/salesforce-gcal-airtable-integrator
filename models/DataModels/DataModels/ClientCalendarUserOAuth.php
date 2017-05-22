@@ -16,5 +16,9 @@ use DataModels\DataModels\Base\ClientCalendarUserOAuth as BaseClientCalendarUser
  */
 class ClientCalendarUserOAuth extends BaseClientCalendarUserOAuth
 {
+    const GCAL = 'gcal';
+    const SFDC = 'sfdc';
 
+    const STATUS_ACTIVE = 'active';
+    const STATUS_EXPIRED = 'expired';
 }

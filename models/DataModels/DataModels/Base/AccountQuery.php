@@ -25,14 +25,14 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccountQuery orderByEmailDomain($order = Criteria::ASC) Order by the email_domain column
  * @method     ChildAccountQuery orderByWebsite($order = Criteria::ASC) Order by the website column
  * @method     ChildAccountQuery orderBySfdcAccountId($order = Criteria::ASC) Order by the sfdc_account_id column
- * @method     ChildAccountQuery orderByInternalClientId($order = Criteria::ASC) Order by the internal_client_id column
+ * @method     ChildAccountQuery orderByClientId($order = Criteria::ASC) Order by the client_id column
  *
  * @method     ChildAccountQuery groupById() Group by the id column
  * @method     ChildAccountQuery groupByName() Group by the name column
  * @method     ChildAccountQuery groupByEmailDomain() Group by the email_domain column
  * @method     ChildAccountQuery groupByWebsite() Group by the website column
  * @method     ChildAccountQuery groupBySfdcAccountId() Group by the sfdc_account_id column
- * @method     ChildAccountQuery groupByInternalClientId() Group by the internal_client_id column
+ * @method     ChildAccountQuery groupByClientId() Group by the client_id column
  *
  * @method     ChildAccountQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method     ChildAccountQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -42,15 +42,15 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccountQuery rightJoinWith($relation) Adds a RIGHT JOIN clause and with to the query
  * @method     ChildAccountQuery innerJoinWith($relation) Adds a INNER JOIN clause and with to the query
  *
- * @method     ChildAccountQuery leftJoinInternalClient($relationAlias = null) Adds a LEFT JOIN clause to the query using the InternalClient relation
- * @method     ChildAccountQuery rightJoinInternalClient($relationAlias = null) Adds a RIGHT JOIN clause to the query using the InternalClient relation
- * @method     ChildAccountQuery innerJoinInternalClient($relationAlias = null) Adds a INNER JOIN clause to the query using the InternalClient relation
+ * @method     ChildAccountQuery leftJoinClient($relationAlias = null) Adds a LEFT JOIN clause to the query using the Client relation
+ * @method     ChildAccountQuery rightJoinClient($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Client relation
+ * @method     ChildAccountQuery innerJoinClient($relationAlias = null) Adds a INNER JOIN clause to the query using the Client relation
  *
- * @method     ChildAccountQuery joinWithInternalClient($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the InternalClient relation
+ * @method     ChildAccountQuery joinWithClient($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the Client relation
  *
- * @method     ChildAccountQuery leftJoinWithInternalClient() Adds a LEFT JOIN clause and with to the query using the InternalClient relation
- * @method     ChildAccountQuery rightJoinWithInternalClient() Adds a RIGHT JOIN clause and with to the query using the InternalClient relation
- * @method     ChildAccountQuery innerJoinWithInternalClient() Adds a INNER JOIN clause and with to the query using the InternalClient relation
+ * @method     ChildAccountQuery leftJoinWithClient() Adds a LEFT JOIN clause and with to the query using the Client relation
+ * @method     ChildAccountQuery rightJoinWithClient() Adds a RIGHT JOIN clause and with to the query using the Client relation
+ * @method     ChildAccountQuery innerJoinWithClient() Adds a INNER JOIN clause and with to the query using the Client relation
  *
  * @method     ChildAccountQuery leftJoinContact($relationAlias = null) Adds a LEFT JOIN clause to the query using the Contact relation
  * @method     ChildAccountQuery rightJoinContact($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Contact relation
@@ -62,7 +62,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccountQuery rightJoinWithContact() Adds a RIGHT JOIN clause and with to the query using the Contact relation
  * @method     ChildAccountQuery innerJoinWithContact() Adds a INNER JOIN clause and with to the query using the Contact relation
  *
- * @method     \DataModels\DataModels\InternalClientQuery|\DataModels\DataModels\ContactQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     \DataModels\DataModels\ClientQuery|\DataModels\DataModels\ContactQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildAccount findOne(ConnectionInterface $con = null) Return the first ChildAccount matching the query
  * @method     ChildAccount findOneOrCreate(ConnectionInterface $con = null) Return the first ChildAccount matching the query, or a new ChildAccount object populated from the query conditions when no match is found
@@ -72,7 +72,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccount findOneByEmailDomain(string $email_domain) Return the first ChildAccount filtered by the email_domain column
  * @method     ChildAccount findOneByWebsite(string $website) Return the first ChildAccount filtered by the website column
  * @method     ChildAccount findOneBySfdcAccountId(int $sfdc_account_id) Return the first ChildAccount filtered by the sfdc_account_id column
- * @method     ChildAccount findOneByInternalClientId(int $internal_client_id) Return the first ChildAccount filtered by the internal_client_id column *
+ * @method     ChildAccount findOneByClientId(int $client_id) Return the first ChildAccount filtered by the client_id column *
 
  * @method     ChildAccount requirePk($key, ConnectionInterface $con = null) Return the ChildAccount by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccount requireOne(ConnectionInterface $con = null) Return the first ChildAccount matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -82,7 +82,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccount requireOneByEmailDomain(string $email_domain) Return the first ChildAccount filtered by the email_domain column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccount requireOneByWebsite(string $website) Return the first ChildAccount filtered by the website column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccount requireOneBySfdcAccountId(int $sfdc_account_id) Return the first ChildAccount filtered by the sfdc_account_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildAccount requireOneByInternalClientId(int $internal_client_id) Return the first ChildAccount filtered by the internal_client_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildAccount requireOneByClientId(int $client_id) Return the first ChildAccount filtered by the client_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildAccount[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildAccount objects based on current ModelCriteria
  * @method     ChildAccount[]|ObjectCollection findById(int $id) Return ChildAccount objects filtered by the id column
@@ -90,7 +90,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccount[]|ObjectCollection findByEmailDomain(string $email_domain) Return ChildAccount objects filtered by the email_domain column
  * @method     ChildAccount[]|ObjectCollection findByWebsite(string $website) Return ChildAccount objects filtered by the website column
  * @method     ChildAccount[]|ObjectCollection findBySfdcAccountId(int $sfdc_account_id) Return ChildAccount objects filtered by the sfdc_account_id column
- * @method     ChildAccount[]|ObjectCollection findByInternalClientId(int $internal_client_id) Return ChildAccount objects filtered by the internal_client_id column
+ * @method     ChildAccount[]|ObjectCollection findByClientId(int $client_id) Return ChildAccount objects filtered by the client_id column
  * @method     ChildAccount[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
  *
  */
@@ -189,7 +189,7 @@ abstract class AccountQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, name, email_domain, website, sfdc_account_id, internal_client_id FROM account WHERE id = :p0';
+        $sql = 'SELECT id, name, email_domain, website, sfdc_account_id, client_id FROM account WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -437,18 +437,18 @@ abstract class AccountQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the internal_client_id column
+     * Filter the query on the client_id column
      *
      * Example usage:
      * <code>
-     * $query->filterByInternalClientId(1234); // WHERE internal_client_id = 1234
-     * $query->filterByInternalClientId(array(12, 34)); // WHERE internal_client_id IN (12, 34)
-     * $query->filterByInternalClientId(array('min' => 12)); // WHERE internal_client_id > 12
+     * $query->filterByClientId(1234); // WHERE client_id = 1234
+     * $query->filterByClientId(array(12, 34)); // WHERE client_id IN (12, 34)
+     * $query->filterByClientId(array('min' => 12)); // WHERE client_id > 12
      * </code>
      *
-     * @see       filterByInternalClient()
+     * @see       filterByClient()
      *
-     * @param     mixed $internalClientId The value to use as filter.
+     * @param     mixed $clientId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
@@ -456,16 +456,16 @@ abstract class AccountQuery extends ModelCriteria
      *
      * @return $this|ChildAccountQuery The current query, for fluid interface
      */
-    public function filterByInternalClientId($internalClientId = null, $comparison = null)
+    public function filterByClientId($clientId = null, $comparison = null)
     {
-        if (is_array($internalClientId)) {
+        if (is_array($clientId)) {
             $useMinMax = false;
-            if (isset($internalClientId['min'])) {
-                $this->addUsingAlias(AccountTableMap::COL_INTERNAL_CLIENT_ID, $internalClientId['min'], Criteria::GREATER_EQUAL);
+            if (isset($clientId['min'])) {
+                $this->addUsingAlias(AccountTableMap::COL_CLIENT_ID, $clientId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($internalClientId['max'])) {
-                $this->addUsingAlias(AccountTableMap::COL_INTERNAL_CLIENT_ID, $internalClientId['max'], Criteria::LESS_EQUAL);
+            if (isset($clientId['max'])) {
+                $this->addUsingAlias(AccountTableMap::COL_CLIENT_ID, $clientId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -476,48 +476,48 @@ abstract class AccountQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(AccountTableMap::COL_INTERNAL_CLIENT_ID, $internalClientId, $comparison);
+        return $this->addUsingAlias(AccountTableMap::COL_CLIENT_ID, $clientId, $comparison);
     }
 
     /**
-     * Filter the query by a related \DataModels\DataModels\InternalClient object
+     * Filter the query by a related \DataModels\DataModels\Client object
      *
-     * @param \DataModels\DataModels\InternalClient|ObjectCollection $internalClient The related object(s) to use as filter
+     * @param \DataModels\DataModels\Client|ObjectCollection $client The related object(s) to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @throws \Propel\Runtime\Exception\PropelException
      *
      * @return ChildAccountQuery The current query, for fluid interface
      */
-    public function filterByInternalClient($internalClient, $comparison = null)
+    public function filterByClient($client, $comparison = null)
     {
-        if ($internalClient instanceof \DataModels\DataModels\InternalClient) {
+        if ($client instanceof \DataModels\DataModels\Client) {
             return $this
-                ->addUsingAlias(AccountTableMap::COL_INTERNAL_CLIENT_ID, $internalClient->getId(), $comparison);
-        } elseif ($internalClient instanceof ObjectCollection) {
+                ->addUsingAlias(AccountTableMap::COL_CLIENT_ID, $client->getId(), $comparison);
+        } elseif ($client instanceof ObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(AccountTableMap::COL_INTERNAL_CLIENT_ID, $internalClient->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(AccountTableMap::COL_CLIENT_ID, $client->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByInternalClient() only accepts arguments of type \DataModels\DataModels\InternalClient or Collection');
+            throw new PropelException('filterByClient() only accepts arguments of type \DataModels\DataModels\Client or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the InternalClient relation
+     * Adds a JOIN clause to the query using the Client relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return $this|ChildAccountQuery The current query, for fluid interface
      */
-    public function joinInternalClient($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinClient($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('InternalClient');
+        $relationMap = $tableMap->getRelation('Client');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -532,14 +532,14 @@ abstract class AccountQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'InternalClient');
+            $this->addJoinObject($join, 'Client');
         }
 
         return $this;
     }
 
     /**
-     * Use the InternalClient relation InternalClient object
+     * Use the Client relation Client object
      *
      * @see useQuery()
      *
@@ -547,13 +547,13 @@ abstract class AccountQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return \DataModels\DataModels\InternalClientQuery A secondary query class using the current class as primary query
+     * @return \DataModels\DataModels\ClientQuery A secondary query class using the current class as primary query
      */
-    public function useInternalClientQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useClientQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
-            ->joinInternalClient($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'InternalClient', '\DataModels\DataModels\InternalClientQuery');
+            ->joinClient($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Client', '\DataModels\DataModels\ClientQuery');
     }
 
     /**

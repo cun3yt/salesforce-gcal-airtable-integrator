@@ -4,16 +4,15 @@ namespace DataModels\DataModels\Base;
 
 use \Exception;
 use \PDO;
-use DataModels\DataModels\Customer as ChildCustomer;
-use DataModels\DataModels\CustomerContact as ChildCustomerContact;
-use DataModels\DataModels\CustomerContactIntegration as ChildCustomerContactIntegration;
-use DataModels\DataModels\CustomerContactIntegrationQuery as ChildCustomerContactIntegrationQuery;
-use DataModels\DataModels\CustomerContactQuery as ChildCustomerContactQuery;
-use DataModels\DataModels\CustomerQuery as ChildCustomerQuery;
-use DataModels\DataModels\MeetingAttendee as ChildMeetingAttendee;
-use DataModels\DataModels\MeetingAttendeeQuery as ChildMeetingAttendeeQuery;
-use DataModels\DataModels\Map\CustomerContactIntegrationTableMap;
-use DataModels\DataModels\Map\CustomerContactTableMap;
+use DataModels\DataModels\Account as ChildAccount;
+use DataModels\DataModels\AccountQuery as ChildAccountQuery;
+use DataModels\DataModels\Client as ChildClient;
+use DataModels\DataModels\ClientCalendarUser as ChildClientCalendarUser;
+use DataModels\DataModels\ClientCalendarUserQuery as ChildClientCalendarUserQuery;
+use DataModels\DataModels\ClientQuery as ChildClientQuery;
+use DataModels\DataModels\Map\AccountTableMap;
+use DataModels\DataModels\Map\ClientCalendarUserTableMap;
+use DataModels\DataModels\Map\ClientTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -28,18 +27,18 @@ use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 
 /**
- * Base class that represents a row from the 'customer_contact' table.
+ * Base class that represents a row from the 'client' table.
  *
  *
  *
  * @package    propel.generator.DataModels.DataModels.Base
  */
-abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRecordInterface
+abstract class Client implements ActiveRecordInterface
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\DataModels\\DataModels\\Map\\CustomerContactTableMap';
+    const TABLE_MAP = '\\DataModels\\DataModels\\Map\\ClientTableMap';
 
 
     /**
@@ -69,11 +68,11 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
     protected $virtualColumns = array();
 
     /**
-     * The value for the customer_id field.
+     * The value for the id field.
      *
      * @var        int
      */
-    protected $customer_id;
+    protected $id;
 
     /**
      * The value for the name field.
@@ -83,48 +82,30 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
     protected $name;
 
     /**
-     * The value for the surname field.
+     * The value for the website field.
      *
      * @var        string
      */
-    protected $surname;
+    protected $website;
 
     /**
-     * The value for the title field.
+     * The value for the email_domain field.
      *
      * @var        string
      */
-    protected $title;
+    protected $email_domain;
 
     /**
-     * The value for the email field.
-     *
-     * @var        string
+     * @var        ObjectCollection|ChildAccount[] Collection to store aggregation of ChildAccount objects.
      */
-    protected $email;
+    protected $collAccounts;
+    protected $collAccountsPartial;
 
     /**
-     * The value for the id field.
-     *
-     * @var        int
+     * @var        ObjectCollection|ChildClientCalendarUser[] Collection to store aggregation of ChildClientCalendarUser objects.
      */
-    protected $id;
-
-    /**
-     * @var        ChildCustomer
-     */
-    protected $aCustomer;
-
-    /**
-     * @var        ChildMeetingAttendee
-     */
-    protected $aMeetingAttendee;
-
-    /**
-     * @var        ObjectCollection|ChildCustomerContactIntegration[] Collection to store aggregation of ChildCustomerContactIntegration objects.
-     */
-    protected $collCustomerContactIntegrations;
-    protected $collCustomerContactIntegrationsPartial;
+    protected $collClientCalendarUsers;
+    protected $collClientCalendarUsersPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -136,12 +117,18 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
 
     /**
      * An array of objects scheduled for deletion.
-     * @var ObjectCollection|ChildCustomerContactIntegration[]
+     * @var ObjectCollection|ChildAccount[]
      */
-    protected $customerContactIntegrationsScheduledForDeletion = null;
+    protected $accountsScheduledForDeletion = null;
 
     /**
-     * Initializes internal state of DataModels\DataModels\Base\CustomerContact object.
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildClientCalendarUser[]
+     */
+    protected $clientCalendarUsersScheduledForDeletion = null;
+
+    /**
+     * Initializes internal state of DataModels\DataModels\Base\Client object.
      */
     public function __construct()
     {
@@ -236,9 +223,9 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
     }
 
     /**
-     * Compares this with another <code>CustomerContact</code> instance.  If
-     * <code>obj</code> is an instance of <code>CustomerContact</code>, delegates to
-     * <code>equals(CustomerContact)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>Client</code> instance.  If
+     * <code>obj</code> is an instance of <code>Client</code>, delegates to
+     * <code>equals(Client)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param  mixed   $obj The object to compare to.
      * @return boolean Whether equal to the object specified.
@@ -304,7 +291,7 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return $this|CustomerContact The current object, for fluid interface
+     * @return $this|Client The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -366,13 +353,13 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
     }
 
     /**
-     * Get the [customer_id] column value.
+     * Get the [id] column value.
      *
      * @return int
      */
-    public function getCustomerId()
+    public function getId()
     {
-        return $this->customer_id;
+        return $this->id;
     }
 
     /**
@@ -386,154 +373,30 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
     }
 
     /**
-     * Get the [surname] column value.
+     * Get the [website] column value.
      *
      * @return string
      */
-    public function getSurname()
+    public function getWebsite()
     {
-        return $this->surname;
+        return $this->website;
     }
 
     /**
-     * Get the [title] column value.
+     * Get the [email_domain] column value.
      *
      * @return string
      */
-    public function getTitle()
+    public function getEmailDomain()
     {
-        return $this->title;
+        return $this->email_domain;
     }
-
-    /**
-     * Get the [email] column value.
-     *
-     * @return string
-     */
-    public function getEmail()
-    {
-        return $this->email;
-    }
-
-    /**
-     * Get the [id] column value.
-     *
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * Set the value of [customer_id] column.
-     *
-     * @param int $v new value
-     * @return $this|\DataModels\DataModels\CustomerContact The current object (for fluent API support)
-     */
-    public function setCustomerId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->customer_id !== $v) {
-            $this->customer_id = $v;
-            $this->modifiedColumns[CustomerContactTableMap::COL_CUSTOMER_ID] = true;
-        }
-
-        if ($this->aCustomer !== null && $this->aCustomer->getId() !== $v) {
-            $this->aCustomer = null;
-        }
-
-        return $this;
-    } // setCustomerId()
-
-    /**
-     * Set the value of [name] column.
-     *
-     * @param string $v new value
-     * @return $this|\DataModels\DataModels\CustomerContact The current object (for fluent API support)
-     */
-    public function setName($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->name !== $v) {
-            $this->name = $v;
-            $this->modifiedColumns[CustomerContactTableMap::COL_NAME] = true;
-        }
-
-        return $this;
-    } // setName()
-
-    /**
-     * Set the value of [surname] column.
-     *
-     * @param string $v new value
-     * @return $this|\DataModels\DataModels\CustomerContact The current object (for fluent API support)
-     */
-    public function setSurname($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->surname !== $v) {
-            $this->surname = $v;
-            $this->modifiedColumns[CustomerContactTableMap::COL_SURNAME] = true;
-        }
-
-        return $this;
-    } // setSurname()
-
-    /**
-     * Set the value of [title] column.
-     *
-     * @param string $v new value
-     * @return $this|\DataModels\DataModels\CustomerContact The current object (for fluent API support)
-     */
-    public function setTitle($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->title !== $v) {
-            $this->title = $v;
-            $this->modifiedColumns[CustomerContactTableMap::COL_TITLE] = true;
-        }
-
-        return $this;
-    } // setTitle()
-
-    /**
-     * Set the value of [email] column.
-     *
-     * @param string $v new value
-     * @return $this|\DataModels\DataModels\CustomerContact The current object (for fluent API support)
-     */
-    public function setEmail($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->email !== $v) {
-            $this->email = $v;
-            $this->modifiedColumns[CustomerContactTableMap::COL_EMAIL] = true;
-        }
-
-        return $this;
-    } // setEmail()
 
     /**
      * Set the value of [id] column.
      *
      * @param int $v new value
-     * @return $this|\DataModels\DataModels\CustomerContact The current object (for fluent API support)
+     * @return $this|\DataModels\DataModels\Client The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -543,15 +406,71 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[CustomerContactTableMap::COL_ID] = true;
-        }
-
-        if ($this->aMeetingAttendee !== null && $this->aMeetingAttendee->getId() !== $v) {
-            $this->aMeetingAttendee = null;
+            $this->modifiedColumns[ClientTableMap::COL_ID] = true;
         }
 
         return $this;
     } // setId()
+
+    /**
+     * Set the value of [name] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\Client The current object (for fluent API support)
+     */
+    public function setName($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->name !== $v) {
+            $this->name = $v;
+            $this->modifiedColumns[ClientTableMap::COL_NAME] = true;
+        }
+
+        return $this;
+    } // setName()
+
+    /**
+     * Set the value of [website] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\Client The current object (for fluent API support)
+     */
+    public function setWebsite($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->website !== $v) {
+            $this->website = $v;
+            $this->modifiedColumns[ClientTableMap::COL_WEBSITE] = true;
+        }
+
+        return $this;
+    } // setWebsite()
+
+    /**
+     * Set the value of [email_domain] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\Client The current object (for fluent API support)
+     */
+    public function setEmailDomain($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->email_domain !== $v) {
+            $this->email_domain = $v;
+            $this->modifiedColumns[ClientTableMap::COL_EMAIL_DOMAIN] = true;
+        }
+
+        return $this;
+    } // setEmailDomain()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -589,23 +508,17 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
     {
         try {
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : CustomerContactTableMap::translateFieldName('CustomerId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->customer_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ClientTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : CustomerContactTableMap::translateFieldName('Name', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ClientTableMap::translateFieldName('Name', TableMap::TYPE_PHPNAME, $indexType)];
             $this->name = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : CustomerContactTableMap::translateFieldName('Surname', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->surname = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ClientTableMap::translateFieldName('Website', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->website = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : CustomerContactTableMap::translateFieldName('Title', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->title = (null !== $col) ? (string) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : CustomerContactTableMap::translateFieldName('Email', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->email = (null !== $col) ? (string) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : CustomerContactTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ClientTableMap::translateFieldName('EmailDomain', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->email_domain = (null !== $col) ? (string) $col : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -614,10 +527,10 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
                 $this->ensureConsistency();
             }
 
-            return $startcol + 6; // 6 = CustomerContactTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 4; // 4 = ClientTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException(sprintf('Error populating %s object', '\\DataModels\\DataModels\\CustomerContact'), 0, $e);
+            throw new PropelException(sprintf('Error populating %s object', '\\DataModels\\DataModels\\Client'), 0, $e);
         }
     }
 
@@ -636,12 +549,6 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
      */
     public function ensureConsistency()
     {
-        if ($this->aCustomer !== null && $this->customer_id !== $this->aCustomer->getId()) {
-            $this->aCustomer = null;
-        }
-        if ($this->aMeetingAttendee !== null && $this->id !== $this->aMeetingAttendee->getId()) {
-            $this->aMeetingAttendee = null;
-        }
     } // ensureConsistency
 
     /**
@@ -665,13 +572,13 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(CustomerContactTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(ClientTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildCustomerContactQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildClientQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -681,9 +588,9 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aCustomer = null;
-            $this->aMeetingAttendee = null;
-            $this->collCustomerContactIntegrations = null;
+            $this->collAccounts = null;
+
+            $this->collClientCalendarUsers = null;
 
         } // if (deep)
     }
@@ -694,8 +601,8 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see CustomerContact::setDeleted()
-     * @see CustomerContact::isDeleted()
+     * @see Client::setDeleted()
+     * @see Client::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -704,19 +611,16 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(CustomerContactTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ClientTableMap::DATABASE_NAME);
         }
 
         $con->transaction(function () use ($con) {
-            $deleteQuery = ChildCustomerContactQuery::create()
+            $deleteQuery = ChildClientQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
                 $deleteQuery->delete($con);
                 $this->postDelete($con);
-                // concrete_inheritance behavior
-                $this->getParentOrCreate($con)->delete($con);
-
                 $this->setDeleted(true);
             }
         });
@@ -746,17 +650,12 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(CustomerContactTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ClientTableMap::DATABASE_NAME);
         }
 
         return $con->transaction(function () use ($con) {
             $ret = $this->preSave($con);
             $isInsert = $this->isNew();
-            // concrete_inheritance behavior
-            $parent = $this->getSyncParent($con);
-            $parent->save($con);
-            $this->setPrimaryKey($parent->getPrimaryKey());
-
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
             } else {
@@ -770,7 +669,7 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                CustomerContactTableMap::addInstanceToPool($this);
+                ClientTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -796,25 +695,6 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
-            // We call the save method on the following object(s) if they
-            // were passed to this object by their corresponding set
-            // method.  This object relates to these object(s) by a
-            // foreign key reference.
-
-            if ($this->aCustomer !== null) {
-                if ($this->aCustomer->isModified() || $this->aCustomer->isNew()) {
-                    $affectedRows += $this->aCustomer->save($con);
-                }
-                $this->setCustomer($this->aCustomer);
-            }
-
-            if ($this->aMeetingAttendee !== null) {
-                if ($this->aMeetingAttendee->isModified() || $this->aMeetingAttendee->isNew()) {
-                    $affectedRows += $this->aMeetingAttendee->save($con);
-                }
-                $this->setMeetingAttendee($this->aMeetingAttendee);
-            }
-
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -826,18 +706,36 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
                 $this->resetModified();
             }
 
-            if ($this->customerContactIntegrationsScheduledForDeletion !== null) {
-                if (!$this->customerContactIntegrationsScheduledForDeletion->isEmpty()) {
-                    foreach ($this->customerContactIntegrationsScheduledForDeletion as $customerContactIntegration) {
+            if ($this->accountsScheduledForDeletion !== null) {
+                if (!$this->accountsScheduledForDeletion->isEmpty()) {
+                    foreach ($this->accountsScheduledForDeletion as $account) {
                         // need to save related object because we set the relation to null
-                        $customerContactIntegration->save($con);
+                        $account->save($con);
                     }
-                    $this->customerContactIntegrationsScheduledForDeletion = null;
+                    $this->accountsScheduledForDeletion = null;
                 }
             }
 
-            if ($this->collCustomerContactIntegrations !== null) {
-                foreach ($this->collCustomerContactIntegrations as $referrerFK) {
+            if ($this->collAccounts !== null) {
+                foreach ($this->collAccounts as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->clientCalendarUsersScheduledForDeletion !== null) {
+                if (!$this->clientCalendarUsersScheduledForDeletion->isEmpty()) {
+                    foreach ($this->clientCalendarUsersScheduledForDeletion as $clientCalendarUser) {
+                        // need to save related object because we set the relation to null
+                        $clientCalendarUser->save($con);
+                    }
+                    $this->clientCalendarUsersScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collClientCalendarUsers !== null) {
+                foreach ($this->collClientCalendarUsers as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -864,29 +762,36 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
         $modifiedColumns = array();
         $index = 0;
 
+        $this->modifiedColumns[ClientTableMap::COL_ID] = true;
+        if (null !== $this->id) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . ClientTableMap::COL_ID . ')');
+        }
+        if (null === $this->id) {
+            try {
+                $dataFetcher = $con->query("SELECT nextval('client_id_seq')");
+                $this->id = (int) $dataFetcher->fetchColumn();
+            } catch (Exception $e) {
+                throw new PropelException('Unable to get sequence id.', 0, $e);
+            }
+        }
+
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(CustomerContactTableMap::COL_CUSTOMER_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'customer_id';
+        if ($this->isColumnModified(ClientTableMap::COL_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'id';
         }
-        if ($this->isColumnModified(CustomerContactTableMap::COL_NAME)) {
+        if ($this->isColumnModified(ClientTableMap::COL_NAME)) {
             $modifiedColumns[':p' . $index++]  = 'name';
         }
-        if ($this->isColumnModified(CustomerContactTableMap::COL_SURNAME)) {
-            $modifiedColumns[':p' . $index++]  = 'surname';
+        if ($this->isColumnModified(ClientTableMap::COL_WEBSITE)) {
+            $modifiedColumns[':p' . $index++]  = 'website';
         }
-        if ($this->isColumnModified(CustomerContactTableMap::COL_TITLE)) {
-            $modifiedColumns[':p' . $index++]  = 'title';
-        }
-        if ($this->isColumnModified(CustomerContactTableMap::COL_EMAIL)) {
-            $modifiedColumns[':p' . $index++]  = 'email';
-        }
-        if ($this->isColumnModified(CustomerContactTableMap::COL_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'id';
+        if ($this->isColumnModified(ClientTableMap::COL_EMAIL_DOMAIN)) {
+            $modifiedColumns[':p' . $index++]  = 'email_domain';
         }
 
         $sql = sprintf(
-            'INSERT INTO customer_contact (%s) VALUES (%s)',
+            'INSERT INTO client (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -895,23 +800,17 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'customer_id':
-                        $stmt->bindValue($identifier, $this->customer_id, PDO::PARAM_INT);
+                    case 'id':
+                        $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
                     case 'name':
                         $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
                         break;
-                    case 'surname':
-                        $stmt->bindValue($identifier, $this->surname, PDO::PARAM_STR);
+                    case 'website':
+                        $stmt->bindValue($identifier, $this->website, PDO::PARAM_STR);
                         break;
-                    case 'title':
-                        $stmt->bindValue($identifier, $this->title, PDO::PARAM_STR);
-                        break;
-                    case 'email':
-                        $stmt->bindValue($identifier, $this->email, PDO::PARAM_STR);
-                        break;
-                    case 'id':
-                        $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
+                    case 'email_domain':
+                        $stmt->bindValue($identifier, $this->email_domain, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -952,7 +851,7 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = CustomerContactTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = ClientTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -969,22 +868,16 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
     {
         switch ($pos) {
             case 0:
-                return $this->getCustomerId();
+                return $this->getId();
                 break;
             case 1:
                 return $this->getName();
                 break;
             case 2:
-                return $this->getSurname();
+                return $this->getWebsite();
                 break;
             case 3:
-                return $this->getTitle();
-                break;
-            case 4:
-                return $this->getEmail();
-                break;
-            case 5:
-                return $this->getId();
+                return $this->getEmailDomain();
                 break;
             default:
                 return null;
@@ -1010,18 +903,16 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
 
-        if (isset($alreadyDumpedObjects['CustomerContact'][$this->hashCode()])) {
+        if (isset($alreadyDumpedObjects['Client'][$this->hashCode()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['CustomerContact'][$this->hashCode()] = true;
-        $keys = CustomerContactTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['Client'][$this->hashCode()] = true;
+        $keys = ClientTableMap::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getCustomerId(),
+            $keys[0] => $this->getId(),
             $keys[1] => $this->getName(),
-            $keys[2] => $this->getSurname(),
-            $keys[3] => $this->getTitle(),
-            $keys[4] => $this->getEmail(),
-            $keys[5] => $this->getId(),
+            $keys[2] => $this->getWebsite(),
+            $keys[3] => $this->getEmailDomain(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1029,50 +920,35 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->aCustomer) {
+            if (null !== $this->collAccounts) {
 
                 switch ($keyType) {
                     case TableMap::TYPE_CAMELNAME:
-                        $key = 'customer';
+                        $key = 'accounts';
                         break;
                     case TableMap::TYPE_FIELDNAME:
-                        $key = 'customer';
+                        $key = 'accounts';
                         break;
                     default:
-                        $key = 'Customer';
+                        $key = 'Accounts';
                 }
 
-                $result[$key] = $this->aCustomer->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+                $result[$key] = $this->collAccounts->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->aMeetingAttendee) {
+            if (null !== $this->collClientCalendarUsers) {
 
                 switch ($keyType) {
                     case TableMap::TYPE_CAMELNAME:
-                        $key = 'meetingAttendee';
+                        $key = 'clientCalendarUsers';
                         break;
                     case TableMap::TYPE_FIELDNAME:
-                        $key = 'meeting_attendee';
+                        $key = 'client_calendar_users';
                         break;
                     default:
-                        $key = 'MeetingAttendee';
+                        $key = 'ClientCalendarUsers';
                 }
 
-                $result[$key] = $this->aMeetingAttendee->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
-            if (null !== $this->collCustomerContactIntegrations) {
-
-                switch ($keyType) {
-                    case TableMap::TYPE_CAMELNAME:
-                        $key = 'customerContactIntegrations';
-                        break;
-                    case TableMap::TYPE_FIELDNAME:
-                        $key = 'customer_contact_integrations';
-                        break;
-                    default:
-                        $key = 'CustomerContactIntegrations';
-                }
-
-                $result[$key] = $this->collCustomerContactIntegrations->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+                $result[$key] = $this->collClientCalendarUsers->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1088,11 +964,11 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
      *                one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
      *                TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      *                Defaults to TableMap::TYPE_PHPNAME.
-     * @return $this|\DataModels\DataModels\CustomerContact
+     * @return $this|\DataModels\DataModels\Client
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = CustomerContactTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = ClientTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -1103,28 +979,22 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
      *
      * @param  int $pos position in xml schema
      * @param  mixed $value field value
-     * @return $this|\DataModels\DataModels\CustomerContact
+     * @return $this|\DataModels\DataModels\Client
      */
     public function setByPosition($pos, $value)
     {
         switch ($pos) {
             case 0:
-                $this->setCustomerId($value);
+                $this->setId($value);
                 break;
             case 1:
                 $this->setName($value);
                 break;
             case 2:
-                $this->setSurname($value);
+                $this->setWebsite($value);
                 break;
             case 3:
-                $this->setTitle($value);
-                break;
-            case 4:
-                $this->setEmail($value);
-                break;
-            case 5:
-                $this->setId($value);
+                $this->setEmailDomain($value);
                 break;
         } // switch()
 
@@ -1150,25 +1020,19 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = CustomerContactTableMap::getFieldNames($keyType);
+        $keys = ClientTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) {
-            $this->setCustomerId($arr[$keys[0]]);
+            $this->setId($arr[$keys[0]]);
         }
         if (array_key_exists($keys[1], $arr)) {
             $this->setName($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
-            $this->setSurname($arr[$keys[2]]);
+            $this->setWebsite($arr[$keys[2]]);
         }
         if (array_key_exists($keys[3], $arr)) {
-            $this->setTitle($arr[$keys[3]]);
-        }
-        if (array_key_exists($keys[4], $arr)) {
-            $this->setEmail($arr[$keys[4]]);
-        }
-        if (array_key_exists($keys[5], $arr)) {
-            $this->setId($arr[$keys[5]]);
+            $this->setEmailDomain($arr[$keys[3]]);
         }
     }
 
@@ -1189,7 +1053,7 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
      * @param string $data The source data to import from
      * @param string $keyType The type of keys the array uses.
      *
-     * @return $this|\DataModels\DataModels\CustomerContact The current object, for fluid interface
+     * @return $this|\DataModels\DataModels\Client The current object, for fluid interface
      */
     public function importFrom($parser, $data, $keyType = TableMap::TYPE_PHPNAME)
     {
@@ -1209,25 +1073,19 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(CustomerContactTableMap::DATABASE_NAME);
+        $criteria = new Criteria(ClientTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(CustomerContactTableMap::COL_CUSTOMER_ID)) {
-            $criteria->add(CustomerContactTableMap::COL_CUSTOMER_ID, $this->customer_id);
+        if ($this->isColumnModified(ClientTableMap::COL_ID)) {
+            $criteria->add(ClientTableMap::COL_ID, $this->id);
         }
-        if ($this->isColumnModified(CustomerContactTableMap::COL_NAME)) {
-            $criteria->add(CustomerContactTableMap::COL_NAME, $this->name);
+        if ($this->isColumnModified(ClientTableMap::COL_NAME)) {
+            $criteria->add(ClientTableMap::COL_NAME, $this->name);
         }
-        if ($this->isColumnModified(CustomerContactTableMap::COL_SURNAME)) {
-            $criteria->add(CustomerContactTableMap::COL_SURNAME, $this->surname);
+        if ($this->isColumnModified(ClientTableMap::COL_WEBSITE)) {
+            $criteria->add(ClientTableMap::COL_WEBSITE, $this->website);
         }
-        if ($this->isColumnModified(CustomerContactTableMap::COL_TITLE)) {
-            $criteria->add(CustomerContactTableMap::COL_TITLE, $this->title);
-        }
-        if ($this->isColumnModified(CustomerContactTableMap::COL_EMAIL)) {
-            $criteria->add(CustomerContactTableMap::COL_EMAIL, $this->email);
-        }
-        if ($this->isColumnModified(CustomerContactTableMap::COL_ID)) {
-            $criteria->add(CustomerContactTableMap::COL_ID, $this->id);
+        if ($this->isColumnModified(ClientTableMap::COL_EMAIL_DOMAIN)) {
+            $criteria->add(ClientTableMap::COL_EMAIL_DOMAIN, $this->email_domain);
         }
 
         return $criteria;
@@ -1245,8 +1103,8 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
      */
     public function buildPkeyCriteria()
     {
-        $criteria = ChildCustomerContactQuery::create();
-        $criteria->add(CustomerContactTableMap::COL_ID, $this->id);
+        $criteria = ChildClientQuery::create();
+        $criteria->add(ClientTableMap::COL_ID, $this->id);
 
         return $criteria;
     }
@@ -1261,15 +1119,8 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
     {
         $validPk = null !== $this->getId();
 
-        $validPrimaryKeyFKs = 1;
+        $validPrimaryKeyFKs = 0;
         $primaryKeyFKs = [];
-
-        //relation customer_contact_fk_5860de to table meeting_attendee
-        if ($this->aMeetingAttendee && $hash = spl_object_hash($this->aMeetingAttendee)) {
-            $primaryKeyFKs[] = $hash;
-        } else {
-            $validPrimaryKeyFKs = false;
-        }
 
         if ($validPk) {
             return crc32(json_encode($this->getPrimaryKey(), JSON_UNESCAPED_UNICODE));
@@ -1315,28 +1166,31 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \DataModels\DataModels\CustomerContact (or compatible) type.
+     * @param      object $copyObj An object of \DataModels\DataModels\Client (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setCustomerId($this->getCustomerId());
         $copyObj->setName($this->getName());
-        $copyObj->setSurname($this->getSurname());
-        $copyObj->setTitle($this->getTitle());
-        $copyObj->setEmail($this->getEmail());
-        $copyObj->setId($this->getId());
+        $copyObj->setWebsite($this->getWebsite());
+        $copyObj->setEmailDomain($this->getEmailDomain());
 
         if ($deepCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
             // the getter/setter methods for fkey referrer objects.
             $copyObj->setNew(false);
 
-            foreach ($this->getCustomerContactIntegrations() as $relObj) {
+            foreach ($this->getAccounts() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addCustomerContactIntegration($relObj->copy($deepCopy));
+                    $copyObj->addAccount($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getClientCalendarUsers() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addClientCalendarUser($relObj->copy($deepCopy));
                 }
             }
 
@@ -1344,6 +1198,7 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
 
         if ($makeNew) {
             $copyObj->setNew(true);
+            $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
         }
     }
 
@@ -1356,7 +1211,7 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
      * objects.
      *
      * @param  boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return \DataModels\DataModels\CustomerContact Clone of current object.
+     * @return \DataModels\DataModels\Client Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1367,102 +1222,6 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
         $this->copyInto($copyObj, $deepCopy);
 
         return $copyObj;
-    }
-
-    /**
-     * Declares an association between this object and a ChildCustomer object.
-     *
-     * @param  ChildCustomer $v
-     * @return $this|\DataModels\DataModels\CustomerContact The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setCustomer(ChildCustomer $v = null)
-    {
-        if ($v === null) {
-            $this->setCustomerId(NULL);
-        } else {
-            $this->setCustomerId($v->getId());
-        }
-
-        $this->aCustomer = $v;
-
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildCustomer object, it will not be re-added.
-        if ($v !== null) {
-            $v->addCustomerContact($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated ChildCustomer object
-     *
-     * @param  ConnectionInterface $con Optional Connection object.
-     * @return ChildCustomer The associated ChildCustomer object.
-     * @throws PropelException
-     */
-    public function getCustomer(ConnectionInterface $con = null)
-    {
-        if ($this->aCustomer === null && ($this->customer_id !== null)) {
-            $this->aCustomer = ChildCustomerQuery::create()->findPk($this->customer_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aCustomer->addCustomerContacts($this);
-             */
-        }
-
-        return $this->aCustomer;
-    }
-
-    /**
-     * Declares an association between this object and a ChildMeetingAttendee object.
-     *
-     * @param  ChildMeetingAttendee $v
-     * @return $this|\DataModels\DataModels\CustomerContact The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setMeetingAttendee(ChildMeetingAttendee $v = null)
-    {
-        if ($v === null) {
-            $this->setId(NULL);
-        } else {
-            $this->setId($v->getId());
-        }
-
-        $this->aMeetingAttendee = $v;
-
-        // Add binding for other direction of this 1:1 relationship.
-        if ($v !== null) {
-            $v->setCustomerContact($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated ChildMeetingAttendee object
-     *
-     * @param  ConnectionInterface $con Optional Connection object.
-     * @return ChildMeetingAttendee The associated ChildMeetingAttendee object.
-     * @throws PropelException
-     */
-    public function getMeetingAttendee(ConnectionInterface $con = null)
-    {
-        if ($this->aMeetingAttendee === null && ($this->id !== null)) {
-            $this->aMeetingAttendee = ChildMeetingAttendeeQuery::create()->findPk($this->id, $con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aMeetingAttendee->setCustomerContact($this);
-        }
-
-        return $this->aMeetingAttendee;
     }
 
 
@@ -1476,37 +1235,40 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
      */
     public function initRelation($relationName)
     {
-        if ('CustomerContactIntegration' == $relationName) {
-            return $this->initCustomerContactIntegrations();
+        if ('Account' == $relationName) {
+            return $this->initAccounts();
+        }
+        if ('ClientCalendarUser' == $relationName) {
+            return $this->initClientCalendarUsers();
         }
     }
 
     /**
-     * Clears out the collCustomerContactIntegrations collection
+     * Clears out the collAccounts collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return void
-     * @see        addCustomerContactIntegrations()
+     * @see        addAccounts()
      */
-    public function clearCustomerContactIntegrations()
+    public function clearAccounts()
     {
-        $this->collCustomerContactIntegrations = null; // important to set this to NULL since that means it is uninitialized
+        $this->collAccounts = null; // important to set this to NULL since that means it is uninitialized
     }
 
     /**
-     * Reset is the collCustomerContactIntegrations collection loaded partially.
+     * Reset is the collAccounts collection loaded partially.
      */
-    public function resetPartialCustomerContactIntegrations($v = true)
+    public function resetPartialAccounts($v = true)
     {
-        $this->collCustomerContactIntegrationsPartial = $v;
+        $this->collAccountsPartial = $v;
     }
 
     /**
-     * Initializes the collCustomerContactIntegrations collection.
+     * Initializes the collAccounts collection.
      *
-     * By default this just sets the collCustomerContactIntegrations collection to an empty array (like clearcollCustomerContactIntegrations());
+     * By default this just sets the collAccounts collection to an empty array (like clearcollAccounts());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -1515,162 +1277,162 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
      *
      * @return void
      */
-    public function initCustomerContactIntegrations($overrideExisting = true)
+    public function initAccounts($overrideExisting = true)
     {
-        if (null !== $this->collCustomerContactIntegrations && !$overrideExisting) {
+        if (null !== $this->collAccounts && !$overrideExisting) {
             return;
         }
 
-        $collectionClassName = CustomerContactIntegrationTableMap::getTableMap()->getCollectionClassName();
+        $collectionClassName = AccountTableMap::getTableMap()->getCollectionClassName();
 
-        $this->collCustomerContactIntegrations = new $collectionClassName;
-        $this->collCustomerContactIntegrations->setModel('\DataModels\DataModels\CustomerContactIntegration');
+        $this->collAccounts = new $collectionClassName;
+        $this->collAccounts->setModel('\DataModels\DataModels\Account');
     }
 
     /**
-     * Gets an array of ChildCustomerContactIntegration objects which contain a foreign key that references this object.
+     * Gets an array of ChildAccount objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
      * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildCustomerContact is new, it will return
+     * If this ChildClient is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
-     * @return ObjectCollection|ChildCustomerContactIntegration[] List of ChildCustomerContactIntegration objects
+     * @return ObjectCollection|ChildAccount[] List of ChildAccount objects
      * @throws PropelException
      */
-    public function getCustomerContactIntegrations(Criteria $criteria = null, ConnectionInterface $con = null)
+    public function getAccounts(Criteria $criteria = null, ConnectionInterface $con = null)
     {
-        $partial = $this->collCustomerContactIntegrationsPartial && !$this->isNew();
-        if (null === $this->collCustomerContactIntegrations || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collCustomerContactIntegrations) {
+        $partial = $this->collAccountsPartial && !$this->isNew();
+        if (null === $this->collAccounts || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collAccounts) {
                 // return empty collection
-                $this->initCustomerContactIntegrations();
+                $this->initAccounts();
             } else {
-                $collCustomerContactIntegrations = ChildCustomerContactIntegrationQuery::create(null, $criteria)
-                    ->filterByCustomerContact($this)
+                $collAccounts = ChildAccountQuery::create(null, $criteria)
+                    ->filterByClient($this)
                     ->find($con);
 
                 if (null !== $criteria) {
-                    if (false !== $this->collCustomerContactIntegrationsPartial && count($collCustomerContactIntegrations)) {
-                        $this->initCustomerContactIntegrations(false);
+                    if (false !== $this->collAccountsPartial && count($collAccounts)) {
+                        $this->initAccounts(false);
 
-                        foreach ($collCustomerContactIntegrations as $obj) {
-                            if (false == $this->collCustomerContactIntegrations->contains($obj)) {
-                                $this->collCustomerContactIntegrations->append($obj);
+                        foreach ($collAccounts as $obj) {
+                            if (false == $this->collAccounts->contains($obj)) {
+                                $this->collAccounts->append($obj);
                             }
                         }
 
-                        $this->collCustomerContactIntegrationsPartial = true;
+                        $this->collAccountsPartial = true;
                     }
 
-                    return $collCustomerContactIntegrations;
+                    return $collAccounts;
                 }
 
-                if ($partial && $this->collCustomerContactIntegrations) {
-                    foreach ($this->collCustomerContactIntegrations as $obj) {
+                if ($partial && $this->collAccounts) {
+                    foreach ($this->collAccounts as $obj) {
                         if ($obj->isNew()) {
-                            $collCustomerContactIntegrations[] = $obj;
+                            $collAccounts[] = $obj;
                         }
                     }
                 }
 
-                $this->collCustomerContactIntegrations = $collCustomerContactIntegrations;
-                $this->collCustomerContactIntegrationsPartial = false;
+                $this->collAccounts = $collAccounts;
+                $this->collAccountsPartial = false;
             }
         }
 
-        return $this->collCustomerContactIntegrations;
+        return $this->collAccounts;
     }
 
     /**
-     * Sets a collection of ChildCustomerContactIntegration objects related by a one-to-many relationship
+     * Sets a collection of ChildAccount objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $customerContactIntegrations A Propel collection.
+     * @param      Collection $accounts A Propel collection.
      * @param      ConnectionInterface $con Optional connection object
-     * @return $this|ChildCustomerContact The current object (for fluent API support)
+     * @return $this|ChildClient The current object (for fluent API support)
      */
-    public function setCustomerContactIntegrations(Collection $customerContactIntegrations, ConnectionInterface $con = null)
+    public function setAccounts(Collection $accounts, ConnectionInterface $con = null)
     {
-        /** @var ChildCustomerContactIntegration[] $customerContactIntegrationsToDelete */
-        $customerContactIntegrationsToDelete = $this->getCustomerContactIntegrations(new Criteria(), $con)->diff($customerContactIntegrations);
+        /** @var ChildAccount[] $accountsToDelete */
+        $accountsToDelete = $this->getAccounts(new Criteria(), $con)->diff($accounts);
 
 
-        $this->customerContactIntegrationsScheduledForDeletion = $customerContactIntegrationsToDelete;
+        $this->accountsScheduledForDeletion = $accountsToDelete;
 
-        foreach ($customerContactIntegrationsToDelete as $customerContactIntegrationRemoved) {
-            $customerContactIntegrationRemoved->setCustomerContact(null);
+        foreach ($accountsToDelete as $accountRemoved) {
+            $accountRemoved->setClient(null);
         }
 
-        $this->collCustomerContactIntegrations = null;
-        foreach ($customerContactIntegrations as $customerContactIntegration) {
-            $this->addCustomerContactIntegration($customerContactIntegration);
+        $this->collAccounts = null;
+        foreach ($accounts as $account) {
+            $this->addAccount($account);
         }
 
-        $this->collCustomerContactIntegrations = $customerContactIntegrations;
-        $this->collCustomerContactIntegrationsPartial = false;
+        $this->collAccounts = $accounts;
+        $this->collAccountsPartial = false;
 
         return $this;
     }
 
     /**
-     * Returns the number of related CustomerContactIntegration objects.
+     * Returns the number of related Account objects.
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct
      * @param      ConnectionInterface $con
-     * @return int             Count of related CustomerContactIntegration objects.
+     * @return int             Count of related Account objects.
      * @throws PropelException
      */
-    public function countCustomerContactIntegrations(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    public function countAccounts(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
     {
-        $partial = $this->collCustomerContactIntegrationsPartial && !$this->isNew();
-        if (null === $this->collCustomerContactIntegrations || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collCustomerContactIntegrations) {
+        $partial = $this->collAccountsPartial && !$this->isNew();
+        if (null === $this->collAccounts || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collAccounts) {
                 return 0;
             }
 
             if ($partial && !$criteria) {
-                return count($this->getCustomerContactIntegrations());
+                return count($this->getAccounts());
             }
 
-            $query = ChildCustomerContactIntegrationQuery::create(null, $criteria);
+            $query = ChildAccountQuery::create(null, $criteria);
             if ($distinct) {
                 $query->distinct();
             }
 
             return $query
-                ->filterByCustomerContact($this)
+                ->filterByClient($this)
                 ->count($con);
         }
 
-        return count($this->collCustomerContactIntegrations);
+        return count($this->collAccounts);
     }
 
     /**
-     * Method called to associate a ChildCustomerContactIntegration object to this object
-     * through the ChildCustomerContactIntegration foreign key attribute.
+     * Method called to associate a ChildAccount object to this object
+     * through the ChildAccount foreign key attribute.
      *
-     * @param  ChildCustomerContactIntegration $l ChildCustomerContactIntegration
-     * @return $this|\DataModels\DataModels\CustomerContact The current object (for fluent API support)
+     * @param  ChildAccount $l ChildAccount
+     * @return $this|\DataModels\DataModels\Client The current object (for fluent API support)
      */
-    public function addCustomerContactIntegration(ChildCustomerContactIntegration $l)
+    public function addAccount(ChildAccount $l)
     {
-        if ($this->collCustomerContactIntegrations === null) {
-            $this->initCustomerContactIntegrations();
-            $this->collCustomerContactIntegrationsPartial = true;
+        if ($this->collAccounts === null) {
+            $this->initAccounts();
+            $this->collAccountsPartial = true;
         }
 
-        if (!$this->collCustomerContactIntegrations->contains($l)) {
-            $this->doAddCustomerContactIntegration($l);
+        if (!$this->collAccounts->contains($l)) {
+            $this->doAddAccount($l);
 
-            if ($this->customerContactIntegrationsScheduledForDeletion and $this->customerContactIntegrationsScheduledForDeletion->contains($l)) {
-                $this->customerContactIntegrationsScheduledForDeletion->remove($this->customerContactIntegrationsScheduledForDeletion->search($l));
+            if ($this->accountsScheduledForDeletion and $this->accountsScheduledForDeletion->contains($l)) {
+                $this->accountsScheduledForDeletion->remove($this->accountsScheduledForDeletion->search($l));
             }
         }
 
@@ -1678,32 +1440,282 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
     }
 
     /**
-     * @param ChildCustomerContactIntegration $customerContactIntegration The ChildCustomerContactIntegration object to add.
+     * @param ChildAccount $account The ChildAccount object to add.
      */
-    protected function doAddCustomerContactIntegration(ChildCustomerContactIntegration $customerContactIntegration)
+    protected function doAddAccount(ChildAccount $account)
     {
-        $this->collCustomerContactIntegrations[]= $customerContactIntegration;
-        $customerContactIntegration->setCustomerContact($this);
+        $this->collAccounts[]= $account;
+        $account->setClient($this);
     }
 
     /**
-     * @param  ChildCustomerContactIntegration $customerContactIntegration The ChildCustomerContactIntegration object to remove.
-     * @return $this|ChildCustomerContact The current object (for fluent API support)
+     * @param  ChildAccount $account The ChildAccount object to remove.
+     * @return $this|ChildClient The current object (for fluent API support)
      */
-    public function removeCustomerContactIntegration(ChildCustomerContactIntegration $customerContactIntegration)
+    public function removeAccount(ChildAccount $account)
     {
-        if ($this->getCustomerContactIntegrations()->contains($customerContactIntegration)) {
-            $pos = $this->collCustomerContactIntegrations->search($customerContactIntegration);
-            $this->collCustomerContactIntegrations->remove($pos);
-            if (null === $this->customerContactIntegrationsScheduledForDeletion) {
-                $this->customerContactIntegrationsScheduledForDeletion = clone $this->collCustomerContactIntegrations;
-                $this->customerContactIntegrationsScheduledForDeletion->clear();
+        if ($this->getAccounts()->contains($account)) {
+            $pos = $this->collAccounts->search($account);
+            $this->collAccounts->remove($pos);
+            if (null === $this->accountsScheduledForDeletion) {
+                $this->accountsScheduledForDeletion = clone $this->collAccounts;
+                $this->accountsScheduledForDeletion->clear();
             }
-            $this->customerContactIntegrationsScheduledForDeletion[]= $customerContactIntegration;
-            $customerContactIntegration->setCustomerContact(null);
+            $this->accountsScheduledForDeletion[]= $account;
+            $account->setClient(null);
         }
 
         return $this;
+    }
+
+    /**
+     * Clears out the collClientCalendarUsers collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addClientCalendarUsers()
+     */
+    public function clearClientCalendarUsers()
+    {
+        $this->collClientCalendarUsers = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collClientCalendarUsers collection loaded partially.
+     */
+    public function resetPartialClientCalendarUsers($v = true)
+    {
+        $this->collClientCalendarUsersPartial = $v;
+    }
+
+    /**
+     * Initializes the collClientCalendarUsers collection.
+     *
+     * By default this just sets the collClientCalendarUsers collection to an empty array (like clearcollClientCalendarUsers());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initClientCalendarUsers($overrideExisting = true)
+    {
+        if (null !== $this->collClientCalendarUsers && !$overrideExisting) {
+            return;
+        }
+
+        $collectionClassName = ClientCalendarUserTableMap::getTableMap()->getCollectionClassName();
+
+        $this->collClientCalendarUsers = new $collectionClassName;
+        $this->collClientCalendarUsers->setModel('\DataModels\DataModels\ClientCalendarUser');
+    }
+
+    /**
+     * Gets an array of ChildClientCalendarUser objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildClient is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildClientCalendarUser[] List of ChildClientCalendarUser objects
+     * @throws PropelException
+     */
+    public function getClientCalendarUsers(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collClientCalendarUsersPartial && !$this->isNew();
+        if (null === $this->collClientCalendarUsers || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collClientCalendarUsers) {
+                // return empty collection
+                $this->initClientCalendarUsers();
+            } else {
+                $collClientCalendarUsers = ChildClientCalendarUserQuery::create(null, $criteria)
+                    ->filterByClient($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collClientCalendarUsersPartial && count($collClientCalendarUsers)) {
+                        $this->initClientCalendarUsers(false);
+
+                        foreach ($collClientCalendarUsers as $obj) {
+                            if (false == $this->collClientCalendarUsers->contains($obj)) {
+                                $this->collClientCalendarUsers->append($obj);
+                            }
+                        }
+
+                        $this->collClientCalendarUsersPartial = true;
+                    }
+
+                    return $collClientCalendarUsers;
+                }
+
+                if ($partial && $this->collClientCalendarUsers) {
+                    foreach ($this->collClientCalendarUsers as $obj) {
+                        if ($obj->isNew()) {
+                            $collClientCalendarUsers[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collClientCalendarUsers = $collClientCalendarUsers;
+                $this->collClientCalendarUsersPartial = false;
+            }
+        }
+
+        return $this->collClientCalendarUsers;
+    }
+
+    /**
+     * Sets a collection of ChildClientCalendarUser objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $clientCalendarUsers A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return $this|ChildClient The current object (for fluent API support)
+     */
+    public function setClientCalendarUsers(Collection $clientCalendarUsers, ConnectionInterface $con = null)
+    {
+        /** @var ChildClientCalendarUser[] $clientCalendarUsersToDelete */
+        $clientCalendarUsersToDelete = $this->getClientCalendarUsers(new Criteria(), $con)->diff($clientCalendarUsers);
+
+
+        $this->clientCalendarUsersScheduledForDeletion = $clientCalendarUsersToDelete;
+
+        foreach ($clientCalendarUsersToDelete as $clientCalendarUserRemoved) {
+            $clientCalendarUserRemoved->setClient(null);
+        }
+
+        $this->collClientCalendarUsers = null;
+        foreach ($clientCalendarUsers as $clientCalendarUser) {
+            $this->addClientCalendarUser($clientCalendarUser);
+        }
+
+        $this->collClientCalendarUsers = $clientCalendarUsers;
+        $this->collClientCalendarUsersPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related ClientCalendarUser objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related ClientCalendarUser objects.
+     * @throws PropelException
+     */
+    public function countClientCalendarUsers(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collClientCalendarUsersPartial && !$this->isNew();
+        if (null === $this->collClientCalendarUsers || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collClientCalendarUsers) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getClientCalendarUsers());
+            }
+
+            $query = ChildClientCalendarUserQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByClient($this)
+                ->count($con);
+        }
+
+        return count($this->collClientCalendarUsers);
+    }
+
+    /**
+     * Method called to associate a ChildClientCalendarUser object to this object
+     * through the ChildClientCalendarUser foreign key attribute.
+     *
+     * @param  ChildClientCalendarUser $l ChildClientCalendarUser
+     * @return $this|\DataModels\DataModels\Client The current object (for fluent API support)
+     */
+    public function addClientCalendarUser(ChildClientCalendarUser $l)
+    {
+        if ($this->collClientCalendarUsers === null) {
+            $this->initClientCalendarUsers();
+            $this->collClientCalendarUsersPartial = true;
+        }
+
+        if (!$this->collClientCalendarUsers->contains($l)) {
+            $this->doAddClientCalendarUser($l);
+
+            if ($this->clientCalendarUsersScheduledForDeletion and $this->clientCalendarUsersScheduledForDeletion->contains($l)) {
+                $this->clientCalendarUsersScheduledForDeletion->remove($this->clientCalendarUsersScheduledForDeletion->search($l));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ChildClientCalendarUser $clientCalendarUser The ChildClientCalendarUser object to add.
+     */
+    protected function doAddClientCalendarUser(ChildClientCalendarUser $clientCalendarUser)
+    {
+        $this->collClientCalendarUsers[]= $clientCalendarUser;
+        $clientCalendarUser->setClient($this);
+    }
+
+    /**
+     * @param  ChildClientCalendarUser $clientCalendarUser The ChildClientCalendarUser object to remove.
+     * @return $this|ChildClient The current object (for fluent API support)
+     */
+    public function removeClientCalendarUser(ChildClientCalendarUser $clientCalendarUser)
+    {
+        if ($this->getClientCalendarUsers()->contains($clientCalendarUser)) {
+            $pos = $this->collClientCalendarUsers->search($clientCalendarUser);
+            $this->collClientCalendarUsers->remove($pos);
+            if (null === $this->clientCalendarUsersScheduledForDeletion) {
+                $this->clientCalendarUsersScheduledForDeletion = clone $this->collClientCalendarUsers;
+                $this->clientCalendarUsersScheduledForDeletion->clear();
+            }
+            $this->clientCalendarUsersScheduledForDeletion[]= $clientCalendarUser;
+            $clientCalendarUser->setClient(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Client is new, it will return
+     * an empty collection; or if this Client has previously
+     * been saved, it will retrieve related ClientCalendarUsers from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Client.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return ObjectCollection|ChildClientCalendarUser[] List of ChildClientCalendarUser objects
+     */
+    public function getClientCalendarUsersJoinMeetingAttendee(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildClientCalendarUserQuery::create(null, $criteria);
+        $query->joinWith('MeetingAttendee', $joinBehavior);
+
+        return $this->getClientCalendarUsers($query, $con);
     }
 
     /**
@@ -1713,18 +1725,10 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
      */
     public function clear()
     {
-        if (null !== $this->aCustomer) {
-            $this->aCustomer->removeCustomerContact($this);
-        }
-        if (null !== $this->aMeetingAttendee) {
-            $this->aMeetingAttendee->removeCustomerContact($this);
-        }
-        $this->customer_id = null;
-        $this->name = null;
-        $this->surname = null;
-        $this->title = null;
-        $this->email = null;
         $this->id = null;
+        $this->name = null;
+        $this->website = null;
+        $this->email_domain = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
         $this->resetModified();
@@ -1743,16 +1747,20 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collCustomerContactIntegrations) {
-                foreach ($this->collCustomerContactIntegrations as $o) {
+            if ($this->collAccounts) {
+                foreach ($this->collAccounts as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collClientCalendarUsers) {
+                foreach ($this->collClientCalendarUsers as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
         } // if ($deep)
 
-        $this->collCustomerContactIntegrations = null;
-        $this->aCustomer = null;
-        $this->aMeetingAttendee = null;
+        $this->collAccounts = null;
+        $this->collClientCalendarUsers = null;
     }
 
     /**
@@ -1762,50 +1770,7 @@ abstract class CustomerContact extends ChildMeetingAttendee implements ActiveRec
      */
     public function __toString()
     {
-        return (string) $this->exportTo(CustomerContactTableMap::DEFAULT_STRING_FORMAT);
-    }
-
-    // concrete_inheritance behavior
-
-    /**
-     * Get or Create the parent ChildMeetingAttendee object of the current object
-     *
-     * @return    ChildMeetingAttendee The parent object
-     */
-    public function getParentOrCreate($con = null)
-    {
-        if ($this->isNew()) {
-            if ($this->isPrimaryKeyNull()) {
-                $parent = new ChildMeetingAttendee();
-                $parent->setDescendantClass('DataModels\DataModels\CustomerContact');
-
-                return $parent;
-            } else {
-                $parent = \DataModels\DataModels\MeetingAttendeeQuery::create()->findPk($this->getPrimaryKey(), $con);
-                if (null === $parent || null !== $parent->getDescendantClass()) {
-                    $parent = new ChildMeetingAttendee();
-                    $parent->setPrimaryKey($this->getPrimaryKey());
-                    $parent->setDescendantClass('DataModels\DataModels\CustomerContact');
-                }
-
-                return $parent;
-            }
-        } else {
-            return ChildMeetingAttendeeQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-    }
-
-    /**
-     * Create or Update the parent MeetingAttendee object
-     * And return its primary key
-     *
-     * @return    int The primary key of the parent object
-     */
-    public function getSyncParent($con = null)
-    {
-        $parent = $this->getParentOrCreate($con);
-
-        return $parent;
+        return (string) $this->exportTo(ClientTableMap::DEFAULT_STRING_FORMAT);
     }
 
     /**

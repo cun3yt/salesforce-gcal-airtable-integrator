@@ -72,9 +72,9 @@ class ClientCalendarUserTableMap extends TableMap
     const NUM_HYDRATE_COLUMNS = 6;
 
     /**
-     * the column name for the internal_client_id field
+     * the column name for the client_id field
      */
-    const COL_INTERNAL_CLIENT_ID = 'client_calendar_user.internal_client_id';
+    const COL_CLIENT_ID = 'client_calendar_user.client_id';
 
     /**
      * the column name for the name field
@@ -113,10 +113,10 @@ class ClientCalendarUserTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('InternalClientId', 'Name', 'Surname', 'Title', 'Email', 'Id', ),
-        self::TYPE_CAMELNAME     => array('internalClientId', 'name', 'surname', 'title', 'email', 'id', ),
-        self::TYPE_COLNAME       => array(ClientCalendarUserTableMap::COL_INTERNAL_CLIENT_ID, ClientCalendarUserTableMap::COL_NAME, ClientCalendarUserTableMap::COL_SURNAME, ClientCalendarUserTableMap::COL_TITLE, ClientCalendarUserTableMap::COL_EMAIL, ClientCalendarUserTableMap::COL_ID, ),
-        self::TYPE_FIELDNAME     => array('internal_client_id', 'name', 'surname', 'title', 'email', 'id', ),
+        self::TYPE_PHPNAME       => array('ClientId', 'Name', 'Surname', 'Title', 'Email', 'Id', ),
+        self::TYPE_CAMELNAME     => array('clientId', 'name', 'surname', 'title', 'email', 'id', ),
+        self::TYPE_COLNAME       => array(ClientCalendarUserTableMap::COL_CLIENT_ID, ClientCalendarUserTableMap::COL_NAME, ClientCalendarUserTableMap::COL_SURNAME, ClientCalendarUserTableMap::COL_TITLE, ClientCalendarUserTableMap::COL_EMAIL, ClientCalendarUserTableMap::COL_ID, ),
+        self::TYPE_FIELDNAME     => array('client_id', 'name', 'surname', 'title', 'email', 'id', ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
@@ -127,10 +127,10 @@ class ClientCalendarUserTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('InternalClientId' => 0, 'Name' => 1, 'Surname' => 2, 'Title' => 3, 'Email' => 4, 'Id' => 5, ),
-        self::TYPE_CAMELNAME     => array('internalClientId' => 0, 'name' => 1, 'surname' => 2, 'title' => 3, 'email' => 4, 'id' => 5, ),
-        self::TYPE_COLNAME       => array(ClientCalendarUserTableMap::COL_INTERNAL_CLIENT_ID => 0, ClientCalendarUserTableMap::COL_NAME => 1, ClientCalendarUserTableMap::COL_SURNAME => 2, ClientCalendarUserTableMap::COL_TITLE => 3, ClientCalendarUserTableMap::COL_EMAIL => 4, ClientCalendarUserTableMap::COL_ID => 5, ),
-        self::TYPE_FIELDNAME     => array('internal_client_id' => 0, 'name' => 1, 'surname' => 2, 'title' => 3, 'email' => 4, 'id' => 5, ),
+        self::TYPE_PHPNAME       => array('ClientId' => 0, 'Name' => 1, 'Surname' => 2, 'Title' => 3, 'Email' => 4, 'Id' => 5, ),
+        self::TYPE_CAMELNAME     => array('clientId' => 0, 'name' => 1, 'surname' => 2, 'title' => 3, 'email' => 4, 'id' => 5, ),
+        self::TYPE_COLNAME       => array(ClientCalendarUserTableMap::COL_CLIENT_ID => 0, ClientCalendarUserTableMap::COL_NAME => 1, ClientCalendarUserTableMap::COL_SURNAME => 2, ClientCalendarUserTableMap::COL_TITLE => 3, ClientCalendarUserTableMap::COL_EMAIL => 4, ClientCalendarUserTableMap::COL_ID => 5, ),
+        self::TYPE_FIELDNAME     => array('client_id' => 0, 'name' => 1, 'surname' => 2, 'title' => 3, 'email' => 4, 'id' => 5, ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
@@ -151,7 +151,7 @@ class ClientCalendarUserTableMap extends TableMap
         $this->setPackage('DataModels.DataModels');
         $this->setUseIdGenerator(false);
         // columns
-        $this->addForeignKey('internal_client_id', 'InternalClientId', 'INTEGER', 'internal_client', 'id', false, null, null);
+        $this->addForeignKey('client_id', 'ClientId', 'INTEGER', 'client', 'id', false, null, null);
         $this->addColumn('name', 'Name', 'VARCHAR', false, 255, null);
         $this->addColumn('surname', 'Surname', 'VARCHAR', false, 255, null);
         $this->addColumn('title', 'Title', 'VARCHAR', false, 127, null);
@@ -164,10 +164,10 @@ class ClientCalendarUserTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('InternalClient', '\\DataModels\\DataModels\\InternalClient', RelationMap::MANY_TO_ONE, array (
+        $this->addRelation('Client', '\\DataModels\\DataModels\\Client', RelationMap::MANY_TO_ONE, array (
   0 =>
   array (
-    0 => ':internal_client_id',
+    0 => ':client_id',
     1 => ':id',
   ),
 ), null, null, null, false);
@@ -341,14 +341,14 @@ class ClientCalendarUserTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(ClientCalendarUserTableMap::COL_INTERNAL_CLIENT_ID);
+            $criteria->addSelectColumn(ClientCalendarUserTableMap::COL_CLIENT_ID);
             $criteria->addSelectColumn(ClientCalendarUserTableMap::COL_NAME);
             $criteria->addSelectColumn(ClientCalendarUserTableMap::COL_SURNAME);
             $criteria->addSelectColumn(ClientCalendarUserTableMap::COL_TITLE);
             $criteria->addSelectColumn(ClientCalendarUserTableMap::COL_EMAIL);
             $criteria->addSelectColumn(ClientCalendarUserTableMap::COL_ID);
         } else {
-            $criteria->addSelectColumn($alias . '.internal_client_id');
+            $criteria->addSelectColumn($alias . '.client_id');
             $criteria->addSelectColumn($alias . '.name');
             $criteria->addSelectColumn($alias . '.surname');
             $criteria->addSelectColumn($alias . '.title');

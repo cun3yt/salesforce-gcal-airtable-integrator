@@ -4,9 +4,9 @@ namespace DataModels\DataModels\Base;
 
 use \Exception;
 use \PDO;
-use DataModels\DataModels\Customer as ChildCustomer;
-use DataModels\DataModels\CustomerQuery as ChildCustomerQuery;
-use DataModels\DataModels\Map\CustomerTableMap;
+use DataModels\DataModels\Client as ChildClient;
+use DataModels\DataModels\ClientQuery as ChildClientQuery;
+use DataModels\DataModels\Map\ClientTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -16,104 +16,104 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 
 /**
- * Base class that represents a query for the 'customer' table.
+ * Base class that represents a query for the 'client' table.
  *
  *
  *
- * @method     ChildCustomerQuery orderById($order = Criteria::ASC) Order by the id column
- * @method     ChildCustomerQuery orderByName($order = Criteria::ASC) Order by the name column
- * @method     ChildCustomerQuery orderByWebsite($order = Criteria::ASC) Order by the website column
- * @method     ChildCustomerQuery orderByEmailDomain($order = Criteria::ASC) Order by the email_domain column
+ * @method     ChildClientQuery orderById($order = Criteria::ASC) Order by the id column
+ * @method     ChildClientQuery orderByName($order = Criteria::ASC) Order by the name column
+ * @method     ChildClientQuery orderByWebsite($order = Criteria::ASC) Order by the website column
+ * @method     ChildClientQuery orderByEmailDomain($order = Criteria::ASC) Order by the email_domain column
  *
- * @method     ChildCustomerQuery groupById() Group by the id column
- * @method     ChildCustomerQuery groupByName() Group by the name column
- * @method     ChildCustomerQuery groupByWebsite() Group by the website column
- * @method     ChildCustomerQuery groupByEmailDomain() Group by the email_domain column
+ * @method     ChildClientQuery groupById() Group by the id column
+ * @method     ChildClientQuery groupByName() Group by the name column
+ * @method     ChildClientQuery groupByWebsite() Group by the website column
+ * @method     ChildClientQuery groupByEmailDomain() Group by the email_domain column
  *
- * @method     ChildCustomerQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
- * @method     ChildCustomerQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
- * @method     ChildCustomerQuery innerJoin($relation) Adds a INNER JOIN clause to the query
+ * @method     ChildClientQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
+ * @method     ChildClientQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
+ * @method     ChildClientQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method     ChildCustomerQuery leftJoinWith($relation) Adds a LEFT JOIN clause and with to the query
- * @method     ChildCustomerQuery rightJoinWith($relation) Adds a RIGHT JOIN clause and with to the query
- * @method     ChildCustomerQuery innerJoinWith($relation) Adds a INNER JOIN clause and with to the query
+ * @method     ChildClientQuery leftJoinWith($relation) Adds a LEFT JOIN clause and with to the query
+ * @method     ChildClientQuery rightJoinWith($relation) Adds a RIGHT JOIN clause and with to the query
+ * @method     ChildClientQuery innerJoinWith($relation) Adds a INNER JOIN clause and with to the query
  *
- * @method     ChildCustomerQuery leftJoinAccount($relationAlias = null) Adds a LEFT JOIN clause to the query using the Account relation
- * @method     ChildCustomerQuery rightJoinAccount($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Account relation
- * @method     ChildCustomerQuery innerJoinAccount($relationAlias = null) Adds a INNER JOIN clause to the query using the Account relation
+ * @method     ChildClientQuery leftJoinAccount($relationAlias = null) Adds a LEFT JOIN clause to the query using the Account relation
+ * @method     ChildClientQuery rightJoinAccount($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Account relation
+ * @method     ChildClientQuery innerJoinAccount($relationAlias = null) Adds a INNER JOIN clause to the query using the Account relation
  *
- * @method     ChildCustomerQuery joinWithAccount($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the Account relation
+ * @method     ChildClientQuery joinWithAccount($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the Account relation
  *
- * @method     ChildCustomerQuery leftJoinWithAccount() Adds a LEFT JOIN clause and with to the query using the Account relation
- * @method     ChildCustomerQuery rightJoinWithAccount() Adds a RIGHT JOIN clause and with to the query using the Account relation
- * @method     ChildCustomerQuery innerJoinWithAccount() Adds a INNER JOIN clause and with to the query using the Account relation
+ * @method     ChildClientQuery leftJoinWithAccount() Adds a LEFT JOIN clause and with to the query using the Account relation
+ * @method     ChildClientQuery rightJoinWithAccount() Adds a RIGHT JOIN clause and with to the query using the Account relation
+ * @method     ChildClientQuery innerJoinWithAccount() Adds a INNER JOIN clause and with to the query using the Account relation
  *
- * @method     ChildCustomerQuery leftJoinCustomerContact($relationAlias = null) Adds a LEFT JOIN clause to the query using the CustomerContact relation
- * @method     ChildCustomerQuery rightJoinCustomerContact($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CustomerContact relation
- * @method     ChildCustomerQuery innerJoinCustomerContact($relationAlias = null) Adds a INNER JOIN clause to the query using the CustomerContact relation
+ * @method     ChildClientQuery leftJoinClientCalendarUser($relationAlias = null) Adds a LEFT JOIN clause to the query using the ClientCalendarUser relation
+ * @method     ChildClientQuery rightJoinClientCalendarUser($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ClientCalendarUser relation
+ * @method     ChildClientQuery innerJoinClientCalendarUser($relationAlias = null) Adds a INNER JOIN clause to the query using the ClientCalendarUser relation
  *
- * @method     ChildCustomerQuery joinWithCustomerContact($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the CustomerContact relation
+ * @method     ChildClientQuery joinWithClientCalendarUser($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the ClientCalendarUser relation
  *
- * @method     ChildCustomerQuery leftJoinWithCustomerContact() Adds a LEFT JOIN clause and with to the query using the CustomerContact relation
- * @method     ChildCustomerQuery rightJoinWithCustomerContact() Adds a RIGHT JOIN clause and with to the query using the CustomerContact relation
- * @method     ChildCustomerQuery innerJoinWithCustomerContact() Adds a INNER JOIN clause and with to the query using the CustomerContact relation
+ * @method     ChildClientQuery leftJoinWithClientCalendarUser() Adds a LEFT JOIN clause and with to the query using the ClientCalendarUser relation
+ * @method     ChildClientQuery rightJoinWithClientCalendarUser() Adds a RIGHT JOIN clause and with to the query using the ClientCalendarUser relation
+ * @method     ChildClientQuery innerJoinWithClientCalendarUser() Adds a INNER JOIN clause and with to the query using the ClientCalendarUser relation
  *
- * @method     \DataModels\DataModels\AccountQuery|\DataModels\DataModels\CustomerContactQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     \DataModels\DataModels\AccountQuery|\DataModels\DataModels\ClientCalendarUserQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
- * @method     ChildCustomer findOne(ConnectionInterface $con = null) Return the first ChildCustomer matching the query
- * @method     ChildCustomer findOneOrCreate(ConnectionInterface $con = null) Return the first ChildCustomer matching the query, or a new ChildCustomer object populated from the query conditions when no match is found
+ * @method     ChildClient findOne(ConnectionInterface $con = null) Return the first ChildClient matching the query
+ * @method     ChildClient findOneOrCreate(ConnectionInterface $con = null) Return the first ChildClient matching the query, or a new ChildClient object populated from the query conditions when no match is found
  *
- * @method     ChildCustomer findOneById(int $id) Return the first ChildCustomer filtered by the id column
- * @method     ChildCustomer findOneByName(string $name) Return the first ChildCustomer filtered by the name column
- * @method     ChildCustomer findOneByWebsite(string $website) Return the first ChildCustomer filtered by the website column
- * @method     ChildCustomer findOneByEmailDomain(string $email_domain) Return the first ChildCustomer filtered by the email_domain column *
+ * @method     ChildClient findOneById(int $id) Return the first ChildClient filtered by the id column
+ * @method     ChildClient findOneByName(string $name) Return the first ChildClient filtered by the name column
+ * @method     ChildClient findOneByWebsite(string $website) Return the first ChildClient filtered by the website column
+ * @method     ChildClient findOneByEmailDomain(string $email_domain) Return the first ChildClient filtered by the email_domain column *
 
- * @method     ChildCustomer requirePk($key, ConnectionInterface $con = null) Return the ChildCustomer by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildCustomer requireOne(ConnectionInterface $con = null) Return the first ChildCustomer matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildClient requirePk($key, ConnectionInterface $con = null) Return the ChildClient by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildClient requireOne(ConnectionInterface $con = null) Return the first ChildClient matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
- * @method     ChildCustomer requireOneById(int $id) Return the first ChildCustomer filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildCustomer requireOneByName(string $name) Return the first ChildCustomer filtered by the name column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildCustomer requireOneByWebsite(string $website) Return the first ChildCustomer filtered by the website column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildCustomer requireOneByEmailDomain(string $email_domain) Return the first ChildCustomer filtered by the email_domain column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildClient requireOneById(int $id) Return the first ChildClient filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildClient requireOneByName(string $name) Return the first ChildClient filtered by the name column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildClient requireOneByWebsite(string $website) Return the first ChildClient filtered by the website column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildClient requireOneByEmailDomain(string $email_domain) Return the first ChildClient filtered by the email_domain column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
- * @method     ChildCustomer[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildCustomer objects based on current ModelCriteria
- * @method     ChildCustomer[]|ObjectCollection findById(int $id) Return ChildCustomer objects filtered by the id column
- * @method     ChildCustomer[]|ObjectCollection findByName(string $name) Return ChildCustomer objects filtered by the name column
- * @method     ChildCustomer[]|ObjectCollection findByWebsite(string $website) Return ChildCustomer objects filtered by the website column
- * @method     ChildCustomer[]|ObjectCollection findByEmailDomain(string $email_domain) Return ChildCustomer objects filtered by the email_domain column
- * @method     ChildCustomer[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
+ * @method     ChildClient[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildClient objects based on current ModelCriteria
+ * @method     ChildClient[]|ObjectCollection findById(int $id) Return ChildClient objects filtered by the id column
+ * @method     ChildClient[]|ObjectCollection findByName(string $name) Return ChildClient objects filtered by the name column
+ * @method     ChildClient[]|ObjectCollection findByWebsite(string $website) Return ChildClient objects filtered by the website column
+ * @method     ChildClient[]|ObjectCollection findByEmailDomain(string $email_domain) Return ChildClient objects filtered by the email_domain column
+ * @method     ChildClient[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
  *
  */
-abstract class CustomerQuery extends ModelCriteria
+abstract class ClientQuery extends ModelCriteria
 {
     protected $entityNotFoundExceptionClass = '\\Propel\\Runtime\\Exception\\EntityNotFoundException';
 
     /**
-     * Initializes internal state of \DataModels\DataModels\Base\CustomerQuery object.
+     * Initializes internal state of \DataModels\DataModels\Base\ClientQuery object.
      *
      * @param     string $dbName The database name
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'default', $modelName = '\\DataModels\\DataModels\\Customer', $modelAlias = null)
+    public function __construct($dbName = 'default', $modelName = '\\DataModels\\DataModels\\Client', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
 
     /**
-     * Returns a new ChildCustomerQuery object.
+     * Returns a new ChildClientQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
      * @param     Criteria $criteria Optional Criteria to build the query from
      *
-     * @return ChildCustomerQuery
+     * @return ChildClientQuery
      */
     public static function create($modelAlias = null, Criteria $criteria = null)
     {
-        if ($criteria instanceof ChildCustomerQuery) {
+        if ($criteria instanceof ChildClientQuery) {
             return $criteria;
         }
-        $query = new ChildCustomerQuery();
+        $query = new ChildClientQuery();
         if (null !== $modelAlias) {
             $query->setModelAlias($modelAlias);
         }
@@ -136,7 +136,7 @@ abstract class CustomerQuery extends ModelCriteria
      * @param mixed $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
-     * @return ChildCustomer|array|mixed the result, formatted by the current formatter
+     * @return ChildClient|array|mixed the result, formatted by the current formatter
      */
     public function findPk($key, ConnectionInterface $con = null)
     {
@@ -145,7 +145,7 @@ abstract class CustomerQuery extends ModelCriteria
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(CustomerTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(ClientTableMap::DATABASE_NAME);
         }
 
         $this->basePreSelect($con);
@@ -158,7 +158,7 @@ abstract class CustomerQuery extends ModelCriteria
             return $this->findPkComplex($key, $con);
         }
 
-        if ((null !== ($obj = CustomerTableMap::getInstanceFromPool(null === $key || is_scalar($key) || is_callable([$key, '__toString']) ? (string) $key : $key)))) {
+        if ((null !== ($obj = ClientTableMap::getInstanceFromPool(null === $key || is_scalar($key) || is_callable([$key, '__toString']) ? (string) $key : $key)))) {
             // the object is already in the instance pool
             return $obj;
         }
@@ -175,11 +175,11 @@ abstract class CustomerQuery extends ModelCriteria
      *
      * @throws \Propel\Runtime\Exception\PropelException
      *
-     * @return ChildCustomer A model object, or null if the key is not found
+     * @return ChildClient A model object, or null if the key is not found
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, name, website, email_domain FROM customer WHERE id = :p0';
+        $sql = 'SELECT id, name, website, email_domain FROM client WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -190,10 +190,10 @@ abstract class CustomerQuery extends ModelCriteria
         }
         $obj = null;
         if ($row = $stmt->fetch(\PDO::FETCH_NUM)) {
-            /** @var ChildCustomer $obj */
-            $obj = new ChildCustomer();
+            /** @var ChildClient $obj */
+            $obj = new ChildClient();
             $obj->hydrate($row);
-            CustomerTableMap::addInstanceToPool($obj, null === $key || is_scalar($key) || is_callable([$key, '__toString']) ? (string) $key : $key);
+            ClientTableMap::addInstanceToPool($obj, null === $key || is_scalar($key) || is_callable([$key, '__toString']) ? (string) $key : $key);
         }
         $stmt->closeCursor();
 
@@ -206,7 +206,7 @@ abstract class CustomerQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     ConnectionInterface $con A connection object
      *
-     * @return ChildCustomer|array|mixed the result, formatted by the current formatter
+     * @return ChildClient|array|mixed the result, formatted by the current formatter
      */
     protected function findPkComplex($key, ConnectionInterface $con)
     {
@@ -248,12 +248,12 @@ abstract class CustomerQuery extends ModelCriteria
      *
      * @param     mixed $key Primary key to use for the query
      *
-     * @return $this|ChildCustomerQuery The current query, for fluid interface
+     * @return $this|ChildClientQuery The current query, for fluid interface
      */
     public function filterByPrimaryKey($key)
     {
 
-        return $this->addUsingAlias(CustomerTableMap::COL_ID, $key, Criteria::EQUAL);
+        return $this->addUsingAlias(ClientTableMap::COL_ID, $key, Criteria::EQUAL);
     }
 
     /**
@@ -261,12 +261,12 @@ abstract class CustomerQuery extends ModelCriteria
      *
      * @param     array $keys The list of primary key to use for the query
      *
-     * @return $this|ChildCustomerQuery The current query, for fluid interface
+     * @return $this|ChildClientQuery The current query, for fluid interface
      */
     public function filterByPrimaryKeys($keys)
     {
 
-        return $this->addUsingAlias(CustomerTableMap::COL_ID, $keys, Criteria::IN);
+        return $this->addUsingAlias(ClientTableMap::COL_ID, $keys, Criteria::IN);
     }
 
     /**
@@ -285,18 +285,18 @@ abstract class CustomerQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildCustomerQuery The current query, for fluid interface
+     * @return $this|ChildClientQuery The current query, for fluid interface
      */
     public function filterById($id = null, $comparison = null)
     {
         if (is_array($id)) {
             $useMinMax = false;
             if (isset($id['min'])) {
-                $this->addUsingAlias(CustomerTableMap::COL_ID, $id['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(ClientTableMap::COL_ID, $id['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($id['max'])) {
-                $this->addUsingAlias(CustomerTableMap::COL_ID, $id['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(ClientTableMap::COL_ID, $id['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -307,7 +307,7 @@ abstract class CustomerQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(CustomerTableMap::COL_ID, $id, $comparison);
+        return $this->addUsingAlias(ClientTableMap::COL_ID, $id, $comparison);
     }
 
     /**
@@ -322,7 +322,7 @@ abstract class CustomerQuery extends ModelCriteria
      * @param     string $name The value to use as filter.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildCustomerQuery The current query, for fluid interface
+     * @return $this|ChildClientQuery The current query, for fluid interface
      */
     public function filterByName($name = null, $comparison = null)
     {
@@ -332,7 +332,7 @@ abstract class CustomerQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(CustomerTableMap::COL_NAME, $name, $comparison);
+        return $this->addUsingAlias(ClientTableMap::COL_NAME, $name, $comparison);
     }
 
     /**
@@ -347,7 +347,7 @@ abstract class CustomerQuery extends ModelCriteria
      * @param     string $website The value to use as filter.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildCustomerQuery The current query, for fluid interface
+     * @return $this|ChildClientQuery The current query, for fluid interface
      */
     public function filterByWebsite($website = null, $comparison = null)
     {
@@ -357,7 +357,7 @@ abstract class CustomerQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(CustomerTableMap::COL_WEBSITE, $website, $comparison);
+        return $this->addUsingAlias(ClientTableMap::COL_WEBSITE, $website, $comparison);
     }
 
     /**
@@ -372,7 +372,7 @@ abstract class CustomerQuery extends ModelCriteria
      * @param     string $emailDomain The value to use as filter.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildCustomerQuery The current query, for fluid interface
+     * @return $this|ChildClientQuery The current query, for fluid interface
      */
     public function filterByEmailDomain($emailDomain = null, $comparison = null)
     {
@@ -382,7 +382,7 @@ abstract class CustomerQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(CustomerTableMap::COL_EMAIL_DOMAIN, $emailDomain, $comparison);
+        return $this->addUsingAlias(ClientTableMap::COL_EMAIL_DOMAIN, $emailDomain, $comparison);
     }
 
     /**
@@ -391,13 +391,13 @@ abstract class CustomerQuery extends ModelCriteria
      * @param \DataModels\DataModels\Account|ObjectCollection $account the related object to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildCustomerQuery The current query, for fluid interface
+     * @return ChildClientQuery The current query, for fluid interface
      */
     public function filterByAccount($account, $comparison = null)
     {
         if ($account instanceof \DataModels\DataModels\Account) {
             return $this
-                ->addUsingAlias(CustomerTableMap::COL_ID, $account->getCustomerId(), $comparison);
+                ->addUsingAlias(ClientTableMap::COL_ID, $account->getClientId(), $comparison);
         } elseif ($account instanceof ObjectCollection) {
             return $this
                 ->useAccountQuery()
@@ -414,7 +414,7 @@ abstract class CustomerQuery extends ModelCriteria
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return $this|ChildCustomerQuery The current query, for fluid interface
+     * @return $this|ChildClientQuery The current query, for fluid interface
      */
     public function joinAccount($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
@@ -459,40 +459,40 @@ abstract class CustomerQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \DataModels\DataModels\CustomerContact object
+     * Filter the query by a related \DataModels\DataModels\ClientCalendarUser object
      *
-     * @param \DataModels\DataModels\CustomerContact|ObjectCollection $customerContact the related object to use as filter
+     * @param \DataModels\DataModels\ClientCalendarUser|ObjectCollection $clientCalendarUser the related object to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildCustomerQuery The current query, for fluid interface
+     * @return ChildClientQuery The current query, for fluid interface
      */
-    public function filterByCustomerContact($customerContact, $comparison = null)
+    public function filterByClientCalendarUser($clientCalendarUser, $comparison = null)
     {
-        if ($customerContact instanceof \DataModels\DataModels\CustomerContact) {
+        if ($clientCalendarUser instanceof \DataModels\DataModels\ClientCalendarUser) {
             return $this
-                ->addUsingAlias(CustomerTableMap::COL_ID, $customerContact->getCustomerId(), $comparison);
-        } elseif ($customerContact instanceof ObjectCollection) {
+                ->addUsingAlias(ClientTableMap::COL_ID, $clientCalendarUser->getClientId(), $comparison);
+        } elseif ($clientCalendarUser instanceof ObjectCollection) {
             return $this
-                ->useCustomerContactQuery()
-                ->filterByPrimaryKeys($customerContact->getPrimaryKeys())
+                ->useClientCalendarUserQuery()
+                ->filterByPrimaryKeys($clientCalendarUser->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByCustomerContact() only accepts arguments of type \DataModels\DataModels\CustomerContact or Collection');
+            throw new PropelException('filterByClientCalendarUser() only accepts arguments of type \DataModels\DataModels\ClientCalendarUser or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the CustomerContact relation
+     * Adds a JOIN clause to the query using the ClientCalendarUser relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return $this|ChildCustomerQuery The current query, for fluid interface
+     * @return $this|ChildClientQuery The current query, for fluid interface
      */
-    public function joinCustomerContact($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinClientCalendarUser($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('CustomerContact');
+        $relationMap = $tableMap->getRelation('ClientCalendarUser');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -507,14 +507,14 @@ abstract class CustomerQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'CustomerContact');
+            $this->addJoinObject($join, 'ClientCalendarUser');
         }
 
         return $this;
     }
 
     /**
-     * Use the CustomerContact relation CustomerContact object
+     * Use the ClientCalendarUser relation ClientCalendarUser object
      *
      * @see useQuery()
      *
@@ -522,33 +522,33 @@ abstract class CustomerQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return \DataModels\DataModels\CustomerContactQuery A secondary query class using the current class as primary query
+     * @return \DataModels\DataModels\ClientCalendarUserQuery A secondary query class using the current class as primary query
      */
-    public function useCustomerContactQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useClientCalendarUserQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
-            ->joinCustomerContact($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'CustomerContact', '\DataModels\DataModels\CustomerContactQuery');
+            ->joinClientCalendarUser($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ClientCalendarUser', '\DataModels\DataModels\ClientCalendarUserQuery');
     }
 
     /**
      * Exclude object from result
      *
-     * @param   ChildCustomer $customer Object to remove from the list of results
+     * @param   ChildClient $client Object to remove from the list of results
      *
-     * @return $this|ChildCustomerQuery The current query, for fluid interface
+     * @return $this|ChildClientQuery The current query, for fluid interface
      */
-    public function prune($customer = null)
+    public function prune($client = null)
     {
-        if ($customer) {
-            $this->addUsingAlias(CustomerTableMap::COL_ID, $customer->getId(), Criteria::NOT_EQUAL);
+        if ($client) {
+            $this->addUsingAlias(ClientTableMap::COL_ID, $client->getId(), Criteria::NOT_EQUAL);
         }
 
         return $this;
     }
 
     /**
-     * Deletes all rows from the customer table.
+     * Deletes all rows from the client table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
@@ -556,7 +556,7 @@ abstract class CustomerQuery extends ModelCriteria
     public function doDeleteAll(ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(CustomerTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ClientTableMap::DATABASE_NAME);
         }
 
         // use transaction because $criteria could contain info
@@ -567,8 +567,8 @@ abstract class CustomerQuery extends ModelCriteria
             // Because this db requires some delete cascade/set null emulation, we have to
             // clear the cached instance *after* the emulation has happened (since
             // instances get re-added by the select statement contained therein).
-            CustomerTableMap::clearInstancePool();
-            CustomerTableMap::clearRelatedInstancePool();
+            ClientTableMap::clearInstancePool();
+            ClientTableMap::clearRelatedInstancePool();
 
             return $affectedRows;
         });
@@ -586,26 +586,26 @@ abstract class CustomerQuery extends ModelCriteria
     public function delete(ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(CustomerTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ClientTableMap::DATABASE_NAME);
         }
 
         $criteria = $this;
 
         // Set the correct dbName
-        $criteria->setDbName(CustomerTableMap::DATABASE_NAME);
+        $criteria->setDbName(ClientTableMap::DATABASE_NAME);
 
         // use transaction because $criteria could contain info
         // for more than one table or we could emulating ON DELETE CASCADE, etc.
         return $con->transaction(function () use ($con, $criteria) {
             $affectedRows = 0; // initialize var to track total num of affected rows
 
-            CustomerTableMap::removeInstanceFromPool($criteria);
+            ClientTableMap::removeInstanceFromPool($criteria);
 
             $affectedRows += ModelCriteria::delete($con);
-            CustomerTableMap::clearRelatedInstancePool();
+            ClientTableMap::clearRelatedInstancePool();
 
             return $affectedRows;
         });
     }
 
-} // CustomerQuery
+} // ClientQuery

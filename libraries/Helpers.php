@@ -1,50 +1,53 @@
 <?
 require_once("${_SERVER['DOCUMENT_ROOT']}/global-config.php");
 
-use DataModels\DataModels\CustomerQuery as CustomerQuery;
-use DataModels\DataModels\Customer as Customer;
-use DataModels\DataModels\CustomerContactIntegrationQuery as CustomerContactIntegrationQuery;
-use DataModels\DataModels\CustomerContactIntegration as CustomerContactIntegration;
-use DataModels\DataModels\CustomerContactQuery as CustomerContactQuery;
-use DataModels\DataModels\CustomerContact as CustomerContact;
+use DataModels\DataModels\ClientCalendarUserQuery as ClientCalendarUserQuery;
+use DataModels\DataModels\ClientCalendarUserOAuth as ClientCalendarUserOAuth;
+use DataModels\DataModels\Client as Client;
+use DataModels\DataModels\ClientCalendarUser as ClientCalendarUser;
 use DataModels\DataModels\MeetingQuery as MeetingQuery;
 use DataModels\DataModels\Meeting as Meeting;
+use DataModels\DataModels\ClientCalendarUserOAuthQuery as ClientCalendarUserOAuthQuery;
+use DataModels\DataModels\ClientQuery as ClientQuery;
 
 class Helpers {
     /**
-     * @param $emailDomain
+     * @param $emailDomain String
      * @return array
      * @throws Exception
      */
-    static function loadCustomerData($emailDomain) {
-        $q = new CustomerQuery();
-        $customerSet = $q->findByEmailDomain($emailDomain);
+    static function loadClientData($emailDomain) {
+        $q = new ClientQuery();
+        $clientSet = $q->findByEmailDomain($emailDomain);
 
-        if($customerSet->count() <= 0) {
-            throw new Exception("Customer Data is not found for {$emailDomain}");
+        if($clientSet->count() <= 0) {
+            throw new Exception("Client Data is not found for {$emailDomain}");
         }
 
-        $customer = $customerSet[0];
-        $contacts = $customer->getCustomerContacts();
+        $client = $clientSet[0];
+        $calendarUsers = $client->getClientCalendarUsers();
 
-        return [$customer, $contacts];
+        return [$client, $calendarUsers];
     }
 
     /**
      * Replaces "fnGetSalesUser" & "fnGetGcalUser" functions
      *
-     * @param Customer $customer
-     * @param string $integrationType
+     * @param Client $client
+     * @param string $authType
      * @return array
      */
-    static function getIntegrations(Customer $customer,
-                                    $integrationType = CustomerContactIntegration::GCAL) {
-        $contacts = $customer->getCustomerContacts();
+    static function getAuthentications(Client $client,
+                                    $authType = ClientCalendarUserOAuth::GCAL) {
+        $calendarUsers = $client->getClientCalendarUsers();
         $integrations = array();
 
-        foreach($contacts as $contact) {
-            $q = new CustomerContactIntegrationQuery();
-            $collection = $q->filterByCustomerContact($contact)->filterByType($integrationType)->find();
+        /**
+         * @var $calendarUser ClientCalendarUser
+         */
+        foreach($calendarUsers as $calendarUser) {
+            $q = new ClientCalendarUserOAuthQuery();
+            $collection = $q->filterByClientCalendarUser($calendarUser)->filterByType($authType)->find();
             $integrations = array_merge($integrations, $collection->getArrayCopy());
         }
         return $integrations;
@@ -63,72 +66,72 @@ class Helpers {
      *
      * This replaces "fnSaveGcalAccount" & "fnUpdateSalesUser"
      *
-     * @param Customer $customer
+     * @param Client $client
      * @param $emailAddress
      * @param $data
      * @param string $integrationType
-     * @return CustomerContactIntegration
+     * @return ClientCalendarUserOAuth
      */
-    static function createIntegrationAccount(Customer $customer, $emailAddress, $data,
-                                             $integrationType = CustomerContactIntegration::GCAL) {
-        $contactQ = new CustomerContactQuery();
-        $contactSet = $contactQ->filterByEmail($emailAddress)->filterByCustomer($customer)->find();
+    static function createAuthAccount(Client $client, $emailAddress, $data,
+                                      $integrationType = ClientCalendarUserOAuth::GCAL) {
+        $calendarUserQ = new ClientCalendarUserQuery();
+        $calendarUserSet = $calendarUserQ->filterByEmail($emailAddress)->filterByClient($client)->find();
 
         // If contact doesn't exist, create it
-        if($contactSet->count() <= 0) {
-            $contact = new CustomerContact();
-            $contact->setCustomer($customer)
+        if($calendarUserSet->count() <= 0) {
+            $calendarUser = new ClientCalendarUser();
+            $calendarUser->setClient($client)
                 ->setEmail($emailAddress)
                 ->save();
         } else {
-            $contact = $contactSet[0];
+            $calendarUser = $calendarUserSet[0];
         }
 
-        $account = new CustomerContactIntegration();
+        $auth = new ClientCalendarUserOAuth();
 
-        $account->setType($integrationType)
-            ->setStatus(CustomerContactIntegration::STATUS_ACTIVE)
-            ->setCustomerContact($contact)
+        $auth->setType($integrationType)
+            ->setStatus(ClientCalendarUserOAuth::STATUS_ACTIVE)
+            ->setClientCalendarUser($calendarUser)
             ->setData($data)
             ->save();
 
-        return $account;
+        return $auth;
     }
 
     /**
-     * Check if email address and associated Integration are present under the given customer
+     * Check if email address and associated authentication are present under the given client
      *
      * This replaces "fnCheckGcalAccountAlreadyPresent"
      *
-     * @param Customer $customer
-     * @param $emailAddress
-     * @param string $integrationType
-     * @return CustomerContactIntegration|null
+     * @param Client $client
+     * @param String $emailAddress
+     * @param string $authType
+     * @return ClientCalendarUserOAuth|null
      */
-    static function getIntegrationIfPresent(Customer $customer, $emailAddress,
-                                            $integrationType = CustomerContactIntegration::GCAL) {
-        $contactQ = new CustomerContactQuery();
-        $contactSet = $contactQ->filterByEmail($emailAddress)->filterByCustomer($customer)->find();
+    static function getOAuthIfPresent(Client $client, $emailAddress,
+                                      $authType = ClientCalendarUserOAuth::GCAL) {
+        $calendarUserQuery = new ClientCalendarUserQuery();
+        $calendarUsers = $calendarUserQuery->filterByEmail($emailAddress)->filterByClient($client)->find();
 
-        if($contactSet->count() <= 0) {
+        if($calendarUsers->count() <= 0) {
             return NULL;
         }
 
-        $contact = $contactSet[0];
+        $calendarUser = $calendarUsers[0];
 
-        $integrationQ = new CustomerContactIntegrationQuery();
-        $integrationSet = $integrationQ->filterByCustomerContact($contact)
-            ->filterByType($integrationType)->find();
+        $authQuery = new ClientCalendarUserOAuthQuery();
+        $authSet = $authQuery->filterByClientCalendarUser($calendarUser)
+            ->filterByType($authType)->find();
 
         $integration = NULL;
 
-        if($integrationSet->count() <= 0) { return NULL; }
+        if($authSet->count() <= 0) { return NULL; }
 
-        if($integrationSet->count() >= 2) {
+        if($authSet->count() >= 2) {
             trigger_error(__FUNCTION__ . " fetches more than 1 integration", E_USER_WARNING);
         }
 
-        return $integrationSet[0];
+        return $authSet[0];
     }
 
     /**
@@ -136,21 +139,21 @@ class Helpers {
      *
      * This function is replacing "fnUpdateUserTokenData()"
      *
-     * @param CustomerContactIntegration $integration
+     * @param ClientCalendarUserOAuth $auth
      * @param $data
-     * @return CustomerContactIntegration
+     * @return ClientCalendarUserOAuth
      */
-    static function updateIntegrationAccountUserToken(CustomerContactIntegration $integration, $data) {
-        $integration
-            ->setStatus(CustomerContactIntegration::STATUS_ACTIVE)
+    static function updateAuthenticationToken(ClientCalendarUserOAuth $auth, $data) {
+        $auth
+            ->setStatus(ClientCalendarUserOAuth::STATUS_ACTIVE)
             ->setData($data)
             ->save();
 
-        return $integration;
+        return $auth;
     }
 
     /**
-     * @deprecated Use Helpers::getIntegrations() instead of this function!
+     * @deprecated Use Helpers::getAuthentications() instead of this function!
      *
      * @return bool
      */
@@ -1317,9 +1320,9 @@ class Helpers {
     }
 
     /**
-     * Function to connect to airtable base and get customers gcals OAuth acceess
+     * Function to connect to airtable base and get clients gcals OAuth acceess
      *
-     * @deprecated Use getIntegrations() function instead
+     * @deprecated Use getAuthentications() function instead
      *
      * @return bool
      */
@@ -1357,22 +1360,22 @@ class Helpers {
     /**
      * Use this function instead of fnGetLatestMeetsForUser() function
      *
-     * @param Customer $customer
+     * @param Client $client
      * @param $emailAddress
      * @return Meeting|null
      */
-    static function getLastMeetingInDBForEmailAddress(Customer $customer, $emailAddress) {
+    static function getLastMeetingInDBForEmailAddress(Client $client, $emailAddress) {
         if(!$emailAddress) {
             return NULL;
         }
 
-        $customerContact = CustomerContact::findByCustomerAndEmailAddress($customer, $emailAddress);
+        $calendarUsers = ClientCalendarUser::findByClientAndEmailAddress($client, $emailAddress);
 
-        if(!$customerContact) {
+        if(!$calendarUsers) {
             return NULL;
         }
 
-        $meetingAttendee = $customerContact->getMeetingAttendee();
+        $meetingAttendee = $calendarUsers->getMeetingAttendee();
 
         if(!$meetingAttendee) {
             return NULL;
@@ -1627,7 +1630,7 @@ class Helpers {
     /**
      * Setting access record as expired
      *
-     * @deprecated use CustomerContactIntegration::setStatus() function instead
+     * @deprecated use ClientCalendarUser::setStatus() function instead
      * @param string $strEmail
      * @return bool
      */
@@ -1822,7 +1825,7 @@ class Helpers {
      * @param $strToken
      * @param $strRecId
      * @return bool
-     * @deprecated use CustomerContactIntegrator instance functions instead!
+     * @deprecated use ClientCalendarUserOAuth instance functions instead!
      */
     function fnUpdateAccessTokenSalesUser($strToken,$strRecId) {
         global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
@@ -1857,7 +1860,7 @@ class Helpers {
     /**
      * Returns user info from airtable if exists
      *
-     * @deprecated use getIntegrationIfPresent() instead
+     * @deprecated use getOAuthIfPresent() instead
      * @param string $strEmail
      * @return bool|array
      */
@@ -1976,7 +1979,7 @@ class Helpers {
 
     /**
      *
-     * @deprecated this function is replaced by "createIntegrationAccount()" function
+     * @deprecated this function is replaced by "createAuthAccount()" function
      * @param $strRecId
      * @param array $arrRecord
      * @return bool
