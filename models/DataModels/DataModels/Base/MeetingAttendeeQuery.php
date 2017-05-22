@@ -74,17 +74,17 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildMeetingAttendeeQuery rightJoinWithContact() Adds a RIGHT JOIN clause and with to the query using the Contact relation
  * @method     ChildMeetingAttendeeQuery innerJoinWithContact() Adds a INNER JOIN clause and with to the query using the Contact relation
  *
- * @method     ChildMeetingAttendeeQuery leftJoinCustomerContact($relationAlias = null) Adds a LEFT JOIN clause to the query using the CustomerContact relation
- * @method     ChildMeetingAttendeeQuery rightJoinCustomerContact($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CustomerContact relation
- * @method     ChildMeetingAttendeeQuery innerJoinCustomerContact($relationAlias = null) Adds a INNER JOIN clause to the query using the CustomerContact relation
+ * @method     ChildMeetingAttendeeQuery leftJoinClientCalendarUser($relationAlias = null) Adds a LEFT JOIN clause to the query using the ClientCalendarUser relation
+ * @method     ChildMeetingAttendeeQuery rightJoinClientCalendarUser($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ClientCalendarUser relation
+ * @method     ChildMeetingAttendeeQuery innerJoinClientCalendarUser($relationAlias = null) Adds a INNER JOIN clause to the query using the ClientCalendarUser relation
  *
- * @method     ChildMeetingAttendeeQuery joinWithCustomerContact($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the CustomerContact relation
+ * @method     ChildMeetingAttendeeQuery joinWithClientCalendarUser($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the ClientCalendarUser relation
  *
- * @method     ChildMeetingAttendeeQuery leftJoinWithCustomerContact() Adds a LEFT JOIN clause and with to the query using the CustomerContact relation
- * @method     ChildMeetingAttendeeQuery rightJoinWithCustomerContact() Adds a RIGHT JOIN clause and with to the query using the CustomerContact relation
- * @method     ChildMeetingAttendeeQuery innerJoinWithCustomerContact() Adds a INNER JOIN clause and with to the query using the CustomerContact relation
+ * @method     ChildMeetingAttendeeQuery leftJoinWithClientCalendarUser() Adds a LEFT JOIN clause and with to the query using the ClientCalendarUser relation
+ * @method     ChildMeetingAttendeeQuery rightJoinWithClientCalendarUser() Adds a RIGHT JOIN clause and with to the query using the ClientCalendarUser relation
+ * @method     ChildMeetingAttendeeQuery innerJoinWithClientCalendarUser() Adds a INNER JOIN clause and with to the query using the ClientCalendarUser relation
  *
- * @method     \DataModels\DataModels\MeetingQuery|\DataModels\DataModels\MeetingHasAttendeeQuery|\DataModels\DataModels\ContactQuery|\DataModels\DataModels\CustomerContactQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     \DataModels\DataModels\MeetingQuery|\DataModels\DataModels\MeetingHasAttendeeQuery|\DataModels\DataModels\ContactQuery|\DataModels\DataModels\ClientCalendarUserQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildMeetingAttendee findOne(ConnectionInterface $con = null) Return the first ChildMeetingAttendee matching the query
  * @method     ChildMeetingAttendee findOneOrCreate(ConnectionInterface $con = null) Return the first ChildMeetingAttendee matching the query, or a new ChildMeetingAttendee object populated from the query conditions when no match is found
@@ -648,40 +648,40 @@ abstract class MeetingAttendeeQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \DataModels\DataModels\CustomerContact object
+     * Filter the query by a related \DataModels\DataModels\ClientCalendarUser object
      *
-     * @param \DataModels\DataModels\CustomerContact|ObjectCollection $customerContact the related object to use as filter
+     * @param \DataModels\DataModels\ClientCalendarUser|ObjectCollection $clientCalendarUser the related object to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildMeetingAttendeeQuery The current query, for fluid interface
      */
-    public function filterByCustomerContact($customerContact, $comparison = null)
+    public function filterByClientCalendarUser($clientCalendarUser, $comparison = null)
     {
-        if ($customerContact instanceof \DataModels\DataModels\CustomerContact) {
+        if ($clientCalendarUser instanceof \DataModels\DataModels\ClientCalendarUser) {
             return $this
-                ->addUsingAlias(MeetingAttendeeTableMap::COL_ID, $customerContact->getId(), $comparison);
-        } elseif ($customerContact instanceof ObjectCollection) {
+                ->addUsingAlias(MeetingAttendeeTableMap::COL_ID, $clientCalendarUser->getId(), $comparison);
+        } elseif ($clientCalendarUser instanceof ObjectCollection) {
             return $this
-                ->useCustomerContactQuery()
-                ->filterByPrimaryKeys($customerContact->getPrimaryKeys())
+                ->useClientCalendarUserQuery()
+                ->filterByPrimaryKeys($clientCalendarUser->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByCustomerContact() only accepts arguments of type \DataModels\DataModels\CustomerContact or Collection');
+            throw new PropelException('filterByClientCalendarUser() only accepts arguments of type \DataModels\DataModels\ClientCalendarUser or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the CustomerContact relation
+     * Adds a JOIN clause to the query using the ClientCalendarUser relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return $this|ChildMeetingAttendeeQuery The current query, for fluid interface
      */
-    public function joinCustomerContact($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinClientCalendarUser($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('CustomerContact');
+        $relationMap = $tableMap->getRelation('ClientCalendarUser');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -696,14 +696,14 @@ abstract class MeetingAttendeeQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'CustomerContact');
+            $this->addJoinObject($join, 'ClientCalendarUser');
         }
 
         return $this;
     }
 
     /**
-     * Use the CustomerContact relation CustomerContact object
+     * Use the ClientCalendarUser relation ClientCalendarUser object
      *
      * @see useQuery()
      *
@@ -711,13 +711,13 @@ abstract class MeetingAttendeeQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return \DataModels\DataModels\CustomerContactQuery A secondary query class using the current class as primary query
+     * @return \DataModels\DataModels\ClientCalendarUserQuery A secondary query class using the current class as primary query
      */
-    public function useCustomerContactQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useClientCalendarUserQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinCustomerContact($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'CustomerContact', '\DataModels\DataModels\CustomerContactQuery');
+            ->joinClientCalendarUser($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ClientCalendarUser', '\DataModels\DataModels\ClientCalendarUserQuery');
     }
 
     /**

@@ -6,10 +6,10 @@
     <column name="email_domain" phpName="EmailDomain" type="VARCHAR" size="255"/>
     <column name="website" phpName="Website" type="VARCHAR" size="255"/>
     <column name="sfdc_account_id" phpName="SfdcAccountId" type="INTEGER"/>
-    <column name="customer_id" phpName="CustomerId" type="INTEGER"/>
+    <column name="internal_client_id" phpName="InternalClientId" type="INTEGER"/>
 
-    <foreign-key foreignTable="customer" onDelete="none" onUpdate="none">
-      <reference local="customer_id" foreign="id" />
+    <foreign-key foreignTable="internal_client" onDelete="none" onUpdate="none">
+      <reference local="internal_client_id" foreign="id" />
     </foreign-key>
   </table>
   <table name="account_history" idMethod="native" phpName="AccountHistory" namespace="DataModels">
@@ -24,17 +24,17 @@
   </table>
   <table name="account_status" idMethod="native" phpName="AccountStatus" namespace="DataModels">
     <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-    <column name="customer_id" phpName="CustomerId" type="INTEGER"/>
+    <column name="internal_client" phpName="InternalClientId" type="INTEGER"/>
     <column name="status" phpName="Status" type="VARCHAR" size="255"/>
   </table>
   <table name="billing_cycle" idMethod="native" phpName="BillingCycle" namespace="DataModels">
     <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-    <column name="customer_id" phpName="CustomerId" type="INTEGER"/>
+    <column name="internal_client_id" phpName="InternalClientId" type="INTEGER"/>
     <column name="type" phpName="Type" type="VARCHAR" size="255"/>
   </table>
   <table name="buyer_stage" idMethod="native" phpName="BuyerStage" namespace="DataModels">
     <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-    <column name="customer_id" phpName="CustomerId" type="INTEGER"/>
+    <column name="internal_client_id" phpName="InternalClientId" type="INTEGER"/>
     <column name="stage" phpName="Stage" type="VARCHAR" size="255"/>
   </table>
   <table name="contact" phpName="Contact" namespace="DataModels">
@@ -59,40 +59,40 @@
     <column name="sfdc_title" phpName="SfdcTitle" type="LONGVARCHAR"/>
     <column name="sfdc_mailing_city" phpName="SfdcMailingCity" type="LONGVARCHAR"/>
   </table>
-  <table name="customer" idMethod="native" phpName="Customer" namespace="DataModels">
+  <table name="internal_client" idMethod="native" phpName="InternalClient" namespace="DataModels">
     <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
     <column name="name" phpName="Name" type="VARCHAR" size="255" required="true"/>
     <column name="website" phpName="Website" type="VARCHAR" size="255"/>
     <column name="email_domain" phpName="EmailDomain" type="VARCHAR" size="255"/>
   </table>
 
-  <table name="customer_contact" phpName="CustomerContact" namespace="DataModels">
+  <table name="client_calendar_user" phpName="ClientCalendarUser" namespace="DataModels">
     <behavior name="concrete_inheritance">
       <parameter name="extends" value="meeting_attendee" />
     </behavior>
 
-    <column name="customer_id" phpName="CustomerId" type="INTEGER"/>
+    <column name="internal_client_id" phpName="InternalClientId" type="INTEGER"/>
 
     <column name="name" phpName="Name" type="VARCHAR" size="255"/>
     <column name="surname" phpName="Surname" type="VARCHAR" size="255"/>
     <column name="title" phpName="Title" type="VARCHAR" size="127"/>
     <column name="email" phpName="Email" type="VARCHAR" size="255"/>
 
-    <foreign-key foreignTable="customer" onDelete="none" onUpdate="none">
-      <reference local="customer_id" foreign="id" />
+    <foreign-key foreignTable="internal_client" onDelete="none" onUpdate="none">
+      <reference local="internal_client_id" foreign="id" />
     </foreign-key>
 
   </table>
 
-  <table name="customer_contact_integration" idMethod="native" phpName="CustomerContactIntegration" namespace="DataModels">
+  <table name="client_calendar_user_oauth" idMethod="native" phpName="ClientCalendarUserOAuth" namespace="DataModels">
     <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-    <column name="customer_contact_id" phpName="CustomerContactId" type="INTEGER"/>
+    <column name="client_calendar_user_id" phpName="ClientCalendarUserId" type="INTEGER"/>
     <column name="type" phpName="Type" type="VARCHAR" size="255"/>
     <column name="status" phpName="Status" type="VARCHAR" size="255"/>
     <column name="data" phpName="Data" type="VARCHAR"/>
 
-    <foreign-key foreignTable="customer_contact" onDelete="none" onUpdate="none">
-      <reference local="customer_contact_id" foreign="id" />
+    <foreign-key foreignTable="client_calendar_user" onDelete="none" onUpdate="none">
+      <reference local="client_calendar_user_id" foreign="id" />
     </foreign-key>
   </table>
   <table name="meeting" idMethod="native" phpName="Meeting" namespace="DataModels">
@@ -166,7 +166,7 @@
   </table>
   <table name="opportunity_stage" idMethod="native" phpName="OpportunityStage" namespace="DataModels">
     <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-    <column name="customer_id" phpName="CustomerId" type="LONGVARCHAR"/>
+    <column name="internal_client_id" phpName="InternalClientId" type="LONGVARCHAR"/>
     <column name="stage" phpName="Stage" type="VARCHAR" size="255"/>
   </table>
 </database>

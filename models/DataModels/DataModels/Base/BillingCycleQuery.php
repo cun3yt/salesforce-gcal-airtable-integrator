@@ -20,11 +20,11 @@ use Propel\Runtime\Exception\PropelException;
  *
  *
  * @method     ChildBillingCycleQuery orderById($order = Criteria::ASC) Order by the id column
- * @method     ChildBillingCycleQuery orderByCustomerId($order = Criteria::ASC) Order by the customer_id column
+ * @method     ChildBillingCycleQuery orderByInternalClientId($order = Criteria::ASC) Order by the internal_client_id column
  * @method     ChildBillingCycleQuery orderByType($order = Criteria::ASC) Order by the type column
  *
  * @method     ChildBillingCycleQuery groupById() Group by the id column
- * @method     ChildBillingCycleQuery groupByCustomerId() Group by the customer_id column
+ * @method     ChildBillingCycleQuery groupByInternalClientId() Group by the internal_client_id column
  * @method     ChildBillingCycleQuery groupByType() Group by the type column
  *
  * @method     ChildBillingCycleQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
@@ -39,19 +39,19 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildBillingCycle findOneOrCreate(ConnectionInterface $con = null) Return the first ChildBillingCycle matching the query, or a new ChildBillingCycle object populated from the query conditions when no match is found
  *
  * @method     ChildBillingCycle findOneById(int $id) Return the first ChildBillingCycle filtered by the id column
- * @method     ChildBillingCycle findOneByCustomerId(int $customer_id) Return the first ChildBillingCycle filtered by the customer_id column
+ * @method     ChildBillingCycle findOneByInternalClientId(int $internal_client_id) Return the first ChildBillingCycle filtered by the internal_client_id column
  * @method     ChildBillingCycle findOneByType(string $type) Return the first ChildBillingCycle filtered by the type column *
 
  * @method     ChildBillingCycle requirePk($key, ConnectionInterface $con = null) Return the ChildBillingCycle by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildBillingCycle requireOne(ConnectionInterface $con = null) Return the first ChildBillingCycle matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildBillingCycle requireOneById(int $id) Return the first ChildBillingCycle filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildBillingCycle requireOneByCustomerId(int $customer_id) Return the first ChildBillingCycle filtered by the customer_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildBillingCycle requireOneByInternalClientId(int $internal_client_id) Return the first ChildBillingCycle filtered by the internal_client_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildBillingCycle requireOneByType(string $type) Return the first ChildBillingCycle filtered by the type column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildBillingCycle[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildBillingCycle objects based on current ModelCriteria
  * @method     ChildBillingCycle[]|ObjectCollection findById(int $id) Return ChildBillingCycle objects filtered by the id column
- * @method     ChildBillingCycle[]|ObjectCollection findByCustomerId(int $customer_id) Return ChildBillingCycle objects filtered by the customer_id column
+ * @method     ChildBillingCycle[]|ObjectCollection findByInternalClientId(int $internal_client_id) Return ChildBillingCycle objects filtered by the internal_client_id column
  * @method     ChildBillingCycle[]|ObjectCollection findByType(string $type) Return ChildBillingCycle objects filtered by the type column
  * @method     ChildBillingCycle[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
  *
@@ -151,7 +151,7 @@ abstract class BillingCycleQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, customer_id, type FROM billing_cycle WHERE id = :p0';
+        $sql = 'SELECT id, internal_client_id, type FROM billing_cycle WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -283,16 +283,16 @@ abstract class BillingCycleQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the customer_id column
+     * Filter the query on the internal_client_id column
      *
      * Example usage:
      * <code>
-     * $query->filterByCustomerId(1234); // WHERE customer_id = 1234
-     * $query->filterByCustomerId(array(12, 34)); // WHERE customer_id IN (12, 34)
-     * $query->filterByCustomerId(array('min' => 12)); // WHERE customer_id > 12
+     * $query->filterByInternalClientId(1234); // WHERE internal_client_id = 1234
+     * $query->filterByInternalClientId(array(12, 34)); // WHERE internal_client_id IN (12, 34)
+     * $query->filterByInternalClientId(array('min' => 12)); // WHERE internal_client_id > 12
      * </code>
      *
-     * @param     mixed $customerId The value to use as filter.
+     * @param     mixed $internalClientId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
@@ -300,16 +300,16 @@ abstract class BillingCycleQuery extends ModelCriteria
      *
      * @return $this|ChildBillingCycleQuery The current query, for fluid interface
      */
-    public function filterByCustomerId($customerId = null, $comparison = null)
+    public function filterByInternalClientId($internalClientId = null, $comparison = null)
     {
-        if (is_array($customerId)) {
+        if (is_array($internalClientId)) {
             $useMinMax = false;
-            if (isset($customerId['min'])) {
-                $this->addUsingAlias(BillingCycleTableMap::COL_CUSTOMER_ID, $customerId['min'], Criteria::GREATER_EQUAL);
+            if (isset($internalClientId['min'])) {
+                $this->addUsingAlias(BillingCycleTableMap::COL_INTERNAL_CLIENT_ID, $internalClientId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($customerId['max'])) {
-                $this->addUsingAlias(BillingCycleTableMap::COL_CUSTOMER_ID, $customerId['max'], Criteria::LESS_EQUAL);
+            if (isset($internalClientId['max'])) {
+                $this->addUsingAlias(BillingCycleTableMap::COL_INTERNAL_CLIENT_ID, $internalClientId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -320,7 +320,7 @@ abstract class BillingCycleQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(BillingCycleTableMap::COL_CUSTOMER_ID, $customerId, $comparison);
+        return $this->addUsingAlias(BillingCycleTableMap::COL_INTERNAL_CLIENT_ID, $internalClientId, $comparison);
     }
 
     /**

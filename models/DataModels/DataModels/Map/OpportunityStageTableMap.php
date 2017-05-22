@@ -77,9 +77,9 @@ class OpportunityStageTableMap extends TableMap
     const COL_ID = 'opportunity_stage.id';
 
     /**
-     * the column name for the customer_id field
+     * the column name for the internal_client_id field
      */
-    const COL_CUSTOMER_ID = 'opportunity_stage.customer_id';
+    const COL_INTERNAL_CLIENT_ID = 'opportunity_stage.internal_client_id';
 
     /**
      * the column name for the stage field
@@ -98,10 +98,10 @@ class OpportunityStageTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'CustomerId', 'Stage', ),
-        self::TYPE_CAMELNAME     => array('id', 'customerId', 'stage', ),
-        self::TYPE_COLNAME       => array(OpportunityStageTableMap::COL_ID, OpportunityStageTableMap::COL_CUSTOMER_ID, OpportunityStageTableMap::COL_STAGE, ),
-        self::TYPE_FIELDNAME     => array('id', 'customer_id', 'stage', ),
+        self::TYPE_PHPNAME       => array('Id', 'InternalClientId', 'Stage', ),
+        self::TYPE_CAMELNAME     => array('id', 'internalClientId', 'stage', ),
+        self::TYPE_COLNAME       => array(OpportunityStageTableMap::COL_ID, OpportunityStageTableMap::COL_INTERNAL_CLIENT_ID, OpportunityStageTableMap::COL_STAGE, ),
+        self::TYPE_FIELDNAME     => array('id', 'internal_client_id', 'stage', ),
         self::TYPE_NUM           => array(0, 1, 2, )
     );
 
@@ -112,10 +112,10 @@ class OpportunityStageTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'CustomerId' => 1, 'Stage' => 2, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'customerId' => 1, 'stage' => 2, ),
-        self::TYPE_COLNAME       => array(OpportunityStageTableMap::COL_ID => 0, OpportunityStageTableMap::COL_CUSTOMER_ID => 1, OpportunityStageTableMap::COL_STAGE => 2, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'customer_id' => 1, 'stage' => 2, ),
+        self::TYPE_PHPNAME       => array('Id' => 0, 'InternalClientId' => 1, 'Stage' => 2, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'internalClientId' => 1, 'stage' => 2, ),
+        self::TYPE_COLNAME       => array(OpportunityStageTableMap::COL_ID => 0, OpportunityStageTableMap::COL_INTERNAL_CLIENT_ID => 1, OpportunityStageTableMap::COL_STAGE => 2, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'internal_client_id' => 1, 'stage' => 2, ),
         self::TYPE_NUM           => array(0, 1, 2, )
     );
 
@@ -138,7 +138,7 @@ class OpportunityStageTableMap extends TableMap
         $this->setPrimaryKeyMethodInfo('opportunity_stage_id_seq');
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('customer_id', 'CustomerId', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('internal_client_id', 'InternalClientId', 'LONGVARCHAR', false, null, null);
         $this->addColumn('stage', 'Stage', 'VARCHAR', false, 255, null);
     } // initialize()
 
@@ -291,11 +291,11 @@ class OpportunityStageTableMap extends TableMap
     {
         if (null === $alias) {
             $criteria->addSelectColumn(OpportunityStageTableMap::COL_ID);
-            $criteria->addSelectColumn(OpportunityStageTableMap::COL_CUSTOMER_ID);
+            $criteria->addSelectColumn(OpportunityStageTableMap::COL_INTERNAL_CLIENT_ID);
             $criteria->addSelectColumn(OpportunityStageTableMap::COL_STAGE);
         } else {
             $criteria->addSelectColumn($alias . '.id');
-            $criteria->addSelectColumn($alias . '.customer_id');
+            $criteria->addSelectColumn($alias . '.internal_client_id');
             $criteria->addSelectColumn($alias . '.stage');
         }
     }

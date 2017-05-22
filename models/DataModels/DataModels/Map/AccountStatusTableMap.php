@@ -77,9 +77,9 @@ class AccountStatusTableMap extends TableMap
     const COL_ID = 'account_status.id';
 
     /**
-     * the column name for the customer_id field
+     * the column name for the internal_client field
      */
-    const COL_CUSTOMER_ID = 'account_status.customer_id';
+    const COL_INTERNAL_CLIENT = 'account_status.internal_client';
 
     /**
      * the column name for the status field
@@ -98,10 +98,10 @@ class AccountStatusTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'CustomerId', 'Status', ),
-        self::TYPE_CAMELNAME     => array('id', 'customerId', 'status', ),
-        self::TYPE_COLNAME       => array(AccountStatusTableMap::COL_ID, AccountStatusTableMap::COL_CUSTOMER_ID, AccountStatusTableMap::COL_STATUS, ),
-        self::TYPE_FIELDNAME     => array('id', 'customer_id', 'status', ),
+        self::TYPE_PHPNAME       => array('Id', 'InternalClientId', 'Status', ),
+        self::TYPE_CAMELNAME     => array('id', 'internalClientId', 'status', ),
+        self::TYPE_COLNAME       => array(AccountStatusTableMap::COL_ID, AccountStatusTableMap::COL_INTERNAL_CLIENT, AccountStatusTableMap::COL_STATUS, ),
+        self::TYPE_FIELDNAME     => array('id', 'internal_client', 'status', ),
         self::TYPE_NUM           => array(0, 1, 2, )
     );
 
@@ -112,10 +112,10 @@ class AccountStatusTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'CustomerId' => 1, 'Status' => 2, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'customerId' => 1, 'status' => 2, ),
-        self::TYPE_COLNAME       => array(AccountStatusTableMap::COL_ID => 0, AccountStatusTableMap::COL_CUSTOMER_ID => 1, AccountStatusTableMap::COL_STATUS => 2, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'customer_id' => 1, 'status' => 2, ),
+        self::TYPE_PHPNAME       => array('Id' => 0, 'InternalClientId' => 1, 'Status' => 2, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'internalClientId' => 1, 'status' => 2, ),
+        self::TYPE_COLNAME       => array(AccountStatusTableMap::COL_ID => 0, AccountStatusTableMap::COL_INTERNAL_CLIENT => 1, AccountStatusTableMap::COL_STATUS => 2, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'internal_client' => 1, 'status' => 2, ),
         self::TYPE_NUM           => array(0, 1, 2, )
     );
 
@@ -138,7 +138,7 @@ class AccountStatusTableMap extends TableMap
         $this->setPrimaryKeyMethodInfo('account_status_id_seq');
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('customer_id', 'CustomerId', 'INTEGER', false, null, null);
+        $this->addColumn('internal_client', 'InternalClientId', 'INTEGER', false, null, null);
         $this->addColumn('status', 'Status', 'VARCHAR', false, 255, null);
     } // initialize()
 
@@ -291,11 +291,11 @@ class AccountStatusTableMap extends TableMap
     {
         if (null === $alias) {
             $criteria->addSelectColumn(AccountStatusTableMap::COL_ID);
-            $criteria->addSelectColumn(AccountStatusTableMap::COL_CUSTOMER_ID);
+            $criteria->addSelectColumn(AccountStatusTableMap::COL_INTERNAL_CLIENT);
             $criteria->addSelectColumn(AccountStatusTableMap::COL_STATUS);
         } else {
             $criteria->addSelectColumn($alias . '.id');
-            $criteria->addSelectColumn($alias . '.customer_id');
+            $criteria->addSelectColumn($alias . '.internal_client');
             $criteria->addSelectColumn($alias . '.status');
         }
     }

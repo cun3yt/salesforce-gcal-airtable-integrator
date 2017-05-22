@@ -2,8 +2,8 @@
 
 namespace DataModels\DataModels\Map;
 
-use DataModels\DataModels\BuyerStage;
-use DataModels\DataModels\BuyerStageQuery;
+use DataModels\DataModels\InternalClient;
+use DataModels\DataModels\InternalClientQuery;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\InstancePoolTrait;
@@ -16,7 +16,7 @@ use Propel\Runtime\Map\TableMapTrait;
 
 
 /**
- * This class defines the structure of the 'buyer_stage' table.
+ * This class defines the structure of the 'internal_client' table.
  *
  *
  *
@@ -26,7 +26,7 @@ use Propel\Runtime\Map\TableMapTrait;
  * (i.e. if it's a text column type).
  *
  */
-class BuyerStageTableMap extends TableMap
+class InternalClientTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
@@ -34,7 +34,7 @@ class BuyerStageTableMap extends TableMap
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'DataModels.DataModels.Map.BuyerStageTableMap';
+    const CLASS_NAME = 'DataModels.DataModels.Map.InternalClientTableMap';
 
     /**
      * The default database name for this class
@@ -44,22 +44,22 @@ class BuyerStageTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'buyer_stage';
+    const TABLE_NAME = 'internal_client';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\DataModels\\DataModels\\BuyerStage';
+    const OM_CLASS = '\\DataModels\\DataModels\\InternalClient';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'DataModels.DataModels.BuyerStage';
+    const CLASS_DEFAULT = 'DataModels.DataModels.InternalClient';
 
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 3;
+    const NUM_COLUMNS = 4;
 
     /**
      * The number of lazy-loaded columns
@@ -69,22 +69,27 @@ class BuyerStageTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 3;
+    const NUM_HYDRATE_COLUMNS = 4;
 
     /**
      * the column name for the id field
      */
-    const COL_ID = 'buyer_stage.id';
+    const COL_ID = 'internal_client.id';
 
     /**
-     * the column name for the internal_client_id field
+     * the column name for the name field
      */
-    const COL_INTERNAL_CLIENT_ID = 'buyer_stage.internal_client_id';
+    const COL_NAME = 'internal_client.name';
 
     /**
-     * the column name for the stage field
+     * the column name for the website field
      */
-    const COL_STAGE = 'buyer_stage.stage';
+    const COL_WEBSITE = 'internal_client.website';
+
+    /**
+     * the column name for the email_domain field
+     */
+    const COL_EMAIL_DOMAIN = 'internal_client.email_domain';
 
     /**
      * The default string format for model objects of the related table
@@ -98,11 +103,11 @@ class BuyerStageTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'InternalClientId', 'Stage', ),
-        self::TYPE_CAMELNAME     => array('id', 'internalClientId', 'stage', ),
-        self::TYPE_COLNAME       => array(BuyerStageTableMap::COL_ID, BuyerStageTableMap::COL_INTERNAL_CLIENT_ID, BuyerStageTableMap::COL_STAGE, ),
-        self::TYPE_FIELDNAME     => array('id', 'internal_client_id', 'stage', ),
-        self::TYPE_NUM           => array(0, 1, 2, )
+        self::TYPE_PHPNAME       => array('Id', 'Name', 'Website', 'EmailDomain', ),
+        self::TYPE_CAMELNAME     => array('id', 'name', 'website', 'emailDomain', ),
+        self::TYPE_COLNAME       => array(InternalClientTableMap::COL_ID, InternalClientTableMap::COL_NAME, InternalClientTableMap::COL_WEBSITE, InternalClientTableMap::COL_EMAIL_DOMAIN, ),
+        self::TYPE_FIELDNAME     => array('id', 'name', 'website', 'email_domain', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
     /**
@@ -112,11 +117,11 @@ class BuyerStageTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'InternalClientId' => 1, 'Stage' => 2, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'internalClientId' => 1, 'stage' => 2, ),
-        self::TYPE_COLNAME       => array(BuyerStageTableMap::COL_ID => 0, BuyerStageTableMap::COL_INTERNAL_CLIENT_ID => 1, BuyerStageTableMap::COL_STAGE => 2, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'internal_client_id' => 1, 'stage' => 2, ),
-        self::TYPE_NUM           => array(0, 1, 2, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Name' => 1, 'Website' => 2, 'EmailDomain' => 3, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'name' => 1, 'website' => 2, 'emailDomain' => 3, ),
+        self::TYPE_COLNAME       => array(InternalClientTableMap::COL_ID => 0, InternalClientTableMap::COL_NAME => 1, InternalClientTableMap::COL_WEBSITE => 2, InternalClientTableMap::COL_EMAIL_DOMAIN => 3, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'name' => 1, 'website' => 2, 'email_domain' => 3, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
     /**
@@ -129,17 +134,18 @@ class BuyerStageTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('buyer_stage');
-        $this->setPhpName('BuyerStage');
+        $this->setName('internal_client');
+        $this->setPhpName('InternalClient');
         $this->setIdentifierQuoting(false);
-        $this->setClassName('\\DataModels\\DataModels\\BuyerStage');
+        $this->setClassName('\\DataModels\\DataModels\\InternalClient');
         $this->setPackage('DataModels.DataModels');
         $this->setUseIdGenerator(true);
-        $this->setPrimaryKeyMethodInfo('buyer_stage_id_seq');
+        $this->setPrimaryKeyMethodInfo('internal_client_id_seq');
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('internal_client_id', 'InternalClientId', 'INTEGER', false, null, null);
-        $this->addColumn('stage', 'Stage', 'VARCHAR', false, 255, null);
+        $this->addColumn('name', 'Name', 'VARCHAR', true, 255, null);
+        $this->addColumn('website', 'Website', 'VARCHAR', false, 255, null);
+        $this->addColumn('email_domain', 'EmailDomain', 'VARCHAR', false, 255, null);
     } // initialize()
 
     /**
@@ -147,6 +153,20 @@ class BuyerStageTableMap extends TableMap
      */
     public function buildRelations()
     {
+        $this->addRelation('Account', '\\DataModels\\DataModels\\Account', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':internal_client_id',
+    1 => ':id',
+  ),
+), null, null, 'Accounts', false);
+        $this->addRelation('ClientCalendarUser', '\\DataModels\\DataModels\\ClientCalendarUser', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':internal_client_id',
+    1 => ':id',
+  ),
+), null, null, 'ClientCalendarUsers', false);
     } // buildRelations()
 
     /**
@@ -206,7 +226,7 @@ class BuyerStageTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? BuyerStageTableMap::CLASS_DEFAULT : BuyerStageTableMap::OM_CLASS;
+        return $withPrefix ? InternalClientTableMap::CLASS_DEFAULT : InternalClientTableMap::OM_CLASS;
     }
 
     /**
@@ -220,22 +240,22 @@ class BuyerStageTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *                         rethrown wrapped into a PropelException.
-     * @return array           (BuyerStage object, last column rank)
+     * @return array           (InternalClient object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = BuyerStageTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = BuyerStageTableMap::getInstanceFromPool($key))) {
+        $key = InternalClientTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = InternalClientTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + BuyerStageTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + InternalClientTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = BuyerStageTableMap::OM_CLASS;
-            /** @var BuyerStage $obj */
+            $cls = InternalClientTableMap::OM_CLASS;
+            /** @var InternalClient $obj */
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            BuyerStageTableMap::addInstanceToPool($obj, $key);
+            InternalClientTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -258,18 +278,18 @@ class BuyerStageTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = BuyerStageTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = BuyerStageTableMap::getInstanceFromPool($key))) {
+            $key = InternalClientTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = InternalClientTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
                 $results[] = $obj;
             } else {
-                /** @var BuyerStage $obj */
+                /** @var InternalClient $obj */
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                BuyerStageTableMap::addInstanceToPool($obj, $key);
+                InternalClientTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -290,13 +310,15 @@ class BuyerStageTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(BuyerStageTableMap::COL_ID);
-            $criteria->addSelectColumn(BuyerStageTableMap::COL_INTERNAL_CLIENT_ID);
-            $criteria->addSelectColumn(BuyerStageTableMap::COL_STAGE);
+            $criteria->addSelectColumn(InternalClientTableMap::COL_ID);
+            $criteria->addSelectColumn(InternalClientTableMap::COL_NAME);
+            $criteria->addSelectColumn(InternalClientTableMap::COL_WEBSITE);
+            $criteria->addSelectColumn(InternalClientTableMap::COL_EMAIL_DOMAIN);
         } else {
             $criteria->addSelectColumn($alias . '.id');
-            $criteria->addSelectColumn($alias . '.internal_client_id');
-            $criteria->addSelectColumn($alias . '.stage');
+            $criteria->addSelectColumn($alias . '.name');
+            $criteria->addSelectColumn($alias . '.website');
+            $criteria->addSelectColumn($alias . '.email_domain');
         }
     }
 
@@ -309,7 +331,7 @@ class BuyerStageTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(BuyerStageTableMap::DATABASE_NAME)->getTable(BuyerStageTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(InternalClientTableMap::DATABASE_NAME)->getTable(InternalClientTableMap::TABLE_NAME);
     }
 
     /**
@@ -317,16 +339,16 @@ class BuyerStageTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-        $dbMap = Propel::getServiceContainer()->getDatabaseMap(BuyerStageTableMap::DATABASE_NAME);
-        if (!$dbMap->hasTable(BuyerStageTableMap::TABLE_NAME)) {
-            $dbMap->addTableObject(new BuyerStageTableMap());
+        $dbMap = Propel::getServiceContainer()->getDatabaseMap(InternalClientTableMap::DATABASE_NAME);
+        if (!$dbMap->hasTable(InternalClientTableMap::TABLE_NAME)) {
+            $dbMap->addTableObject(new InternalClientTableMap());
         }
     }
 
     /**
-     * Performs a DELETE on the database, given a BuyerStage or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a InternalClient or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or BuyerStage object or primary key or array of primary keys
+     * @param mixed               $values Criteria or InternalClient object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param  ConnectionInterface $con the connection to use
      * @return int             The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -337,27 +359,27 @@ class BuyerStageTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(BuyerStageTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(InternalClientTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \DataModels\DataModels\BuyerStage) { // it's a model object
+        } elseif ($values instanceof \DataModels\DataModels\InternalClient) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(BuyerStageTableMap::DATABASE_NAME);
-            $criteria->add(BuyerStageTableMap::COL_ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(InternalClientTableMap::DATABASE_NAME);
+            $criteria->add(InternalClientTableMap::COL_ID, (array) $values, Criteria::IN);
         }
 
-        $query = BuyerStageQuery::create()->mergeWith($criteria);
+        $query = InternalClientQuery::create()->mergeWith($criteria);
 
         if ($values instanceof Criteria) {
-            BuyerStageTableMap::clearInstancePool();
+            InternalClientTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
             foreach ((array) $values as $singleval) {
-                BuyerStageTableMap::removeInstanceFromPool($singleval);
+                InternalClientTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -365,20 +387,20 @@ class BuyerStageTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the buyer_stage table.
+     * Deletes all rows from the internal_client table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return BuyerStageQuery::create()->doDeleteAll($con);
+        return InternalClientQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a BuyerStage or Criteria object.
+     * Performs an INSERT on the database, given a InternalClient or Criteria object.
      *
-     * @param mixed               $criteria Criteria or BuyerStage object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or InternalClient object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -387,22 +409,22 @@ class BuyerStageTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(BuyerStageTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(InternalClientTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from BuyerStage object
+            $criteria = $criteria->buildCriteria(); // build Criteria from InternalClient object
         }
 
-        if ($criteria->containsKey(BuyerStageTableMap::COL_ID) && $criteria->keyContainsValue(BuyerStageTableMap::COL_ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.BuyerStageTableMap::COL_ID.')');
+        if ($criteria->containsKey(InternalClientTableMap::COL_ID) && $criteria->keyContainsValue(InternalClientTableMap::COL_ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.InternalClientTableMap::COL_ID.')');
         }
 
 
         // Set the correct dbName
-        $query = BuyerStageQuery::create()->mergeWith($criteria);
+        $query = InternalClientQuery::create()->mergeWith($criteria);
 
         // use transaction because $criteria could contain info
         // for more than one table (I guess, conceivably)
@@ -411,7 +433,7 @@ class BuyerStageTableMap extends TableMap
         });
     }
 
-} // BuyerStageTableMap
+} // InternalClientTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-BuyerStageTableMap::buildTableMap();
+InternalClientTableMap::buildTableMap();

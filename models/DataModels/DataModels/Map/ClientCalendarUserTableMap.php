@@ -2,8 +2,8 @@
 
 namespace DataModels\DataModels\Map;
 
-use DataModels\DataModels\BuyerStage;
-use DataModels\DataModels\BuyerStageQuery;
+use DataModels\DataModels\ClientCalendarUser;
+use DataModels\DataModels\ClientCalendarUserQuery;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\InstancePoolTrait;
@@ -16,7 +16,7 @@ use Propel\Runtime\Map\TableMapTrait;
 
 
 /**
- * This class defines the structure of the 'buyer_stage' table.
+ * This class defines the structure of the 'client_calendar_user' table.
  *
  *
  *
@@ -26,7 +26,7 @@ use Propel\Runtime\Map\TableMapTrait;
  * (i.e. if it's a text column type).
  *
  */
-class BuyerStageTableMap extends TableMap
+class ClientCalendarUserTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
@@ -34,7 +34,7 @@ class BuyerStageTableMap extends TableMap
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'DataModels.DataModels.Map.BuyerStageTableMap';
+    const CLASS_NAME = 'DataModels.DataModels.Map.ClientCalendarUserTableMap';
 
     /**
      * The default database name for this class
@@ -44,22 +44,22 @@ class BuyerStageTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'buyer_stage';
+    const TABLE_NAME = 'client_calendar_user';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\DataModels\\DataModels\\BuyerStage';
+    const OM_CLASS = '\\DataModels\\DataModels\\ClientCalendarUser';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'DataModels.DataModels.BuyerStage';
+    const CLASS_DEFAULT = 'DataModels.DataModels.ClientCalendarUser';
 
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 3;
+    const NUM_COLUMNS = 6;
 
     /**
      * The number of lazy-loaded columns
@@ -69,22 +69,37 @@ class BuyerStageTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 3;
-
-    /**
-     * the column name for the id field
-     */
-    const COL_ID = 'buyer_stage.id';
+    const NUM_HYDRATE_COLUMNS = 6;
 
     /**
      * the column name for the internal_client_id field
      */
-    const COL_INTERNAL_CLIENT_ID = 'buyer_stage.internal_client_id';
+    const COL_INTERNAL_CLIENT_ID = 'client_calendar_user.internal_client_id';
 
     /**
-     * the column name for the stage field
+     * the column name for the name field
      */
-    const COL_STAGE = 'buyer_stage.stage';
+    const COL_NAME = 'client_calendar_user.name';
+
+    /**
+     * the column name for the surname field
+     */
+    const COL_SURNAME = 'client_calendar_user.surname';
+
+    /**
+     * the column name for the title field
+     */
+    const COL_TITLE = 'client_calendar_user.title';
+
+    /**
+     * the column name for the email field
+     */
+    const COL_EMAIL = 'client_calendar_user.email';
+
+    /**
+     * the column name for the id field
+     */
+    const COL_ID = 'client_calendar_user.id';
 
     /**
      * The default string format for model objects of the related table
@@ -98,11 +113,11 @@ class BuyerStageTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'InternalClientId', 'Stage', ),
-        self::TYPE_CAMELNAME     => array('id', 'internalClientId', 'stage', ),
-        self::TYPE_COLNAME       => array(BuyerStageTableMap::COL_ID, BuyerStageTableMap::COL_INTERNAL_CLIENT_ID, BuyerStageTableMap::COL_STAGE, ),
-        self::TYPE_FIELDNAME     => array('id', 'internal_client_id', 'stage', ),
-        self::TYPE_NUM           => array(0, 1, 2, )
+        self::TYPE_PHPNAME       => array('InternalClientId', 'Name', 'Surname', 'Title', 'Email', 'Id', ),
+        self::TYPE_CAMELNAME     => array('internalClientId', 'name', 'surname', 'title', 'email', 'id', ),
+        self::TYPE_COLNAME       => array(ClientCalendarUserTableMap::COL_INTERNAL_CLIENT_ID, ClientCalendarUserTableMap::COL_NAME, ClientCalendarUserTableMap::COL_SURNAME, ClientCalendarUserTableMap::COL_TITLE, ClientCalendarUserTableMap::COL_EMAIL, ClientCalendarUserTableMap::COL_ID, ),
+        self::TYPE_FIELDNAME     => array('internal_client_id', 'name', 'surname', 'title', 'email', 'id', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -112,11 +127,11 @@ class BuyerStageTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'InternalClientId' => 1, 'Stage' => 2, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'internalClientId' => 1, 'stage' => 2, ),
-        self::TYPE_COLNAME       => array(BuyerStageTableMap::COL_ID => 0, BuyerStageTableMap::COL_INTERNAL_CLIENT_ID => 1, BuyerStageTableMap::COL_STAGE => 2, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'internal_client_id' => 1, 'stage' => 2, ),
-        self::TYPE_NUM           => array(0, 1, 2, )
+        self::TYPE_PHPNAME       => array('InternalClientId' => 0, 'Name' => 1, 'Surname' => 2, 'Title' => 3, 'Email' => 4, 'Id' => 5, ),
+        self::TYPE_CAMELNAME     => array('internalClientId' => 0, 'name' => 1, 'surname' => 2, 'title' => 3, 'email' => 4, 'id' => 5, ),
+        self::TYPE_COLNAME       => array(ClientCalendarUserTableMap::COL_INTERNAL_CLIENT_ID => 0, ClientCalendarUserTableMap::COL_NAME => 1, ClientCalendarUserTableMap::COL_SURNAME => 2, ClientCalendarUserTableMap::COL_TITLE => 3, ClientCalendarUserTableMap::COL_EMAIL => 4, ClientCalendarUserTableMap::COL_ID => 5, ),
+        self::TYPE_FIELDNAME     => array('internal_client_id' => 0, 'name' => 1, 'surname' => 2, 'title' => 3, 'email' => 4, 'id' => 5, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -129,17 +144,19 @@ class BuyerStageTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('buyer_stage');
-        $this->setPhpName('BuyerStage');
+        $this->setName('client_calendar_user');
+        $this->setPhpName('ClientCalendarUser');
         $this->setIdentifierQuoting(false);
-        $this->setClassName('\\DataModels\\DataModels\\BuyerStage');
+        $this->setClassName('\\DataModels\\DataModels\\ClientCalendarUser');
         $this->setPackage('DataModels.DataModels');
-        $this->setUseIdGenerator(true);
-        $this->setPrimaryKeyMethodInfo('buyer_stage_id_seq');
+        $this->setUseIdGenerator(false);
         // columns
-        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('internal_client_id', 'InternalClientId', 'INTEGER', false, null, null);
-        $this->addColumn('stage', 'Stage', 'VARCHAR', false, 255, null);
+        $this->addForeignKey('internal_client_id', 'InternalClientId', 'INTEGER', 'internal_client', 'id', false, null, null);
+        $this->addColumn('name', 'Name', 'VARCHAR', false, 255, null);
+        $this->addColumn('surname', 'Surname', 'VARCHAR', false, 255, null);
+        $this->addColumn('title', 'Title', 'VARCHAR', false, 127, null);
+        $this->addColumn('email', 'Email', 'VARCHAR', false, 255, null);
+        $this->addForeignPrimaryKey('id', 'Id', 'INTEGER' , 'meeting_attendee', 'id', true, null, null);
     } // initialize()
 
     /**
@@ -147,7 +164,41 @@ class BuyerStageTableMap extends TableMap
      */
     public function buildRelations()
     {
+        $this->addRelation('InternalClient', '\\DataModels\\DataModels\\InternalClient', RelationMap::MANY_TO_ONE, array (
+  0 =>
+  array (
+    0 => ':internal_client_id',
+    1 => ':id',
+  ),
+), null, null, null, false);
+        $this->addRelation('MeetingAttendee', '\\DataModels\\DataModels\\MeetingAttendee', RelationMap::MANY_TO_ONE, array (
+  0 =>
+  array (
+    0 => ':id',
+    1 => ':id',
+  ),
+), 'CASCADE', null, null, false);
+        $this->addRelation('ClientCalendarUserOAuth', '\\DataModels\\DataModels\\ClientCalendarUserOAuth', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':client_calendar_user_id',
+    1 => ':id',
+  ),
+), null, null, 'ClientCalendarUserOAuths', false);
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'concrete_inheritance' => array('extends' => 'meeting_attendee', 'descendant_column' => 'descendant_class', 'copy_data_to_parent' => 'true', 'copy_data_to_child' => 'false', 'schema' => '', 'exclude_behaviors' => '', ),
+        );
+    } // getBehaviors()
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -165,11 +216,11 @@ class BuyerStageTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 5 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return null === $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+        return null === $row[TableMap::TYPE_NUM == $indexType ? 5 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 5 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 5 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 5 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 5 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
     }
 
     /**
@@ -188,7 +239,7 @@ class BuyerStageTableMap extends TableMap
     {
         return (int) $row[
             $indexType == TableMap::TYPE_NUM
-                ? 0 + $offset
+                ? 5 + $offset
                 : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
         ];
     }
@@ -206,7 +257,7 @@ class BuyerStageTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? BuyerStageTableMap::CLASS_DEFAULT : BuyerStageTableMap::OM_CLASS;
+        return $withPrefix ? ClientCalendarUserTableMap::CLASS_DEFAULT : ClientCalendarUserTableMap::OM_CLASS;
     }
 
     /**
@@ -220,22 +271,22 @@ class BuyerStageTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *                         rethrown wrapped into a PropelException.
-     * @return array           (BuyerStage object, last column rank)
+     * @return array           (ClientCalendarUser object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = BuyerStageTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = BuyerStageTableMap::getInstanceFromPool($key))) {
+        $key = ClientCalendarUserTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = ClientCalendarUserTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + BuyerStageTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + ClientCalendarUserTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = BuyerStageTableMap::OM_CLASS;
-            /** @var BuyerStage $obj */
+            $cls = ClientCalendarUserTableMap::OM_CLASS;
+            /** @var ClientCalendarUser $obj */
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            BuyerStageTableMap::addInstanceToPool($obj, $key);
+            ClientCalendarUserTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -258,18 +309,18 @@ class BuyerStageTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = BuyerStageTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = BuyerStageTableMap::getInstanceFromPool($key))) {
+            $key = ClientCalendarUserTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = ClientCalendarUserTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
                 $results[] = $obj;
             } else {
-                /** @var BuyerStage $obj */
+                /** @var ClientCalendarUser $obj */
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                BuyerStageTableMap::addInstanceToPool($obj, $key);
+                ClientCalendarUserTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -290,13 +341,19 @@ class BuyerStageTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(BuyerStageTableMap::COL_ID);
-            $criteria->addSelectColumn(BuyerStageTableMap::COL_INTERNAL_CLIENT_ID);
-            $criteria->addSelectColumn(BuyerStageTableMap::COL_STAGE);
+            $criteria->addSelectColumn(ClientCalendarUserTableMap::COL_INTERNAL_CLIENT_ID);
+            $criteria->addSelectColumn(ClientCalendarUserTableMap::COL_NAME);
+            $criteria->addSelectColumn(ClientCalendarUserTableMap::COL_SURNAME);
+            $criteria->addSelectColumn(ClientCalendarUserTableMap::COL_TITLE);
+            $criteria->addSelectColumn(ClientCalendarUserTableMap::COL_EMAIL);
+            $criteria->addSelectColumn(ClientCalendarUserTableMap::COL_ID);
         } else {
-            $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.internal_client_id');
-            $criteria->addSelectColumn($alias . '.stage');
+            $criteria->addSelectColumn($alias . '.name');
+            $criteria->addSelectColumn($alias . '.surname');
+            $criteria->addSelectColumn($alias . '.title');
+            $criteria->addSelectColumn($alias . '.email');
+            $criteria->addSelectColumn($alias . '.id');
         }
     }
 
@@ -309,7 +366,7 @@ class BuyerStageTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(BuyerStageTableMap::DATABASE_NAME)->getTable(BuyerStageTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(ClientCalendarUserTableMap::DATABASE_NAME)->getTable(ClientCalendarUserTableMap::TABLE_NAME);
     }
 
     /**
@@ -317,16 +374,16 @@ class BuyerStageTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-        $dbMap = Propel::getServiceContainer()->getDatabaseMap(BuyerStageTableMap::DATABASE_NAME);
-        if (!$dbMap->hasTable(BuyerStageTableMap::TABLE_NAME)) {
-            $dbMap->addTableObject(new BuyerStageTableMap());
+        $dbMap = Propel::getServiceContainer()->getDatabaseMap(ClientCalendarUserTableMap::DATABASE_NAME);
+        if (!$dbMap->hasTable(ClientCalendarUserTableMap::TABLE_NAME)) {
+            $dbMap->addTableObject(new ClientCalendarUserTableMap());
         }
     }
 
     /**
-     * Performs a DELETE on the database, given a BuyerStage or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a ClientCalendarUser or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or BuyerStage object or primary key or array of primary keys
+     * @param mixed               $values Criteria or ClientCalendarUser object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param  ConnectionInterface $con the connection to use
      * @return int             The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -337,27 +394,27 @@ class BuyerStageTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(BuyerStageTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ClientCalendarUserTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \DataModels\DataModels\BuyerStage) { // it's a model object
+        } elseif ($values instanceof \DataModels\DataModels\ClientCalendarUser) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(BuyerStageTableMap::DATABASE_NAME);
-            $criteria->add(BuyerStageTableMap::COL_ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(ClientCalendarUserTableMap::DATABASE_NAME);
+            $criteria->add(ClientCalendarUserTableMap::COL_ID, (array) $values, Criteria::IN);
         }
 
-        $query = BuyerStageQuery::create()->mergeWith($criteria);
+        $query = ClientCalendarUserQuery::create()->mergeWith($criteria);
 
         if ($values instanceof Criteria) {
-            BuyerStageTableMap::clearInstancePool();
+            ClientCalendarUserTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
             foreach ((array) $values as $singleval) {
-                BuyerStageTableMap::removeInstanceFromPool($singleval);
+                ClientCalendarUserTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -365,20 +422,20 @@ class BuyerStageTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the buyer_stage table.
+     * Deletes all rows from the client_calendar_user table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return BuyerStageQuery::create()->doDeleteAll($con);
+        return ClientCalendarUserQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a BuyerStage or Criteria object.
+     * Performs an INSERT on the database, given a ClientCalendarUser or Criteria object.
      *
-     * @param mixed               $criteria Criteria or BuyerStage object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or ClientCalendarUser object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -387,22 +444,18 @@ class BuyerStageTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(BuyerStageTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ClientCalendarUserTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from BuyerStage object
-        }
-
-        if ($criteria->containsKey(BuyerStageTableMap::COL_ID) && $criteria->keyContainsValue(BuyerStageTableMap::COL_ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.BuyerStageTableMap::COL_ID.')');
+            $criteria = $criteria->buildCriteria(); // build Criteria from ClientCalendarUser object
         }
 
 
         // Set the correct dbName
-        $query = BuyerStageQuery::create()->mergeWith($criteria);
+        $query = ClientCalendarUserQuery::create()->mergeWith($criteria);
 
         // use transaction because $criteria could contain info
         // for more than one table (I guess, conceivably)
@@ -411,7 +464,7 @@ class BuyerStageTableMap extends TableMap
         });
     }
 
-} // BuyerStageTableMap
+} // ClientCalendarUserTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-BuyerStageTableMap::buildTableMap();
+ClientCalendarUserTableMap::buildTableMap();

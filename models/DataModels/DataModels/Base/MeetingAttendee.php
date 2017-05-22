@@ -4,10 +4,10 @@ namespace DataModels\DataModels\Base;
 
 use \Exception;
 use \PDO;
+use DataModels\DataModels\ClientCalendarUser as ChildClientCalendarUser;
+use DataModels\DataModels\ClientCalendarUserQuery as ChildClientCalendarUserQuery;
 use DataModels\DataModels\Contact as ChildContact;
 use DataModels\DataModels\ContactQuery as ChildContactQuery;
-use DataModels\DataModels\CustomerContact as ChildCustomerContact;
-use DataModels\DataModels\CustomerContactQuery as ChildCustomerContactQuery;
 use DataModels\DataModels\Meeting as ChildMeeting;
 use DataModels\DataModels\MeetingAttendee as ChildMeetingAttendee;
 use DataModels\DataModels\MeetingAttendeeQuery as ChildMeetingAttendeeQuery;
@@ -110,9 +110,9 @@ abstract class MeetingAttendee implements ActiveRecordInterface
     protected $singleContact;
 
     /**
-     * @var        ChildCustomerContact one-to-one related ChildCustomerContact object
+     * @var        ChildClientCalendarUser one-to-one related ChildClientCalendarUser object
      */
-    protected $singleCustomerContact;
+    protected $singleClientCalendarUser;
 
     /**
      * @var        ObjectCollection|ChildMeeting[] Cross Collection to store aggregation of ChildMeeting objects.
@@ -559,7 +559,7 @@ abstract class MeetingAttendee implements ActiveRecordInterface
 
             $this->singleContact = null;
 
-            $this->singleCustomerContact = null;
+            $this->singleClientCalendarUser = null;
 
             $this->collMeetings = null;
         } // if (deep)
@@ -764,9 +764,9 @@ abstract class MeetingAttendee implements ActiveRecordInterface
                 }
             }
 
-            if ($this->singleCustomerContact !== null) {
-                if (!$this->singleCustomerContact->isDeleted() && ($this->singleCustomerContact->isNew() || $this->singleCustomerContact->isModified())) {
-                    $affectedRows += $this->singleCustomerContact->save($con);
+            if ($this->singleClientCalendarUser !== null) {
+                if (!$this->singleClientCalendarUser->isDeleted() && ($this->singleClientCalendarUser->isNew() || $this->singleClientCalendarUser->isModified())) {
+                    $affectedRows += $this->singleClientCalendarUser->save($con);
                 }
             }
 
@@ -988,20 +988,20 @@ abstract class MeetingAttendee implements ActiveRecordInterface
 
                 $result[$key] = $this->singleContact->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
             }
-            if (null !== $this->singleCustomerContact) {
+            if (null !== $this->singleClientCalendarUser) {
 
                 switch ($keyType) {
                     case TableMap::TYPE_CAMELNAME:
-                        $key = 'customerContact';
+                        $key = 'clientCalendarUser';
                         break;
                     case TableMap::TYPE_FIELDNAME:
-                        $key = 'customer_contact';
+                        $key = 'client_calendar_user';
                         break;
                     default:
-                        $key = 'CustomerContact';
+                        $key = 'ClientCalendarUser';
                 }
 
-                $result[$key] = $this->singleCustomerContact->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+                $result[$key] = $this->singleClientCalendarUser->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
             }
         }
 
@@ -1238,9 +1238,9 @@ abstract class MeetingAttendee implements ActiveRecordInterface
                 $copyObj->setContact($relObj->copy($deepCopy));
             }
 
-            $relObj = $this->getCustomerContact();
+            $relObj = $this->getClientCalendarUser();
             if ($relObj) {
-                $copyObj->setCustomerContact($relObj->copy($deepCopy));
+                $copyObj->setClientCalendarUser($relObj->copy($deepCopy));
             }
 
         } // if ($deepCopy)
@@ -2035,34 +2035,34 @@ abstract class MeetingAttendee implements ActiveRecordInterface
     }
 
     /**
-     * Gets a single ChildCustomerContact object, which is related to this object by a one-to-one relationship.
+     * Gets a single ChildClientCalendarUser object, which is related to this object by a one-to-one relationship.
      *
      * @param  ConnectionInterface $con optional connection object
-     * @return ChildCustomerContact
+     * @return ChildClientCalendarUser
      * @throws PropelException
      */
-    public function getCustomerContact(ConnectionInterface $con = null)
+    public function getClientCalendarUser(ConnectionInterface $con = null)
     {
 
-        if ($this->singleCustomerContact === null && !$this->isNew()) {
-            $this->singleCustomerContact = ChildCustomerContactQuery::create()->findPk($this->getPrimaryKey(), $con);
+        if ($this->singleClientCalendarUser === null && !$this->isNew()) {
+            $this->singleClientCalendarUser = ChildClientCalendarUserQuery::create()->findPk($this->getPrimaryKey(), $con);
         }
 
-        return $this->singleCustomerContact;
+        return $this->singleClientCalendarUser;
     }
 
     /**
-     * Sets a single ChildCustomerContact object as related to this object by a one-to-one relationship.
+     * Sets a single ChildClientCalendarUser object as related to this object by a one-to-one relationship.
      *
-     * @param  ChildCustomerContact $v ChildCustomerContact
+     * @param  ChildClientCalendarUser $v ChildClientCalendarUser
      * @return $this|\DataModels\DataModels\MeetingAttendee The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setCustomerContact(ChildCustomerContact $v = null)
+    public function setClientCalendarUser(ChildClientCalendarUser $v = null)
     {
-        $this->singleCustomerContact = $v;
+        $this->singleClientCalendarUser = $v;
 
-        // Make sure that that the passed-in ChildCustomerContact isn't already associated with this object
+        // Make sure that that the passed-in ChildClientCalendarUser isn't already associated with this object
         if ($v !== null && $v->getMeetingAttendee(null, false) === null) {
             $v->setMeetingAttendee($this);
         }
@@ -2358,8 +2358,8 @@ abstract class MeetingAttendee implements ActiveRecordInterface
             if ($this->singleContact) {
                 $this->singleContact->clearAllReferences($deep);
             }
-            if ($this->singleCustomerContact) {
-                $this->singleCustomerContact->clearAllReferences($deep);
+            if ($this->singleClientCalendarUser) {
+                $this->singleClientCalendarUser->clearAllReferences($deep);
             }
             if ($this->collMeetings) {
                 foreach ($this->collMeetings as $o) {
@@ -2372,7 +2372,7 @@ abstract class MeetingAttendee implements ActiveRecordInterface
         $this->collMeetingsRelatedByEventCreatorId = null;
         $this->collMeetingHasAttendees = null;
         $this->singleContact = null;
-        $this->singleCustomerContact = null;
+        $this->singleClientCalendarUser = null;
         $this->collMeetings = null;
     }
 

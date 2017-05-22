@@ -169,7 +169,7 @@ class MeetingAttendeeTableMap extends TableMap
     1 => ':id',
   ),
 ), 'CASCADE', null, null, false);
-        $this->addRelation('CustomerContact', '\\DataModels\\DataModels\\CustomerContact', RelationMap::ONE_TO_ONE, array (
+        $this->addRelation('ClientCalendarUser', '\\DataModels\\DataModels\\ClientCalendarUser', RelationMap::ONE_TO_ONE, array (
   0 =>
   array (
     0 => ':id',
@@ -199,7 +199,7 @@ class MeetingAttendeeTableMap extends TableMap
         // Invalidate objects in related instance pools,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         ContactTableMap::clearInstancePool();
-        CustomerContactTableMap::clearInstancePool();
+        ClientCalendarUserTableMap::clearInstancePool();
     }
 
     /**

@@ -4,20 +4,15 @@ namespace DataModels\DataModels\Base;
 
 use \Exception;
 use \PDO;
-use DataModels\DataModels\Account as ChildAccount;
-use DataModels\DataModels\AccountQuery as ChildAccountQuery;
-use DataModels\DataModels\Contact as ChildContact;
-use DataModels\DataModels\ContactQuery as ChildContactQuery;
-use DataModels\DataModels\InternalClient as ChildInternalClient;
-use DataModels\DataModels\InternalClientQuery as ChildInternalClientQuery;
-use DataModels\DataModels\Map\AccountTableMap;
-use DataModels\DataModels\Map\ContactTableMap;
+use DataModels\DataModels\ClientCalendarUser as ChildClientCalendarUser;
+use DataModels\DataModels\ClientCalendarUserOAuthQuery as ChildClientCalendarUserOAuthQuery;
+use DataModels\DataModels\ClientCalendarUserQuery as ChildClientCalendarUserQuery;
+use DataModels\DataModels\Map\ClientCalendarUserOAuthTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
-use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\BadMethodCallException;
 use Propel\Runtime\Exception\LogicException;
@@ -26,18 +21,18 @@ use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 
 /**
- * Base class that represents a row from the 'account' table.
+ * Base class that represents a row from the 'client_calendar_user_oauth' table.
  *
  *
  *
  * @package    propel.generator.DataModels.DataModels.Base
  */
-abstract class Account implements ActiveRecordInterface
+abstract class ClientCalendarUserOAuth implements ActiveRecordInterface
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\DataModels\\DataModels\\Map\\AccountTableMap';
+    const TABLE_MAP = '\\DataModels\\DataModels\\Map\\ClientCalendarUserOAuthTableMap';
 
 
     /**
@@ -74,50 +69,37 @@ abstract class Account implements ActiveRecordInterface
     protected $id;
 
     /**
-     * The value for the name field.
-     *
-     * @var        string
-     */
-    protected $name;
-
-    /**
-     * The value for the email_domain field.
-     *
-     * @var        string
-     */
-    protected $email_domain;
-
-    /**
-     * The value for the website field.
-     *
-     * @var        string
-     */
-    protected $website;
-
-    /**
-     * The value for the sfdc_account_id field.
+     * The value for the client_calendar_user_id field.
      *
      * @var        int
      */
-    protected $sfdc_account_id;
+    protected $client_calendar_user_id;
 
     /**
-     * The value for the internal_client_id field.
+     * The value for the type field.
      *
-     * @var        int
+     * @var        string
      */
-    protected $internal_client_id;
+    protected $type;
 
     /**
-     * @var        ChildInternalClient
+     * The value for the status field.
+     *
+     * @var        string
      */
-    protected $aInternalClient;
+    protected $status;
 
     /**
-     * @var        ObjectCollection|ChildContact[] Collection to store aggregation of ChildContact objects.
+     * The value for the data field.
+     *
+     * @var        string
      */
-    protected $collContacts;
-    protected $collContactsPartial;
+    protected $data;
+
+    /**
+     * @var        ChildClientCalendarUser
+     */
+    protected $aClientCalendarUser;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -128,13 +110,7 @@ abstract class Account implements ActiveRecordInterface
     protected $alreadyInSave = false;
 
     /**
-     * An array of objects scheduled for deletion.
-     * @var ObjectCollection|ChildContact[]
-     */
-    protected $contactsScheduledForDeletion = null;
-
-    /**
-     * Initializes internal state of DataModels\DataModels\Base\Account object.
+     * Initializes internal state of DataModels\DataModels\Base\ClientCalendarUserOAuth object.
      */
     public function __construct()
     {
@@ -229,9 +205,9 @@ abstract class Account implements ActiveRecordInterface
     }
 
     /**
-     * Compares this with another <code>Account</code> instance.  If
-     * <code>obj</code> is an instance of <code>Account</code>, delegates to
-     * <code>equals(Account)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>ClientCalendarUserOAuth</code> instance.  If
+     * <code>obj</code> is an instance of <code>ClientCalendarUserOAuth</code>, delegates to
+     * <code>equals(ClientCalendarUserOAuth)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param  mixed   $obj The object to compare to.
      * @return boolean Whether equal to the object specified.
@@ -297,7 +273,7 @@ abstract class Account implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return $this|Account The current object, for fluid interface
+     * @return $this|ClientCalendarUserOAuth The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -369,60 +345,50 @@ abstract class Account implements ActiveRecordInterface
     }
 
     /**
-     * Get the [name] column value.
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * Get the [email_domain] column value.
-     *
-     * @return string
-     */
-    public function getEmailDomain()
-    {
-        return $this->email_domain;
-    }
-
-    /**
-     * Get the [website] column value.
-     *
-     * @return string
-     */
-    public function getWebsite()
-    {
-        return $this->website;
-    }
-
-    /**
-     * Get the [sfdc_account_id] column value.
+     * Get the [client_calendar_user_id] column value.
      *
      * @return int
      */
-    public function getSfdcAccountId()
+    public function getClientCalendarUserId()
     {
-        return $this->sfdc_account_id;
+        return $this->client_calendar_user_id;
     }
 
     /**
-     * Get the [internal_client_id] column value.
+     * Get the [type] column value.
      *
-     * @return int
+     * @return string
      */
-    public function getInternalClientId()
+    public function getType()
     {
-        return $this->internal_client_id;
+        return $this->type;
+    }
+
+    /**
+     * Get the [status] column value.
+     *
+     * @return string
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    /**
+     * Get the [data] column value.
+     *
+     * @return string
+     */
+    public function getData()
+    {
+        return $this->data;
     }
 
     /**
      * Set the value of [id] column.
      *
      * @param int $v new value
-     * @return $this|\DataModels\DataModels\Account The current object (for fluent API support)
+     * @return $this|\DataModels\DataModels\ClientCalendarUserOAuth The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -432,115 +398,95 @@ abstract class Account implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[AccountTableMap::COL_ID] = true;
+            $this->modifiedColumns[ClientCalendarUserOAuthTableMap::COL_ID] = true;
         }
 
         return $this;
     } // setId()
 
     /**
-     * Set the value of [name] column.
-     *
-     * @param string $v new value
-     * @return $this|\DataModels\DataModels\Account The current object (for fluent API support)
-     */
-    public function setName($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->name !== $v) {
-            $this->name = $v;
-            $this->modifiedColumns[AccountTableMap::COL_NAME] = true;
-        }
-
-        return $this;
-    } // setName()
-
-    /**
-     * Set the value of [email_domain] column.
-     *
-     * @param string $v new value
-     * @return $this|\DataModels\DataModels\Account The current object (for fluent API support)
-     */
-    public function setEmailDomain($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->email_domain !== $v) {
-            $this->email_domain = $v;
-            $this->modifiedColumns[AccountTableMap::COL_EMAIL_DOMAIN] = true;
-        }
-
-        return $this;
-    } // setEmailDomain()
-
-    /**
-     * Set the value of [website] column.
-     *
-     * @param string $v new value
-     * @return $this|\DataModels\DataModels\Account The current object (for fluent API support)
-     */
-    public function setWebsite($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->website !== $v) {
-            $this->website = $v;
-            $this->modifiedColumns[AccountTableMap::COL_WEBSITE] = true;
-        }
-
-        return $this;
-    } // setWebsite()
-
-    /**
-     * Set the value of [sfdc_account_id] column.
+     * Set the value of [client_calendar_user_id] column.
      *
      * @param int $v new value
-     * @return $this|\DataModels\DataModels\Account The current object (for fluent API support)
+     * @return $this|\DataModels\DataModels\ClientCalendarUserOAuth The current object (for fluent API support)
      */
-    public function setSfdcAccountId($v)
+    public function setClientCalendarUserId($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->sfdc_account_id !== $v) {
-            $this->sfdc_account_id = $v;
-            $this->modifiedColumns[AccountTableMap::COL_SFDC_ACCOUNT_ID] = true;
+        if ($this->client_calendar_user_id !== $v) {
+            $this->client_calendar_user_id = $v;
+            $this->modifiedColumns[ClientCalendarUserOAuthTableMap::COL_CLIENT_CALENDAR_USER_ID] = true;
+        }
+
+        if ($this->aClientCalendarUser !== null && $this->aClientCalendarUser->getId() !== $v) {
+            $this->aClientCalendarUser = null;
         }
 
         return $this;
-    } // setSfdcAccountId()
+    } // setClientCalendarUserId()
 
     /**
-     * Set the value of [internal_client_id] column.
+     * Set the value of [type] column.
      *
-     * @param int $v new value
-     * @return $this|\DataModels\DataModels\Account The current object (for fluent API support)
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\ClientCalendarUserOAuth The current object (for fluent API support)
      */
-    public function setInternalClientId($v)
+    public function setType($v)
     {
         if ($v !== null) {
-            $v = (int) $v;
+            $v = (string) $v;
         }
 
-        if ($this->internal_client_id !== $v) {
-            $this->internal_client_id = $v;
-            $this->modifiedColumns[AccountTableMap::COL_INTERNAL_CLIENT_ID] = true;
-        }
-
-        if ($this->aInternalClient !== null && $this->aInternalClient->getId() !== $v) {
-            $this->aInternalClient = null;
+        if ($this->type !== $v) {
+            $this->type = $v;
+            $this->modifiedColumns[ClientCalendarUserOAuthTableMap::COL_TYPE] = true;
         }
 
         return $this;
-    } // setInternalClientId()
+    } // setType()
+
+    /**
+     * Set the value of [status] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\ClientCalendarUserOAuth The current object (for fluent API support)
+     */
+    public function setStatus($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->status !== $v) {
+            $this->status = $v;
+            $this->modifiedColumns[ClientCalendarUserOAuthTableMap::COL_STATUS] = true;
+        }
+
+        return $this;
+    } // setStatus()
+
+    /**
+     * Set the value of [data] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\ClientCalendarUserOAuth The current object (for fluent API support)
+     */
+    public function setData($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->data !== $v) {
+            $this->data = $v;
+            $this->modifiedColumns[ClientCalendarUserOAuthTableMap::COL_DATA] = true;
+        }
+
+        return $this;
+    } // setData()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -578,23 +524,20 @@ abstract class Account implements ActiveRecordInterface
     {
         try {
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : AccountTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ClientCalendarUserOAuthTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : AccountTableMap::translateFieldName('Name', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->name = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ClientCalendarUserOAuthTableMap::translateFieldName('ClientCalendarUserId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->client_calendar_user_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : AccountTableMap::translateFieldName('EmailDomain', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->email_domain = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ClientCalendarUserOAuthTableMap::translateFieldName('Type', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->type = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : AccountTableMap::translateFieldName('Website', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->website = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ClientCalendarUserOAuthTableMap::translateFieldName('Status', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->status = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : AccountTableMap::translateFieldName('SfdcAccountId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->sfdc_account_id = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : AccountTableMap::translateFieldName('InternalClientId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->internal_client_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ClientCalendarUserOAuthTableMap::translateFieldName('Data', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->data = (null !== $col) ? (string) $col : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -603,10 +546,10 @@ abstract class Account implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 6; // 6 = AccountTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 5; // 5 = ClientCalendarUserOAuthTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException(sprintf('Error populating %s object', '\\DataModels\\DataModels\\Account'), 0, $e);
+            throw new PropelException(sprintf('Error populating %s object', '\\DataModels\\DataModels\\ClientCalendarUserOAuth'), 0, $e);
         }
     }
 
@@ -625,8 +568,8 @@ abstract class Account implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
-        if ($this->aInternalClient !== null && $this->internal_client_id !== $this->aInternalClient->getId()) {
-            $this->aInternalClient = null;
+        if ($this->aClientCalendarUser !== null && $this->client_calendar_user_id !== $this->aClientCalendarUser->getId()) {
+            $this->aClientCalendarUser = null;
         }
     } // ensureConsistency
 
@@ -651,13 +594,13 @@ abstract class Account implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(AccountTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(ClientCalendarUserOAuthTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildAccountQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildClientCalendarUserOAuthQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -667,9 +610,7 @@ abstract class Account implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aInternalClient = null;
-            $this->collContacts = null;
-
+            $this->aClientCalendarUser = null;
         } // if (deep)
     }
 
@@ -679,8 +620,8 @@ abstract class Account implements ActiveRecordInterface
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see Account::setDeleted()
-     * @see Account::isDeleted()
+     * @see ClientCalendarUserOAuth::setDeleted()
+     * @see ClientCalendarUserOAuth::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -689,11 +630,11 @@ abstract class Account implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(AccountTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ClientCalendarUserOAuthTableMap::DATABASE_NAME);
         }
 
         $con->transaction(function () use ($con) {
-            $deleteQuery = ChildAccountQuery::create()
+            $deleteQuery = ChildClientCalendarUserOAuthQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -728,7 +669,7 @@ abstract class Account implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(AccountTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ClientCalendarUserOAuthTableMap::DATABASE_NAME);
         }
 
         return $con->transaction(function () use ($con) {
@@ -747,7 +688,7 @@ abstract class Account implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                AccountTableMap::addInstanceToPool($this);
+                ClientCalendarUserOAuthTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -778,11 +719,11 @@ abstract class Account implements ActiveRecordInterface
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aInternalClient !== null) {
-                if ($this->aInternalClient->isModified() || $this->aInternalClient->isNew()) {
-                    $affectedRows += $this->aInternalClient->save($con);
+            if ($this->aClientCalendarUser !== null) {
+                if ($this->aClientCalendarUser->isModified() || $this->aClientCalendarUser->isNew()) {
+                    $affectedRows += $this->aClientCalendarUser->save($con);
                 }
-                $this->setInternalClient($this->aInternalClient);
+                $this->setClientCalendarUser($this->aClientCalendarUser);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -794,24 +735,6 @@ abstract class Account implements ActiveRecordInterface
                     $affectedRows += $this->doUpdate($con);
                 }
                 $this->resetModified();
-            }
-
-            if ($this->contactsScheduledForDeletion !== null) {
-                if (!$this->contactsScheduledForDeletion->isEmpty()) {
-                    foreach ($this->contactsScheduledForDeletion as $contact) {
-                        // need to save related object because we set the relation to null
-                        $contact->save($con);
-                    }
-                    $this->contactsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collContacts !== null) {
-                foreach ($this->collContacts as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
             }
 
             $this->alreadyInSave = false;
@@ -834,13 +757,13 @@ abstract class Account implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[AccountTableMap::COL_ID] = true;
+        $this->modifiedColumns[ClientCalendarUserOAuthTableMap::COL_ID] = true;
         if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . AccountTableMap::COL_ID . ')');
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . ClientCalendarUserOAuthTableMap::COL_ID . ')');
         }
         if (null === $this->id) {
             try {
-                $dataFetcher = $con->query("SELECT nextval('account_id_seq')");
+                $dataFetcher = $con->query("SELECT nextval('client_calendar_user_oauth_id_seq')");
                 $this->id = (int) $dataFetcher->fetchColumn();
             } catch (Exception $e) {
                 throw new PropelException('Unable to get sequence id.', 0, $e);
@@ -849,27 +772,24 @@ abstract class Account implements ActiveRecordInterface
 
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(AccountTableMap::COL_ID)) {
+        if ($this->isColumnModified(ClientCalendarUserOAuthTableMap::COL_ID)) {
             $modifiedColumns[':p' . $index++]  = 'id';
         }
-        if ($this->isColumnModified(AccountTableMap::COL_NAME)) {
-            $modifiedColumns[':p' . $index++]  = 'name';
+        if ($this->isColumnModified(ClientCalendarUserOAuthTableMap::COL_CLIENT_CALENDAR_USER_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'client_calendar_user_id';
         }
-        if ($this->isColumnModified(AccountTableMap::COL_EMAIL_DOMAIN)) {
-            $modifiedColumns[':p' . $index++]  = 'email_domain';
+        if ($this->isColumnModified(ClientCalendarUserOAuthTableMap::COL_TYPE)) {
+            $modifiedColumns[':p' . $index++]  = 'type';
         }
-        if ($this->isColumnModified(AccountTableMap::COL_WEBSITE)) {
-            $modifiedColumns[':p' . $index++]  = 'website';
+        if ($this->isColumnModified(ClientCalendarUserOAuthTableMap::COL_STATUS)) {
+            $modifiedColumns[':p' . $index++]  = 'status';
         }
-        if ($this->isColumnModified(AccountTableMap::COL_SFDC_ACCOUNT_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'sfdc_account_id';
-        }
-        if ($this->isColumnModified(AccountTableMap::COL_INTERNAL_CLIENT_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'internal_client_id';
+        if ($this->isColumnModified(ClientCalendarUserOAuthTableMap::COL_DATA)) {
+            $modifiedColumns[':p' . $index++]  = 'data';
         }
 
         $sql = sprintf(
-            'INSERT INTO account (%s) VALUES (%s)',
+            'INSERT INTO client_calendar_user_oauth (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -881,20 +801,17 @@ abstract class Account implements ActiveRecordInterface
                     case 'id':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case 'name':
-                        $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
+                    case 'client_calendar_user_id':
+                        $stmt->bindValue($identifier, $this->client_calendar_user_id, PDO::PARAM_INT);
                         break;
-                    case 'email_domain':
-                        $stmt->bindValue($identifier, $this->email_domain, PDO::PARAM_STR);
+                    case 'type':
+                        $stmt->bindValue($identifier, $this->type, PDO::PARAM_STR);
                         break;
-                    case 'website':
-                        $stmt->bindValue($identifier, $this->website, PDO::PARAM_STR);
+                    case 'status':
+                        $stmt->bindValue($identifier, $this->status, PDO::PARAM_STR);
                         break;
-                    case 'sfdc_account_id':
-                        $stmt->bindValue($identifier, $this->sfdc_account_id, PDO::PARAM_INT);
-                        break;
-                    case 'internal_client_id':
-                        $stmt->bindValue($identifier, $this->internal_client_id, PDO::PARAM_INT);
+                    case 'data':
+                        $stmt->bindValue($identifier, $this->data, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -935,7 +852,7 @@ abstract class Account implements ActiveRecordInterface
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = AccountTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = ClientCalendarUserOAuthTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -955,19 +872,16 @@ abstract class Account implements ActiveRecordInterface
                 return $this->getId();
                 break;
             case 1:
-                return $this->getName();
+                return $this->getClientCalendarUserId();
                 break;
             case 2:
-                return $this->getEmailDomain();
+                return $this->getType();
                 break;
             case 3:
-                return $this->getWebsite();
+                return $this->getStatus();
                 break;
             case 4:
-                return $this->getSfdcAccountId();
-                break;
-            case 5:
-                return $this->getInternalClientId();
+                return $this->getData();
                 break;
             default:
                 return null;
@@ -993,18 +907,17 @@ abstract class Account implements ActiveRecordInterface
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
 
-        if (isset($alreadyDumpedObjects['Account'][$this->hashCode()])) {
+        if (isset($alreadyDumpedObjects['ClientCalendarUserOAuth'][$this->hashCode()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['Account'][$this->hashCode()] = true;
-        $keys = AccountTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['ClientCalendarUserOAuth'][$this->hashCode()] = true;
+        $keys = ClientCalendarUserOAuthTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getName(),
-            $keys[2] => $this->getEmailDomain(),
-            $keys[3] => $this->getWebsite(),
-            $keys[4] => $this->getSfdcAccountId(),
-            $keys[5] => $this->getInternalClientId(),
+            $keys[1] => $this->getClientCalendarUserId(),
+            $keys[2] => $this->getType(),
+            $keys[3] => $this->getStatus(),
+            $keys[4] => $this->getData(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1012,35 +925,20 @@ abstract class Account implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->aInternalClient) {
+            if (null !== $this->aClientCalendarUser) {
 
                 switch ($keyType) {
                     case TableMap::TYPE_CAMELNAME:
-                        $key = 'internalClient';
+                        $key = 'clientCalendarUser';
                         break;
                     case TableMap::TYPE_FIELDNAME:
-                        $key = 'internal_client';
+                        $key = 'client_calendar_user';
                         break;
                     default:
-                        $key = 'InternalClient';
+                        $key = 'ClientCalendarUser';
                 }
 
-                $result[$key] = $this->aInternalClient->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
-            if (null !== $this->collContacts) {
-
-                switch ($keyType) {
-                    case TableMap::TYPE_CAMELNAME:
-                        $key = 'contacts';
-                        break;
-                    case TableMap::TYPE_FIELDNAME:
-                        $key = 'contacts';
-                        break;
-                    default:
-                        $key = 'Contacts';
-                }
-
-                $result[$key] = $this->collContacts->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+                $result[$key] = $this->aClientCalendarUser->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1056,11 +954,11 @@ abstract class Account implements ActiveRecordInterface
      *                one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
      *                TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      *                Defaults to TableMap::TYPE_PHPNAME.
-     * @return $this|\DataModels\DataModels\Account
+     * @return $this|\DataModels\DataModels\ClientCalendarUserOAuth
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = AccountTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = ClientCalendarUserOAuthTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -1071,7 +969,7 @@ abstract class Account implements ActiveRecordInterface
      *
      * @param  int $pos position in xml schema
      * @param  mixed $value field value
-     * @return $this|\DataModels\DataModels\Account
+     * @return $this|\DataModels\DataModels\ClientCalendarUserOAuth
      */
     public function setByPosition($pos, $value)
     {
@@ -1080,19 +978,16 @@ abstract class Account implements ActiveRecordInterface
                 $this->setId($value);
                 break;
             case 1:
-                $this->setName($value);
+                $this->setClientCalendarUserId($value);
                 break;
             case 2:
-                $this->setEmailDomain($value);
+                $this->setType($value);
                 break;
             case 3:
-                $this->setWebsite($value);
+                $this->setStatus($value);
                 break;
             case 4:
-                $this->setSfdcAccountId($value);
-                break;
-            case 5:
-                $this->setInternalClientId($value);
+                $this->setData($value);
                 break;
         } // switch()
 
@@ -1118,25 +1013,22 @@ abstract class Account implements ActiveRecordInterface
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = AccountTableMap::getFieldNames($keyType);
+        $keys = ClientCalendarUserOAuthTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) {
             $this->setId($arr[$keys[0]]);
         }
         if (array_key_exists($keys[1], $arr)) {
-            $this->setName($arr[$keys[1]]);
+            $this->setClientCalendarUserId($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
-            $this->setEmailDomain($arr[$keys[2]]);
+            $this->setType($arr[$keys[2]]);
         }
         if (array_key_exists($keys[3], $arr)) {
-            $this->setWebsite($arr[$keys[3]]);
+            $this->setStatus($arr[$keys[3]]);
         }
         if (array_key_exists($keys[4], $arr)) {
-            $this->setSfdcAccountId($arr[$keys[4]]);
-        }
-        if (array_key_exists($keys[5], $arr)) {
-            $this->setInternalClientId($arr[$keys[5]]);
+            $this->setData($arr[$keys[4]]);
         }
     }
 
@@ -1157,7 +1049,7 @@ abstract class Account implements ActiveRecordInterface
      * @param string $data The source data to import from
      * @param string $keyType The type of keys the array uses.
      *
-     * @return $this|\DataModels\DataModels\Account The current object, for fluid interface
+     * @return $this|\DataModels\DataModels\ClientCalendarUserOAuth The current object, for fluid interface
      */
     public function importFrom($parser, $data, $keyType = TableMap::TYPE_PHPNAME)
     {
@@ -1177,25 +1069,22 @@ abstract class Account implements ActiveRecordInterface
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(AccountTableMap::DATABASE_NAME);
+        $criteria = new Criteria(ClientCalendarUserOAuthTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(AccountTableMap::COL_ID)) {
-            $criteria->add(AccountTableMap::COL_ID, $this->id);
+        if ($this->isColumnModified(ClientCalendarUserOAuthTableMap::COL_ID)) {
+            $criteria->add(ClientCalendarUserOAuthTableMap::COL_ID, $this->id);
         }
-        if ($this->isColumnModified(AccountTableMap::COL_NAME)) {
-            $criteria->add(AccountTableMap::COL_NAME, $this->name);
+        if ($this->isColumnModified(ClientCalendarUserOAuthTableMap::COL_CLIENT_CALENDAR_USER_ID)) {
+            $criteria->add(ClientCalendarUserOAuthTableMap::COL_CLIENT_CALENDAR_USER_ID, $this->client_calendar_user_id);
         }
-        if ($this->isColumnModified(AccountTableMap::COL_EMAIL_DOMAIN)) {
-            $criteria->add(AccountTableMap::COL_EMAIL_DOMAIN, $this->email_domain);
+        if ($this->isColumnModified(ClientCalendarUserOAuthTableMap::COL_TYPE)) {
+            $criteria->add(ClientCalendarUserOAuthTableMap::COL_TYPE, $this->type);
         }
-        if ($this->isColumnModified(AccountTableMap::COL_WEBSITE)) {
-            $criteria->add(AccountTableMap::COL_WEBSITE, $this->website);
+        if ($this->isColumnModified(ClientCalendarUserOAuthTableMap::COL_STATUS)) {
+            $criteria->add(ClientCalendarUserOAuthTableMap::COL_STATUS, $this->status);
         }
-        if ($this->isColumnModified(AccountTableMap::COL_SFDC_ACCOUNT_ID)) {
-            $criteria->add(AccountTableMap::COL_SFDC_ACCOUNT_ID, $this->sfdc_account_id);
-        }
-        if ($this->isColumnModified(AccountTableMap::COL_INTERNAL_CLIENT_ID)) {
-            $criteria->add(AccountTableMap::COL_INTERNAL_CLIENT_ID, $this->internal_client_id);
+        if ($this->isColumnModified(ClientCalendarUserOAuthTableMap::COL_DATA)) {
+            $criteria->add(ClientCalendarUserOAuthTableMap::COL_DATA, $this->data);
         }
 
         return $criteria;
@@ -1213,8 +1102,8 @@ abstract class Account implements ActiveRecordInterface
      */
     public function buildPkeyCriteria()
     {
-        $criteria = ChildAccountQuery::create();
-        $criteria->add(AccountTableMap::COL_ID, $this->id);
+        $criteria = ChildClientCalendarUserOAuthQuery::create();
+        $criteria->add(ClientCalendarUserOAuthTableMap::COL_ID, $this->id);
 
         return $criteria;
     }
@@ -1276,32 +1165,17 @@ abstract class Account implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \DataModels\DataModels\Account (or compatible) type.
+     * @param      object $copyObj An object of \DataModels\DataModels\ClientCalendarUserOAuth (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setName($this->getName());
-        $copyObj->setEmailDomain($this->getEmailDomain());
-        $copyObj->setWebsite($this->getWebsite());
-        $copyObj->setSfdcAccountId($this->getSfdcAccountId());
-        $copyObj->setInternalClientId($this->getInternalClientId());
-
-        if ($deepCopy) {
-            // important: temporarily setNew(false) because this affects the behavior of
-            // the getter/setter methods for fkey referrer objects.
-            $copyObj->setNew(false);
-
-            foreach ($this->getContacts() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addContact($relObj->copy($deepCopy));
-                }
-            }
-
-        } // if ($deepCopy)
-
+        $copyObj->setClientCalendarUserId($this->getClientCalendarUserId());
+        $copyObj->setType($this->getType());
+        $copyObj->setStatus($this->getStatus());
+        $copyObj->setData($this->getData());
         if ($makeNew) {
             $copyObj->setNew(true);
             $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
@@ -1317,7 +1191,7 @@ abstract class Account implements ActiveRecordInterface
      * objects.
      *
      * @param  boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return \DataModels\DataModels\Account Clone of current object.
+     * @return \DataModels\DataModels\ClientCalendarUserOAuth Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1331,26 +1205,26 @@ abstract class Account implements ActiveRecordInterface
     }
 
     /**
-     * Declares an association between this object and a ChildInternalClient object.
+     * Declares an association between this object and a ChildClientCalendarUser object.
      *
-     * @param  ChildInternalClient $v
-     * @return $this|\DataModels\DataModels\Account The current object (for fluent API support)
+     * @param  ChildClientCalendarUser $v
+     * @return $this|\DataModels\DataModels\ClientCalendarUserOAuth The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setInternalClient(ChildInternalClient $v = null)
+    public function setClientCalendarUser(ChildClientCalendarUser $v = null)
     {
         if ($v === null) {
-            $this->setInternalClientId(NULL);
+            $this->setClientCalendarUserId(NULL);
         } else {
-            $this->setInternalClientId($v->getId());
+            $this->setClientCalendarUserId($v->getId());
         }
 
-        $this->aInternalClient = $v;
+        $this->aClientCalendarUser = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildInternalClient object, it will not be re-added.
+        // If this object has already been added to the ChildClientCalendarUser object, it will not be re-added.
         if ($v !== null) {
-            $v->addAccount($this);
+            $v->addClientCalendarUserOAuth($this);
         }
 
 
@@ -1359,292 +1233,26 @@ abstract class Account implements ActiveRecordInterface
 
 
     /**
-     * Get the associated ChildInternalClient object
+     * Get the associated ChildClientCalendarUser object
      *
      * @param  ConnectionInterface $con Optional Connection object.
-     * @return ChildInternalClient The associated ChildInternalClient object.
+     * @return ChildClientCalendarUser The associated ChildClientCalendarUser object.
      * @throws PropelException
      */
-    public function getInternalClient(ConnectionInterface $con = null)
+    public function getClientCalendarUser(ConnectionInterface $con = null)
     {
-        if ($this->aInternalClient === null && ($this->internal_client_id !== null)) {
-            $this->aInternalClient = ChildInternalClientQuery::create()->findPk($this->internal_client_id, $con);
+        if ($this->aClientCalendarUser === null && ($this->client_calendar_user_id !== null)) {
+            $this->aClientCalendarUser = ChildClientCalendarUserQuery::create()->findPk($this->client_calendar_user_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aInternalClient->addAccounts($this);
+                $this->aClientCalendarUser->addClientCalendarUserOAuths($this);
              */
         }
 
-        return $this->aInternalClient;
-    }
-
-
-    /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
-     *
-     * @param      string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-        if ('Contact' == $relationName) {
-            return $this->initContacts();
-        }
-    }
-
-    /**
-     * Clears out the collContacts collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addContacts()
-     */
-    public function clearContacts()
-    {
-        $this->collContacts = null; // important to set this to NULL since that means it is uninitialized
-    }
-
-    /**
-     * Reset is the collContacts collection loaded partially.
-     */
-    public function resetPartialContacts($v = true)
-    {
-        $this->collContactsPartial = $v;
-    }
-
-    /**
-     * Initializes the collContacts collection.
-     *
-     * By default this just sets the collContacts collection to an empty array (like clearcollContacts());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initContacts($overrideExisting = true)
-    {
-        if (null !== $this->collContacts && !$overrideExisting) {
-            return;
-        }
-
-        $collectionClassName = ContactTableMap::getTableMap()->getCollectionClassName();
-
-        $this->collContacts = new $collectionClassName;
-        $this->collContacts->setModel('\DataModels\DataModels\Contact');
-    }
-
-    /**
-     * Gets an array of ChildContact objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildAccount is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @return ObjectCollection|ChildContact[] List of ChildContact objects
-     * @throws PropelException
-     */
-    public function getContacts(Criteria $criteria = null, ConnectionInterface $con = null)
-    {
-        $partial = $this->collContactsPartial && !$this->isNew();
-        if (null === $this->collContacts || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collContacts) {
-                // return empty collection
-                $this->initContacts();
-            } else {
-                $collContacts = ChildContactQuery::create(null, $criteria)
-                    ->filterByAccount($this)
-                    ->find($con);
-
-                if (null !== $criteria) {
-                    if (false !== $this->collContactsPartial && count($collContacts)) {
-                        $this->initContacts(false);
-
-                        foreach ($collContacts as $obj) {
-                            if (false == $this->collContacts->contains($obj)) {
-                                $this->collContacts->append($obj);
-                            }
-                        }
-
-                        $this->collContactsPartial = true;
-                    }
-
-                    return $collContacts;
-                }
-
-                if ($partial && $this->collContacts) {
-                    foreach ($this->collContacts as $obj) {
-                        if ($obj->isNew()) {
-                            $collContacts[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collContacts = $collContacts;
-                $this->collContactsPartial = false;
-            }
-        }
-
-        return $this->collContacts;
-    }
-
-    /**
-     * Sets a collection of ChildContact objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param      Collection $contacts A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return $this|ChildAccount The current object (for fluent API support)
-     */
-    public function setContacts(Collection $contacts, ConnectionInterface $con = null)
-    {
-        /** @var ChildContact[] $contactsToDelete */
-        $contactsToDelete = $this->getContacts(new Criteria(), $con)->diff($contacts);
-
-
-        $this->contactsScheduledForDeletion = $contactsToDelete;
-
-        foreach ($contactsToDelete as $contactRemoved) {
-            $contactRemoved->setAccount(null);
-        }
-
-        $this->collContacts = null;
-        foreach ($contacts as $contact) {
-            $this->addContact($contact);
-        }
-
-        $this->collContacts = $contacts;
-        $this->collContactsPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related Contact objects.
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related Contact objects.
-     * @throws PropelException
-     */
-    public function countContacts(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
-    {
-        $partial = $this->collContactsPartial && !$this->isNew();
-        if (null === $this->collContacts || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collContacts) {
-                return 0;
-            }
-
-            if ($partial && !$criteria) {
-                return count($this->getContacts());
-            }
-
-            $query = ChildContactQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByAccount($this)
-                ->count($con);
-        }
-
-        return count($this->collContacts);
-    }
-
-    /**
-     * Method called to associate a ChildContact object to this object
-     * through the ChildContact foreign key attribute.
-     *
-     * @param  ChildContact $l ChildContact
-     * @return $this|\DataModels\DataModels\Account The current object (for fluent API support)
-     */
-    public function addContact(ChildContact $l)
-    {
-        if ($this->collContacts === null) {
-            $this->initContacts();
-            $this->collContactsPartial = true;
-        }
-
-        if (!$this->collContacts->contains($l)) {
-            $this->doAddContact($l);
-
-            if ($this->contactsScheduledForDeletion and $this->contactsScheduledForDeletion->contains($l)) {
-                $this->contactsScheduledForDeletion->remove($this->contactsScheduledForDeletion->search($l));
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param ChildContact $contact The ChildContact object to add.
-     */
-    protected function doAddContact(ChildContact $contact)
-    {
-        $this->collContacts[]= $contact;
-        $contact->setAccount($this);
-    }
-
-    /**
-     * @param  ChildContact $contact The ChildContact object to remove.
-     * @return $this|ChildAccount The current object (for fluent API support)
-     */
-    public function removeContact(ChildContact $contact)
-    {
-        if ($this->getContacts()->contains($contact)) {
-            $pos = $this->collContacts->search($contact);
-            $this->collContacts->remove($pos);
-            if (null === $this->contactsScheduledForDeletion) {
-                $this->contactsScheduledForDeletion = clone $this->collContacts;
-                $this->contactsScheduledForDeletion->clear();
-            }
-            $this->contactsScheduledForDeletion[]= $contact;
-            $contact->setAccount(null);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Account is new, it will return
-     * an empty collection; or if this Account has previously
-     * been saved, it will retrieve related Contacts from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Account.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildContact[] List of ChildContact objects
-     */
-    public function getContactsJoinMeetingAttendee(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildContactQuery::create(null, $criteria);
-        $query->joinWith('MeetingAttendee', $joinBehavior);
-
-        return $this->getContacts($query, $con);
+        return $this->aClientCalendarUser;
     }
 
     /**
@@ -1654,15 +1262,14 @@ abstract class Account implements ActiveRecordInterface
      */
     public function clear()
     {
-        if (null !== $this->aInternalClient) {
-            $this->aInternalClient->removeAccount($this);
+        if (null !== $this->aClientCalendarUser) {
+            $this->aClientCalendarUser->removeClientCalendarUserOAuth($this);
         }
         $this->id = null;
-        $this->name = null;
-        $this->email_domain = null;
-        $this->website = null;
-        $this->sfdc_account_id = null;
-        $this->internal_client_id = null;
+        $this->client_calendar_user_id = null;
+        $this->type = null;
+        $this->status = null;
+        $this->data = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
         $this->resetModified();
@@ -1681,15 +1288,9 @@ abstract class Account implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collContacts) {
-                foreach ($this->collContacts as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
         } // if ($deep)
 
-        $this->collContacts = null;
-        $this->aInternalClient = null;
+        $this->aClientCalendarUser = null;
     }
 
     /**
@@ -1699,7 +1300,7 @@ abstract class Account implements ActiveRecordInterface
      */
     public function __toString()
     {
-        return (string) $this->exportTo(AccountTableMap::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(ClientCalendarUserOAuthTableMap::DEFAULT_STRING_FORMAT);
     }
 
     /**
