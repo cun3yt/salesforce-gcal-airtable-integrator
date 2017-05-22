@@ -3,8 +3,6 @@
  * This file is responsible for processing meetings and fetching accounts and its respective account
  * from SFDC and than mapping it within DB for easy lookup and reference.
  *
- * @todo change the name of the file and crontab entry
- *
  * @todo delete processcalendar.php entry on crontab
  */
 error_reporting(E_ALL);
