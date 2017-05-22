@@ -18,7 +18,7 @@ and present it in Airtable document.
 ## Migrations
 
 ### Database Change to Migration Class Generation & Model Generation
-* `./propel diff --schema-dir models`
+* `./propel diff --schema-dir models --table-renaming`
 * `./propel model:build --schema-dir=models --output-dir=models`
 
 ### Application of Migrations
