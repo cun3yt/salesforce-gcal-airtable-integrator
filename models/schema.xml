@@ -6,6 +6,11 @@
     <column name="email_domain" phpName="EmailDomain" type="VARCHAR" size="255"/>
     <column name="website" phpName="Website" type="VARCHAR" size="255"/>
     <column name="sfdc_account_id" phpName="SfdcAccountId" type="INTEGER"/>
+    <column name="customer_id" phpName="CustomerId" type="INTEGER"/>
+
+    <foreign-key foreignTable="customer" onDelete="none" onUpdate="none">
+      <reference local="customer_id" foreign="id" />
+    </foreign-key>
   </table>
   <table name="account_history" idMethod="native" phpName="AccountHistory" namespace="DataModels">
     <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
@@ -43,10 +48,8 @@
     <column name="sfdc_contact_id" phpName="SfdcContactId" type="INTEGER"/>
     <column name="sfdc_contact_name" phpName="SfdcContactName" type="VARCHAR" size="255"/>
 
-    <column name="customer_id" phpName="CustomerId" type="INTEGER"/>
-
-    <foreign-key foreignTable="customer" onDelete="none" onUpdate="none">
-      <reference local="customer_id" foreign="id" />
+    <foreign-key foreignTable="account" onDelete="none" onUpdate="none">
+      <reference local="account_id" foreign="id" />
     </foreign-key>
   </table>
   <table name="contact_history" idMethod="native" phpName="ContactHistory" namespace="DataModels">

@@ -59,7 +59,7 @@ class AccountTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 5;
+    const NUM_COLUMNS = 6;
 
     /**
      * The number of lazy-loaded columns
@@ -69,7 +69,7 @@ class AccountTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 5;
+    const NUM_HYDRATE_COLUMNS = 6;
 
     /**
      * the column name for the id field
@@ -97,6 +97,11 @@ class AccountTableMap extends TableMap
     const COL_SFDC_ACCOUNT_ID = 'account.sfdc_account_id';
 
     /**
+     * the column name for the customer_id field
+     */
+    const COL_CUSTOMER_ID = 'account.customer_id';
+
+    /**
      * The default string format for model objects of the related table
      */
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -108,11 +113,11 @@ class AccountTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Name', 'EmailDomain', 'Website', 'SfdcAccountId', ),
-        self::TYPE_CAMELNAME     => array('id', 'name', 'emailDomain', 'website', 'sfdcAccountId', ),
-        self::TYPE_COLNAME       => array(AccountTableMap::COL_ID, AccountTableMap::COL_NAME, AccountTableMap::COL_EMAIL_DOMAIN, AccountTableMap::COL_WEBSITE, AccountTableMap::COL_SFDC_ACCOUNT_ID, ),
-        self::TYPE_FIELDNAME     => array('id', 'name', 'email_domain', 'website', 'sfdc_account_id', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
+        self::TYPE_PHPNAME       => array('Id', 'Name', 'EmailDomain', 'Website', 'SfdcAccountId', 'CustomerId', ),
+        self::TYPE_CAMELNAME     => array('id', 'name', 'emailDomain', 'website', 'sfdcAccountId', 'customerId', ),
+        self::TYPE_COLNAME       => array(AccountTableMap::COL_ID, AccountTableMap::COL_NAME, AccountTableMap::COL_EMAIL_DOMAIN, AccountTableMap::COL_WEBSITE, AccountTableMap::COL_SFDC_ACCOUNT_ID, AccountTableMap::COL_CUSTOMER_ID, ),
+        self::TYPE_FIELDNAME     => array('id', 'name', 'email_domain', 'website', 'sfdc_account_id', 'customer_id', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -122,11 +127,11 @@ class AccountTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Name' => 1, 'EmailDomain' => 2, 'Website' => 3, 'SfdcAccountId' => 4, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'name' => 1, 'emailDomain' => 2, 'website' => 3, 'sfdcAccountId' => 4, ),
-        self::TYPE_COLNAME       => array(AccountTableMap::COL_ID => 0, AccountTableMap::COL_NAME => 1, AccountTableMap::COL_EMAIL_DOMAIN => 2, AccountTableMap::COL_WEBSITE => 3, AccountTableMap::COL_SFDC_ACCOUNT_ID => 4, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'name' => 1, 'email_domain' => 2, 'website' => 3, 'sfdc_account_id' => 4, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Name' => 1, 'EmailDomain' => 2, 'Website' => 3, 'SfdcAccountId' => 4, 'CustomerId' => 5, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'name' => 1, 'emailDomain' => 2, 'website' => 3, 'sfdcAccountId' => 4, 'customerId' => 5, ),
+        self::TYPE_COLNAME       => array(AccountTableMap::COL_ID => 0, AccountTableMap::COL_NAME => 1, AccountTableMap::COL_EMAIL_DOMAIN => 2, AccountTableMap::COL_WEBSITE => 3, AccountTableMap::COL_SFDC_ACCOUNT_ID => 4, AccountTableMap::COL_CUSTOMER_ID => 5, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'name' => 1, 'email_domain' => 2, 'website' => 3, 'sfdc_account_id' => 4, 'customer_id' => 5, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -152,6 +157,7 @@ class AccountTableMap extends TableMap
         $this->addColumn('email_domain', 'EmailDomain', 'VARCHAR', false, 255, null);
         $this->addColumn('website', 'Website', 'VARCHAR', false, 255, null);
         $this->addColumn('sfdc_account_id', 'SfdcAccountId', 'INTEGER', false, null, null);
+        $this->addForeignKey('customer_id', 'CustomerId', 'INTEGER', 'customer', 'id', false, null, null);
     } // initialize()
 
     /**
@@ -159,6 +165,20 @@ class AccountTableMap extends TableMap
      */
     public function buildRelations()
     {
+        $this->addRelation('Customer', '\\DataModels\\DataModels\\Customer', RelationMap::MANY_TO_ONE, array (
+  0 =>
+  array (
+    0 => ':customer_id',
+    1 => ':id',
+  ),
+), null, null, null, false);
+        $this->addRelation('Contact', '\\DataModels\\DataModels\\Contact', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':account_id',
+    1 => ':id',
+  ),
+), null, null, 'Contacts', false);
     } // buildRelations()
 
     /**
@@ -307,12 +327,14 @@ class AccountTableMap extends TableMap
             $criteria->addSelectColumn(AccountTableMap::COL_EMAIL_DOMAIN);
             $criteria->addSelectColumn(AccountTableMap::COL_WEBSITE);
             $criteria->addSelectColumn(AccountTableMap::COL_SFDC_ACCOUNT_ID);
+            $criteria->addSelectColumn(AccountTableMap::COL_CUSTOMER_ID);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.name');
             $criteria->addSelectColumn($alias . '.email_domain');
             $criteria->addSelectColumn($alias . '.website');
             $criteria->addSelectColumn($alias . '.sfdc_account_id');
+            $criteria->addSelectColumn($alias . '.customer_id');
         }
     }
 
