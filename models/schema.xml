@@ -114,6 +114,10 @@
     <foreign-key foreignTable="client_calendar_user" onDelete="none" onUpdate="none" phpName="ClientCalendarUser">
       <reference local="client_calendar_user_id" foreign="id" />
     </foreign-key>
+
+    <index name="event_id_index">
+      <index-column name="event_id" />
+    </index>
   </table>
   <table name="meeting_attendee" phpName="MeetingAttendee" namespace="DataModels">
     <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" />
