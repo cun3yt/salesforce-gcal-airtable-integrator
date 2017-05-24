@@ -26,7 +26,12 @@ class ClientCalendarUser extends BaseClientCalendarUser //implements IMeetingAtt
         return $q->findById($id);
     }
 
-    static function findByClientAndEmailAddress(Client $client, $emailAddress) {
+    /**
+     * @param Client $client
+     * @param $emailAddress
+     * @return ClientCalendarUser|null
+     */
+    static function findByClientAndCalendar(Client $client, $emailAddress) {
         $ccq = new ClientCalendarUserQuery();
         $clientCalendarUserSet = $ccq->filterByClient($client)->filterByEmail($emailAddress)->find();
 
@@ -37,6 +42,23 @@ class ClientCalendarUser extends BaseClientCalendarUser //implements IMeetingAtt
         }
 
         return $clientCalendarUserSet[0];
+    }
+
+    /**
+     * @param Client $client
+     * @param String $emailAddress
+     * @return ClientCalendarUser
+     */
+    static function findOrCreateByClientAndCalendar(Client $client, $emailAddress) {
+        $clientCalenderUser = self::findByClientAndCalendar($client, $emailAddress);
+
+        if($clientCalenderUser) {
+            return $clientCalenderUser;
+        }
+
+        $clientCalenderUser = new ClientCalendarUser();
+        $clientCalenderUser->setClient($client)->setEmail($emailAddress)->save();
+        return $clientCalenderUser;
     }
 
     /**

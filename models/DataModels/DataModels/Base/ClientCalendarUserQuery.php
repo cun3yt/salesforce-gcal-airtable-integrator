@@ -73,7 +73,17 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildClientCalendarUserQuery rightJoinWithClientCalendarUserOAuth() Adds a RIGHT JOIN clause and with to the query using the ClientCalendarUserOAuth relation
  * @method     ChildClientCalendarUserQuery innerJoinWithClientCalendarUserOAuth() Adds a INNER JOIN clause and with to the query using the ClientCalendarUserOAuth relation
  *
- * @method     \DataModels\DataModels\ClientQuery|\DataModels\DataModels\MeetingAttendeeQuery|\DataModels\DataModels\ClientCalendarUserOAuthQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     ChildClientCalendarUserQuery leftJoinMeeting($relationAlias = null) Adds a LEFT JOIN clause to the query using the Meeting relation
+ * @method     ChildClientCalendarUserQuery rightJoinMeeting($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Meeting relation
+ * @method     ChildClientCalendarUserQuery innerJoinMeeting($relationAlias = null) Adds a INNER JOIN clause to the query using the Meeting relation
+ *
+ * @method     ChildClientCalendarUserQuery joinWithMeeting($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the Meeting relation
+ *
+ * @method     ChildClientCalendarUserQuery leftJoinWithMeeting() Adds a LEFT JOIN clause and with to the query using the Meeting relation
+ * @method     ChildClientCalendarUserQuery rightJoinWithMeeting() Adds a RIGHT JOIN clause and with to the query using the Meeting relation
+ * @method     ChildClientCalendarUserQuery innerJoinWithMeeting() Adds a INNER JOIN clause and with to the query using the Meeting relation
+ *
+ * @method     \DataModels\DataModels\ClientQuery|\DataModels\DataModels\MeetingAttendeeQuery|\DataModels\DataModels\ClientCalendarUserOAuthQuery|\DataModels\DataModels\MeetingQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildClientCalendarUser findOne(ConnectionInterface $con = null) Return the first ChildClientCalendarUser matching the query
  * @method     ChildClientCalendarUser findOneOrCreate(ConnectionInterface $con = null) Return the first ChildClientCalendarUser matching the query, or a new ChildClientCalendarUser object populated from the query conditions when no match is found
@@ -701,6 +711,79 @@ abstract class ClientCalendarUserQuery extends ChildMeetingAttendeeQuery
         return $this
             ->joinClientCalendarUserOAuth($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'ClientCalendarUserOAuth', '\DataModels\DataModels\ClientCalendarUserOAuthQuery');
+    }
+
+    /**
+     * Filter the query by a related \DataModels\DataModels\Meeting object
+     *
+     * @param \DataModels\DataModels\Meeting|ObjectCollection $meeting the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildClientCalendarUserQuery The current query, for fluid interface
+     */
+    public function filterByMeeting($meeting, $comparison = null)
+    {
+        if ($meeting instanceof \DataModels\DataModels\Meeting) {
+            return $this
+                ->addUsingAlias(ClientCalendarUserTableMap::COL_ID, $meeting->getClientCalendarUserId(), $comparison);
+        } elseif ($meeting instanceof ObjectCollection) {
+            return $this
+                ->useMeetingQuery()
+                ->filterByPrimaryKeys($meeting->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByMeeting() only accepts arguments of type \DataModels\DataModels\Meeting or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Meeting relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildClientCalendarUserQuery The current query, for fluid interface
+     */
+    public function joinMeeting($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Meeting');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Meeting');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Meeting relation Meeting object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \DataModels\DataModels\MeetingQuery A secondary query class using the current class as primary query
+     */
+    public function useMeetingQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinMeeting($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Meeting', '\DataModels\DataModels\MeetingQuery');
     }
 
     /**

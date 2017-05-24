@@ -98,17 +98,21 @@
     <column name="event_creator_id" phpName="EventCreatorId" type="INTEGER"/>
     <column name="event_owner_id" phpName="EventOwnerId" type="INTEGER"/>
     <column name="event_description" phpName="EventDescription" type="LONGVARCHAR"/>
-    <column name="account_id" phpName="AccountId" type="INTEGER"/>
     <column name="additional_data" phpName="AdditionalData" type="VARCHAR"/>
     <column name="event_created_at" phpName="EventCreatedAt" type="TIMESTAMP"/>
     <column name="event_updated_at" phpName="EventUpdatedAt" type="TIMESTAMP"/>
     <column name="raw_data" phpName="RawData" type="VARCHAR"/>
+    <column name="client_calendar_user_id" phpName="ClientCalendarUserId" type="INTEGER"/>
+
     <behavior name="timestampable"/>
     <foreign-key foreignTable="meeting_attendee" onDelete="none" onUpdate="none" phpName="EventOwner">
       <reference local="event_owner_id" foreign="id" />
     </foreign-key>
     <foreign-key foreignTable="meeting_attendee" onDelete="none" onUpdate="none" phpName="EventCreator">
       <reference local="event_creator_id" foreign="id" />
+    </foreign-key>
+    <foreign-key foreignTable="client_calendar_user" onDelete="none" onUpdate="none" phpName="ClientCalendarUser">
+      <reference local="client_calendar_user_id" foreign="id" />
     </foreign-key>
   </table>
   <table name="meeting_attendee" phpName="MeetingAttendee" namespace="DataModels">

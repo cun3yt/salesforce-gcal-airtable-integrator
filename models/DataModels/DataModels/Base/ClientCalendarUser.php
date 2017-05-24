@@ -10,10 +10,13 @@ use DataModels\DataModels\ClientCalendarUserOAuth as ChildClientCalendarUserOAut
 use DataModels\DataModels\ClientCalendarUserOAuthQuery as ChildClientCalendarUserOAuthQuery;
 use DataModels\DataModels\ClientCalendarUserQuery as ChildClientCalendarUserQuery;
 use DataModels\DataModels\ClientQuery as ChildClientQuery;
+use DataModels\DataModels\Meeting as ChildMeeting;
 use DataModels\DataModels\MeetingAttendee as ChildMeetingAttendee;
 use DataModels\DataModels\MeetingAttendeeQuery as ChildMeetingAttendeeQuery;
+use DataModels\DataModels\MeetingQuery as ChildMeetingQuery;
 use DataModels\DataModels\Map\ClientCalendarUserOAuthTableMap;
 use DataModels\DataModels\Map\ClientCalendarUserTableMap;
+use DataModels\DataModels\Map\MeetingTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -127,6 +130,12 @@ abstract class ClientCalendarUser extends ChildMeetingAttendee implements Active
     protected $collClientCalendarUserOAuthsPartial;
 
     /**
+     * @var        ObjectCollection|ChildMeeting[] Collection to store aggregation of ChildMeeting objects.
+     */
+    protected $collMeetings;
+    protected $collMeetingsPartial;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      *
@@ -139,6 +148,12 @@ abstract class ClientCalendarUser extends ChildMeetingAttendee implements Active
      * @var ObjectCollection|ChildClientCalendarUserOAuth[]
      */
     protected $clientCalendarUserOAuthsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildMeeting[]
+     */
+    protected $meetingsScheduledForDeletion = null;
 
     /**
      * Initializes internal state of DataModels\DataModels\Base\ClientCalendarUser object.
@@ -685,6 +700,8 @@ abstract class ClientCalendarUser extends ChildMeetingAttendee implements Active
             $this->aMeetingAttendee = null;
             $this->collClientCalendarUserOAuths = null;
 
+            $this->collMeetings = null;
+
         } // if (deep)
     }
 
@@ -838,6 +855,24 @@ abstract class ClientCalendarUser extends ChildMeetingAttendee implements Active
 
             if ($this->collClientCalendarUserOAuths !== null) {
                 foreach ($this->collClientCalendarUserOAuths as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->meetingsScheduledForDeletion !== null) {
+                if (!$this->meetingsScheduledForDeletion->isEmpty()) {
+                    foreach ($this->meetingsScheduledForDeletion as $meeting) {
+                        // need to save related object because we set the relation to null
+                        $meeting->save($con);
+                    }
+                    $this->meetingsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collMeetings !== null) {
+                foreach ($this->collMeetings as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1073,6 +1108,21 @@ abstract class ClientCalendarUser extends ChildMeetingAttendee implements Active
                 }
 
                 $result[$key] = $this->collClientCalendarUserOAuths->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collMeetings) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'meetings';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'meetings';
+                        break;
+                    default:
+                        $key = 'Meetings';
+                }
+
+                $result[$key] = $this->collMeetings->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1340,6 +1390,12 @@ abstract class ClientCalendarUser extends ChildMeetingAttendee implements Active
                 }
             }
 
+            foreach ($this->getMeetings() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addMeeting($relObj->copy($deepCopy));
+                }
+            }
+
         } // if ($deepCopy)
 
         if ($makeNew) {
@@ -1478,6 +1534,9 @@ abstract class ClientCalendarUser extends ChildMeetingAttendee implements Active
     {
         if ('ClientCalendarUserOAuth' == $relationName) {
             return $this->initClientCalendarUserOAuths();
+        }
+        if ('Meeting' == $relationName) {
+            return $this->initMeetings();
         }
     }
 
@@ -1707,6 +1766,281 @@ abstract class ClientCalendarUser extends ChildMeetingAttendee implements Active
     }
 
     /**
+     * Clears out the collMeetings collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addMeetings()
+     */
+    public function clearMeetings()
+    {
+        $this->collMeetings = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collMeetings collection loaded partially.
+     */
+    public function resetPartialMeetings($v = true)
+    {
+        $this->collMeetingsPartial = $v;
+    }
+
+    /**
+     * Initializes the collMeetings collection.
+     *
+     * By default this just sets the collMeetings collection to an empty array (like clearcollMeetings());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initMeetings($overrideExisting = true)
+    {
+        if (null !== $this->collMeetings && !$overrideExisting) {
+            return;
+        }
+
+        $collectionClassName = MeetingTableMap::getTableMap()->getCollectionClassName();
+
+        $this->collMeetings = new $collectionClassName;
+        $this->collMeetings->setModel('\DataModels\DataModels\Meeting');
+    }
+
+    /**
+     * Gets an array of ChildMeeting objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildClientCalendarUser is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildMeeting[] List of ChildMeeting objects
+     * @throws PropelException
+     */
+    public function getMeetings(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collMeetingsPartial && !$this->isNew();
+        if (null === $this->collMeetings || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collMeetings) {
+                // return empty collection
+                $this->initMeetings();
+            } else {
+                $collMeetings = ChildMeetingQuery::create(null, $criteria)
+                    ->filterByClientCalendarUser($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collMeetingsPartial && count($collMeetings)) {
+                        $this->initMeetings(false);
+
+                        foreach ($collMeetings as $obj) {
+                            if (false == $this->collMeetings->contains($obj)) {
+                                $this->collMeetings->append($obj);
+                            }
+                        }
+
+                        $this->collMeetingsPartial = true;
+                    }
+
+                    return $collMeetings;
+                }
+
+                if ($partial && $this->collMeetings) {
+                    foreach ($this->collMeetings as $obj) {
+                        if ($obj->isNew()) {
+                            $collMeetings[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collMeetings = $collMeetings;
+                $this->collMeetingsPartial = false;
+            }
+        }
+
+        return $this->collMeetings;
+    }
+
+    /**
+     * Sets a collection of ChildMeeting objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $meetings A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return $this|ChildClientCalendarUser The current object (for fluent API support)
+     */
+    public function setMeetings(Collection $meetings, ConnectionInterface $con = null)
+    {
+        /** @var ChildMeeting[] $meetingsToDelete */
+        $meetingsToDelete = $this->getMeetings(new Criteria(), $con)->diff($meetings);
+
+
+        $this->meetingsScheduledForDeletion = $meetingsToDelete;
+
+        foreach ($meetingsToDelete as $meetingRemoved) {
+            $meetingRemoved->setClientCalendarUser(null);
+        }
+
+        $this->collMeetings = null;
+        foreach ($meetings as $meeting) {
+            $this->addMeeting($meeting);
+        }
+
+        $this->collMeetings = $meetings;
+        $this->collMeetingsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Meeting objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related Meeting objects.
+     * @throws PropelException
+     */
+    public function countMeetings(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collMeetingsPartial && !$this->isNew();
+        if (null === $this->collMeetings || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collMeetings) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getMeetings());
+            }
+
+            $query = ChildMeetingQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByClientCalendarUser($this)
+                ->count($con);
+        }
+
+        return count($this->collMeetings);
+    }
+
+    /**
+     * Method called to associate a ChildMeeting object to this object
+     * through the ChildMeeting foreign key attribute.
+     *
+     * @param  ChildMeeting $l ChildMeeting
+     * @return $this|\DataModels\DataModels\ClientCalendarUser The current object (for fluent API support)
+     */
+    public function addMeeting(ChildMeeting $l)
+    {
+        if ($this->collMeetings === null) {
+            $this->initMeetings();
+            $this->collMeetingsPartial = true;
+        }
+
+        if (!$this->collMeetings->contains($l)) {
+            $this->doAddMeeting($l);
+
+            if ($this->meetingsScheduledForDeletion and $this->meetingsScheduledForDeletion->contains($l)) {
+                $this->meetingsScheduledForDeletion->remove($this->meetingsScheduledForDeletion->search($l));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ChildMeeting $meeting The ChildMeeting object to add.
+     */
+    protected function doAddMeeting(ChildMeeting $meeting)
+    {
+        $this->collMeetings[]= $meeting;
+        $meeting->setClientCalendarUser($this);
+    }
+
+    /**
+     * @param  ChildMeeting $meeting The ChildMeeting object to remove.
+     * @return $this|ChildClientCalendarUser The current object (for fluent API support)
+     */
+    public function removeMeeting(ChildMeeting $meeting)
+    {
+        if ($this->getMeetings()->contains($meeting)) {
+            $pos = $this->collMeetings->search($meeting);
+            $this->collMeetings->remove($pos);
+            if (null === $this->meetingsScheduledForDeletion) {
+                $this->meetingsScheduledForDeletion = clone $this->collMeetings;
+                $this->meetingsScheduledForDeletion->clear();
+            }
+            $this->meetingsScheduledForDeletion[]= $meeting;
+            $meeting->setClientCalendarUser(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this ClientCalendarUser is new, it will return
+     * an empty collection; or if this ClientCalendarUser has previously
+     * been saved, it will retrieve related Meetings from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in ClientCalendarUser.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return ObjectCollection|ChildMeeting[] List of ChildMeeting objects
+     */
+    public function getMeetingsJoinEventOwner(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildMeetingQuery::create(null, $criteria);
+        $query->joinWith('EventOwner', $joinBehavior);
+
+        return $this->getMeetings($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this ClientCalendarUser is new, it will return
+     * an empty collection; or if this ClientCalendarUser has previously
+     * been saved, it will retrieve related Meetings from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in ClientCalendarUser.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return ObjectCollection|ChildMeeting[] List of ChildMeeting objects
+     */
+    public function getMeetingsJoinEventCreator(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildMeetingQuery::create(null, $criteria);
+        $query->joinWith('EventCreator', $joinBehavior);
+
+        return $this->getMeetings($query, $con);
+    }
+
+    /**
      * Clears the current object, sets all attributes to their default values and removes
      * outgoing references as well as back-references (from other objects to this one. Results probably in a database
      * change of those foreign objects when you call `save` there).
@@ -1748,9 +2082,15 @@ abstract class ClientCalendarUser extends ChildMeetingAttendee implements Active
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collMeetings) {
+                foreach ($this->collMeetings as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
         $this->collClientCalendarUserOAuths = null;
+        $this->collMeetings = null;
         $this->aClient = null;
         $this->aMeetingAttendee = null;
     }

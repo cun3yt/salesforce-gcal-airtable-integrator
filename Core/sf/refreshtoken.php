@@ -1,6 +1,6 @@
 <?
 require_once("${_SERVER['DOCUMENT_ROOT']}/salesforce/config.php");
-require_once("${_SERVER['DOCUMENT_ROOT']}/Attent/config.php");
+require_once("${_SERVER['DOCUMENT_ROOT']}/Core/config.php");
 
 require_once("${_SERVER['DOCUMENT_ROOT']}/libraries/Helpers.php");
 Helpers::setDebugParam($isDebugActive);

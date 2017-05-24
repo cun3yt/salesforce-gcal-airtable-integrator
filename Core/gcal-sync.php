@@ -22,10 +22,10 @@ SessionSingleton::start();
 const DateFormat = 'Y-m-d';
 const DateTimeFormat = 'Y-m-d H:i:s';
 
-use DataModels\DataModels\Meeting as Meeting;
-use DataModels\DataModels\ClientCalendarUserOAuth as ClientCalendarUserOAuth;
 use DataModels\DataModels\Client as Client;
-
+use DataModels\DataModels\ClientCalendarUser as ClientCalendarUser;
+use DataModels\DataModels\ClientCalendarUserOAuth as ClientCalendarUserOAuth;
+use DataModels\DataModels\Meeting as Meeting;
 use DataModels\DataModels\MeetingAttendee as MeetingAttendee;
 
 require_once('config.php');
@@ -35,7 +35,7 @@ $apiClient = Helpers::setupGoogleAPIClient($googleCalAPICredentialFile, true);
 /**
  * @var $client Client
  */
-list($client, $contacts) = Helpers::loadClientData($strClientDomainName);
+list($client, $calendarUsers) = Helpers::loadClientData($strClientDomainName);
 $calendarAuths = Helpers::getAuthentications($client);
 
 /**
@@ -53,8 +53,8 @@ foreach($calendarAuths as $auth) {
  * @param Google_Client $apiClient
  */
 function processCalendars(Client $client, ClientCalendarUserOAuth $auth, Google_Client $apiClient) {
-    $integrationData = json_decode($auth->getData());
-    $accessToken = $integrationData->access_token;
+    $authData = json_decode($auth->getData());
+    $accessToken = $authData->access_token;
 
     if( !$accessToken ) {
         trigger_error("Access token doesn't exist!", E_USER_WARNING);
@@ -73,13 +73,14 @@ function processCalendars(Client $client, ClientCalendarUserOAuth $auth, Google_
         }
 
         foreach($calendarList->getItems() as $calendar) {
-            echo "Processing Calendar: {$calendar->id}<br/>";
+            echo "Processing Calendar: {$calendar->getId()}<br/>";
             if( !isCalInClient($calendar, $client) ) {
-                trigger_error("{$calendar->id} is not in the domain: {$client->getEmailDomain()}. 
+                trigger_error("{$calendar->getId()} is not in the domain: {$client->getEmailDomain()}. 
                     Checking the next calendar", E_USER_WARNING);
                 continue;
             }
-            processCalendar($client, $service, $calendar);
+            $clientCalendarUser = ClientCalendarUser::findOrCreateByClientAndCalendar($client, $calendar->getId());
+            processCalendar($client, $service, $calendar, $clientCalendarUser);
         }
     } catch(Exception $e) {
         trigger_error("Exception raised: " . $e->getMessage(), E_USER_WARNING);
@@ -101,23 +102,24 @@ function processCalendars(Client $client, ClientCalendarUserOAuth $auth, Google_
  * @param Client $client
  * @param $service
  * @param $calendar
+ * @param ClientCalendarUser $clientCalendarUser
  */
-function processCalendar(Client $client, $service, $calendar) {
-    if( !($calendar->id) ) {
+function processCalendar(Client $client, $service, $calendar, ClientCalendarUser $clientCalendarUser) {
+    if( !($calendar->getId()) ) {
         trigger_error("Calendar doesn't have an ID", E_USER_WARNING);
         return;
     }
 
-    date_default_timezone_set($calendar->timeZone);
+    date_default_timezone_set($calendar->getTimeZone());
 
     $date = date(DateFormat,strtotime(' -1 day'));
     $nextMonthStart = date(DateFormat,strtotime('first day of +1 month'));
     $yearStartFiscal = date("Y")."-"."01"."-"."01";
 
-    // get the latest meeting date in the DB and fetch all meets from that date ahead
+    // get the latest meeting date in the DB and fetch all meetings from that date ahead
     // for current calendar fetch the latest meet present in DB so as to set the lower limit
-    // for further pulling calendar meets
-    $lastMeeting = Helpers::getLastMeetingInDBForEmailAddress($client, $calendar->id);
+    // for further pulling calendar meetings
+    $lastMeeting = Helpers::getLastMeetingInDBForEmailAddress($client, $calendar->getId());
 
     if(!$lastMeeting) {
         $date = date(DateFormat,strtotime($yearStartFiscal));
@@ -127,7 +129,6 @@ function processCalendar(Client $client, $service, $calendar) {
         unset($eventDateTime);
     }
 
-    $calendarId = $calendar->id;
     $optParams = array(
         'timeMin' => date('c',strtotime($date)),
         'timeMax' => date('c',strtotime($nextMonthStart)),
@@ -135,13 +136,13 @@ function processCalendar(Client $client, $service, $calendar) {
         'singleEvents' => TRUE
     );
 
-    $events = $service->events->listEvents($calendarId, $optParams);
+    $events = $service->events->listEvents($calendar->getId(), $optParams);
 
     if( !(is_array($events->getItems()) && (count($events->getItems())>0)) ) {
         return;
     }
 
-    $calTimeZone = $events->timeZone; // Calendar Timezone
+    $calTimeZone = $events->getTimeZone(); // Calendar Timezone
 
     date_default_timezone_set($calTimeZone); // Setting default timezone
 
@@ -158,7 +159,6 @@ function processCalendar(Client $client, $service, $calendar) {
         $timezone = empty($tempTimezone) ? new DateTimeZone($calTimeZone) : new DateTimeZone($tempTimezone);
 
         $eventDate = new DateTime($eventDatetime,$timezone);
-        $creator = $event->getCreator();
         $eventAttendeesList = array();
         $eventType = "Internal";
 
@@ -203,26 +203,32 @@ function processCalendar(Client $client, $service, $calendar) {
             // @todo Assoc. attendee list to account, account_has_contact & contact tables.
 
             if(!$meeting) {
-                saveNewMeeting($client, $event, $calendarId, $eventDate, $eventType);
+                saveNewMeeting($client, $event, $clientCalendarUser, $eventDate, $eventType);
             }
         }
+
+        unset($eventAttendeesList);
+        unset($meeting);
+        unset($event);
     }
 }
 
 /**
  * @param Client $client
  * @param $event
- * @param $calendarId
+ * @param ClientCalendarUser $clientCalenderUser
  * @param $eventDate
  * @param $eventType
  * @return Meeting
+ *
+ * @todo Fill `client_calendar_user_id` column!
  */
-function saveNewMeeting(Client $client, $event, $calendarId, $eventDate, $eventType) {
+function saveNewMeeting(Client $client, $event, ClientCalendarUser $clientCalenderUser, $eventDate, $eventType) {
     $meeting = new Meeting();
     $meeting->setEventId($event->getId())
         ->setName($event->getSummary())
         ->setEventDatetime($eventDate)
-        ->setAdditionalData(json_encode(array('calendarId' => $calendarId)))
+        ->setClientCalendarUser($clientCalenderUser)
         ->setEventCreatedAt($event->getCreated())
         ->setEventUpdatedAt($event->getUpdated())
         ->setRawData(json_encode($event->toSimpleObject()))
@@ -237,7 +243,7 @@ function saveNewMeeting(Client $client, $event, $calendarId, $eventDate, $eventT
      */
     $meeting->save();
     echo "<pre>";
-    var_dump(json_decode($meeting->exportTo('json')));
+    var_dump($meeting->getId());
     echo "</pre>";
 
     /**
@@ -277,7 +283,7 @@ function saveNewMeeting(Client $client, $event, $calendarId, $eventDate, $eventT
 /**
  * @param Client $client
  * @param $attendeeEmailAddress
- * @return \DataModels\DataModels\Contact|\DataModels\DataModels\MeetingAttendee
+ * @return MeetingAttendee
  */
 function getOrSaveMeetingAttendee(Client $client, $attendeeEmailAddress) {
     $creatorContact = NULL;

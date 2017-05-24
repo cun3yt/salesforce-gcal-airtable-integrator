@@ -14,14 +14,9 @@ $googleCalAPICredentialFile = "${_SERVER['DOCUMENT_ROOT']}/config/google_api_cre
 /**
  * Below needs to be moved to somewhere per-client level.
  */
+//
+//$strClient = "Attent";
+//$strClientFolderName = 'Attent';
+//$strClientDomainName = "attent.ai";
 
-$strClient = "Attent";
-$strClientFolderName = 'Attent';
-$strClientDomainName = "attent.ai";
-
-//$strAirtableApiKey = "keyx8INc59tYr3T01";
-//$strAirtableBase = "apppLD0hgRCJ4d8dk";
-//$strAirtableBaseName = "Test_Attent_Internal";
-//$strAirtableBaseEndpoint = 'https://api.airtable.com/v0/';
-
-$_SESSION['currentclientfoldername'] = $strClientFolderName;
+//$_SESSION['currentclientfoldername'] = $strClientFolderName;

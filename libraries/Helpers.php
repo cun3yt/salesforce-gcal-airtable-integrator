@@ -9,6 +9,7 @@ use DataModels\DataModels\MeetingQuery as MeetingQuery;
 use DataModels\DataModels\Meeting as Meeting;
 use DataModels\DataModels\ClientCalendarUserOAuthQuery as ClientCalendarUserOAuthQuery;
 use DataModels\DataModels\ClientQuery as ClientQuery;
+use Propel\Runtime\ActiveQuery\Criteria as Criteria;
 
 class Helpers {
     /**
@@ -68,25 +69,14 @@ class Helpers {
      *
      * @param Client $client
      * @param $emailAddress
-     * @param $data
+     * @param String $data JSON Data
      * @param string $integrationType
      * @return ClientCalendarUserOAuth
      */
     static function createAuthAccount(Client $client, $emailAddress, $data,
                                       $integrationType = ClientCalendarUserOAuth::GCAL) {
-        $calendarUserQ = new ClientCalendarUserQuery();
-        $calendarUserSet = $calendarUserQ->filterByEmail($emailAddress)->filterByClient($client)->find();
 
-        // If contact doesn't exist, create it
-        if($calendarUserSet->count() <= 0) {
-            $calendarUser = new ClientCalendarUser();
-            $calendarUser->setClient($client)
-                ->setEmail($emailAddress)
-                ->save();
-        } else {
-            $calendarUser = $calendarUserSet[0];
-        }
-
+        $calendarUser = ClientCalendarUser::findOrCreateByClientAndCalendar($client, $emailAddress);
         $auth = new ClientCalendarUserOAuth();
 
         $auth->setType($integrationType)
@@ -140,13 +130,13 @@ class Helpers {
      * This function is replacing "fnUpdateUserTokenData()"
      *
      * @param ClientCalendarUserOAuth $auth
-     * @param $data
+     * @param Array $data
      * @return ClientCalendarUserOAuth
      */
     static function updateAuthenticationToken(ClientCalendarUserOAuth $auth, $data) {
         $auth
             ->setStatus(ClientCalendarUserOAuth::STATUS_ACTIVE)
-            ->setData($data)
+            ->setData(json_encode($data))
             ->save();
 
         return $auth;
@@ -1369,20 +1359,14 @@ class Helpers {
             return NULL;
         }
 
-        $calendarUsers = ClientCalendarUser::findByClientAndEmailAddress($client, $emailAddress);
+        $calendarUser = ClientCalendarUser::findByClientAndCalendar($client, $emailAddress);
 
-        if(!$calendarUsers) {
-            return NULL;
-        }
-
-        $meetingAttendee = $calendarUsers->getMeetingAttendee();
-
-        if(!$meetingAttendee) {
+        if(!$calendarUser) {
             return NULL;
         }
 
         $q = new MeetingQuery();
-        return $q->filterByEventOwnerId($meetingAttendee->getId())->orderByEventDatetime()->findOne();
+        return $q->filterByClientCalendarUser($calendarUser)->orderByEventDatetime(Criteria::DESC)->findOne();
     }
 
     /**

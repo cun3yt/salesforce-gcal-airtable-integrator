@@ -185,6 +185,13 @@ class ClientCalendarUserTableMap extends TableMap
     1 => ':id',
   ),
 ), null, null, 'ClientCalendarUserOAuths', false);
+        $this->addRelation('Meeting', '\\DataModels\\DataModels\\Meeting', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':client_calendar_user_id',
+    1 => ':id',
+  ),
+), null, null, 'Meetings', false);
     } // buildRelations()
 
     /**

@@ -4,7 +4,7 @@ error_reporting(E_ALL);
 require_once("${_SERVER['DOCUMENT_ROOT']}/libraries/SessionSingleton.php");
 SessionSingleton::start();
 
-require_once("${_SERVER['DOCUMENT_ROOT']}/Attent/config.php");
+require_once("${_SERVER['DOCUMENT_ROOT']}/Core/config.php");
 require_once("${_SERVER['DOCUMENT_ROOT']}/libraries/Helpers.php");
 
 Helpers::setDebugParam($isDebugActive);
@@ -21,7 +21,7 @@ $tokendData = $_SESSION['arraccess'];
 $accessToken = $tokendData['access_token'];
 $instanceUrl = $tokendData['instance_url'];
 
-$sales['tokendata'] = json_encode($tokendData);
+$sales['tokendata'] = $tokendData;
 $sales['accesstoken'] = $tokendData['access_token'];
 $sales['instanceurl'] = $tokendData['instance_url'];
 $userUrl = $tokendData['id'];
@@ -44,9 +44,13 @@ $authentication = Helpers::getOAuthIfPresent($client, $sales['email'],
     ClientCalendarUserOAuth::SFDC);
 
 if($authentication) {
-    $hasDBWriteHappened = Helpers::updateAuthenticationToken($authentication, $sales);
+    $hasDBWriteHappened = Helpers::updateAuthenticationToken($authentication, json_encode($sales));
 } else {
-    $hasDBWriteHappened = Helpers::createAuthAccount($client, $sales['email'], $sales, ClientCalendarUserOAuth::SFDC);
+    $hasDBWriteHappened = Helpers::createAuthAccount(
+        $client,
+        $sales['email'],
+        json_encode($sales),
+        ClientCalendarUserOAuth::SFDC);
 }
 
 if( !$hasDBWriteHappened ) {

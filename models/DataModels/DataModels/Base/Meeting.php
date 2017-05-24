@@ -5,6 +5,8 @@ namespace DataModels\DataModels\Base;
 use \DateTime;
 use \Exception;
 use \PDO;
+use DataModels\DataModels\ClientCalendarUser as ChildClientCalendarUser;
+use DataModels\DataModels\ClientCalendarUserQuery as ChildClientCalendarUserQuery;
 use DataModels\DataModels\Meeting as ChildMeeting;
 use DataModels\DataModels\MeetingAttendee as ChildMeetingAttendee;
 use DataModels\DataModels\MeetingAttendeeQuery as ChildMeetingAttendeeQuery;
@@ -125,13 +127,6 @@ abstract class Meeting implements ActiveRecordInterface
     protected $event_description;
 
     /**
-     * The value for the account_id field.
-     *
-     * @var        int
-     */
-    protected $account_id;
-
-    /**
      * The value for the additional_data field.
      *
      * @var        string
@@ -160,6 +155,13 @@ abstract class Meeting implements ActiveRecordInterface
     protected $raw_data;
 
     /**
+     * The value for the client_calendar_user_id field.
+     *
+     * @var        int
+     */
+    protected $client_calendar_user_id;
+
+    /**
      * The value for the created_at field.
      *
      * @var        DateTime
@@ -182,6 +184,11 @@ abstract class Meeting implements ActiveRecordInterface
      * @var        ChildMeetingAttendee
      */
     protected $aEventCreator;
+
+    /**
+     * @var        ChildClientCalendarUser
+     */
+    protected $aClientCalendarUser;
 
     /**
      * @var        ObjectCollection|ChildMeetingHasAttendee[] Collection to store aggregation of ChildMeetingHasAttendee objects.
@@ -535,16 +542,6 @@ abstract class Meeting implements ActiveRecordInterface
     }
 
     /**
-     * Get the [account_id] column value.
-     *
-     * @return int
-     */
-    public function getAccountId()
-    {
-        return $this->account_id;
-    }
-
-    /**
      * Get the [additional_data] column value.
      *
      * @return string
@@ -602,6 +599,16 @@ abstract class Meeting implements ActiveRecordInterface
     public function getRawData()
     {
         return $this->raw_data;
+    }
+
+    /**
+     * Get the [client_calendar_user_id] column value.
+     *
+     * @return int
+     */
+    public function getClientCalendarUserId()
+    {
+        return $this->client_calendar_user_id;
     }
 
     /**
@@ -813,26 +820,6 @@ abstract class Meeting implements ActiveRecordInterface
     } // setEventDescription()
 
     /**
-     * Set the value of [account_id] column.
-     *
-     * @param int $v new value
-     * @return $this|\DataModels\DataModels\Meeting The current object (for fluent API support)
-     */
-    public function setAccountId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->account_id !== $v) {
-            $this->account_id = $v;
-            $this->modifiedColumns[MeetingTableMap::COL_ACCOUNT_ID] = true;
-        }
-
-        return $this;
-    } // setAccountId()
-
-    /**
      * Set the value of [additional_data] column.
      *
      * @param string $v new value
@@ -911,6 +898,30 @@ abstract class Meeting implements ActiveRecordInterface
 
         return $this;
     } // setRawData()
+
+    /**
+     * Set the value of [client_calendar_user_id] column.
+     *
+     * @param int $v new value
+     * @return $this|\DataModels\DataModels\Meeting The current object (for fluent API support)
+     */
+    public function setClientCalendarUserId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->client_calendar_user_id !== $v) {
+            $this->client_calendar_user_id = $v;
+            $this->modifiedColumns[MeetingTableMap::COL_CLIENT_CALENDAR_USER_ID] = true;
+        }
+
+        if ($this->aClientCalendarUser !== null && $this->aClientCalendarUser->getId() !== $v) {
+            $this->aClientCalendarUser = null;
+        }
+
+        return $this;
+    } // setClientCalendarUserId()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
@@ -1012,20 +1023,20 @@ abstract class Meeting implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : MeetingTableMap::translateFieldName('EventDescription', TableMap::TYPE_PHPNAME, $indexType)];
             $this->event_description = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : MeetingTableMap::translateFieldName('AccountId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->account_id = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : MeetingTableMap::translateFieldName('AdditionalData', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : MeetingTableMap::translateFieldName('AdditionalData', TableMap::TYPE_PHPNAME, $indexType)];
             $this->additional_data = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : MeetingTableMap::translateFieldName('EventCreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : MeetingTableMap::translateFieldName('EventCreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             $this->event_created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : MeetingTableMap::translateFieldName('EventUpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : MeetingTableMap::translateFieldName('EventUpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             $this->event_updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : MeetingTableMap::translateFieldName('RawData', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : MeetingTableMap::translateFieldName('RawData', TableMap::TYPE_PHPNAME, $indexType)];
             $this->raw_data = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : MeetingTableMap::translateFieldName('ClientCalendarUserId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->client_calendar_user_id = (null !== $col) ? (int) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : MeetingTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
@@ -1068,6 +1079,9 @@ abstract class Meeting implements ActiveRecordInterface
         if ($this->aEventOwner !== null && $this->event_owner_id !== $this->aEventOwner->getId()) {
             $this->aEventOwner = null;
         }
+        if ($this->aClientCalendarUser !== null && $this->client_calendar_user_id !== $this->aClientCalendarUser->getId()) {
+            $this->aClientCalendarUser = null;
+        }
     } // ensureConsistency
 
     /**
@@ -1109,6 +1123,7 @@ abstract class Meeting implements ActiveRecordInterface
 
             $this->aEventOwner = null;
             $this->aEventCreator = null;
+            $this->aClientCalendarUser = null;
             $this->collMeetingHasAttendees = null;
 
             $this->collMeetingAttendees = null;
@@ -1246,6 +1261,13 @@ abstract class Meeting implements ActiveRecordInterface
                 $this->setEventCreator($this->aEventCreator);
             }
 
+            if ($this->aClientCalendarUser !== null) {
+                if ($this->aClientCalendarUser->isModified() || $this->aClientCalendarUser->isNew()) {
+                    $affectedRows += $this->aClientCalendarUser->save($con);
+                }
+                $this->setClientCalendarUser($this->aClientCalendarUser);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -1362,9 +1384,6 @@ abstract class Meeting implements ActiveRecordInterface
         if ($this->isColumnModified(MeetingTableMap::COL_EVENT_DESCRIPTION)) {
             $modifiedColumns[':p' . $index++]  = 'event_description';
         }
-        if ($this->isColumnModified(MeetingTableMap::COL_ACCOUNT_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'account_id';
-        }
         if ($this->isColumnModified(MeetingTableMap::COL_ADDITIONAL_DATA)) {
             $modifiedColumns[':p' . $index++]  = 'additional_data';
         }
@@ -1376,6 +1395,9 @@ abstract class Meeting implements ActiveRecordInterface
         }
         if ($this->isColumnModified(MeetingTableMap::COL_RAW_DATA)) {
             $modifiedColumns[':p' . $index++]  = 'raw_data';
+        }
+        if ($this->isColumnModified(MeetingTableMap::COL_CLIENT_CALENDAR_USER_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'client_calendar_user_id';
         }
         if ($this->isColumnModified(MeetingTableMap::COL_CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'created_at';
@@ -1418,9 +1440,6 @@ abstract class Meeting implements ActiveRecordInterface
                     case 'event_description':
                         $stmt->bindValue($identifier, $this->event_description, PDO::PARAM_STR);
                         break;
-                    case 'account_id':
-                        $stmt->bindValue($identifier, $this->account_id, PDO::PARAM_INT);
-                        break;
                     case 'additional_data':
                         $stmt->bindValue($identifier, $this->additional_data, PDO::PARAM_STR);
                         break;
@@ -1432,6 +1451,9 @@ abstract class Meeting implements ActiveRecordInterface
                         break;
                     case 'raw_data':
                         $stmt->bindValue($identifier, $this->raw_data, PDO::PARAM_STR);
+                        break;
+                    case 'client_calendar_user_id':
+                        $stmt->bindValue($identifier, $this->client_calendar_user_id, PDO::PARAM_INT);
                         break;
                     case 'created_at':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
@@ -1519,19 +1541,19 @@ abstract class Meeting implements ActiveRecordInterface
                 return $this->getEventDescription();
                 break;
             case 8:
-                return $this->getAccountId();
-                break;
-            case 9:
                 return $this->getAdditionalData();
                 break;
-            case 10:
+            case 9:
                 return $this->getEventCreatedAt();
                 break;
-            case 11:
+            case 10:
                 return $this->getEventUpdatedAt();
                 break;
-            case 12:
+            case 11:
                 return $this->getRawData();
+                break;
+            case 12:
+                return $this->getClientCalendarUserId();
                 break;
             case 13:
                 return $this->getCreatedAt();
@@ -1577,11 +1599,11 @@ abstract class Meeting implements ActiveRecordInterface
             $keys[5] => $this->getEventCreatorId(),
             $keys[6] => $this->getEventOwnerId(),
             $keys[7] => $this->getEventDescription(),
-            $keys[8] => $this->getAccountId(),
-            $keys[9] => $this->getAdditionalData(),
-            $keys[10] => $this->getEventCreatedAt(),
-            $keys[11] => $this->getEventUpdatedAt(),
-            $keys[12] => $this->getRawData(),
+            $keys[8] => $this->getAdditionalData(),
+            $keys[9] => $this->getEventCreatedAt(),
+            $keys[10] => $this->getEventUpdatedAt(),
+            $keys[11] => $this->getRawData(),
+            $keys[12] => $this->getClientCalendarUserId(),
             $keys[13] => $this->getCreatedAt(),
             $keys[14] => $this->getUpdatedAt(),
         );
@@ -1589,12 +1611,12 @@ abstract class Meeting implements ActiveRecordInterface
             $result[$keys[4]] = $result[$keys[4]]->format('c');
         }
 
-        if ($result[$keys[10]] instanceof \DateTime) {
-            $result[$keys[10]] = $result[$keys[10]]->format('c');
+        if ($result[$keys[9]] instanceof \DateTime) {
+            $result[$keys[9]] = $result[$keys[9]]->format('c');
         }
 
-        if ($result[$keys[11]] instanceof \DateTime) {
-            $result[$keys[11]] = $result[$keys[11]]->format('c');
+        if ($result[$keys[10]] instanceof \DateTime) {
+            $result[$keys[10]] = $result[$keys[10]]->format('c');
         }
 
         if ($result[$keys[13]] instanceof \DateTime) {
@@ -1640,6 +1662,21 @@ abstract class Meeting implements ActiveRecordInterface
                 }
 
                 $result[$key] = $this->aEventCreator->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aClientCalendarUser) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'clientCalendarUser';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'client_calendar_user';
+                        break;
+                    default:
+                        $key = 'ClientCalendarUser';
+                }
+
+                $result[$key] = $this->aClientCalendarUser->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->collMeetingHasAttendees) {
 
@@ -1715,19 +1752,19 @@ abstract class Meeting implements ActiveRecordInterface
                 $this->setEventDescription($value);
                 break;
             case 8:
-                $this->setAccountId($value);
-                break;
-            case 9:
                 $this->setAdditionalData($value);
                 break;
-            case 10:
+            case 9:
                 $this->setEventCreatedAt($value);
                 break;
-            case 11:
+            case 10:
                 $this->setEventUpdatedAt($value);
                 break;
-            case 12:
+            case 11:
                 $this->setRawData($value);
+                break;
+            case 12:
+                $this->setClientCalendarUserId($value);
                 break;
             case 13:
                 $this->setCreatedAt($value);
@@ -1786,19 +1823,19 @@ abstract class Meeting implements ActiveRecordInterface
             $this->setEventDescription($arr[$keys[7]]);
         }
         if (array_key_exists($keys[8], $arr)) {
-            $this->setAccountId($arr[$keys[8]]);
+            $this->setAdditionalData($arr[$keys[8]]);
         }
         if (array_key_exists($keys[9], $arr)) {
-            $this->setAdditionalData($arr[$keys[9]]);
+            $this->setEventCreatedAt($arr[$keys[9]]);
         }
         if (array_key_exists($keys[10], $arr)) {
-            $this->setEventCreatedAt($arr[$keys[10]]);
+            $this->setEventUpdatedAt($arr[$keys[10]]);
         }
         if (array_key_exists($keys[11], $arr)) {
-            $this->setEventUpdatedAt($arr[$keys[11]]);
+            $this->setRawData($arr[$keys[11]]);
         }
         if (array_key_exists($keys[12], $arr)) {
-            $this->setRawData($arr[$keys[12]]);
+            $this->setClientCalendarUserId($arr[$keys[12]]);
         }
         if (array_key_exists($keys[13], $arr)) {
             $this->setCreatedAt($arr[$keys[13]]);
@@ -1871,9 +1908,6 @@ abstract class Meeting implements ActiveRecordInterface
         if ($this->isColumnModified(MeetingTableMap::COL_EVENT_DESCRIPTION)) {
             $criteria->add(MeetingTableMap::COL_EVENT_DESCRIPTION, $this->event_description);
         }
-        if ($this->isColumnModified(MeetingTableMap::COL_ACCOUNT_ID)) {
-            $criteria->add(MeetingTableMap::COL_ACCOUNT_ID, $this->account_id);
-        }
         if ($this->isColumnModified(MeetingTableMap::COL_ADDITIONAL_DATA)) {
             $criteria->add(MeetingTableMap::COL_ADDITIONAL_DATA, $this->additional_data);
         }
@@ -1885,6 +1919,9 @@ abstract class Meeting implements ActiveRecordInterface
         }
         if ($this->isColumnModified(MeetingTableMap::COL_RAW_DATA)) {
             $criteria->add(MeetingTableMap::COL_RAW_DATA, $this->raw_data);
+        }
+        if ($this->isColumnModified(MeetingTableMap::COL_CLIENT_CALENDAR_USER_ID)) {
+            $criteria->add(MeetingTableMap::COL_CLIENT_CALENDAR_USER_ID, $this->client_calendar_user_id);
         }
         if ($this->isColumnModified(MeetingTableMap::COL_CREATED_AT)) {
             $criteria->add(MeetingTableMap::COL_CREATED_AT, $this->created_at);
@@ -1985,11 +2022,11 @@ abstract class Meeting implements ActiveRecordInterface
         $copyObj->setEventCreatorId($this->getEventCreatorId());
         $copyObj->setEventOwnerId($this->getEventOwnerId());
         $copyObj->setEventDescription($this->getEventDescription());
-        $copyObj->setAccountId($this->getAccountId());
         $copyObj->setAdditionalData($this->getAdditionalData());
         $copyObj->setEventCreatedAt($this->getEventCreatedAt());
         $copyObj->setEventUpdatedAt($this->getEventUpdatedAt());
         $copyObj->setRawData($this->getRawData());
+        $copyObj->setClientCalendarUserId($this->getClientCalendarUserId());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
 
@@ -2134,6 +2171,57 @@ abstract class Meeting implements ActiveRecordInterface
         }
 
         return $this->aEventCreator;
+    }
+
+    /**
+     * Declares an association between this object and a ChildClientCalendarUser object.
+     *
+     * @param  ChildClientCalendarUser $v
+     * @return $this|\DataModels\DataModels\Meeting The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setClientCalendarUser(ChildClientCalendarUser $v = null)
+    {
+        if ($v === null) {
+            $this->setClientCalendarUserId(NULL);
+        } else {
+            $this->setClientCalendarUserId($v->getId());
+        }
+
+        $this->aClientCalendarUser = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildClientCalendarUser object, it will not be re-added.
+        if ($v !== null) {
+            $v->addMeeting($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildClientCalendarUser object
+     *
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildClientCalendarUser The associated ChildClientCalendarUser object.
+     * @throws PropelException
+     */
+    public function getClientCalendarUser(ConnectionInterface $con = null)
+    {
+        if ($this->aClientCalendarUser === null && ($this->client_calendar_user_id !== null)) {
+            $this->aClientCalendarUser = ChildClientCalendarUserQuery::create()->findPk($this->client_calendar_user_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aClientCalendarUser->addMeetings($this);
+             */
+        }
+
+        return $this->aClientCalendarUser;
     }
 
 
@@ -2661,6 +2749,9 @@ abstract class Meeting implements ActiveRecordInterface
         if (null !== $this->aEventCreator) {
             $this->aEventCreator->removeMeetingRelatedByEventCreatorId($this);
         }
+        if (null !== $this->aClientCalendarUser) {
+            $this->aClientCalendarUser->removeMeeting($this);
+        }
         $this->id = null;
         $this->event_id = null;
         $this->event_type = null;
@@ -2669,11 +2760,11 @@ abstract class Meeting implements ActiveRecordInterface
         $this->event_creator_id = null;
         $this->event_owner_id = null;
         $this->event_description = null;
-        $this->account_id = null;
         $this->additional_data = null;
         $this->event_created_at = null;
         $this->event_updated_at = null;
         $this->raw_data = null;
+        $this->client_calendar_user_id = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
@@ -2710,6 +2801,7 @@ abstract class Meeting implements ActiveRecordInterface
         $this->collMeetingAttendees = null;
         $this->aEventOwner = null;
         $this->aEventCreator = null;
+        $this->aClientCalendarUser = null;
     }
 
     /**

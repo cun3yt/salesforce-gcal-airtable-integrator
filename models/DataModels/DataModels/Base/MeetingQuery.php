@@ -28,11 +28,11 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildMeetingQuery orderByEventCreatorId($order = Criteria::ASC) Order by the event_creator_id column
  * @method     ChildMeetingQuery orderByEventOwnerId($order = Criteria::ASC) Order by the event_owner_id column
  * @method     ChildMeetingQuery orderByEventDescription($order = Criteria::ASC) Order by the event_description column
- * @method     ChildMeetingQuery orderByAccountId($order = Criteria::ASC) Order by the account_id column
  * @method     ChildMeetingQuery orderByAdditionalData($order = Criteria::ASC) Order by the additional_data column
  * @method     ChildMeetingQuery orderByEventCreatedAt($order = Criteria::ASC) Order by the event_created_at column
  * @method     ChildMeetingQuery orderByEventUpdatedAt($order = Criteria::ASC) Order by the event_updated_at column
  * @method     ChildMeetingQuery orderByRawData($order = Criteria::ASC) Order by the raw_data column
+ * @method     ChildMeetingQuery orderByClientCalendarUserId($order = Criteria::ASC) Order by the client_calendar_user_id column
  * @method     ChildMeetingQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildMeetingQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
@@ -44,11 +44,11 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildMeetingQuery groupByEventCreatorId() Group by the event_creator_id column
  * @method     ChildMeetingQuery groupByEventOwnerId() Group by the event_owner_id column
  * @method     ChildMeetingQuery groupByEventDescription() Group by the event_description column
- * @method     ChildMeetingQuery groupByAccountId() Group by the account_id column
  * @method     ChildMeetingQuery groupByAdditionalData() Group by the additional_data column
  * @method     ChildMeetingQuery groupByEventCreatedAt() Group by the event_created_at column
  * @method     ChildMeetingQuery groupByEventUpdatedAt() Group by the event_updated_at column
  * @method     ChildMeetingQuery groupByRawData() Group by the raw_data column
+ * @method     ChildMeetingQuery groupByClientCalendarUserId() Group by the client_calendar_user_id column
  * @method     ChildMeetingQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildMeetingQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -80,6 +80,16 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildMeetingQuery rightJoinWithEventCreator() Adds a RIGHT JOIN clause and with to the query using the EventCreator relation
  * @method     ChildMeetingQuery innerJoinWithEventCreator() Adds a INNER JOIN clause and with to the query using the EventCreator relation
  *
+ * @method     ChildMeetingQuery leftJoinClientCalendarUser($relationAlias = null) Adds a LEFT JOIN clause to the query using the ClientCalendarUser relation
+ * @method     ChildMeetingQuery rightJoinClientCalendarUser($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ClientCalendarUser relation
+ * @method     ChildMeetingQuery innerJoinClientCalendarUser($relationAlias = null) Adds a INNER JOIN clause to the query using the ClientCalendarUser relation
+ *
+ * @method     ChildMeetingQuery joinWithClientCalendarUser($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the ClientCalendarUser relation
+ *
+ * @method     ChildMeetingQuery leftJoinWithClientCalendarUser() Adds a LEFT JOIN clause and with to the query using the ClientCalendarUser relation
+ * @method     ChildMeetingQuery rightJoinWithClientCalendarUser() Adds a RIGHT JOIN clause and with to the query using the ClientCalendarUser relation
+ * @method     ChildMeetingQuery innerJoinWithClientCalendarUser() Adds a INNER JOIN clause and with to the query using the ClientCalendarUser relation
+ *
  * @method     ChildMeetingQuery leftJoinMeetingHasAttendee($relationAlias = null) Adds a LEFT JOIN clause to the query using the MeetingHasAttendee relation
  * @method     ChildMeetingQuery rightJoinMeetingHasAttendee($relationAlias = null) Adds a RIGHT JOIN clause to the query using the MeetingHasAttendee relation
  * @method     ChildMeetingQuery innerJoinMeetingHasAttendee($relationAlias = null) Adds a INNER JOIN clause to the query using the MeetingHasAttendee relation
@@ -90,7 +100,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildMeetingQuery rightJoinWithMeetingHasAttendee() Adds a RIGHT JOIN clause and with to the query using the MeetingHasAttendee relation
  * @method     ChildMeetingQuery innerJoinWithMeetingHasAttendee() Adds a INNER JOIN clause and with to the query using the MeetingHasAttendee relation
  *
- * @method     \DataModels\DataModels\MeetingAttendeeQuery|\DataModels\DataModels\MeetingHasAttendeeQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     \DataModels\DataModels\MeetingAttendeeQuery|\DataModels\DataModels\ClientCalendarUserQuery|\DataModels\DataModels\MeetingHasAttendeeQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildMeeting findOne(ConnectionInterface $con = null) Return the first ChildMeeting matching the query
  * @method     ChildMeeting findOneOrCreate(ConnectionInterface $con = null) Return the first ChildMeeting matching the query, or a new ChildMeeting object populated from the query conditions when no match is found
@@ -103,11 +113,11 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildMeeting findOneByEventCreatorId(int $event_creator_id) Return the first ChildMeeting filtered by the event_creator_id column
  * @method     ChildMeeting findOneByEventOwnerId(int $event_owner_id) Return the first ChildMeeting filtered by the event_owner_id column
  * @method     ChildMeeting findOneByEventDescription(string $event_description) Return the first ChildMeeting filtered by the event_description column
- * @method     ChildMeeting findOneByAccountId(int $account_id) Return the first ChildMeeting filtered by the account_id column
  * @method     ChildMeeting findOneByAdditionalData(string $additional_data) Return the first ChildMeeting filtered by the additional_data column
  * @method     ChildMeeting findOneByEventCreatedAt(string $event_created_at) Return the first ChildMeeting filtered by the event_created_at column
  * @method     ChildMeeting findOneByEventUpdatedAt(string $event_updated_at) Return the first ChildMeeting filtered by the event_updated_at column
  * @method     ChildMeeting findOneByRawData(string $raw_data) Return the first ChildMeeting filtered by the raw_data column
+ * @method     ChildMeeting findOneByClientCalendarUserId(int $client_calendar_user_id) Return the first ChildMeeting filtered by the client_calendar_user_id column
  * @method     ChildMeeting findOneByCreatedAt(string $created_at) Return the first ChildMeeting filtered by the created_at column
  * @method     ChildMeeting findOneByUpdatedAt(string $updated_at) Return the first ChildMeeting filtered by the updated_at column *
 
@@ -122,11 +132,11 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildMeeting requireOneByEventCreatorId(int $event_creator_id) Return the first ChildMeeting filtered by the event_creator_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildMeeting requireOneByEventOwnerId(int $event_owner_id) Return the first ChildMeeting filtered by the event_owner_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildMeeting requireOneByEventDescription(string $event_description) Return the first ChildMeeting filtered by the event_description column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildMeeting requireOneByAccountId(int $account_id) Return the first ChildMeeting filtered by the account_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildMeeting requireOneByAdditionalData(string $additional_data) Return the first ChildMeeting filtered by the additional_data column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildMeeting requireOneByEventCreatedAt(string $event_created_at) Return the first ChildMeeting filtered by the event_created_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildMeeting requireOneByEventUpdatedAt(string $event_updated_at) Return the first ChildMeeting filtered by the event_updated_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildMeeting requireOneByRawData(string $raw_data) Return the first ChildMeeting filtered by the raw_data column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildMeeting requireOneByClientCalendarUserId(int $client_calendar_user_id) Return the first ChildMeeting filtered by the client_calendar_user_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildMeeting requireOneByCreatedAt(string $created_at) Return the first ChildMeeting filtered by the created_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildMeeting requireOneByUpdatedAt(string $updated_at) Return the first ChildMeeting filtered by the updated_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
@@ -139,11 +149,11 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildMeeting[]|ObjectCollection findByEventCreatorId(int $event_creator_id) Return ChildMeeting objects filtered by the event_creator_id column
  * @method     ChildMeeting[]|ObjectCollection findByEventOwnerId(int $event_owner_id) Return ChildMeeting objects filtered by the event_owner_id column
  * @method     ChildMeeting[]|ObjectCollection findByEventDescription(string $event_description) Return ChildMeeting objects filtered by the event_description column
- * @method     ChildMeeting[]|ObjectCollection findByAccountId(int $account_id) Return ChildMeeting objects filtered by the account_id column
  * @method     ChildMeeting[]|ObjectCollection findByAdditionalData(string $additional_data) Return ChildMeeting objects filtered by the additional_data column
  * @method     ChildMeeting[]|ObjectCollection findByEventCreatedAt(string $event_created_at) Return ChildMeeting objects filtered by the event_created_at column
  * @method     ChildMeeting[]|ObjectCollection findByEventUpdatedAt(string $event_updated_at) Return ChildMeeting objects filtered by the event_updated_at column
  * @method     ChildMeeting[]|ObjectCollection findByRawData(string $raw_data) Return ChildMeeting objects filtered by the raw_data column
+ * @method     ChildMeeting[]|ObjectCollection findByClientCalendarUserId(int $client_calendar_user_id) Return ChildMeeting objects filtered by the client_calendar_user_id column
  * @method     ChildMeeting[]|ObjectCollection findByCreatedAt(string $created_at) Return ChildMeeting objects filtered by the created_at column
  * @method     ChildMeeting[]|ObjectCollection findByUpdatedAt(string $updated_at) Return ChildMeeting objects filtered by the updated_at column
  * @method     ChildMeeting[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
@@ -244,7 +254,7 @@ abstract class MeetingQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, event_id, event_type, name, event_datetime, event_creator_id, event_owner_id, event_description, account_id, additional_data, event_created_at, event_updated_at, raw_data, created_at, updated_at FROM meeting WHERE id = :p0';
+        $sql = 'SELECT id, event_id, event_type, name, event_datetime, event_creator_id, event_owner_id, event_description, additional_data, event_created_at, event_updated_at, raw_data, client_calendar_user_id, created_at, updated_at FROM meeting WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -605,47 +615,6 @@ abstract class MeetingQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the account_id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByAccountId(1234); // WHERE account_id = 1234
-     * $query->filterByAccountId(array(12, 34)); // WHERE account_id IN (12, 34)
-     * $query->filterByAccountId(array('min' => 12)); // WHERE account_id > 12
-     * </code>
-     *
-     * @param     mixed $accountId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return $this|ChildMeetingQuery The current query, for fluid interface
-     */
-    public function filterByAccountId($accountId = null, $comparison = null)
-    {
-        if (is_array($accountId)) {
-            $useMinMax = false;
-            if (isset($accountId['min'])) {
-                $this->addUsingAlias(MeetingTableMap::COL_ACCOUNT_ID, $accountId['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($accountId['max'])) {
-                $this->addUsingAlias(MeetingTableMap::COL_ACCOUNT_ID, $accountId['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(MeetingTableMap::COL_ACCOUNT_ID, $accountId, $comparison);
-    }
-
-    /**
      * Filter the query on the additional_data column
      *
      * Example usage:
@@ -779,6 +748,49 @@ abstract class MeetingQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(MeetingTableMap::COL_RAW_DATA, $rawData, $comparison);
+    }
+
+    /**
+     * Filter the query on the client_calendar_user_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByClientCalendarUserId(1234); // WHERE client_calendar_user_id = 1234
+     * $query->filterByClientCalendarUserId(array(12, 34)); // WHERE client_calendar_user_id IN (12, 34)
+     * $query->filterByClientCalendarUserId(array('min' => 12)); // WHERE client_calendar_user_id > 12
+     * </code>
+     *
+     * @see       filterByClientCalendarUser()
+     *
+     * @param     mixed $clientCalendarUserId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildMeetingQuery The current query, for fluid interface
+     */
+    public function filterByClientCalendarUserId($clientCalendarUserId = null, $comparison = null)
+    {
+        if (is_array($clientCalendarUserId)) {
+            $useMinMax = false;
+            if (isset($clientCalendarUserId['min'])) {
+                $this->addUsingAlias(MeetingTableMap::COL_CLIENT_CALENDAR_USER_ID, $clientCalendarUserId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($clientCalendarUserId['max'])) {
+                $this->addUsingAlias(MeetingTableMap::COL_CLIENT_CALENDAR_USER_ID, $clientCalendarUserId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(MeetingTableMap::COL_CLIENT_CALENDAR_USER_ID, $clientCalendarUserId, $comparison);
     }
 
     /**
@@ -1019,6 +1031,83 @@ abstract class MeetingQuery extends ModelCriteria
         return $this
             ->joinEventCreator($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'EventCreator', '\DataModels\DataModels\MeetingAttendeeQuery');
+    }
+
+    /**
+     * Filter the query by a related \DataModels\DataModels\ClientCalendarUser object
+     *
+     * @param \DataModels\DataModels\ClientCalendarUser|ObjectCollection $clientCalendarUser The related object(s) to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return ChildMeetingQuery The current query, for fluid interface
+     */
+    public function filterByClientCalendarUser($clientCalendarUser, $comparison = null)
+    {
+        if ($clientCalendarUser instanceof \DataModels\DataModels\ClientCalendarUser) {
+            return $this
+                ->addUsingAlias(MeetingTableMap::COL_CLIENT_CALENDAR_USER_ID, $clientCalendarUser->getId(), $comparison);
+        } elseif ($clientCalendarUser instanceof ObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(MeetingTableMap::COL_CLIENT_CALENDAR_USER_ID, $clientCalendarUser->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByClientCalendarUser() only accepts arguments of type \DataModels\DataModels\ClientCalendarUser or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the ClientCalendarUser relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildMeetingQuery The current query, for fluid interface
+     */
+    public function joinClientCalendarUser($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('ClientCalendarUser');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'ClientCalendarUser');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the ClientCalendarUser relation ClientCalendarUser object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \DataModels\DataModels\ClientCalendarUserQuery A secondary query class using the current class as primary query
+     */
+    public function useClientCalendarUserQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinClientCalendarUser($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ClientCalendarUser', '\DataModels\DataModels\ClientCalendarUserQuery');
     }
 
     /**

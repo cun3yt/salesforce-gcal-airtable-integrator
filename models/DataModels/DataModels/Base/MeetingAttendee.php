@@ -1520,6 +1520,31 @@ abstract class MeetingAttendee implements ActiveRecordInterface
         return $this;
     }
 
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this MeetingAttendee is new, it will return
+     * an empty collection; or if this MeetingAttendee has previously
+     * been saved, it will retrieve related MeetingsRelatedByEventOwnerId from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in MeetingAttendee.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return ObjectCollection|ChildMeeting[] List of ChildMeeting objects
+     */
+    public function getMeetingsRelatedByEventOwnerIdJoinClientCalendarUser(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildMeetingQuery::create(null, $criteria);
+        $query->joinWith('ClientCalendarUser', $joinBehavior);
+
+        return $this->getMeetingsRelatedByEventOwnerId($query, $con);
+    }
+
     /**
      * Clears out the collMeetingsRelatedByEventCreatorId collection
      *
@@ -1743,6 +1768,31 @@ abstract class MeetingAttendee implements ActiveRecordInterface
         }
 
         return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this MeetingAttendee is new, it will return
+     * an empty collection; or if this MeetingAttendee has previously
+     * been saved, it will retrieve related MeetingsRelatedByEventCreatorId from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in MeetingAttendee.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return ObjectCollection|ChildMeeting[] List of ChildMeeting objects
+     */
+    public function getMeetingsRelatedByEventCreatorIdJoinClientCalendarUser(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildMeetingQuery::create(null, $criteria);
+        $query->joinWith('ClientCalendarUser', $joinBehavior);
+
+        return $this->getMeetingsRelatedByEventCreatorId($query, $con);
     }
 
     /**
