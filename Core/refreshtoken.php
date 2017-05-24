@@ -33,7 +33,7 @@ foreach($calendarAuths as $auth) {
     $authData = json_decode($auth->getData());
 
     /**
-     * @todo below line must be like this: $apiClient->setAccessToken($integration->getData());
+     * @todo below line must be like this: $apiClient->setAccessToken($authData->getData());
      */
     $apiClient->setAccessToken($authData->access_token);
     $isTokenExpired = $apiClient->isAccessTokenExpired();

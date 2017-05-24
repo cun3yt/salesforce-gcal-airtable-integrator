@@ -220,8 +220,6 @@ function processCalendar(Client $client, $service, $calendar, ClientCalendarUser
  * @param $eventDate
  * @param $eventType
  * @return Meeting
- *
- * @todo Fill `client_calendar_user_id` column!
  */
 function saveNewMeeting(Client $client, $event, ClientCalendarUser $clientCalenderUser, $eventDate, $eventType) {
     $meeting = new Meeting();
