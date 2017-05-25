@@ -2332,6 +2332,28 @@ class Helpers {
      * @return array
      */
     static function getBannedDomains() {
-        return array("resource.calendar.google.com");
+        return array(
+            "resource.calendar.google.com",
+            "ywsync.com"
+        );
+    }
+
+    /**
+     *  "cuneyt@attent.ai" => "attent.ai"
+     *
+     * @param $emailAddress
+     * @return String
+     */
+    static function getEmailDomain($emailAddress) {
+        list($id, $domain) = explode('@', $emailAddress);
+        return $domain;
+    }
+
+    /**
+     * "cuneyt@attent.ai" => ["attent", "ai"]
+     */
+    static function getEmailDomainSegments($emailAddress) {
+        $domain = self::getEmailDomain($emailAddress);
+        return explode('.', $domain);
     }
 }

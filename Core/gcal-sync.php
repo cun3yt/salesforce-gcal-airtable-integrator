@@ -301,7 +301,9 @@ function getOrSaveMeetingAttendee(Client $client, $attendeeEmailAddress) {
         $contact = $q->findOneByEmail($attendeeEmailAddress);
         if (!$contact) {
             $contact = new \DataModels\DataModels\Contact();
-            $contact->setEmail($attendeeEmailAddress)->save();
+            $contact->setEmail($attendeeEmailAddress)
+                ->setClient($client)
+                ->save();
         }
         $creatorContact = $contact;
     }

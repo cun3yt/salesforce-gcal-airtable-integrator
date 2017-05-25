@@ -4,7 +4,7 @@ error_reporting(E_ALL);
 require_once("${_SERVER['DOCUMENT_ROOT']}/libraries/SessionSingleton.php");
 SessionSingleton::start();
 
-require_once("${_SERVER['DOCUMENT_ROOT']}/Core/config.php");
+require_once("${_SERVER['DOCUMENT_ROOT']}/15Five/config.php");
 require_once("${_SERVER['DOCUMENT_ROOT']}/libraries/Helpers.php");
 
 Helpers::setDebugParam($isDebugActive);

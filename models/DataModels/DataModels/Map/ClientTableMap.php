@@ -160,6 +160,13 @@ class ClientTableMap extends TableMap
     1 => ':id',
   ),
 ), null, null, 'Accounts', false);
+        $this->addRelation('Contact', '\\DataModels\\DataModels\\Contact', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':client_id',
+    1 => ':id',
+  ),
+), null, null, 'Contacts', false);
         $this->addRelation('ClientCalendarUser', '\\DataModels\\DataModels\\ClientCalendarUser', RelationMap::ONE_TO_MANY, array (
   0 =>
   array (

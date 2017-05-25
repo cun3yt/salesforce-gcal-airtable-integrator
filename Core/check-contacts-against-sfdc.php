@@ -70,7 +70,7 @@ while($page <= $accountPagesNb) {
                             ->where('sfdc_contact_id IS NULL')
                             ->paginate($contactPage = 1, $maxPerPage);
 
-        $contactPagesNb = $contactPage->getLastPage();
+        $contactPagesNb = $contactPager->getLastPage();
 
         while($contactPage <= $contactPagesNb) {
 
@@ -102,6 +102,9 @@ while($page <= $accountPagesNb) {
     $accountPager = $accountQ->filterByClient($client)->paginate($page, $maxPerPage);
 }
 
+
+
+die;
 // vvvv Techila Code! vvvv
 
 $user = array();
@@ -144,7 +147,7 @@ foreach ($emails as $email) {
 
     $externalNameEmails++;
     $domainInfo = explode(".", $domain);
-    $emailDomain = $domainInfo[0];
+    $emailDomain = $domainInfo[0];  // getting the domain excluding .com
     $accountDetail = Helpers::fnGetAccountDetailByAccountDomain($emailDomain);
 
     /**

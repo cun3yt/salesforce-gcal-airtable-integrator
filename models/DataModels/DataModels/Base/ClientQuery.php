@@ -48,6 +48,16 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildClientQuery rightJoinWithAccount() Adds a RIGHT JOIN clause and with to the query using the Account relation
  * @method     ChildClientQuery innerJoinWithAccount() Adds a INNER JOIN clause and with to the query using the Account relation
  *
+ * @method     ChildClientQuery leftJoinContact($relationAlias = null) Adds a LEFT JOIN clause to the query using the Contact relation
+ * @method     ChildClientQuery rightJoinContact($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Contact relation
+ * @method     ChildClientQuery innerJoinContact($relationAlias = null) Adds a INNER JOIN clause to the query using the Contact relation
+ *
+ * @method     ChildClientQuery joinWithContact($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the Contact relation
+ *
+ * @method     ChildClientQuery leftJoinWithContact() Adds a LEFT JOIN clause and with to the query using the Contact relation
+ * @method     ChildClientQuery rightJoinWithContact() Adds a RIGHT JOIN clause and with to the query using the Contact relation
+ * @method     ChildClientQuery innerJoinWithContact() Adds a INNER JOIN clause and with to the query using the Contact relation
+ *
  * @method     ChildClientQuery leftJoinClientCalendarUser($relationAlias = null) Adds a LEFT JOIN clause to the query using the ClientCalendarUser relation
  * @method     ChildClientQuery rightJoinClientCalendarUser($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ClientCalendarUser relation
  * @method     ChildClientQuery innerJoinClientCalendarUser($relationAlias = null) Adds a INNER JOIN clause to the query using the ClientCalendarUser relation
@@ -58,7 +68,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildClientQuery rightJoinWithClientCalendarUser() Adds a RIGHT JOIN clause and with to the query using the ClientCalendarUser relation
  * @method     ChildClientQuery innerJoinWithClientCalendarUser() Adds a INNER JOIN clause and with to the query using the ClientCalendarUser relation
  *
- * @method     \DataModels\DataModels\AccountQuery|\DataModels\DataModels\ClientCalendarUserQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     \DataModels\DataModels\AccountQuery|\DataModels\DataModels\ContactQuery|\DataModels\DataModels\ClientCalendarUserQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildClient findOne(ConnectionInterface $con = null) Return the first ChildClient matching the query
  * @method     ChildClient findOneOrCreate(ConnectionInterface $con = null) Return the first ChildClient matching the query, or a new ChildClient object populated from the query conditions when no match is found
@@ -456,6 +466,79 @@ abstract class ClientQuery extends ModelCriteria
         return $this
             ->joinAccount($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Account', '\DataModels\DataModels\AccountQuery');
+    }
+
+    /**
+     * Filter the query by a related \DataModels\DataModels\Contact object
+     *
+     * @param \DataModels\DataModels\Contact|ObjectCollection $contact the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildClientQuery The current query, for fluid interface
+     */
+    public function filterByContact($contact, $comparison = null)
+    {
+        if ($contact instanceof \DataModels\DataModels\Contact) {
+            return $this
+                ->addUsingAlias(ClientTableMap::COL_ID, $contact->getClientId(), $comparison);
+        } elseif ($contact instanceof ObjectCollection) {
+            return $this
+                ->useContactQuery()
+                ->filterByPrimaryKeys($contact->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByContact() only accepts arguments of type \DataModels\DataModels\Contact or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Contact relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildClientQuery The current query, for fluid interface
+     */
+    public function joinContact($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Contact');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Contact');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Contact relation Contact object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \DataModels\DataModels\ContactQuery A secondary query class using the current class as primary query
+     */
+    public function useContactQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinContact($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Contact', '\DataModels\DataModels\ContactQuery');
     }
 
     /**

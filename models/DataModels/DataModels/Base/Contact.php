@@ -6,6 +6,8 @@ use \Exception;
 use \PDO;
 use DataModels\DataModels\Account as ChildAccount;
 use DataModels\DataModels\AccountQuery as ChildAccountQuery;
+use DataModels\DataModels\Client as ChildClient;
+use DataModels\DataModels\ClientQuery as ChildClientQuery;
 use DataModels\DataModels\ContactQuery as ChildContactQuery;
 use DataModels\DataModels\MeetingAttendee as ChildMeetingAttendee;
 use DataModels\DataModels\MeetingAttendeeQuery as ChildMeetingAttendeeQuery;
@@ -78,6 +80,13 @@ abstract class Contact extends ChildMeetingAttendee implements ActiveRecordInter
     protected $full_name;
 
     /**
+     * The value for the client_id field.
+     *
+     * @var        int
+     */
+    protected $client_id;
+
+    /**
      * The value for the account_id field.
      *
      * @var        int
@@ -109,6 +118,11 @@ abstract class Contact extends ChildMeetingAttendee implements ActiveRecordInter
      * @var        ChildAccount
      */
     protected $aAccount;
+
+    /**
+     * @var        ChildClient
+     */
+    protected $aClient;
 
     /**
      * @var        ChildMeetingAttendee
@@ -369,6 +383,16 @@ abstract class Contact extends ChildMeetingAttendee implements ActiveRecordInter
     }
 
     /**
+     * Get the [client_id] column value.
+     *
+     * @return int
+     */
+    public function getClientId()
+    {
+        return $this->client_id;
+    }
+
+    /**
      * Get the [account_id] column value.
      *
      * @return int
@@ -447,6 +471,30 @@ abstract class Contact extends ChildMeetingAttendee implements ActiveRecordInter
 
         return $this;
     } // setFullName()
+
+    /**
+     * Set the value of [client_id] column.
+     *
+     * @param int $v new value
+     * @return $this|\DataModels\DataModels\Contact The current object (for fluent API support)
+     */
+    public function setClientId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->client_id !== $v) {
+            $this->client_id = $v;
+            $this->modifiedColumns[ContactTableMap::COL_CLIENT_ID] = true;
+        }
+
+        if ($this->aClient !== null && $this->aClient->getId() !== $v) {
+            $this->aClient = null;
+        }
+
+        return $this;
+    } // setClientId()
 
     /**
      * Set the value of [account_id] column.
@@ -578,16 +626,19 @@ abstract class Contact extends ChildMeetingAttendee implements ActiveRecordInter
             $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ContactTableMap::translateFieldName('FullName', TableMap::TYPE_PHPNAME, $indexType)];
             $this->full_name = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ContactTableMap::translateFieldName('AccountId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ContactTableMap::translateFieldName('ClientId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->client_id = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ContactTableMap::translateFieldName('AccountId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->account_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ContactTableMap::translateFieldName('SfdcContactId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ContactTableMap::translateFieldName('SfdcContactId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->sfdc_contact_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ContactTableMap::translateFieldName('SfdcContactName', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ContactTableMap::translateFieldName('SfdcContactName', TableMap::TYPE_PHPNAME, $indexType)];
             $this->sfdc_contact_name = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ContactTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : ContactTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
             $this->resetModified();
 
@@ -597,7 +648,7 @@ abstract class Contact extends ChildMeetingAttendee implements ActiveRecordInter
                 $this->ensureConsistency();
             }
 
-            return $startcol + 6; // 6 = ContactTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 7; // 7 = ContactTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\DataModels\\DataModels\\Contact'), 0, $e);
@@ -619,6 +670,9 @@ abstract class Contact extends ChildMeetingAttendee implements ActiveRecordInter
      */
     public function ensureConsistency()
     {
+        if ($this->aClient !== null && $this->client_id !== $this->aClient->getId()) {
+            $this->aClient = null;
+        }
         if ($this->aAccount !== null && $this->account_id !== $this->aAccount->getId()) {
             $this->aAccount = null;
         }
@@ -665,6 +719,7 @@ abstract class Contact extends ChildMeetingAttendee implements ActiveRecordInter
         if ($deep) {  // also de-associate any related objects?
 
             $this->aAccount = null;
+            $this->aClient = null;
             $this->aMeetingAttendee = null;
         } // if (deep)
     }
@@ -789,6 +844,13 @@ abstract class Contact extends ChildMeetingAttendee implements ActiveRecordInter
                 $this->setAccount($this->aAccount);
             }
 
+            if ($this->aClient !== null) {
+                if ($this->aClient->isModified() || $this->aClient->isNew()) {
+                    $affectedRows += $this->aClient->save($con);
+                }
+                $this->setClient($this->aClient);
+            }
+
             if ($this->aMeetingAttendee !== null) {
                 if ($this->aMeetingAttendee->isModified() || $this->aMeetingAttendee->isNew()) {
                     $affectedRows += $this->aMeetingAttendee->save($con);
@@ -835,6 +897,9 @@ abstract class Contact extends ChildMeetingAttendee implements ActiveRecordInter
         if ($this->isColumnModified(ContactTableMap::COL_FULL_NAME)) {
             $modifiedColumns[':p' . $index++]  = 'full_name';
         }
+        if ($this->isColumnModified(ContactTableMap::COL_CLIENT_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'client_id';
+        }
         if ($this->isColumnModified(ContactTableMap::COL_ACCOUNT_ID)) {
             $modifiedColumns[':p' . $index++]  = 'account_id';
         }
@@ -863,6 +928,9 @@ abstract class Contact extends ChildMeetingAttendee implements ActiveRecordInter
                         break;
                     case 'full_name':
                         $stmt->bindValue($identifier, $this->full_name, PDO::PARAM_STR);
+                        break;
+                    case 'client_id':
+                        $stmt->bindValue($identifier, $this->client_id, PDO::PARAM_INT);
                         break;
                     case 'account_id':
                         $stmt->bindValue($identifier, $this->account_id, PDO::PARAM_INT);
@@ -938,15 +1006,18 @@ abstract class Contact extends ChildMeetingAttendee implements ActiveRecordInter
                 return $this->getFullName();
                 break;
             case 2:
-                return $this->getAccountId();
+                return $this->getClientId();
                 break;
             case 3:
-                return $this->getSfdcContactId();
+                return $this->getAccountId();
                 break;
             case 4:
-                return $this->getSfdcContactName();
+                return $this->getSfdcContactId();
                 break;
             case 5:
+                return $this->getSfdcContactName();
+                break;
+            case 6:
                 return $this->getId();
                 break;
             default:
@@ -981,10 +1052,11 @@ abstract class Contact extends ChildMeetingAttendee implements ActiveRecordInter
         $result = array(
             $keys[0] => $this->getEmail(),
             $keys[1] => $this->getFullName(),
-            $keys[2] => $this->getAccountId(),
-            $keys[3] => $this->getSfdcContactId(),
-            $keys[4] => $this->getSfdcContactName(),
-            $keys[5] => $this->getId(),
+            $keys[2] => $this->getClientId(),
+            $keys[3] => $this->getAccountId(),
+            $keys[4] => $this->getSfdcContactId(),
+            $keys[5] => $this->getSfdcContactName(),
+            $keys[6] => $this->getId(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1006,6 +1078,21 @@ abstract class Contact extends ChildMeetingAttendee implements ActiveRecordInter
                 }
 
                 $result[$key] = $this->aAccount->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aClient) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'client';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'client';
+                        break;
+                    default:
+                        $key = 'Client';
+                }
+
+                $result[$key] = $this->aClient->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->aMeetingAttendee) {
 
@@ -1063,15 +1150,18 @@ abstract class Contact extends ChildMeetingAttendee implements ActiveRecordInter
                 $this->setFullName($value);
                 break;
             case 2:
-                $this->setAccountId($value);
+                $this->setClientId($value);
                 break;
             case 3:
-                $this->setSfdcContactId($value);
+                $this->setAccountId($value);
                 break;
             case 4:
-                $this->setSfdcContactName($value);
+                $this->setSfdcContactId($value);
                 break;
             case 5:
+                $this->setSfdcContactName($value);
+                break;
+            case 6:
                 $this->setId($value);
                 break;
         } // switch()
@@ -1107,16 +1197,19 @@ abstract class Contact extends ChildMeetingAttendee implements ActiveRecordInter
             $this->setFullName($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
-            $this->setAccountId($arr[$keys[2]]);
+            $this->setClientId($arr[$keys[2]]);
         }
         if (array_key_exists($keys[3], $arr)) {
-            $this->setSfdcContactId($arr[$keys[3]]);
+            $this->setAccountId($arr[$keys[3]]);
         }
         if (array_key_exists($keys[4], $arr)) {
-            $this->setSfdcContactName($arr[$keys[4]]);
+            $this->setSfdcContactId($arr[$keys[4]]);
         }
         if (array_key_exists($keys[5], $arr)) {
-            $this->setId($arr[$keys[5]]);
+            $this->setSfdcContactName($arr[$keys[5]]);
+        }
+        if (array_key_exists($keys[6], $arr)) {
+            $this->setId($arr[$keys[6]]);
         }
     }
 
@@ -1164,6 +1257,9 @@ abstract class Contact extends ChildMeetingAttendee implements ActiveRecordInter
         }
         if ($this->isColumnModified(ContactTableMap::COL_FULL_NAME)) {
             $criteria->add(ContactTableMap::COL_FULL_NAME, $this->full_name);
+        }
+        if ($this->isColumnModified(ContactTableMap::COL_CLIENT_ID)) {
+            $criteria->add(ContactTableMap::COL_CLIENT_ID, $this->client_id);
         }
         if ($this->isColumnModified(ContactTableMap::COL_ACCOUNT_ID)) {
             $criteria->add(ContactTableMap::COL_ACCOUNT_ID, $this->account_id);
@@ -1272,6 +1368,7 @@ abstract class Contact extends ChildMeetingAttendee implements ActiveRecordInter
     {
         $copyObj->setEmail($this->getEmail());
         $copyObj->setFullName($this->getFullName());
+        $copyObj->setClientId($this->getClientId());
         $copyObj->setAccountId($this->getAccountId());
         $copyObj->setSfdcContactId($this->getSfdcContactId());
         $copyObj->setSfdcContactName($this->getSfdcContactName());
@@ -1355,6 +1452,57 @@ abstract class Contact extends ChildMeetingAttendee implements ActiveRecordInter
     }
 
     /**
+     * Declares an association between this object and a ChildClient object.
+     *
+     * @param  ChildClient $v
+     * @return $this|\DataModels\DataModels\Contact The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setClient(ChildClient $v = null)
+    {
+        if ($v === null) {
+            $this->setClientId(NULL);
+        } else {
+            $this->setClientId($v->getId());
+        }
+
+        $this->aClient = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildClient object, it will not be re-added.
+        if ($v !== null) {
+            $v->addContact($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildClient object
+     *
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildClient The associated ChildClient object.
+     * @throws PropelException
+     */
+    public function getClient(ConnectionInterface $con = null)
+    {
+        if ($this->aClient === null && ($this->client_id !== null)) {
+            $this->aClient = ChildClientQuery::create()->findPk($this->client_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aClient->addContacts($this);
+             */
+        }
+
+        return $this->aClient;
+    }
+
+    /**
      * Declares an association between this object and a ChildMeetingAttendee object.
      *
      * @param  ChildMeetingAttendee $v
@@ -1409,11 +1557,15 @@ abstract class Contact extends ChildMeetingAttendee implements ActiveRecordInter
         if (null !== $this->aAccount) {
             $this->aAccount->removeContact($this);
         }
+        if (null !== $this->aClient) {
+            $this->aClient->removeContact($this);
+        }
         if (null !== $this->aMeetingAttendee) {
             $this->aMeetingAttendee->removeContact($this);
         }
         $this->email = null;
         $this->full_name = null;
+        $this->client_id = null;
         $this->account_id = null;
         $this->sfdc_contact_id = null;
         $this->sfdc_contact_name = null;
@@ -1439,6 +1591,7 @@ abstract class Contact extends ChildMeetingAttendee implements ActiveRecordInter
         } // if ($deep)
 
         $this->aAccount = null;
+        $this->aClient = null;
         $this->aMeetingAttendee = null;
     }
 

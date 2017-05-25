@@ -44,12 +44,16 @@
 
     <column name="email" phpName="Email" type="VARCHAR" size="255"/>
     <column name="full_name" phpName="FullName" type="VARCHAR" size="255"/>
+    <column name="client_id" phpName="ClientId" type="INTEGER"/>
     <column name="account_id" phpName="AccountId" type="INTEGER"/>
     <column name="sfdc_contact_id" phpName="SfdcContactId" type="INTEGER"/>
     <column name="sfdc_contact_name" phpName="SfdcContactName" type="VARCHAR" size="255"/>
 
     <foreign-key foreignTable="account" onDelete="none" onUpdate="none">
       <reference local="account_id" foreign="id" />
+    </foreign-key>
+    <foreign-key foreignTable="client" onDelete="none" onUpdate="none">
+      <reference local="client_id" foreign="id" />
     </foreign-key>
   </table>
   <table name="contact_history" idMethod="native" phpName="ContactHistory" namespace="DataModels">
