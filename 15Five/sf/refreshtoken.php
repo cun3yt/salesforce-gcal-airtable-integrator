@@ -28,6 +28,8 @@ foreach($SFDCAuths as $auth) {
     $data = json_decode($auth->getData());
     $tokenData = json_decode($data->tokendata);
     $emailAddress = $calendarUser->getEmail();
+
+    // @todo This still hits to Airtable! Needs to be modified
     $newTokenData = Helpers::sfdcRefreshToken($tokenData->refresh_token, $emailAddress);
 
     if( !$newTokenData ) {
