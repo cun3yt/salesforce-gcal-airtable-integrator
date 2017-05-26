@@ -33,9 +33,9 @@ if(count($SFDCAuths) <= 0) {
 
 $sfdcCredentialObject = json_decode($SFDCAuths[0]->getData());
 $sfdcToken = $sfdcCredentialObject->tokendata;
+unset($sfdcCredentialObject);
 
 unset($SFDCAuths);
-unset($sfdcCredentialObject);
 
 /**
  * 1. Fetch all accounts belonging to the customer
@@ -50,10 +50,12 @@ while($page <= $accountPagesNb) {
 
     foreach($accountPager as $account) {
 
+        $account->checkAgainstSFDC();
+
         if($account->getSfdcAccountId() == null) {
-            $accountDetailSF = Helpers::fnGetAccountDetailFromSf($sfdcCredentialObject->instance_url,
+            $accountDetailSF = Helpers::fnGetAccountDetailFromSf($sfdcToken->instance_url,
                                                                 $sfdcToken->access_token,
-                                                                $account->getEmailDomain());
+                                                                Helpers::getEmailDomainSegment($account->getEmailDomain()));
 
             if( isset($accountDetailSF['records'][0]['id']) ) {
                 $account->setSfdcAccountId($accountDetailSF['records'][0]['id']);
@@ -78,7 +80,7 @@ while($page <= $accountPagesNb) {
 
             foreach($contactPager as $contact) {
                 $sfdcContact = Helpers::fnGetContactDetailFromSf(
-                    $sfdcCredentialObject->instance_url,
+                    $sfdcToken->instance_url,
                     $sfdcToken->access_token,
                     $contact->getEmail(), false);
 
@@ -87,6 +89,22 @@ while($page <= $accountPagesNb) {
                 }
 
                 $contact->setSfdcContactId($sfdcContact['records'][0]['AccountId']);
+                //
+                /*
+                 $sfdcContact['records'][0] =>
+                 array (
+                    'attributes' =>
+                    array (
+                    'type' => 'Contact',
+                    'url' => '/services/data/v20.0/sobjects/Contact/003F000002CBbEPIA1',
+                    ),
+                    'Name' => 'Rochelle DiRe',
+                    'Id' => '003F000002CBbEPIA1',
+                    'Email' => 'rochelledire@gmail.com',
+                    'Title' => 'VP People & Culture',
+                    'AccountId' => '001F000001j3r0HIAQ',
+                    )
+                 */
                 $contact->save();
             }
 
@@ -113,10 +131,10 @@ $user = array();
  * foreach meeting record, system will get hold of attendee email, extract the doamin part from the email
  * address check to see if account with that domain present in airtable accounte table
  * if yes than connect sf to get the latest modified account detail from sf.
- * check if the the there is update in the account info pulled from sf, if yes than make
+ * check if there is update in the account info pulled from sf, if yes then make
  * an account detail entry in account history table and return back the created history record id
  * for mapping to meeting history table if no update in the account details than get
- * the exiting account history record id and map it with meeting history record.
+ * the existing account history record id and map it with meeting history record.
  * If account detail not present in account airtable than use domain part to pull
  * the latest modified account and its detail, create account record from the pulled info,
  * create a account history record from the pulled account detail info and use the account history
