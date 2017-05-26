@@ -32,7 +32,7 @@ class Helpers {
     }
 
     /**
-     * Replaces "fnGetSalesUser" & "fnGetGcalUser" functions
+     * Replaces "fnGetSalesUser" function
      *
      * @param Client $client
      * @param string $authType
@@ -63,9 +63,7 @@ class Helpers {
     }
 
     /**
-     * Creating a new GCal Account
-     *
-     * This replaces "fnSaveGcalAccount" & "fnUpdateSalesUser"
+     * Creating a new Auth Entry in `client_calendar_user_oauth` table
      *
      * @param Client $client
      * @param $emailAddress
@@ -843,18 +841,18 @@ class Helpers {
      *
      * @param $instance_url
      * @param $access_token
-     * @param string $strEmail
+     * @param string $emailAddress
      * @return bool|mixed
      */
-    static function fnGetContactDetailFromSf($instance_url, $access_token,$strEmail, $withMailingCity = true) {
-        if(!$strEmail) {
+    static function fnGetContactDetailFromSf($instance_url, $access_token, $emailAddress, $withMailingCity = true) {
+        if(!$emailAddress) {
             return false;
         }
 
         if($withMailingCity) {
-            $query = "SELECT Name, Id, Email, Title, MailingCity, AccountId from Contact WHERE Email = '".$strEmail."' ORDER BY lastmodifieddate DESC LIMIT 1";
+            $query = "SELECT Name, Id, Email, Title, MailingCity, AccountId from Contact WHERE Email = '".$emailAddress."' ORDER BY lastmodifieddate DESC LIMIT 1";
         } else {
-            $query = "SELECT Name, Id, Email, Title, AccountId from Contact WHERE Email = '" . $strEmail . "' LIMIT 1";
+            $query = "SELECT Name, Id, Email, Title, AccountId from Contact WHERE Email = '" . $emailAddress . "' LIMIT 1";
         }
         $url = "$instance_url/services/data/v20.0/query?q=" . urlencode($query);
 
@@ -1156,38 +1154,37 @@ class Helpers {
 
     static function fnUpdateMeetingRecord($strRecId, $strId) {
         global $strAirtableBase, $strAirtableApiKey, $strAirtableBaseEndpoint;
-        if ($strRecId) {
-            $base = $strAirtableBase;
-            $table = 'Meeting%20History';
-            $strApiKey = $strAirtableApiKey;
-            $url = $strAirtableBaseEndpoint . $base . '/' . $table . '/' . $strRecId;
-            $authorization = "Authorization: Bearer " . $strApiKey;
-            //$arrFields['fields']['Account'] = array($strId)$strName;
-            $arrFields['fields']['Opportunity History'] = $strId;
-            $arrFields['fields']['oppurtunity_processed'] = "yes";
-            $srtF = json_encode($arrFields);
-            $curl = curl_init($url);
-            // Accept any server (peer) certificate on dev envs
-            curl_setopt($curl, CURLOPT_HEADER, false);
-            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PATCH');
-            curl_setopt($curl, CURLOPT_POSTFIELDS, $srtF);
-            curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-type: application/json", $authorization));
-            $info = curl_getinfo($curl);
-            echo "----" . $response = curl_exec($curl);
-            if (!$response) {
-                echo curl_error($curl);
-            }
-            curl_close($curl);
-            $jsonResponse = json_decode($response, true);
-            if (is_array($jsonResponse) && (count($jsonResponse) > 0)) {
-                return true;
-            } else {
-                return false;
-            }
-        } else {
+
+        if(!$strRecId) {
             return false;
         }
+
+        $base = $strAirtableBase;
+        $table = 'Meeting%20History';
+        $strApiKey = $strAirtableApiKey;
+        $url = $strAirtableBaseEndpoint . $base . '/' . $table . '/' . $strRecId;
+        $authorization = "Authorization: Bearer " . $strApiKey;
+
+        $arrFields['fields']['Opportunity History'] = $strId;
+        $arrFields['fields']['oppurtunity_processed'] = "yes";
+
+        $srtF = json_encode($arrFields);
+
+        $curl = curl_init($url);
+        // Accept any server (peer) certificate on dev envs
+        curl_setopt($curl, CURLOPT_HEADER, false);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PATCH');
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $srtF);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-type: application/json", $authorization));
+        $info = curl_getinfo($curl);
+        echo "----" . $response = curl_exec($curl);
+        if (!$response) {
+            echo curl_error($curl);
+        }
+        curl_close($curl);
+        $jsonResponse = json_decode($response, true);
+        return (is_array($jsonResponse) && (count($jsonResponse) > 0));
     }
 
     static function fnGetAccountDetailByName($strAccName = "") {
@@ -1310,46 +1307,6 @@ class Helpers {
     }
 
     /**
-     * Function to connect to airtable base and get clients gcals OAuth acceess
-     *
-     * @deprecated Use getAuthentications() function instead
-     *
-     * @return bool
-     */
-    static function fnGetGcalUser() {
-        global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
-        $base = $strAirtableBase;
-        $table = 'gaccounts';
-        $strApiKey = $strAirtableApiKey;
-        $url = $strAirtableBaseEndpoint.$base.'/'.$table;
-        $authorization = "Authorization: Bearer ".$strApiKey;
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_HTTPGET, 1);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
-        curl_setopt($ch,CURLOPT_URL, $url);
-
-        $result = curl_exec($ch);
-
-        if(!$result) {
-            echo 'error:' . curl_error($ch);
-            return false;
-        }
-
-        $arrResponse = json_decode($result,true);
-
-        if(isset($arrResponse['records']) && (count($arrResponse['records'])>0)) {
-            $arrSUser = $arrResponse['records'];
-            return $arrSUser;
-        }
-
-        return false;
-    }
-
-    /**
-     * Use this function instead of fnGetLatestMeetsForUser() function
-     *
      * @param Client $client
      * @param $emailAddress
      * @return Meeting|null
@@ -1370,56 +1327,6 @@ class Helpers {
     }
 
     /**
-     * Function to connect to airtable base latest record for the passed email address
-     * System uses the Meetingsreverse view of airtable for this processing
-     *
-     * @deprecated use getLastMeetingInDBForEmailAddress() instead
-     * @param $strEmail
-     * @return bool
-     */
-    static function fnGetLatestMeetsForUser($strEmail) {
-        global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
-
-        if(!$strEmail) {
-            return false;
-        }
-
-        $base = $strAirtableBase;
-        $table = 'Meeting%20History';
-        $strApiKey = $strAirtableApiKey;
-        $url = $strAirtableBaseEndpoint.$base.'/'.$table."?maxRecords=1&view=".rawurlencode("Meetingsreverse");
-        $url .= '&filterByFormula=('.rawurlencode("{calendaremail}='".$strEmail."'").')';
-
-        $authorization = "Authorization: Bearer ".$strApiKey;
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_HTTPGET, 1);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
-        //set the url, number of POST vars, POST data
-        curl_setopt($ch,CURLOPT_URL, $url);
-
-        //execute post
-        $result = curl_exec($ch);//exit;
-
-        if(!$result) {
-            echo 'error:' . curl_error($ch);
-            return false;
-        }
-
-        $arrResponse = json_decode($result,true);
-
-        if(isset($arrResponse['records']) && (count($arrResponse['records'])>0)) {
-            $arrSUser = $arrResponse['records'];
-            return $arrSUser;
-        }
-
-        return false;
-    }
-
-    /**
-     * Replaced fnCheckMeetingAlreadyPresent()
-     *
      * @param Google_Service_Calendar_Event $event
      * @return Meeting|null
      */
@@ -1436,129 +1343,6 @@ class Helpers {
         }
 
         return $meetings[0];
-    }
-
-    /**
-     * Function to check if meet already present in airtable meeting history table
-     * It takes gcal eventid as parameter to check
-     * Returns true if found false otherwise
-     *
-     * @param array $arrRecord
-     * @return bool
-     * @deprecated use getMeetingIfExists() function instead
-     */
-    static function fnCheckMeetingAlreadyPresent($arrRecord = array()) {
-        global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
-
-        if( !(is_array($arrRecord) && (count($arrRecord)>0)) ) {
-            return false;
-        }
-
-        $base = $strAirtableBase;
-        $table = 'Meeting%20History';
-        $strApiKey = $strAirtableApiKey;
-        $url = $strAirtableBaseEndpoint.$base.'/'.$table;
-        $url .= "?filterByFormula=(gcal_mee_id='".$arrRecord['eventid']."')";
-        $authorization = "Authorization: Bearer ".$strApiKey;
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_HTTPGET, 1);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
-        //set the url, number of POST vars, POST data
-        curl_setopt($ch,CURLOPT_URL, $url);
-
-        $result = curl_exec($ch);
-
-        if(!$result) {
-            return true;
-        }
-
-        $arrResponse = json_decode($result,true);
-
-        if(is_array($arrResponse) && (count($arrResponse)>0)) {
-            $arrRecords = $arrResponse['records'];
-            return (is_array($arrRecords) && (count($arrRecords)>0));
-        }
-
-        return true;
-    }
-
-    /**
-     * Function to save google meeting into airtable meeting history table
-     * It takes event record as input parameter and returns the created record as reposne or false otherwise
-     *
-     * @param array $arrRecord
-     * @return bool
-     * @deprecated use new Meeting instance instead (look at "synccaldata.php")
-     */
-    static function fnSaveAirtableMeetings($arrRecord = array()) {
-        global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
-
-        if( !(is_array($arrRecord) && (count($arrRecord)>0)) ) {
-            return false;
-        }
-
-        $base = $strAirtableBase;
-        $table = 'Meeting%20History';
-        $strApiKey = $strAirtableApiKey;
-        $url = $strAirtableBaseEndpoint.$base.'/'.$table;
-
-        $authorization = "Authorization: Bearer ".$strApiKey;
-
-        if($arrRecord['eventsummary']) {
-            $arrFields['fields']['Meeting Name'] = $arrRecord['eventsummary'];
-        }
-
-        if($arrRecord['startdate']) {
-            $arrFields['fields']['Meeting Date'] = date("m/d/Y",strtotime($arrRecord['startdate']));
-        }
-
-        if($arrRecord['calendarid']) {
-            $arrFields['fields']['calendaremail'] = $arrRecord['calendarid'];
-        }
-
-        if($arrRecord['createdByName']) {
-            $arrFields['fields']['Created By'] = $arrRecord['createdByName'];
-        }
-
-        if($arrRecord['ceatedbyemail']) {
-            $arrFields['fields']['created_by_email'] = $arrRecord['ceatedbyemail'];
-        }
-
-        if($arrRecord['eventdescription']) {
-            $arrFields['fields']['Description'] = $arrRecord['eventdescription'];
-        }
-
-        if($arrRecord['attendeesemail']) {
-            $arrFields['fields']['Attendee Email(s)'] = $arrRecord['attendeesemail'];
-        }
-
-        if($arrRecord['meetingtype']) {
-            $arrFields['fields']['Meeting'] = $arrRecord['meetingtype'];
-        }
-
-        if($arrRecord['processtime']) {
-            $arrFields['fields']['meetingprocesstime'] = $arrRecord['processtime'];
-        }
-
-        if($arrRecord['eventid']) {
-            $arrFields['fields']['gcal_mee_id'] = $arrRecord['eventid'];
-        }
-
-        $srtF = json_encode($arrFields);
-        $curl = curl_init($url);
-        // Accept any server (peer) certificate on dev envs
-        curl_setopt($curl, CURLOPT_HEADER, false);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $srtF);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-type: application/json",$authorization));
-        $info = curl_getinfo($curl);
-        $response = curl_exec($curl);
-        curl_close($curl);
-        $jsonResponse =  json_decode($response,true);
-        return (is_array($jsonResponse) && (count($jsonResponse)>0));
     }
 
     /**
@@ -1609,55 +1393,6 @@ class Helpers {
         }
 
         return false;
-    }
-
-    /**
-     * Setting access record as expired
-     *
-     * @deprecated use ClientCalendarUser::setStatus() function instead
-     * @param string $strEmail
-     * @return bool
-     */
-    static function fnUpdatesGstatus($strEmail = "") {
-        global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
-
-        if(!$strEmail) {
-            return false;
-        }
-
-        $strId = Helpers::fnGetUsergAcc($strEmail);
-
-        if(!$strId) {
-            return false;
-        }
-
-        $base = $strAirtableBase;
-        $table = 'gaccounts';
-        $strApiKey = $strAirtableApiKey;
-        $url = $strAirtableBaseEndpoint.$base.'/'.$table.'/'.$strId;
-
-        $authorization = "Authorization: Bearer ".$strApiKey;
-        $arrFields['fields']['status'] = "expired";
-
-        $srtF = json_encode($arrFields);
-        $curl = curl_init($url);
-        // Accept any server (peer) certificate on dev envs
-        curl_setopt($curl, CURLOPT_HEADER, false);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PATCH');
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $srtF);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-type: application/json",$authorization));
-        $info = curl_getinfo($curl);
-        $response = curl_exec($curl);
-
-        if(!$response) {
-            echo curl_error($curl);
-        }
-
-        curl_close($curl);
-        $jsonResponse =  json_decode($response,true);
-
-        return (is_array($jsonResponse) && (count($jsonResponse)>0));
     }
 
     /**
@@ -1716,177 +1451,6 @@ class Helpers {
     }
 
     /**
-     * Function to connect to airtable base and looks up for the calendraemail in people table
-     * On match found it will return the macthed record and user name detail for that email address other wise return false
-     * It takes calendaremail as parameter
-     *
-     * @param string $strEmail
-     * @return bool
-     */
-    static function fnGetUserName($strEmail = "") {
-        global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
-
-        if(!$strEmail) {
-            return false;
-        }
-
-        $base = $strAirtableBase;
-        $table = 'People';
-        $strApiKey = $strAirtableApiKey;
-        $url = $strAirtableBaseEndpoint.$base.'/'.$table;
-        $url .= '?filterByFormula=('.rawurlencode("Email ='".$strEmail."'").")";
-
-        $authorization = "Authorization: Bearer ".$strApiKey;
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_HTTPGET, 1);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
-        //set the url, number of POST vars, POST data
-        curl_setopt($ch,CURLOPT_URL, $url);
-
-        //execute post
-        $result = curl_exec($ch);
-        if(!$result) {
-            echo 'error:' . curl_error($ch);
-            return false;
-        }
-
-        $arrResponse = json_decode($result,true);
-
-        if(isset($arrResponse['records']) && (count($arrResponse['records'])>0)) {
-            $arrSUser = $arrResponse['records'];
-            $strName = $arrSUser[0]['fields']['Name'];
-            return $strName;
-        }
-
-        return false;
-    }
-
-    /**
-     * Function to update meeting history table with (calendar) name via recordId.
-     *
-     * @param $strName
-     * @param $strRecId
-     * @return bool
-     */
-    static function fnUpdateUserName($strName,$strRecId) {
-        global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
-
-        if(!$strRecId) {
-            return false;
-        }
-
-        $base = $strAirtableBase;
-        $table = 'Meeting%20History';
-        $strApiKey = $strAirtableApiKey;
-        $url = $strAirtableBaseEndpoint.$base.'/'.$table.'/'.$strRecId;
-
-        $authorization = "Authorization: Bearer ".$strApiKey;
-        $arrFields['fields']['Calendar'] = $strName;
-        $arrFields['fields']['calendar_processed'] = "processed";
-
-        $srtF = json_encode($arrFields);
-        $curl = curl_init($url);
-        // Accept any server (peer) certificate on dev envs
-        curl_setopt($curl, CURLOPT_HEADER, false);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PATCH');
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $srtF);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-type: application/json",$authorization));
-        $info = curl_getinfo($curl);
-        $response = curl_exec($curl);
-        curl_close($curl);
-        $jsonResponse =  json_decode($response,true);
-        return (is_array($jsonResponse) && (count($jsonResponse)>0));
-    }
-
-    /**
-     * Function to connect to airtable base and update google calendar access details
-     * It take 1 parameter as the updated token and 1 as the record if where token is to be updated
-     * On success it returns true otherwise false
-     *
-     * @param $strToken
-     * @param $strRecId
-     * @return bool
-     * @deprecated use ClientCalendarUserOAuth instance functions instead!
-     */
-    function fnUpdateAccessTokenSalesUser($strToken,$strRecId) {
-        global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
-
-        if(!$strToken) {
-            return false;
-        }
-
-        $base = $strAirtableBase;
-        $table = 'gaccounts';
-        $strApiKey = $strAirtableApiKey;
-        $url = $strAirtableBaseEndpoint.$base.'/'.$table.'/'.$strRecId;
-
-        $authorization = "Authorization: Bearer ".$strApiKey;
-        $arrFields['fields']['user_token'] = $strToken;
-
-        $srtF = json_encode($arrFields);
-        $curl = curl_init($url);
-        // Accept any server (peer) certificate on dev envs
-        curl_setopt($curl, CURLOPT_HEADER, false);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PATCH');
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $srtF);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-type: application/json",$authorization));
-        $info = curl_getinfo($curl);
-        $response = curl_exec($curl);
-        curl_close($curl);
-        $jsonResponse =  json_decode($response,true);
-        return (is_array($jsonResponse) && (count($jsonResponse)>0));
-    }
-
-    /**
-     * Returns user info from airtable if exists
-     *
-     * @deprecated use getOAuthIfPresent() instead
-     * @param string $strEmail
-     * @return bool|array
-     */
-    static function fnCheckAlreadySavedSalesUser($strEmail = "") {
-        global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
-
-        if( !$strEmail ) {
-            return false;
-        }
-
-        $base = $strAirtableBase;
-        $table = 'salesuser';
-        $strApiKey = $strAirtableApiKey;
-        $url = $strAirtableBaseEndpoint.$base.'/'.$table;
-        $url .= '?filterByFormula=('.rawurlencode("{email}='".$strEmail."'").')';
-        $authorization = "Authorization: Bearer ".$strApiKey;
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_HTTPGET, 1);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
-        curl_setopt($ch,CURLOPT_URL, $url);
-
-        $result = curl_exec($ch);
-
-        if(!$result) {
-            echo 'error:' . curl_error($ch);
-            return false;
-        }
-
-        $arrResponse = json_decode($result,true);
-
-        if( !(isset($arrResponse['records']) && (count($arrResponse['records'])>0)) ) {
-            return false;
-        }
-
-        return $arrResponse['records'];
-    }
-
-    /**
-     * Replaced "fnGetUserDetailFromSF()" function
-     *
      * @param string $userUrl
      * @param string $access_token
      * @return null | mixed
@@ -1913,114 +1477,6 @@ class Helpers {
 
         $response = json_decode($json_response, true);
         return $response;
-    }
-
-    static function fnSaveSalesUser($arrRecord = array()) {
-        global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
-        if(is_array($arrRecord) && (count($arrRecord)>0)) {
-            $base = $strAirtableBase;
-            $table = 'salesuser';
-            $strApiKey = $strAirtableApiKey;
-            $url = $strAirtableBaseEndpoint.$base.'/'.$table;
-
-            $authorization = "Authorization: Bearer ".$strApiKey;
-            if($arrRecord['accesstoken']) {
-                $arrFields['fields']['user_token'] = $arrRecord['accesstoken'];
-            }
-
-            if($arrRecord['tokendata']) {
-                $arrFields['fields']['salesuseraccesstoken'] = $arrRecord['tokendata'];
-            }
-            $arrFields['fields']['status'] = "active";
-            if($arrRecord['userid']) {
-                $arrFields['fields']['userid'] = $arrRecord['userid'];
-            }
-
-            if($arrRecord['email']) {
-                $arrFields['fields']['email'] = $arrRecord['email'];
-            }
-            $srtF = json_encode($arrFields);
-            $curl = curl_init($url);
-            // Accept any server (peer) certificate on dev envs
-            curl_setopt($curl, CURLOPT_HEADER, false);
-            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($curl, CURLOPT_POST, true);
-            curl_setopt($curl, CURLOPT_POSTFIELDS, $srtF);
-            curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-type: application/json",$authorization));
-            $info = curl_getinfo($curl);
-            $response = curl_exec($curl);
-            curl_close($curl);
-            $jsonResponse =  json_decode($response,true);
-            if(is_array($jsonResponse) && (count($jsonResponse)>0)) {
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     *
-     * @deprecated this function is replaced by "createAuthAccount()" function
-     * @param $strRecId
-     * @param array $arrRecord
-     * @return bool
-     */
-    static function fnUpdateSalesUser($strRecId,$arrRecord = array()) {
-        global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
-
-        if(!$strRecId) {
-            return false;
-        }
-
-        $base = $strAirtableBase;
-        $table = 'salesuser';
-        $strApiKey = $strAirtableApiKey;
-        $url = $strAirtableBaseEndpoint.$base.'/'.$table.'/'.$strRecId;
-
-        $authorization = "Authorization: Bearer ".$strApiKey;
-
-        if($arrRecord['accesstoken']) {
-            $arrFields['fields']['user_token'] = $arrRecord['accesstoken'];
-        }
-
-        if($arrRecord['tokendata']) {
-            $arrFields['fields']['salesuseraccesstoken'] = $arrRecord['tokendata'];
-        }
-
-        $arrFields['fields']['status'] = "active";
-
-        if($arrRecord['userid']) {
-            $arrFields['fields']['userid'] = $arrRecord['userid'];
-        }
-
-        if($arrRecord['email']) {
-            $arrFields['fields']['email'] = $arrRecord['email'];
-        }
-
-        $srtF = json_encode($arrFields);
-        $curl = curl_init($url);
-
-        // Accept any server (peer) certificate on dev envs
-        curl_setopt($curl, CURLOPT_HEADER, false);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PATCH');
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $srtF);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-type: application/json",$authorization));
-        curl_getinfo($curl);
-
-        $response = curl_exec($curl);
-
-        if(!$response) {
-            echo curl_error($curl);
-        }
-
-        curl_close($curl);
-        $jsonResponse =  json_decode($response,true);
-
-        return is_array($jsonResponse) && (count($jsonResponse)>0);
     }
 
     /**
@@ -2053,7 +1509,7 @@ class Helpers {
             $response['error_description'] == "expired access/refresh token") {
 
             Helpers::fnUpdatesSGstatus($strEmail);
-            Helpers::fnSendEmailToSFDCAdminAboutTokenExpiry($strEmail);
+            Helpers::sendEmailToSFDCAdminAboutTokenExpiry($strEmail);
 
             trigger_error("Admin for SFDC got an email for account token reset.", E_NOTICE);
             return false;
@@ -2067,7 +1523,7 @@ class Helpers {
         return false;
     }
 
-    static function fnSendEmailToSFDCAdminAboutTokenExpiry($strEmail) {
+    static function sendEmailToSFDCAdminAboutTokenExpiry($strEmail) {
         global $strClientFolderName,$strFromEmailAddress,$strSmtpHost,$strSmtpUsername,$strSmtpPassword,$strSmtpPPort;
 
         if(!$strEmail) {
@@ -2085,17 +1541,6 @@ class Helpers {
 
         $message .= "Please login at following URL to revoke the access: <a href='{$link}'>Revoke Access</a> <br/><br/><br/>";
         $message .= 'Thanks';
-
-        /* $headers = "MIME-Version: 1.0" . "\r\n";
-        $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-
-        $headers .= 'From: johnrola36@gmail.com'."\r\n";
-        $retval = mail ($to,$subject,$message,$headers); */
-
-        /* define('USERNAME','AKIAIBPZMF6PMB6XK2OA');
-        define('PASSWORD','At6xulRB6J8VtWqlLWQZ5+NWas6G2GchiYVInzyeD2Xe');
-        define('HOST', 'email-smtp.us-west-2.amazonaws.com');
-        define('PORT', '587'); */
 
         require_once 'Mail.php';
 
@@ -2299,7 +1744,6 @@ class Helpers {
         return false;
     }
 
-
     /**
      * @param $googleCalAPICredentialFile
      * @param bool $accessOffline
@@ -2350,10 +1794,13 @@ class Helpers {
     }
 
     /**
-     * "cuneyt@attent.ai" => ["attent", "ai"]
+     * "cuneyt@attent.ai" => "attent"
+     *
+     * @param $emailDomain
+     * @return String
      */
-    static function getEmailDomainSegments($emailAddress) {
-        $domain = self::getEmailDomain($emailAddress);
-        return explode('.', $domain);
+    static function getEmailDomainSegment($emailDomain) {
+        $segments = explode('.', $emailDomain);
+        return $segments[0];
     }
 }
