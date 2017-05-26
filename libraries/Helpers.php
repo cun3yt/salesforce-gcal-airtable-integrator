@@ -32,8 +32,6 @@ class Helpers {
     }
 
     /**
-     * Replaces "fnGetSalesUser" function
-     *
      * @param Client $client
      * @param string $authType
      * @return array
@@ -138,43 +136,6 @@ class Helpers {
             ->save();
 
         return $auth;
-    }
-
-    /**
-     * @deprecated Use Helpers::getAuthentications() instead of this function!
-     *
-     * @return bool
-     */
-    static function fnGetSalesUser() {
-        global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
-
-        $base = $strAirtableBase;
-        $table = 'salesuser';
-        $strApiKey = $strAirtableApiKey;
-        $url = $strAirtableBaseEndpoint.$base.'/'.$table;
-        $authorization = "Authorization: Bearer ".$strApiKey;
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_HTTPGET, 1);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
-        curl_setopt($ch,CURLOPT_URL, $url);
-
-        $result = curl_exec($ch);
-
-        if(!$result) {
-            echo 'error: ' . curl_error($ch);
-            return false;
-        }
-
-        $arrResponse = json_decode($result,true);
-
-        if(isset($arrResponse['records']) && (count($arrResponse['records'])>0)) {
-            $arrSUser = $arrResponse['records'];
-            return $arrSUser;
-        }
-
-        return false;
     }
 
     /**
@@ -287,8 +248,7 @@ class Helpers {
 
         return array();
     }
-
-
+    
     /**
      * Function to check fetched contact details from sf and existing contact detail in attendee history table are same or diff
      * If detail dont match, means there is update in contact and we return true, so as to make a new entry record in attendee

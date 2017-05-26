@@ -9,10 +9,10 @@ error_reporting(E_ALL);
 require_once('config.php');
 require_once("${_SERVER['DOCUMENT_ROOT']}/libraries/Helpers.php");
 
+Helpers::setDebugParam($isDebugActive);
+
 use DataModels\DataModels\Client as Client;
 use DataModels\DataModels\ClientCalendarUserOAuth as ClientCalendarUserOAuth;
-
-Helpers::setDebugParam($isDebugActive);
 
 $access_token = "";
 $instance_url = "";
