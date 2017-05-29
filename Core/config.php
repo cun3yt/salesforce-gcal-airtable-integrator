@@ -10,13 +10,3 @@ require_once("${_SERVER['DOCUMENT_ROOT']}/libraries/Helpers.php");
 
 $googleCalAPICredentialFile = "${_SERVER['DOCUMENT_ROOT']}/config/google_api_credential_15five_domain.json";
 
-
-/**
- * Below needs to be moved to somewhere per-client level.
- */
-//
-//$strClient = "Attent";
-//$strClientFolderName = 'Attent';
-//$strClientDomainName = "attent.ai";
-
-//$_SESSION['currentclientfoldername'] = $strClientFolderName;
