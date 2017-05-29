@@ -26,7 +26,7 @@ if( count($SFDCAuths) <= 0 ) {
 foreach($SFDCAuths as $auth) {
     $calendarUser = $auth->getClientCalendarUser();
     $data = json_decode($auth->getData());
-    $tokenData = json_decode($data->tokendata);
+    $tokenData = $data->tokendata;
     $emailAddress = $calendarUser->getEmail();
 
     // @todo This still hits to Airtable! Needs to be modified
