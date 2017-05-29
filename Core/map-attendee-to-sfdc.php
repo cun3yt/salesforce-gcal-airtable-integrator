@@ -1,8 +1,7 @@
 <?
-/*
-* Mapping meetings' attendees to SFDC contacts
-*/
-
+/**
+ * map attendee (contact) to SFDC
+ */
 error_reporting(E_ALL);
 
 require_once('config.php');
@@ -14,9 +13,6 @@ use DataModels\DataModels\Client as Client;
 use DataModels\DataModels\ClientCalendarUserOAuth as ClientCalendarUserOAuth;
 use DataModels\DataModels\Contact as Contact;
 use DataModels\DataModels\ContactQuery as ContactQuery;
-
-$access_token = "";
-$instance_url = "";
 
 /**
  * @var $client Client
@@ -33,14 +29,7 @@ if(count($SFDCAuths) <= 0) {
 $sfdcCredentialObject = json_decode($SFDCAuths[0]->getData());
 $sfdcToken = $sfdcCredentialObject->tokendata;
 
-$access_token = $sfdcToken->access_token;
-$instance_url = $sfdcToken->instance_url;
-
-
-$contactQ = new ContactQuery();
-$contactPager = $contactQ->filterByClient($client)
-    ->where('sfdc_contact_id IS NULL')
-    ->paginate($contactPage = 1, $maxPerPage = 50);
+$contactPager = getContacts($client, $contactPage = 1);
 
 $contactPageNb = $contactPager->getLastPage();
 
@@ -49,8 +38,8 @@ while($contactPage <= $contactPageNb) {
 
     foreach($contactPager as $contact) {
         $sfdcContact = Helpers::fnGetContactDetailFromSf(
-            $instance_url,
-            $access_token,
+            $sfdcToken->instance_url,
+            $sfdcToken->access_token,
             $contact->getEmail(),
             false
         );
@@ -65,10 +54,25 @@ while($contactPage <= $contactPageNb) {
     }
 
     ++$contactPage;
+    $contactPager = getContacts($client, $contactPage);
+}
+
+/**
+ * @param Client $client
+ * @param int $page
+ * @param int $maxPerPage
+ * @return Contact[]|\Propel\Runtime\Util\PropelModelPager
+ */
+function getContacts(Client $client, $page, $maxPerPage = 50) {
+    $contactQ = new ContactQuery();
+
     $contactPager = $contactQ->filterByClient($client)
         ->where('sfdc_contact_id IS NULL')
-        ->paginate($contactPage, $maxPerPage);
+        ->paginate($page, $maxPerPage);
+
+    return $contactPager;
 }
+
 
 die;
 // WARNING: Techila's Code vvvv
@@ -120,7 +124,7 @@ foreach($arrGcalUser as $arrUser) {
             // and than map it with meeting history table for look up
 
             // connecting and getting latest modified contact detail from sf
-            $arrAccountDetailSF = Helpers::fnGetContactDetailFromSf($instance_url, $access_token, $strEm);
+            $arrAccountDetailSF = Helpers::fnGetContactDetailFromSf($sfdcToken->instance_url, $sfdcToken->access_token, $strEm);
 
             if( !(is_array($arrAccountDetailSF['records']) && (count($arrAccountDetailSF['records'])>0)) ) {
                 continue;
@@ -149,7 +153,7 @@ foreach($arrGcalUser as $arrUser) {
             // create a attendee record in the attendee table
             // create a attendee history record in attendee history table and
             // map attendee history record to meeting record
-            $arrAccountDetailSF = Helpers::fnGetContactDetailFromSf($instance_url, $access_token,$strEm);
+            $arrAccountDetailSF = Helpers::fnGetContactDetailFromSf($sfdcToken->instance_url, $sfdcToken->access_token,$strEm);
 
             if( !(is_array($arrAccountDetailSF['records']) && (count($arrAccountDetailSF['records'])>0)) ) {
                 continue;
