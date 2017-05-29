@@ -26,6 +26,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildContactQuery orderByClientId($order = Criteria::ASC) Order by the client_id column
  * @method     ChildContactQuery orderByAccountId($order = Criteria::ASC) Order by the account_id column
  * @method     ChildContactQuery orderBySfdcContactId($order = Criteria::ASC) Order by the sfdc_contact_id column
+ * @method     ChildContactQuery orderBySfdcAccountId($order = Criteria::ASC) Order by the sfdc_account_id column
  * @method     ChildContactQuery orderBySfdcContactName($order = Criteria::ASC) Order by the sfdc_contact_name column
  * @method     ChildContactQuery orderById($order = Criteria::ASC) Order by the id column
  *
@@ -34,6 +35,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildContactQuery groupByClientId() Group by the client_id column
  * @method     ChildContactQuery groupByAccountId() Group by the account_id column
  * @method     ChildContactQuery groupBySfdcContactId() Group by the sfdc_contact_id column
+ * @method     ChildContactQuery groupBySfdcAccountId() Group by the sfdc_account_id column
  * @method     ChildContactQuery groupBySfdcContactName() Group by the sfdc_contact_name column
  * @method     ChildContactQuery groupById() Group by the id column
  *
@@ -84,7 +86,8 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildContact findOneByFullName(string $full_name) Return the first ChildContact filtered by the full_name column
  * @method     ChildContact findOneByClientId(int $client_id) Return the first ChildContact filtered by the client_id column
  * @method     ChildContact findOneByAccountId(int $account_id) Return the first ChildContact filtered by the account_id column
- * @method     ChildContact findOneBySfdcContactId(int $sfdc_contact_id) Return the first ChildContact filtered by the sfdc_contact_id column
+ * @method     ChildContact findOneBySfdcContactId(string $sfdc_contact_id) Return the first ChildContact filtered by the sfdc_contact_id column
+ * @method     ChildContact findOneBySfdcAccountId(string $sfdc_account_id) Return the first ChildContact filtered by the sfdc_account_id column
  * @method     ChildContact findOneBySfdcContactName(string $sfdc_contact_name) Return the first ChildContact filtered by the sfdc_contact_name column
  * @method     ChildContact findOneById(int $id) Return the first ChildContact filtered by the id column *
 
@@ -95,7 +98,8 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildContact requireOneByFullName(string $full_name) Return the first ChildContact filtered by the full_name column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildContact requireOneByClientId(int $client_id) Return the first ChildContact filtered by the client_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildContact requireOneByAccountId(int $account_id) Return the first ChildContact filtered by the account_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildContact requireOneBySfdcContactId(int $sfdc_contact_id) Return the first ChildContact filtered by the sfdc_contact_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildContact requireOneBySfdcContactId(string $sfdc_contact_id) Return the first ChildContact filtered by the sfdc_contact_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildContact requireOneBySfdcAccountId(string $sfdc_account_id) Return the first ChildContact filtered by the sfdc_account_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildContact requireOneBySfdcContactName(string $sfdc_contact_name) Return the first ChildContact filtered by the sfdc_contact_name column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildContact requireOneById(int $id) Return the first ChildContact filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
@@ -104,7 +108,8 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildContact[]|ObjectCollection findByFullName(string $full_name) Return ChildContact objects filtered by the full_name column
  * @method     ChildContact[]|ObjectCollection findByClientId(int $client_id) Return ChildContact objects filtered by the client_id column
  * @method     ChildContact[]|ObjectCollection findByAccountId(int $account_id) Return ChildContact objects filtered by the account_id column
- * @method     ChildContact[]|ObjectCollection findBySfdcContactId(int $sfdc_contact_id) Return ChildContact objects filtered by the sfdc_contact_id column
+ * @method     ChildContact[]|ObjectCollection findBySfdcContactId(string $sfdc_contact_id) Return ChildContact objects filtered by the sfdc_contact_id column
+ * @method     ChildContact[]|ObjectCollection findBySfdcAccountId(string $sfdc_account_id) Return ChildContact objects filtered by the sfdc_account_id column
  * @method     ChildContact[]|ObjectCollection findBySfdcContactName(string $sfdc_contact_name) Return ChildContact objects filtered by the sfdc_contact_name column
  * @method     ChildContact[]|ObjectCollection findById(int $id) Return ChildContact objects filtered by the id column
  * @method     ChildContact[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
@@ -205,7 +210,7 @@ abstract class ContactQuery extends ChildMeetingAttendeeQuery
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT email, full_name, client_id, account_id, sfdc_contact_id, sfdc_contact_name, id FROM contact WHERE id = :p0';
+        $sql = 'SELECT email, full_name, client_id, account_id, sfdc_contact_id, sfdc_account_id, sfdc_contact_name, id FROM contact WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -436,40 +441,49 @@ abstract class ContactQuery extends ChildMeetingAttendeeQuery
      *
      * Example usage:
      * <code>
-     * $query->filterBySfdcContactId(1234); // WHERE sfdc_contact_id = 1234
-     * $query->filterBySfdcContactId(array(12, 34)); // WHERE sfdc_contact_id IN (12, 34)
-     * $query->filterBySfdcContactId(array('min' => 12)); // WHERE sfdc_contact_id > 12
+     * $query->filterBySfdcContactId('fooValue');   // WHERE sfdc_contact_id = 'fooValue'
+     * $query->filterBySfdcContactId('%fooValue%', Criteria::LIKE); // WHERE sfdc_contact_id LIKE '%fooValue%'
      * </code>
      *
-     * @param     mixed $sfdcContactId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $sfdcContactId The value to use as filter.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return $this|ChildContactQuery The current query, for fluid interface
      */
     public function filterBySfdcContactId($sfdcContactId = null, $comparison = null)
     {
-        if (is_array($sfdcContactId)) {
-            $useMinMax = false;
-            if (isset($sfdcContactId['min'])) {
-                $this->addUsingAlias(ContactTableMap::COL_SFDC_CONTACT_ID, $sfdcContactId['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($sfdcContactId['max'])) {
-                $this->addUsingAlias(ContactTableMap::COL_SFDC_CONTACT_ID, $sfdcContactId['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
+        if (null === $comparison) {
+            if (is_array($sfdcContactId)) {
                 $comparison = Criteria::IN;
             }
         }
 
         return $this->addUsingAlias(ContactTableMap::COL_SFDC_CONTACT_ID, $sfdcContactId, $comparison);
+    }
+
+    /**
+     * Filter the query on the sfdc_account_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterBySfdcAccountId('fooValue');   // WHERE sfdc_account_id = 'fooValue'
+     * $query->filterBySfdcAccountId('%fooValue%', Criteria::LIKE); // WHERE sfdc_account_id LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $sfdcAccountId The value to use as filter.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildContactQuery The current query, for fluid interface
+     */
+    public function filterBySfdcAccountId($sfdcAccountId = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($sfdcAccountId)) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(ContactTableMap::COL_SFDC_ACCOUNT_ID, $sfdcAccountId, $comparison);
     }
 
     /**

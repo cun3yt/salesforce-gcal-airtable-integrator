@@ -250,10 +250,15 @@ class Helpers {
     }
     
     /**
-     * Function to check fetched contact details from sf and existing contact detail in attendee history table are same or diff
-     * If detail dont match, means there is update in contact and we return true, so as to make a new entry record in attendee
-     * history table
-     * Other wise we return the existing attendee history record id for mapping
+     * Function to check if the fetched contact details from SFDC
+     * and existing `contact` detail in attendee history table
+     * are the same
+     *
+     * If detail don't match, means there is update in contact
+     * and we return true, so as to make a new entry record in
+     * attendee history table
+     *
+     * O/W we return the existing attendee history record id for mapping
      *
      * @param array $arrAccountHistory
      * @return string
@@ -797,7 +802,7 @@ class Helpers {
     /**
      * Function to connect to sf and pull the contact detail from sf
      * It accepts email as parameter and queries the contact object in sf to pull details
-     * It returns pulled contact detail from sf other wise false
+     * It returns pulled contact detail from SFDC
      *
      * @param $instance_url
      * @param $access_token

@@ -5,7 +5,7 @@
     <column name="name" phpName="Name" type="VARCHAR" size="255"/>
     <column name="email_domain" phpName="EmailDomain" type="VARCHAR" size="255"/>
     <column name="website" phpName="Website" type="VARCHAR" size="255"/>
-    <column name="sfdc_account_id" phpName="SfdcAccountId" type="INTEGER"/>
+    <column name="sfdc_account_id" phpName="SfdcAccountId" type="VARCHAR" size="127"/>
     <column name="client_id" phpName="ClientId" type="INTEGER"/>
 
     <foreign-key foreignTable="client" onDelete="none" onUpdate="none">
@@ -46,7 +46,8 @@
     <column name="full_name" phpName="FullName" type="VARCHAR" size="255"/>
     <column name="client_id" phpName="ClientId" type="INTEGER"/>
     <column name="account_id" phpName="AccountId" type="INTEGER"/>
-    <column name="sfdc_contact_id" phpName="SfdcContactId" type="INTEGER"/>
+    <column name="sfdc_contact_id" phpName="SfdcContactId" type="VARCHAR" size="127"/>
+    <column name="sfdc_account_id" phpName="SfdcAccountId" type="VARCHAR" size="127"/>
     <column name="sfdc_contact_name" phpName="SfdcContactName" type="VARCHAR" size="255"/>
 
     <foreign-key foreignTable="account" onDelete="none" onUpdate="none">

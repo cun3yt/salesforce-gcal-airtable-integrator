@@ -97,7 +97,7 @@ abstract class Account implements ActiveRecordInterface
     /**
      * The value for the sfdc_account_id field.
      *
-     * @var        int
+     * @var        string
      */
     protected $sfdc_account_id;
 
@@ -401,7 +401,7 @@ abstract class Account implements ActiveRecordInterface
     /**
      * Get the [sfdc_account_id] column value.
      *
-     * @return int
+     * @return string
      */
     public function getSfdcAccountId()
     {
@@ -501,13 +501,13 @@ abstract class Account implements ActiveRecordInterface
     /**
      * Set the value of [sfdc_account_id] column.
      *
-     * @param int $v new value
+     * @param string $v new value
      * @return $this|\DataModels\DataModels\Account The current object (for fluent API support)
      */
     public function setSfdcAccountId($v)
     {
         if ($v !== null) {
-            $v = (int) $v;
+            $v = (string) $v;
         }
 
         if ($this->sfdc_account_id !== $v) {
@@ -591,7 +591,7 @@ abstract class Account implements ActiveRecordInterface
             $this->website = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : AccountTableMap::translateFieldName('SfdcAccountId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->sfdc_account_id = (null !== $col) ? (int) $col : null;
+            $this->sfdc_account_id = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : AccountTableMap::translateFieldName('ClientId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->client_id = (null !== $col) ? (int) $col : null;
@@ -891,7 +891,7 @@ abstract class Account implements ActiveRecordInterface
                         $stmt->bindValue($identifier, $this->website, PDO::PARAM_STR);
                         break;
                     case 'sfdc_account_id':
-                        $stmt->bindValue($identifier, $this->sfdc_account_id, PDO::PARAM_INT);
+                        $stmt->bindValue($identifier, $this->sfdc_account_id, PDO::PARAM_STR);
                         break;
                     case 'client_id':
                         $stmt->bindValue($identifier, $this->client_id, PDO::PARAM_INT);

@@ -156,7 +156,7 @@ class AccountTableMap extends TableMap
         $this->addColumn('name', 'Name', 'VARCHAR', false, 255, null);
         $this->addColumn('email_domain', 'EmailDomain', 'VARCHAR', false, 255, null);
         $this->addColumn('website', 'Website', 'VARCHAR', false, 255, null);
-        $this->addColumn('sfdc_account_id', 'SfdcAccountId', 'INTEGER', false, null, null);
+        $this->addColumn('sfdc_account_id', 'SfdcAccountId', 'VARCHAR', false, 127, null);
         $this->addForeignKey('client_id', 'ClientId', 'INTEGER', 'client', 'id', false, null, null);
     } // initialize()
 

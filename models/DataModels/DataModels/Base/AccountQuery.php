@@ -71,7 +71,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccount findOneByName(string $name) Return the first ChildAccount filtered by the name column
  * @method     ChildAccount findOneByEmailDomain(string $email_domain) Return the first ChildAccount filtered by the email_domain column
  * @method     ChildAccount findOneByWebsite(string $website) Return the first ChildAccount filtered by the website column
- * @method     ChildAccount findOneBySfdcAccountId(int $sfdc_account_id) Return the first ChildAccount filtered by the sfdc_account_id column
+ * @method     ChildAccount findOneBySfdcAccountId(string $sfdc_account_id) Return the first ChildAccount filtered by the sfdc_account_id column
  * @method     ChildAccount findOneByClientId(int $client_id) Return the first ChildAccount filtered by the client_id column *
 
  * @method     ChildAccount requirePk($key, ConnectionInterface $con = null) Return the ChildAccount by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -81,7 +81,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccount requireOneByName(string $name) Return the first ChildAccount filtered by the name column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccount requireOneByEmailDomain(string $email_domain) Return the first ChildAccount filtered by the email_domain column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccount requireOneByWebsite(string $website) Return the first ChildAccount filtered by the website column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildAccount requireOneBySfdcAccountId(int $sfdc_account_id) Return the first ChildAccount filtered by the sfdc_account_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildAccount requireOneBySfdcAccountId(string $sfdc_account_id) Return the first ChildAccount filtered by the sfdc_account_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccount requireOneByClientId(int $client_id) Return the first ChildAccount filtered by the client_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildAccount[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildAccount objects based on current ModelCriteria
@@ -89,7 +89,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccount[]|ObjectCollection findByName(string $name) Return ChildAccount objects filtered by the name column
  * @method     ChildAccount[]|ObjectCollection findByEmailDomain(string $email_domain) Return ChildAccount objects filtered by the email_domain column
  * @method     ChildAccount[]|ObjectCollection findByWebsite(string $website) Return ChildAccount objects filtered by the website column
- * @method     ChildAccount[]|ObjectCollection findBySfdcAccountId(int $sfdc_account_id) Return ChildAccount objects filtered by the sfdc_account_id column
+ * @method     ChildAccount[]|ObjectCollection findBySfdcAccountId(string $sfdc_account_id) Return ChildAccount objects filtered by the sfdc_account_id column
  * @method     ChildAccount[]|ObjectCollection findByClientId(int $client_id) Return ChildAccount objects filtered by the client_id column
  * @method     ChildAccount[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
  *
@@ -400,35 +400,19 @@ abstract class AccountQuery extends ModelCriteria
      *
      * Example usage:
      * <code>
-     * $query->filterBySfdcAccountId(1234); // WHERE sfdc_account_id = 1234
-     * $query->filterBySfdcAccountId(array(12, 34)); // WHERE sfdc_account_id IN (12, 34)
-     * $query->filterBySfdcAccountId(array('min' => 12)); // WHERE sfdc_account_id > 12
+     * $query->filterBySfdcAccountId('fooValue');   // WHERE sfdc_account_id = 'fooValue'
+     * $query->filterBySfdcAccountId('%fooValue%', Criteria::LIKE); // WHERE sfdc_account_id LIKE '%fooValue%'
      * </code>
      *
-     * @param     mixed $sfdcAccountId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $sfdcAccountId The value to use as filter.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return $this|ChildAccountQuery The current query, for fluid interface
      */
     public function filterBySfdcAccountId($sfdcAccountId = null, $comparison = null)
     {
-        if (is_array($sfdcAccountId)) {
-            $useMinMax = false;
-            if (isset($sfdcAccountId['min'])) {
-                $this->addUsingAlias(AccountTableMap::COL_SFDC_ACCOUNT_ID, $sfdcAccountId['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($sfdcAccountId['max'])) {
-                $this->addUsingAlias(AccountTableMap::COL_SFDC_ACCOUNT_ID, $sfdcAccountId['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
+        if (null === $comparison) {
+            if (is_array($sfdcAccountId)) {
                 $comparison = Criteria::IN;
             }
         }

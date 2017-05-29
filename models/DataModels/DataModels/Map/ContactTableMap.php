@@ -59,7 +59,7 @@ class ContactTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 7;
+    const NUM_COLUMNS = 8;
 
     /**
      * The number of lazy-loaded columns
@@ -69,7 +69,7 @@ class ContactTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 7;
+    const NUM_HYDRATE_COLUMNS = 8;
 
     /**
      * the column name for the email field
@@ -97,6 +97,11 @@ class ContactTableMap extends TableMap
     const COL_SFDC_CONTACT_ID = 'contact.sfdc_contact_id';
 
     /**
+     * the column name for the sfdc_account_id field
+     */
+    const COL_SFDC_ACCOUNT_ID = 'contact.sfdc_account_id';
+
+    /**
      * the column name for the sfdc_contact_name field
      */
     const COL_SFDC_CONTACT_NAME = 'contact.sfdc_contact_name';
@@ -118,11 +123,11 @@ class ContactTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Email', 'FullName', 'ClientId', 'AccountId', 'SfdcContactId', 'SfdcContactName', 'Id', ),
-        self::TYPE_CAMELNAME     => array('email', 'fullName', 'clientId', 'accountId', 'sfdcContactId', 'sfdcContactName', 'id', ),
-        self::TYPE_COLNAME       => array(ContactTableMap::COL_EMAIL, ContactTableMap::COL_FULL_NAME, ContactTableMap::COL_CLIENT_ID, ContactTableMap::COL_ACCOUNT_ID, ContactTableMap::COL_SFDC_CONTACT_ID, ContactTableMap::COL_SFDC_CONTACT_NAME, ContactTableMap::COL_ID, ),
-        self::TYPE_FIELDNAME     => array('email', 'full_name', 'client_id', 'account_id', 'sfdc_contact_id', 'sfdc_contact_name', 'id', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('Email', 'FullName', 'ClientId', 'AccountId', 'SfdcContactId', 'SfdcAccountId', 'SfdcContactName', 'Id', ),
+        self::TYPE_CAMELNAME     => array('email', 'fullName', 'clientId', 'accountId', 'sfdcContactId', 'sfdcAccountId', 'sfdcContactName', 'id', ),
+        self::TYPE_COLNAME       => array(ContactTableMap::COL_EMAIL, ContactTableMap::COL_FULL_NAME, ContactTableMap::COL_CLIENT_ID, ContactTableMap::COL_ACCOUNT_ID, ContactTableMap::COL_SFDC_CONTACT_ID, ContactTableMap::COL_SFDC_ACCOUNT_ID, ContactTableMap::COL_SFDC_CONTACT_NAME, ContactTableMap::COL_ID, ),
+        self::TYPE_FIELDNAME     => array('email', 'full_name', 'client_id', 'account_id', 'sfdc_contact_id', 'sfdc_account_id', 'sfdc_contact_name', 'id', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
     /**
@@ -132,11 +137,11 @@ class ContactTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Email' => 0, 'FullName' => 1, 'ClientId' => 2, 'AccountId' => 3, 'SfdcContactId' => 4, 'SfdcContactName' => 5, 'Id' => 6, ),
-        self::TYPE_CAMELNAME     => array('email' => 0, 'fullName' => 1, 'clientId' => 2, 'accountId' => 3, 'sfdcContactId' => 4, 'sfdcContactName' => 5, 'id' => 6, ),
-        self::TYPE_COLNAME       => array(ContactTableMap::COL_EMAIL => 0, ContactTableMap::COL_FULL_NAME => 1, ContactTableMap::COL_CLIENT_ID => 2, ContactTableMap::COL_ACCOUNT_ID => 3, ContactTableMap::COL_SFDC_CONTACT_ID => 4, ContactTableMap::COL_SFDC_CONTACT_NAME => 5, ContactTableMap::COL_ID => 6, ),
-        self::TYPE_FIELDNAME     => array('email' => 0, 'full_name' => 1, 'client_id' => 2, 'account_id' => 3, 'sfdc_contact_id' => 4, 'sfdc_contact_name' => 5, 'id' => 6, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('Email' => 0, 'FullName' => 1, 'ClientId' => 2, 'AccountId' => 3, 'SfdcContactId' => 4, 'SfdcAccountId' => 5, 'SfdcContactName' => 6, 'Id' => 7, ),
+        self::TYPE_CAMELNAME     => array('email' => 0, 'fullName' => 1, 'clientId' => 2, 'accountId' => 3, 'sfdcContactId' => 4, 'sfdcAccountId' => 5, 'sfdcContactName' => 6, 'id' => 7, ),
+        self::TYPE_COLNAME       => array(ContactTableMap::COL_EMAIL => 0, ContactTableMap::COL_FULL_NAME => 1, ContactTableMap::COL_CLIENT_ID => 2, ContactTableMap::COL_ACCOUNT_ID => 3, ContactTableMap::COL_SFDC_CONTACT_ID => 4, ContactTableMap::COL_SFDC_ACCOUNT_ID => 5, ContactTableMap::COL_SFDC_CONTACT_NAME => 6, ContactTableMap::COL_ID => 7, ),
+        self::TYPE_FIELDNAME     => array('email' => 0, 'full_name' => 1, 'client_id' => 2, 'account_id' => 3, 'sfdc_contact_id' => 4, 'sfdc_account_id' => 5, 'sfdc_contact_name' => 6, 'id' => 7, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
     /**
@@ -160,7 +165,8 @@ class ContactTableMap extends TableMap
         $this->addColumn('full_name', 'FullName', 'VARCHAR', false, 255, null);
         $this->addForeignKey('client_id', 'ClientId', 'INTEGER', 'client', 'id', false, null, null);
         $this->addForeignKey('account_id', 'AccountId', 'INTEGER', 'account', 'id', false, null, null);
-        $this->addColumn('sfdc_contact_id', 'SfdcContactId', 'INTEGER', false, null, null);
+        $this->addColumn('sfdc_contact_id', 'SfdcContactId', 'VARCHAR', false, 127, null);
+        $this->addColumn('sfdc_account_id', 'SfdcAccountId', 'VARCHAR', false, 127, null);
         $this->addColumn('sfdc_contact_name', 'SfdcContactName', 'VARCHAR', false, 255, null);
         $this->addForeignPrimaryKey('id', 'Id', 'INTEGER' , 'meeting_attendee', 'id', true, null, null);
     } // initialize()
@@ -222,11 +228,11 @@ class ContactTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 6 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 7 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return null === $row[TableMap::TYPE_NUM == $indexType ? 6 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 6 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 6 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 6 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 6 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+        return null === $row[TableMap::TYPE_NUM == $indexType ? 7 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 7 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 7 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 7 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 7 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
     }
 
     /**
@@ -245,7 +251,7 @@ class ContactTableMap extends TableMap
     {
         return (int) $row[
             $indexType == TableMap::TYPE_NUM
-                ? 6 + $offset
+                ? 7 + $offset
                 : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
         ];
     }
@@ -352,6 +358,7 @@ class ContactTableMap extends TableMap
             $criteria->addSelectColumn(ContactTableMap::COL_CLIENT_ID);
             $criteria->addSelectColumn(ContactTableMap::COL_ACCOUNT_ID);
             $criteria->addSelectColumn(ContactTableMap::COL_SFDC_CONTACT_ID);
+            $criteria->addSelectColumn(ContactTableMap::COL_SFDC_ACCOUNT_ID);
             $criteria->addSelectColumn(ContactTableMap::COL_SFDC_CONTACT_NAME);
             $criteria->addSelectColumn(ContactTableMap::COL_ID);
         } else {
@@ -360,6 +367,7 @@ class ContactTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.client_id');
             $criteria->addSelectColumn($alias . '.account_id');
             $criteria->addSelectColumn($alias . '.sfdc_contact_id');
+            $criteria->addSelectColumn($alias . '.sfdc_account_id');
             $criteria->addSelectColumn($alias . '.sfdc_contact_name');
             $criteria->addSelectColumn($alias . '.id');
         }
