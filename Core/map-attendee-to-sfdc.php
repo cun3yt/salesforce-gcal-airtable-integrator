@@ -1,7 +1,6 @@
 <?
 /*
-* This file is responsible for processing meetings from DB and fetching attendees respective contact from
-* salesforce and than mapping it within DB for easy lookup and reference.
+* Mapping meetings' attendees to SFDC contacts
 */
 
 error_reporting(E_ALL);
@@ -13,6 +12,8 @@ Helpers::setDebugParam($isDebugActive);
 
 use DataModels\DataModels\Client as Client;
 use DataModels\DataModels\ClientCalendarUserOAuth as ClientCalendarUserOAuth;
+use DataModels\DataModels\Contact as Contact;
+use DataModels\DataModels\ContactQuery as ContactQuery;
 
 $access_token = "";
 $instance_url = "";
@@ -22,15 +23,55 @@ $instance_url = "";
  */
 list($client, $calendarUsers) = Helpers::loadClientData($strClientDomainName);
 
-$sfdcAuths = Helpers::getAuthentications($client, ClientCalendarUserOAuth::SFDC);
+$SFDCAuths = Helpers::getAuthentications($client, ClientCalendarUserOAuth::SFDC);
 
-if(count($sfdcAuths)>0) {
-    // if we get salesforce OAuth access data we iterate and use the access data
-    // and assign it out global variables declared.
-    $integrationDetails = json_decode($sfdcAuths[0]->getData());
-    $access_token = $integrationDetails->sfdc_access_token->access_token;
-    $instance_url = $integrationDetails->sfdc_access_token->instance_url;
+if(count($SFDCAuths) <= 0) {
+    trigger_error("No SFDC integration is found in ".__FILE__, E_USER_ERROR);
+    die;
 }
+
+$sfdcCredentialObject = json_decode($SFDCAuths[0]->getData());
+$sfdcToken = $sfdcCredentialObject->tokendata;
+
+$access_token = $sfdcToken->access_token;
+$instance_url = $sfdcToken->instance_url;
+
+
+$contactQ = new ContactQuery();
+$contactPager = $contactQ->filterByClient($client)
+    ->where('sfdc_contact_id IS NULL')
+    ->paginate($contactPage = 1, $maxPerPage = 50);
+
+$contactPageNb = $contactPager->getLastPage();
+
+while($contactPage <= $contactPageNb) {
+    echo "Processing Contacts: page {$contactPage} of {$contactPageNb}<br/>";
+
+    foreach($contactPager as $contact) {
+        $sfdcContact = Helpers::fnGetContactDetailFromSf(
+            $instance_url,
+            $access_token,
+            $contact->getEmail(),
+            false
+        );
+
+        if(!isset($sfdcContact['records'][0])) {
+            continue;
+        }
+
+        $contact->setSfdcContactId($sfdcContact['records'][0]['Id'])
+            ->setSfdcAccountId($sfdcContact['records'][0]['AccountId'])
+            ->save();
+    }
+
+    ++$contactPage;
+    $contactPager = $contactQ->filterByClient($client)
+        ->where('sfdc_contact_id IS NULL')
+        ->paginate($contactPage, $maxPerPage);
+}
+
+die;
+// WARNING: Techila's Code vvvv
 
 /*
 * Below you will see system fetching unprocessed attendees from customeer's meeting table
