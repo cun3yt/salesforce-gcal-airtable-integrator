@@ -59,7 +59,7 @@ class MeetingHasAttendeeTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 2;
+    const NUM_COLUMNS = 4;
 
     /**
      * The number of lazy-loaded columns
@@ -69,7 +69,7 @@ class MeetingHasAttendeeTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 2;
+    const NUM_HYDRATE_COLUMNS = 4;
 
     /**
      * the column name for the meeting_id field
@@ -80,6 +80,16 @@ class MeetingHasAttendeeTableMap extends TableMap
      * the column name for the meeting_attendee_id field
      */
     const COL_MEETING_ATTENDEE_ID = 'meeting_has_attendee.meeting_attendee_id';
+
+    /**
+     * the column name for the created_at field
+     */
+    const COL_CREATED_AT = 'meeting_has_attendee.created_at';
+
+    /**
+     * the column name for the updated_at field
+     */
+    const COL_UPDATED_AT = 'meeting_has_attendee.updated_at';
 
     /**
      * The default string format for model objects of the related table
@@ -93,11 +103,11 @@ class MeetingHasAttendeeTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('MeetingId', 'MeetingAttendeeId', ),
-        self::TYPE_CAMELNAME     => array('meetingId', 'meetingAttendeeId', ),
-        self::TYPE_COLNAME       => array(MeetingHasAttendeeTableMap::COL_MEETING_ID, MeetingHasAttendeeTableMap::COL_MEETING_ATTENDEE_ID, ),
-        self::TYPE_FIELDNAME     => array('meeting_id', 'meeting_attendee_id', ),
-        self::TYPE_NUM           => array(0, 1, )
+        self::TYPE_PHPNAME       => array('MeetingId', 'MeetingAttendeeId', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_CAMELNAME     => array('meetingId', 'meetingAttendeeId', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(MeetingHasAttendeeTableMap::COL_MEETING_ID, MeetingHasAttendeeTableMap::COL_MEETING_ATTENDEE_ID, MeetingHasAttendeeTableMap::COL_CREATED_AT, MeetingHasAttendeeTableMap::COL_UPDATED_AT, ),
+        self::TYPE_FIELDNAME     => array('meeting_id', 'meeting_attendee_id', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
     /**
@@ -107,11 +117,11 @@ class MeetingHasAttendeeTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('MeetingId' => 0, 'MeetingAttendeeId' => 1, ),
-        self::TYPE_CAMELNAME     => array('meetingId' => 0, 'meetingAttendeeId' => 1, ),
-        self::TYPE_COLNAME       => array(MeetingHasAttendeeTableMap::COL_MEETING_ID => 0, MeetingHasAttendeeTableMap::COL_MEETING_ATTENDEE_ID => 1, ),
-        self::TYPE_FIELDNAME     => array('meeting_id' => 0, 'meeting_attendee_id' => 1, ),
-        self::TYPE_NUM           => array(0, 1, )
+        self::TYPE_PHPNAME       => array('MeetingId' => 0, 'MeetingAttendeeId' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, ),
+        self::TYPE_CAMELNAME     => array('meetingId' => 0, 'meetingAttendeeId' => 1, 'createdAt' => 2, 'updatedAt' => 3, ),
+        self::TYPE_COLNAME       => array(MeetingHasAttendeeTableMap::COL_MEETING_ID => 0, MeetingHasAttendeeTableMap::COL_MEETING_ATTENDEE_ID => 1, MeetingHasAttendeeTableMap::COL_CREATED_AT => 2, MeetingHasAttendeeTableMap::COL_UPDATED_AT => 3, ),
+        self::TYPE_FIELDNAME     => array('meeting_id' => 0, 'meeting_attendee_id' => 1, 'created_at' => 2, 'updated_at' => 3, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
     /**
@@ -134,6 +144,8 @@ class MeetingHasAttendeeTableMap extends TableMap
         // columns
         $this->addForeignPrimaryKey('meeting_id', 'MeetingId', 'INTEGER' , 'meeting', 'id', true, null, null);
         $this->addForeignPrimaryKey('meeting_attendee_id', 'MeetingAttendeeId', 'INTEGER' , 'meeting_attendee', 'id', true, null, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
 
     /**
@@ -156,6 +168,19 @@ class MeetingHasAttendeeTableMap extends TableMap
   ),
 ), null, null, null, false);
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_created_at' => 'false', 'disable_updated_at' => 'false', ),
+        );
+    } // getBehaviors()
 
     /**
      * Adds an object to the instance pool.
@@ -362,9 +387,13 @@ class MeetingHasAttendeeTableMap extends TableMap
         if (null === $alias) {
             $criteria->addSelectColumn(MeetingHasAttendeeTableMap::COL_MEETING_ID);
             $criteria->addSelectColumn(MeetingHasAttendeeTableMap::COL_MEETING_ATTENDEE_ID);
+            $criteria->addSelectColumn(MeetingHasAttendeeTableMap::COL_CREATED_AT);
+            $criteria->addSelectColumn(MeetingHasAttendeeTableMap::COL_UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.meeting_id');
             $criteria->addSelectColumn($alias . '.meeting_attendee_id');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 

@@ -59,7 +59,7 @@ class OpportunityHistoryTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 7;
+    const NUM_COLUMNS = 9;
 
     /**
      * The number of lazy-loaded columns
@@ -69,7 +69,7 @@ class OpportunityHistoryTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 7;
+    const NUM_HYDRATE_COLUMNS = 9;
 
     /**
      * the column name for the id field
@@ -107,6 +107,16 @@ class OpportunityHistoryTableMap extends TableMap
     const COL_CLOSE_DATE = 'opportunity_history.close_date';
 
     /**
+     * the column name for the created_at field
+     */
+    const COL_CREATED_AT = 'opportunity_history.created_at';
+
+    /**
+     * the column name for the updated_at field
+     */
+    const COL_UPDATED_AT = 'opportunity_history.updated_at';
+
+    /**
      * The default string format for model objects of the related table
      */
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -118,11 +128,11 @@ class OpportunityHistoryTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'OpportunityId', 'UserAccountId', 'OpportunityStageId', 'BuyerStageId', 'Amount', 'CloseDate', ),
-        self::TYPE_CAMELNAME     => array('id', 'opportunityId', 'userAccountId', 'opportunityStageId', 'buyerStageId', 'amount', 'closeDate', ),
-        self::TYPE_COLNAME       => array(OpportunityHistoryTableMap::COL_ID, OpportunityHistoryTableMap::COL_OPPORTUNITY_ID, OpportunityHistoryTableMap::COL_USER_ACCOUNT_ID, OpportunityHistoryTableMap::COL_OPPORTUNITY_STAGE_ID, OpportunityHistoryTableMap::COL_BUYER_STAGE_ID, OpportunityHistoryTableMap::COL_AMOUNT, OpportunityHistoryTableMap::COL_CLOSE_DATE, ),
-        self::TYPE_FIELDNAME     => array('id', 'opportunity_id', 'user_account_id', 'opportunity_stage_id', 'buyer_stage_id', 'amount', 'close_date', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('Id', 'OpportunityId', 'UserAccountId', 'OpportunityStageId', 'BuyerStageId', 'Amount', 'CloseDate', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_CAMELNAME     => array('id', 'opportunityId', 'userAccountId', 'opportunityStageId', 'buyerStageId', 'amount', 'closeDate', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(OpportunityHistoryTableMap::COL_ID, OpportunityHistoryTableMap::COL_OPPORTUNITY_ID, OpportunityHistoryTableMap::COL_USER_ACCOUNT_ID, OpportunityHistoryTableMap::COL_OPPORTUNITY_STAGE_ID, OpportunityHistoryTableMap::COL_BUYER_STAGE_ID, OpportunityHistoryTableMap::COL_AMOUNT, OpportunityHistoryTableMap::COL_CLOSE_DATE, OpportunityHistoryTableMap::COL_CREATED_AT, OpportunityHistoryTableMap::COL_UPDATED_AT, ),
+        self::TYPE_FIELDNAME     => array('id', 'opportunity_id', 'user_account_id', 'opportunity_stage_id', 'buyer_stage_id', 'amount', 'close_date', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
     );
 
     /**
@@ -132,11 +142,11 @@ class OpportunityHistoryTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'OpportunityId' => 1, 'UserAccountId' => 2, 'OpportunityStageId' => 3, 'BuyerStageId' => 4, 'Amount' => 5, 'CloseDate' => 6, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'opportunityId' => 1, 'userAccountId' => 2, 'opportunityStageId' => 3, 'buyerStageId' => 4, 'amount' => 5, 'closeDate' => 6, ),
-        self::TYPE_COLNAME       => array(OpportunityHistoryTableMap::COL_ID => 0, OpportunityHistoryTableMap::COL_OPPORTUNITY_ID => 1, OpportunityHistoryTableMap::COL_USER_ACCOUNT_ID => 2, OpportunityHistoryTableMap::COL_OPPORTUNITY_STAGE_ID => 3, OpportunityHistoryTableMap::COL_BUYER_STAGE_ID => 4, OpportunityHistoryTableMap::COL_AMOUNT => 5, OpportunityHistoryTableMap::COL_CLOSE_DATE => 6, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'opportunity_id' => 1, 'user_account_id' => 2, 'opportunity_stage_id' => 3, 'buyer_stage_id' => 4, 'amount' => 5, 'close_date' => 6, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'OpportunityId' => 1, 'UserAccountId' => 2, 'OpportunityStageId' => 3, 'BuyerStageId' => 4, 'Amount' => 5, 'CloseDate' => 6, 'CreatedAt' => 7, 'UpdatedAt' => 8, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'opportunityId' => 1, 'userAccountId' => 2, 'opportunityStageId' => 3, 'buyerStageId' => 4, 'amount' => 5, 'closeDate' => 6, 'createdAt' => 7, 'updatedAt' => 8, ),
+        self::TYPE_COLNAME       => array(OpportunityHistoryTableMap::COL_ID => 0, OpportunityHistoryTableMap::COL_OPPORTUNITY_ID => 1, OpportunityHistoryTableMap::COL_USER_ACCOUNT_ID => 2, OpportunityHistoryTableMap::COL_OPPORTUNITY_STAGE_ID => 3, OpportunityHistoryTableMap::COL_BUYER_STAGE_ID => 4, OpportunityHistoryTableMap::COL_AMOUNT => 5, OpportunityHistoryTableMap::COL_CLOSE_DATE => 6, OpportunityHistoryTableMap::COL_CREATED_AT => 7, OpportunityHistoryTableMap::COL_UPDATED_AT => 8, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'opportunity_id' => 1, 'user_account_id' => 2, 'opportunity_stage_id' => 3, 'buyer_stage_id' => 4, 'amount' => 5, 'close_date' => 6, 'created_at' => 7, 'updated_at' => 8, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
     );
 
     /**
@@ -164,6 +174,8 @@ class OpportunityHistoryTableMap extends TableMap
         $this->addColumn('buyer_stage_id', 'BuyerStageId', 'INTEGER', false, null, null);
         $this->addColumn('amount', 'Amount', 'VARCHAR', false, null, null);
         $this->addColumn('close_date', 'CloseDate', 'DATE', false, null, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
 
     /**
@@ -172,6 +184,19 @@ class OpportunityHistoryTableMap extends TableMap
     public function buildRelations()
     {
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_created_at' => 'false', 'disable_updated_at' => 'false', ),
+        );
+    } // getBehaviors()
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -321,6 +346,8 @@ class OpportunityHistoryTableMap extends TableMap
             $criteria->addSelectColumn(OpportunityHistoryTableMap::COL_BUYER_STAGE_ID);
             $criteria->addSelectColumn(OpportunityHistoryTableMap::COL_AMOUNT);
             $criteria->addSelectColumn(OpportunityHistoryTableMap::COL_CLOSE_DATE);
+            $criteria->addSelectColumn(OpportunityHistoryTableMap::COL_CREATED_AT);
+            $criteria->addSelectColumn(OpportunityHistoryTableMap::COL_UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.opportunity_id');
@@ -329,6 +356,8 @@ class OpportunityHistoryTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.buyer_stage_id');
             $criteria->addSelectColumn($alias . '.amount');
             $criteria->addSelectColumn($alias . '.close_date');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 

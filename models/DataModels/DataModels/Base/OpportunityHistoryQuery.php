@@ -26,6 +26,8 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildOpportunityHistoryQuery orderByBuyerStageId($order = Criteria::ASC) Order by the buyer_stage_id column
  * @method     ChildOpportunityHistoryQuery orderByAmount($order = Criteria::ASC) Order by the amount column
  * @method     ChildOpportunityHistoryQuery orderByCloseDate($order = Criteria::ASC) Order by the close_date column
+ * @method     ChildOpportunityHistoryQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
+ * @method     ChildOpportunityHistoryQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildOpportunityHistoryQuery groupById() Group by the id column
  * @method     ChildOpportunityHistoryQuery groupByOpportunityId() Group by the opportunity_id column
@@ -34,6 +36,8 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildOpportunityHistoryQuery groupByBuyerStageId() Group by the buyer_stage_id column
  * @method     ChildOpportunityHistoryQuery groupByAmount() Group by the amount column
  * @method     ChildOpportunityHistoryQuery groupByCloseDate() Group by the close_date column
+ * @method     ChildOpportunityHistoryQuery groupByCreatedAt() Group by the created_at column
+ * @method     ChildOpportunityHistoryQuery groupByUpdatedAt() Group by the updated_at column
  *
  * @method     ChildOpportunityHistoryQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method     ChildOpportunityHistoryQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -52,7 +56,9 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildOpportunityHistory findOneByOpportunityStageId(int $opportunity_stage_id) Return the first ChildOpportunityHistory filtered by the opportunity_stage_id column
  * @method     ChildOpportunityHistory findOneByBuyerStageId(int $buyer_stage_id) Return the first ChildOpportunityHistory filtered by the buyer_stage_id column
  * @method     ChildOpportunityHistory findOneByAmount(string $amount) Return the first ChildOpportunityHistory filtered by the amount column
- * @method     ChildOpportunityHistory findOneByCloseDate(string $close_date) Return the first ChildOpportunityHistory filtered by the close_date column *
+ * @method     ChildOpportunityHistory findOneByCloseDate(string $close_date) Return the first ChildOpportunityHistory filtered by the close_date column
+ * @method     ChildOpportunityHistory findOneByCreatedAt(string $created_at) Return the first ChildOpportunityHistory filtered by the created_at column
+ * @method     ChildOpportunityHistory findOneByUpdatedAt(string $updated_at) Return the first ChildOpportunityHistory filtered by the updated_at column *
 
  * @method     ChildOpportunityHistory requirePk($key, ConnectionInterface $con = null) Return the ChildOpportunityHistory by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildOpportunityHistory requireOne(ConnectionInterface $con = null) Return the first ChildOpportunityHistory matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -64,6 +70,8 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildOpportunityHistory requireOneByBuyerStageId(int $buyer_stage_id) Return the first ChildOpportunityHistory filtered by the buyer_stage_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildOpportunityHistory requireOneByAmount(string $amount) Return the first ChildOpportunityHistory filtered by the amount column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildOpportunityHistory requireOneByCloseDate(string $close_date) Return the first ChildOpportunityHistory filtered by the close_date column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildOpportunityHistory requireOneByCreatedAt(string $created_at) Return the first ChildOpportunityHistory filtered by the created_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildOpportunityHistory requireOneByUpdatedAt(string $updated_at) Return the first ChildOpportunityHistory filtered by the updated_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildOpportunityHistory[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildOpportunityHistory objects based on current ModelCriteria
  * @method     ChildOpportunityHistory[]|ObjectCollection findById(int $id) Return ChildOpportunityHistory objects filtered by the id column
@@ -73,6 +81,8 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildOpportunityHistory[]|ObjectCollection findByBuyerStageId(int $buyer_stage_id) Return ChildOpportunityHistory objects filtered by the buyer_stage_id column
  * @method     ChildOpportunityHistory[]|ObjectCollection findByAmount(string $amount) Return ChildOpportunityHistory objects filtered by the amount column
  * @method     ChildOpportunityHistory[]|ObjectCollection findByCloseDate(string $close_date) Return ChildOpportunityHistory objects filtered by the close_date column
+ * @method     ChildOpportunityHistory[]|ObjectCollection findByCreatedAt(string $created_at) Return ChildOpportunityHistory objects filtered by the created_at column
+ * @method     ChildOpportunityHistory[]|ObjectCollection findByUpdatedAt(string $updated_at) Return ChildOpportunityHistory objects filtered by the updated_at column
  * @method     ChildOpportunityHistory[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
  *
  */
@@ -171,7 +181,7 @@ abstract class OpportunityHistoryQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, opportunity_id, user_account_id, opportunity_stage_id, buyer_stage_id, amount, close_date FROM opportunity_history WHERE id = :p0';
+        $sql = 'SELECT id, opportunity_id, user_account_id, opportunity_stage_id, buyer_stage_id, amount, close_date, created_at, updated_at FROM opportunity_history WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -535,6 +545,92 @@ abstract class OpportunityHistoryQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the created_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByCreatedAt('2011-03-14'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt('now'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $createdAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildOpportunityHistoryQuery The current query, for fluid interface
+     */
+    public function filterByCreatedAt($createdAt = null, $comparison = null)
+    {
+        if (is_array($createdAt)) {
+            $useMinMax = false;
+            if (isset($createdAt['min'])) {
+                $this->addUsingAlias(OpportunityHistoryTableMap::COL_CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($createdAt['max'])) {
+                $this->addUsingAlias(OpportunityHistoryTableMap::COL_CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(OpportunityHistoryTableMap::COL_CREATED_AT, $createdAt, $comparison);
+    }
+
+    /**
+     * Filter the query on the updated_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt('now'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $updatedAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildOpportunityHistoryQuery The current query, for fluid interface
+     */
+    public function filterByUpdatedAt($updatedAt = null, $comparison = null)
+    {
+        if (is_array($updatedAt)) {
+            $useMinMax = false;
+            if (isset($updatedAt['min'])) {
+                $this->addUsingAlias(OpportunityHistoryTableMap::COL_UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($updatedAt['max'])) {
+                $this->addUsingAlias(OpportunityHistoryTableMap::COL_UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(OpportunityHistoryTableMap::COL_UPDATED_AT, $updatedAt, $comparison);
+    }
+
+    /**
      * Exclude object from result
      *
      * @param   ChildOpportunityHistory $opportunityHistory Object to remove from the list of results
@@ -609,6 +705,72 @@ abstract class OpportunityHistoryQuery extends ModelCriteria
 
             return $affectedRows;
         });
+    }
+
+    // timestampable behavior
+
+    /**
+     * Filter by the latest updated
+     *
+     * @param      int $nbDays Maximum age of the latest update in days
+     *
+     * @return     $this|ChildOpportunityHistoryQuery The current query, for fluid interface
+     */
+    public function recentlyUpdated($nbDays = 7)
+    {
+        return $this->addUsingAlias(OpportunityHistoryTableMap::COL_UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     $this|ChildOpportunityHistoryQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(OpportunityHistoryTableMap::COL_UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     $this|ChildOpportunityHistoryQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(OpportunityHistoryTableMap::COL_UPDATED_AT);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     $this|ChildOpportunityHistoryQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(OpportunityHistoryTableMap::COL_CREATED_AT);
+    }
+
+    /**
+     * Filter by the latest created
+     *
+     * @param      int $nbDays Maximum age of in days
+     *
+     * @return     $this|ChildOpportunityHistoryQuery The current query, for fluid interface
+     */
+    public function recentlyCreated($nbDays = 7)
+    {
+        return $this->addUsingAlias(OpportunityHistoryTableMap::COL_CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by create date asc
+     *
+     * @return     $this|ChildOpportunityHistoryQuery The current query, for fluid interface
+     */
+    public function firstCreatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(OpportunityHistoryTableMap::COL_CREATED_AT);
     }
 
 } // OpportunityHistoryQuery

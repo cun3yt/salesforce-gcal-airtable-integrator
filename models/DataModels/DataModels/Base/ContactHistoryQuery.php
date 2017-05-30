@@ -10,6 +10,7 @@ use DataModels\DataModels\Map\ContactHistoryTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Propel\Runtime\ActiveQuery\ModelJoin;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
@@ -24,12 +25,16 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildContactHistoryQuery orderByAccountId($order = Criteria::ASC) Order by the account_id column
  * @method     ChildContactHistoryQuery orderBySfdcTitle($order = Criteria::ASC) Order by the sfdc_title column
  * @method     ChildContactHistoryQuery orderBySfdcMailingCity($order = Criteria::ASC) Order by the sfdc_mailing_city column
+ * @method     ChildContactHistoryQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
+ * @method     ChildContactHistoryQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildContactHistoryQuery groupById() Group by the id column
  * @method     ChildContactHistoryQuery groupByContactId() Group by the contact_id column
  * @method     ChildContactHistoryQuery groupByAccountId() Group by the account_id column
  * @method     ChildContactHistoryQuery groupBySfdcTitle() Group by the sfdc_title column
  * @method     ChildContactHistoryQuery groupBySfdcMailingCity() Group by the sfdc_mailing_city column
+ * @method     ChildContactHistoryQuery groupByCreatedAt() Group by the created_at column
+ * @method     ChildContactHistoryQuery groupByUpdatedAt() Group by the updated_at column
  *
  * @method     ChildContactHistoryQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method     ChildContactHistoryQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -39,6 +44,18 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildContactHistoryQuery rightJoinWith($relation) Adds a RIGHT JOIN clause and with to the query
  * @method     ChildContactHistoryQuery innerJoinWith($relation) Adds a INNER JOIN clause and with to the query
  *
+ * @method     ChildContactHistoryQuery leftJoinContact($relationAlias = null) Adds a LEFT JOIN clause to the query using the Contact relation
+ * @method     ChildContactHistoryQuery rightJoinContact($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Contact relation
+ * @method     ChildContactHistoryQuery innerJoinContact($relationAlias = null) Adds a INNER JOIN clause to the query using the Contact relation
+ *
+ * @method     ChildContactHistoryQuery joinWithContact($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the Contact relation
+ *
+ * @method     ChildContactHistoryQuery leftJoinWithContact() Adds a LEFT JOIN clause and with to the query using the Contact relation
+ * @method     ChildContactHistoryQuery rightJoinWithContact() Adds a RIGHT JOIN clause and with to the query using the Contact relation
+ * @method     ChildContactHistoryQuery innerJoinWithContact() Adds a INNER JOIN clause and with to the query using the Contact relation
+ *
+ * @method     \DataModels\DataModels\ContactQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ *
  * @method     ChildContactHistory findOne(ConnectionInterface $con = null) Return the first ChildContactHistory matching the query
  * @method     ChildContactHistory findOneOrCreate(ConnectionInterface $con = null) Return the first ChildContactHistory matching the query, or a new ChildContactHistory object populated from the query conditions when no match is found
  *
@@ -46,7 +63,9 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildContactHistory findOneByContactId(int $contact_id) Return the first ChildContactHistory filtered by the contact_id column
  * @method     ChildContactHistory findOneByAccountId(int $account_id) Return the first ChildContactHistory filtered by the account_id column
  * @method     ChildContactHistory findOneBySfdcTitle(string $sfdc_title) Return the first ChildContactHistory filtered by the sfdc_title column
- * @method     ChildContactHistory findOneBySfdcMailingCity(string $sfdc_mailing_city) Return the first ChildContactHistory filtered by the sfdc_mailing_city column *
+ * @method     ChildContactHistory findOneBySfdcMailingCity(string $sfdc_mailing_city) Return the first ChildContactHistory filtered by the sfdc_mailing_city column
+ * @method     ChildContactHistory findOneByCreatedAt(string $created_at) Return the first ChildContactHistory filtered by the created_at column
+ * @method     ChildContactHistory findOneByUpdatedAt(string $updated_at) Return the first ChildContactHistory filtered by the updated_at column *
 
  * @method     ChildContactHistory requirePk($key, ConnectionInterface $con = null) Return the ChildContactHistory by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildContactHistory requireOne(ConnectionInterface $con = null) Return the first ChildContactHistory matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -56,6 +75,8 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildContactHistory requireOneByAccountId(int $account_id) Return the first ChildContactHistory filtered by the account_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildContactHistory requireOneBySfdcTitle(string $sfdc_title) Return the first ChildContactHistory filtered by the sfdc_title column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildContactHistory requireOneBySfdcMailingCity(string $sfdc_mailing_city) Return the first ChildContactHistory filtered by the sfdc_mailing_city column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildContactHistory requireOneByCreatedAt(string $created_at) Return the first ChildContactHistory filtered by the created_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildContactHistory requireOneByUpdatedAt(string $updated_at) Return the first ChildContactHistory filtered by the updated_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildContactHistory[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildContactHistory objects based on current ModelCriteria
  * @method     ChildContactHistory[]|ObjectCollection findById(int $id) Return ChildContactHistory objects filtered by the id column
@@ -63,6 +84,8 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildContactHistory[]|ObjectCollection findByAccountId(int $account_id) Return ChildContactHistory objects filtered by the account_id column
  * @method     ChildContactHistory[]|ObjectCollection findBySfdcTitle(string $sfdc_title) Return ChildContactHistory objects filtered by the sfdc_title column
  * @method     ChildContactHistory[]|ObjectCollection findBySfdcMailingCity(string $sfdc_mailing_city) Return ChildContactHistory objects filtered by the sfdc_mailing_city column
+ * @method     ChildContactHistory[]|ObjectCollection findByCreatedAt(string $created_at) Return ChildContactHistory objects filtered by the created_at column
+ * @method     ChildContactHistory[]|ObjectCollection findByUpdatedAt(string $updated_at) Return ChildContactHistory objects filtered by the updated_at column
  * @method     ChildContactHistory[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
  *
  */
@@ -161,7 +184,7 @@ abstract class ContactHistoryQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, contact_id, account_id, sfdc_title, sfdc_mailing_city FROM contact_history WHERE id = :p0';
+        $sql = 'SELECT id, contact_id, account_id, sfdc_title, sfdc_mailing_city, created_at, updated_at FROM contact_history WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -302,6 +325,8 @@ abstract class ContactHistoryQuery extends ModelCriteria
      * $query->filterByContactId(array('min' => 12)); // WHERE contact_id > 12
      * </code>
      *
+     * @see       filterByContact()
+     *
      * @param     mixed $contactId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
@@ -425,6 +450,169 @@ abstract class ContactHistoryQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the created_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByCreatedAt('2011-03-14'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt('now'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $createdAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildContactHistoryQuery The current query, for fluid interface
+     */
+    public function filterByCreatedAt($createdAt = null, $comparison = null)
+    {
+        if (is_array($createdAt)) {
+            $useMinMax = false;
+            if (isset($createdAt['min'])) {
+                $this->addUsingAlias(ContactHistoryTableMap::COL_CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($createdAt['max'])) {
+                $this->addUsingAlias(ContactHistoryTableMap::COL_CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(ContactHistoryTableMap::COL_CREATED_AT, $createdAt, $comparison);
+    }
+
+    /**
+     * Filter the query on the updated_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt('now'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $updatedAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildContactHistoryQuery The current query, for fluid interface
+     */
+    public function filterByUpdatedAt($updatedAt = null, $comparison = null)
+    {
+        if (is_array($updatedAt)) {
+            $useMinMax = false;
+            if (isset($updatedAt['min'])) {
+                $this->addUsingAlias(ContactHistoryTableMap::COL_UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($updatedAt['max'])) {
+                $this->addUsingAlias(ContactHistoryTableMap::COL_UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(ContactHistoryTableMap::COL_UPDATED_AT, $updatedAt, $comparison);
+    }
+
+    /**
+     * Filter the query by a related \DataModels\DataModels\Contact object
+     *
+     * @param \DataModels\DataModels\Contact|ObjectCollection $contact The related object(s) to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return ChildContactHistoryQuery The current query, for fluid interface
+     */
+    public function filterByContact($contact, $comparison = null)
+    {
+        if ($contact instanceof \DataModels\DataModels\Contact) {
+            return $this
+                ->addUsingAlias(ContactHistoryTableMap::COL_CONTACT_ID, $contact->getId(), $comparison);
+        } elseif ($contact instanceof ObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(ContactHistoryTableMap::COL_CONTACT_ID, $contact->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByContact() only accepts arguments of type \DataModels\DataModels\Contact or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Contact relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildContactHistoryQuery The current query, for fluid interface
+     */
+    public function joinContact($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Contact');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Contact');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Contact relation Contact object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \DataModels\DataModels\ContactQuery A secondary query class using the current class as primary query
+     */
+    public function useContactQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinContact($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Contact', '\DataModels\DataModels\ContactQuery');
+    }
+
+    /**
      * Exclude object from result
      *
      * @param   ChildContactHistory $contactHistory Object to remove from the list of results
@@ -499,6 +687,72 @@ abstract class ContactHistoryQuery extends ModelCriteria
 
             return $affectedRows;
         });
+    }
+
+    // timestampable behavior
+
+    /**
+     * Filter by the latest updated
+     *
+     * @param      int $nbDays Maximum age of the latest update in days
+     *
+     * @return     $this|ChildContactHistoryQuery The current query, for fluid interface
+     */
+    public function recentlyUpdated($nbDays = 7)
+    {
+        return $this->addUsingAlias(ContactHistoryTableMap::COL_UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     $this|ChildContactHistoryQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(ContactHistoryTableMap::COL_UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     $this|ChildContactHistoryQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(ContactHistoryTableMap::COL_UPDATED_AT);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     $this|ChildContactHistoryQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(ContactHistoryTableMap::COL_CREATED_AT);
+    }
+
+    /**
+     * Filter by the latest created
+     *
+     * @param      int $nbDays Maximum age of in days
+     *
+     * @return     $this|ChildContactHistoryQuery The current query, for fluid interface
+     */
+    public function recentlyCreated($nbDays = 7)
+    {
+        return $this->addUsingAlias(ContactHistoryTableMap::COL_CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by create date asc
+     *
+     * @return     $this|ChildContactHistoryQuery The current query, for fluid interface
+     */
+    public function firstCreatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(ContactHistoryTableMap::COL_CREATED_AT);
     }
 
 } // ContactHistoryQuery

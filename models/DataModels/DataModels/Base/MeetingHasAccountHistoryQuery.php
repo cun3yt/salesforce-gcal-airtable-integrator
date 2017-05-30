@@ -22,10 +22,14 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildMeetingHasAccountHistoryQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildMeetingHasAccountHistoryQuery orderByMeetingId($order = Criteria::ASC) Order by the meeting_id column
  * @method     ChildMeetingHasAccountHistoryQuery orderByAccountHistoryId($order = Criteria::ASC) Order by the account_history_id column
+ * @method     ChildMeetingHasAccountHistoryQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
+ * @method     ChildMeetingHasAccountHistoryQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildMeetingHasAccountHistoryQuery groupById() Group by the id column
  * @method     ChildMeetingHasAccountHistoryQuery groupByMeetingId() Group by the meeting_id column
  * @method     ChildMeetingHasAccountHistoryQuery groupByAccountHistoryId() Group by the account_history_id column
+ * @method     ChildMeetingHasAccountHistoryQuery groupByCreatedAt() Group by the created_at column
+ * @method     ChildMeetingHasAccountHistoryQuery groupByUpdatedAt() Group by the updated_at column
  *
  * @method     ChildMeetingHasAccountHistoryQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method     ChildMeetingHasAccountHistoryQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -40,7 +44,9 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildMeetingHasAccountHistory findOneById(int $id) Return the first ChildMeetingHasAccountHistory filtered by the id column
  * @method     ChildMeetingHasAccountHistory findOneByMeetingId(int $meeting_id) Return the first ChildMeetingHasAccountHistory filtered by the meeting_id column
- * @method     ChildMeetingHasAccountHistory findOneByAccountHistoryId(int $account_history_id) Return the first ChildMeetingHasAccountHistory filtered by the account_history_id column *
+ * @method     ChildMeetingHasAccountHistory findOneByAccountHistoryId(int $account_history_id) Return the first ChildMeetingHasAccountHistory filtered by the account_history_id column
+ * @method     ChildMeetingHasAccountHistory findOneByCreatedAt(string $created_at) Return the first ChildMeetingHasAccountHistory filtered by the created_at column
+ * @method     ChildMeetingHasAccountHistory findOneByUpdatedAt(string $updated_at) Return the first ChildMeetingHasAccountHistory filtered by the updated_at column *
 
  * @method     ChildMeetingHasAccountHistory requirePk($key, ConnectionInterface $con = null) Return the ChildMeetingHasAccountHistory by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildMeetingHasAccountHistory requireOne(ConnectionInterface $con = null) Return the first ChildMeetingHasAccountHistory matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -48,11 +54,15 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildMeetingHasAccountHistory requireOneById(int $id) Return the first ChildMeetingHasAccountHistory filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildMeetingHasAccountHistory requireOneByMeetingId(int $meeting_id) Return the first ChildMeetingHasAccountHistory filtered by the meeting_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildMeetingHasAccountHistory requireOneByAccountHistoryId(int $account_history_id) Return the first ChildMeetingHasAccountHistory filtered by the account_history_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildMeetingHasAccountHistory requireOneByCreatedAt(string $created_at) Return the first ChildMeetingHasAccountHistory filtered by the created_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildMeetingHasAccountHistory requireOneByUpdatedAt(string $updated_at) Return the first ChildMeetingHasAccountHistory filtered by the updated_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildMeetingHasAccountHistory[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildMeetingHasAccountHistory objects based on current ModelCriteria
  * @method     ChildMeetingHasAccountHistory[]|ObjectCollection findById(int $id) Return ChildMeetingHasAccountHistory objects filtered by the id column
  * @method     ChildMeetingHasAccountHistory[]|ObjectCollection findByMeetingId(int $meeting_id) Return ChildMeetingHasAccountHistory objects filtered by the meeting_id column
  * @method     ChildMeetingHasAccountHistory[]|ObjectCollection findByAccountHistoryId(int $account_history_id) Return ChildMeetingHasAccountHistory objects filtered by the account_history_id column
+ * @method     ChildMeetingHasAccountHistory[]|ObjectCollection findByCreatedAt(string $created_at) Return ChildMeetingHasAccountHistory objects filtered by the created_at column
+ * @method     ChildMeetingHasAccountHistory[]|ObjectCollection findByUpdatedAt(string $updated_at) Return ChildMeetingHasAccountHistory objects filtered by the updated_at column
  * @method     ChildMeetingHasAccountHistory[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
  *
  */
@@ -151,7 +161,7 @@ abstract class MeetingHasAccountHistoryQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, meeting_id, account_history_id FROM meeting_has_account_history WHERE id = :p0';
+        $sql = 'SELECT id, meeting_id, account_history_id, created_at, updated_at FROM meeting_has_account_history WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -365,6 +375,92 @@ abstract class MeetingHasAccountHistoryQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the created_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByCreatedAt('2011-03-14'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt('now'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $createdAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildMeetingHasAccountHistoryQuery The current query, for fluid interface
+     */
+    public function filterByCreatedAt($createdAt = null, $comparison = null)
+    {
+        if (is_array($createdAt)) {
+            $useMinMax = false;
+            if (isset($createdAt['min'])) {
+                $this->addUsingAlias(MeetingHasAccountHistoryTableMap::COL_CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($createdAt['max'])) {
+                $this->addUsingAlias(MeetingHasAccountHistoryTableMap::COL_CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(MeetingHasAccountHistoryTableMap::COL_CREATED_AT, $createdAt, $comparison);
+    }
+
+    /**
+     * Filter the query on the updated_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt('now'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $updatedAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildMeetingHasAccountHistoryQuery The current query, for fluid interface
+     */
+    public function filterByUpdatedAt($updatedAt = null, $comparison = null)
+    {
+        if (is_array($updatedAt)) {
+            $useMinMax = false;
+            if (isset($updatedAt['min'])) {
+                $this->addUsingAlias(MeetingHasAccountHistoryTableMap::COL_UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($updatedAt['max'])) {
+                $this->addUsingAlias(MeetingHasAccountHistoryTableMap::COL_UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(MeetingHasAccountHistoryTableMap::COL_UPDATED_AT, $updatedAt, $comparison);
+    }
+
+    /**
      * Exclude object from result
      *
      * @param   ChildMeetingHasAccountHistory $meetingHasAccountHistory Object to remove from the list of results
@@ -439,6 +535,72 @@ abstract class MeetingHasAccountHistoryQuery extends ModelCriteria
 
             return $affectedRows;
         });
+    }
+
+    // timestampable behavior
+
+    /**
+     * Filter by the latest updated
+     *
+     * @param      int $nbDays Maximum age of the latest update in days
+     *
+     * @return     $this|ChildMeetingHasAccountHistoryQuery The current query, for fluid interface
+     */
+    public function recentlyUpdated($nbDays = 7)
+    {
+        return $this->addUsingAlias(MeetingHasAccountHistoryTableMap::COL_UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     $this|ChildMeetingHasAccountHistoryQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(MeetingHasAccountHistoryTableMap::COL_UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     $this|ChildMeetingHasAccountHistoryQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(MeetingHasAccountHistoryTableMap::COL_UPDATED_AT);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     $this|ChildMeetingHasAccountHistoryQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(MeetingHasAccountHistoryTableMap::COL_CREATED_AT);
+    }
+
+    /**
+     * Filter by the latest created
+     *
+     * @param      int $nbDays Maximum age of in days
+     *
+     * @return     $this|ChildMeetingHasAccountHistoryQuery The current query, for fluid interface
+     */
+    public function recentlyCreated($nbDays = 7)
+    {
+        return $this->addUsingAlias(MeetingHasAccountHistoryTableMap::COL_CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by create date asc
+     *
+     * @return     $this|ChildMeetingHasAccountHistoryQuery The current query, for fluid interface
+     */
+    public function firstCreatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(MeetingHasAccountHistoryTableMap::COL_CREATED_AT);
     }
 
 } // MeetingHasAccountHistoryQuery

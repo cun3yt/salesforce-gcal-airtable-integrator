@@ -22,10 +22,14 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildBillingCycleQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildBillingCycleQuery orderByClientId($order = Criteria::ASC) Order by the client_id column
  * @method     ChildBillingCycleQuery orderByType($order = Criteria::ASC) Order by the type column
+ * @method     ChildBillingCycleQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
+ * @method     ChildBillingCycleQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildBillingCycleQuery groupById() Group by the id column
  * @method     ChildBillingCycleQuery groupByClientId() Group by the client_id column
  * @method     ChildBillingCycleQuery groupByType() Group by the type column
+ * @method     ChildBillingCycleQuery groupByCreatedAt() Group by the created_at column
+ * @method     ChildBillingCycleQuery groupByUpdatedAt() Group by the updated_at column
  *
  * @method     ChildBillingCycleQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method     ChildBillingCycleQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -40,7 +44,9 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildBillingCycle findOneById(int $id) Return the first ChildBillingCycle filtered by the id column
  * @method     ChildBillingCycle findOneByClientId(int $client_id) Return the first ChildBillingCycle filtered by the client_id column
- * @method     ChildBillingCycle findOneByType(string $type) Return the first ChildBillingCycle filtered by the type column *
+ * @method     ChildBillingCycle findOneByType(string $type) Return the first ChildBillingCycle filtered by the type column
+ * @method     ChildBillingCycle findOneByCreatedAt(string $created_at) Return the first ChildBillingCycle filtered by the created_at column
+ * @method     ChildBillingCycle findOneByUpdatedAt(string $updated_at) Return the first ChildBillingCycle filtered by the updated_at column *
 
  * @method     ChildBillingCycle requirePk($key, ConnectionInterface $con = null) Return the ChildBillingCycle by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildBillingCycle requireOne(ConnectionInterface $con = null) Return the first ChildBillingCycle matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -48,11 +54,15 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildBillingCycle requireOneById(int $id) Return the first ChildBillingCycle filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildBillingCycle requireOneByClientId(int $client_id) Return the first ChildBillingCycle filtered by the client_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildBillingCycle requireOneByType(string $type) Return the first ChildBillingCycle filtered by the type column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildBillingCycle requireOneByCreatedAt(string $created_at) Return the first ChildBillingCycle filtered by the created_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildBillingCycle requireOneByUpdatedAt(string $updated_at) Return the first ChildBillingCycle filtered by the updated_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildBillingCycle[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildBillingCycle objects based on current ModelCriteria
  * @method     ChildBillingCycle[]|ObjectCollection findById(int $id) Return ChildBillingCycle objects filtered by the id column
  * @method     ChildBillingCycle[]|ObjectCollection findByClientId(int $client_id) Return ChildBillingCycle objects filtered by the client_id column
  * @method     ChildBillingCycle[]|ObjectCollection findByType(string $type) Return ChildBillingCycle objects filtered by the type column
+ * @method     ChildBillingCycle[]|ObjectCollection findByCreatedAt(string $created_at) Return ChildBillingCycle objects filtered by the created_at column
+ * @method     ChildBillingCycle[]|ObjectCollection findByUpdatedAt(string $updated_at) Return ChildBillingCycle objects filtered by the updated_at column
  * @method     ChildBillingCycle[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
  *
  */
@@ -151,7 +161,7 @@ abstract class BillingCycleQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, client_id, type FROM billing_cycle WHERE id = :p0';
+        $sql = 'SELECT id, client_id, type, created_at, updated_at FROM billing_cycle WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -349,6 +359,92 @@ abstract class BillingCycleQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the created_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByCreatedAt('2011-03-14'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt('now'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $createdAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildBillingCycleQuery The current query, for fluid interface
+     */
+    public function filterByCreatedAt($createdAt = null, $comparison = null)
+    {
+        if (is_array($createdAt)) {
+            $useMinMax = false;
+            if (isset($createdAt['min'])) {
+                $this->addUsingAlias(BillingCycleTableMap::COL_CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($createdAt['max'])) {
+                $this->addUsingAlias(BillingCycleTableMap::COL_CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(BillingCycleTableMap::COL_CREATED_AT, $createdAt, $comparison);
+    }
+
+    /**
+     * Filter the query on the updated_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt('now'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $updatedAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildBillingCycleQuery The current query, for fluid interface
+     */
+    public function filterByUpdatedAt($updatedAt = null, $comparison = null)
+    {
+        if (is_array($updatedAt)) {
+            $useMinMax = false;
+            if (isset($updatedAt['min'])) {
+                $this->addUsingAlias(BillingCycleTableMap::COL_UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($updatedAt['max'])) {
+                $this->addUsingAlias(BillingCycleTableMap::COL_UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(BillingCycleTableMap::COL_UPDATED_AT, $updatedAt, $comparison);
+    }
+
+    /**
      * Exclude object from result
      *
      * @param   ChildBillingCycle $billingCycle Object to remove from the list of results
@@ -423,6 +519,72 @@ abstract class BillingCycleQuery extends ModelCriteria
 
             return $affectedRows;
         });
+    }
+
+    // timestampable behavior
+
+    /**
+     * Filter by the latest updated
+     *
+     * @param      int $nbDays Maximum age of the latest update in days
+     *
+     * @return     $this|ChildBillingCycleQuery The current query, for fluid interface
+     */
+    public function recentlyUpdated($nbDays = 7)
+    {
+        return $this->addUsingAlias(BillingCycleTableMap::COL_UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     $this|ChildBillingCycleQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(BillingCycleTableMap::COL_UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     $this|ChildBillingCycleQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(BillingCycleTableMap::COL_UPDATED_AT);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     $this|ChildBillingCycleQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(BillingCycleTableMap::COL_CREATED_AT);
+    }
+
+    /**
+     * Filter by the latest created
+     *
+     * @param      int $nbDays Maximum age of in days
+     *
+     * @return     $this|ChildBillingCycleQuery The current query, for fluid interface
+     */
+    public function recentlyCreated($nbDays = 7)
+    {
+        return $this->addUsingAlias(BillingCycleTableMap::COL_CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by create date asc
+     *
+     * @return     $this|ChildBillingCycleQuery The current query, for fluid interface
+     */
+    public function firstCreatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(BillingCycleTableMap::COL_CREATED_AT);
     }
 
 } // BillingCycleQuery

@@ -25,12 +25,16 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildClientCalendarUserOAuthQuery orderByType($order = Criteria::ASC) Order by the type column
  * @method     ChildClientCalendarUserOAuthQuery orderByStatus($order = Criteria::ASC) Order by the status column
  * @method     ChildClientCalendarUserOAuthQuery orderByData($order = Criteria::ASC) Order by the data column
+ * @method     ChildClientCalendarUserOAuthQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
+ * @method     ChildClientCalendarUserOAuthQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildClientCalendarUserOAuthQuery groupById() Group by the id column
  * @method     ChildClientCalendarUserOAuthQuery groupByClientCalendarUserId() Group by the client_calendar_user_id column
  * @method     ChildClientCalendarUserOAuthQuery groupByType() Group by the type column
  * @method     ChildClientCalendarUserOAuthQuery groupByStatus() Group by the status column
  * @method     ChildClientCalendarUserOAuthQuery groupByData() Group by the data column
+ * @method     ChildClientCalendarUserOAuthQuery groupByCreatedAt() Group by the created_at column
+ * @method     ChildClientCalendarUserOAuthQuery groupByUpdatedAt() Group by the updated_at column
  *
  * @method     ChildClientCalendarUserOAuthQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method     ChildClientCalendarUserOAuthQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -59,7 +63,9 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildClientCalendarUserOAuth findOneByClientCalendarUserId(int $client_calendar_user_id) Return the first ChildClientCalendarUserOAuth filtered by the client_calendar_user_id column
  * @method     ChildClientCalendarUserOAuth findOneByType(string $type) Return the first ChildClientCalendarUserOAuth filtered by the type column
  * @method     ChildClientCalendarUserOAuth findOneByStatus(string $status) Return the first ChildClientCalendarUserOAuth filtered by the status column
- * @method     ChildClientCalendarUserOAuth findOneByData(string $data) Return the first ChildClientCalendarUserOAuth filtered by the data column *
+ * @method     ChildClientCalendarUserOAuth findOneByData(string $data) Return the first ChildClientCalendarUserOAuth filtered by the data column
+ * @method     ChildClientCalendarUserOAuth findOneByCreatedAt(string $created_at) Return the first ChildClientCalendarUserOAuth filtered by the created_at column
+ * @method     ChildClientCalendarUserOAuth findOneByUpdatedAt(string $updated_at) Return the first ChildClientCalendarUserOAuth filtered by the updated_at column *
 
  * @method     ChildClientCalendarUserOAuth requirePk($key, ConnectionInterface $con = null) Return the ChildClientCalendarUserOAuth by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildClientCalendarUserOAuth requireOne(ConnectionInterface $con = null) Return the first ChildClientCalendarUserOAuth matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -69,6 +75,8 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildClientCalendarUserOAuth requireOneByType(string $type) Return the first ChildClientCalendarUserOAuth filtered by the type column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildClientCalendarUserOAuth requireOneByStatus(string $status) Return the first ChildClientCalendarUserOAuth filtered by the status column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildClientCalendarUserOAuth requireOneByData(string $data) Return the first ChildClientCalendarUserOAuth filtered by the data column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildClientCalendarUserOAuth requireOneByCreatedAt(string $created_at) Return the first ChildClientCalendarUserOAuth filtered by the created_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildClientCalendarUserOAuth requireOneByUpdatedAt(string $updated_at) Return the first ChildClientCalendarUserOAuth filtered by the updated_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildClientCalendarUserOAuth[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildClientCalendarUserOAuth objects based on current ModelCriteria
  * @method     ChildClientCalendarUserOAuth[]|ObjectCollection findById(int $id) Return ChildClientCalendarUserOAuth objects filtered by the id column
@@ -76,6 +84,8 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildClientCalendarUserOAuth[]|ObjectCollection findByType(string $type) Return ChildClientCalendarUserOAuth objects filtered by the type column
  * @method     ChildClientCalendarUserOAuth[]|ObjectCollection findByStatus(string $status) Return ChildClientCalendarUserOAuth objects filtered by the status column
  * @method     ChildClientCalendarUserOAuth[]|ObjectCollection findByData(string $data) Return ChildClientCalendarUserOAuth objects filtered by the data column
+ * @method     ChildClientCalendarUserOAuth[]|ObjectCollection findByCreatedAt(string $created_at) Return ChildClientCalendarUserOAuth objects filtered by the created_at column
+ * @method     ChildClientCalendarUserOAuth[]|ObjectCollection findByUpdatedAt(string $updated_at) Return ChildClientCalendarUserOAuth objects filtered by the updated_at column
  * @method     ChildClientCalendarUserOAuth[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
  *
  */
@@ -174,7 +184,7 @@ abstract class ClientCalendarUserOAuthQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, client_calendar_user_id, type, status, data FROM client_calendar_user_oauth WHERE id = :p0';
+        $sql = 'SELECT id, client_calendar_user_id, type, status, data, created_at, updated_at FROM client_calendar_user_oauth WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -424,6 +434,92 @@ abstract class ClientCalendarUserOAuthQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the created_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByCreatedAt('2011-03-14'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt('now'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $createdAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildClientCalendarUserOAuthQuery The current query, for fluid interface
+     */
+    public function filterByCreatedAt($createdAt = null, $comparison = null)
+    {
+        if (is_array($createdAt)) {
+            $useMinMax = false;
+            if (isset($createdAt['min'])) {
+                $this->addUsingAlias(ClientCalendarUserOAuthTableMap::COL_CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($createdAt['max'])) {
+                $this->addUsingAlias(ClientCalendarUserOAuthTableMap::COL_CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(ClientCalendarUserOAuthTableMap::COL_CREATED_AT, $createdAt, $comparison);
+    }
+
+    /**
+     * Filter the query on the updated_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt('now'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $updatedAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildClientCalendarUserOAuthQuery The current query, for fluid interface
+     */
+    public function filterByUpdatedAt($updatedAt = null, $comparison = null)
+    {
+        if (is_array($updatedAt)) {
+            $useMinMax = false;
+            if (isset($updatedAt['min'])) {
+                $this->addUsingAlias(ClientCalendarUserOAuthTableMap::COL_UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($updatedAt['max'])) {
+                $this->addUsingAlias(ClientCalendarUserOAuthTableMap::COL_UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(ClientCalendarUserOAuthTableMap::COL_UPDATED_AT, $updatedAt, $comparison);
+    }
+
+    /**
      * Filter the query by a related \DataModels\DataModels\ClientCalendarUser object
      *
      * @param \DataModels\DataModels\ClientCalendarUser|ObjectCollection $clientCalendarUser The related object(s) to use as filter
@@ -575,6 +671,72 @@ abstract class ClientCalendarUserOAuthQuery extends ModelCriteria
 
             return $affectedRows;
         });
+    }
+
+    // timestampable behavior
+
+    /**
+     * Filter by the latest updated
+     *
+     * @param      int $nbDays Maximum age of the latest update in days
+     *
+     * @return     $this|ChildClientCalendarUserOAuthQuery The current query, for fluid interface
+     */
+    public function recentlyUpdated($nbDays = 7)
+    {
+        return $this->addUsingAlias(ClientCalendarUserOAuthTableMap::COL_UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     $this|ChildClientCalendarUserOAuthQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(ClientCalendarUserOAuthTableMap::COL_UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     $this|ChildClientCalendarUserOAuthQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(ClientCalendarUserOAuthTableMap::COL_UPDATED_AT);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     $this|ChildClientCalendarUserOAuthQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(ClientCalendarUserOAuthTableMap::COL_CREATED_AT);
+    }
+
+    /**
+     * Filter by the latest created
+     *
+     * @param      int $nbDays Maximum age of in days
+     *
+     * @return     $this|ChildClientCalendarUserOAuthQuery The current query, for fluid interface
+     */
+    public function recentlyCreated($nbDays = 7)
+    {
+        return $this->addUsingAlias(ClientCalendarUserOAuthTableMap::COL_CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by create date asc
+     *
+     * @return     $this|ChildClientCalendarUserOAuthQuery The current query, for fluid interface
+     */
+    public function firstCreatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(ClientCalendarUserOAuthTableMap::COL_CREATED_AT);
     }
 
 } // ClientCalendarUserOAuthQuery

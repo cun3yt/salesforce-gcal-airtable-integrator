@@ -59,7 +59,7 @@ class ClientTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 4;
+    const NUM_COLUMNS = 6;
 
     /**
      * The number of lazy-loaded columns
@@ -69,7 +69,7 @@ class ClientTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 4;
+    const NUM_HYDRATE_COLUMNS = 6;
 
     /**
      * the column name for the id field
@@ -92,6 +92,16 @@ class ClientTableMap extends TableMap
     const COL_EMAIL_DOMAIN = 'client.email_domain';
 
     /**
+     * the column name for the created_at field
+     */
+    const COL_CREATED_AT = 'client.created_at';
+
+    /**
+     * the column name for the updated_at field
+     */
+    const COL_UPDATED_AT = 'client.updated_at';
+
+    /**
      * The default string format for model objects of the related table
      */
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -103,11 +113,11 @@ class ClientTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Name', 'Website', 'EmailDomain', ),
-        self::TYPE_CAMELNAME     => array('id', 'name', 'website', 'emailDomain', ),
-        self::TYPE_COLNAME       => array(ClientTableMap::COL_ID, ClientTableMap::COL_NAME, ClientTableMap::COL_WEBSITE, ClientTableMap::COL_EMAIL_DOMAIN, ),
-        self::TYPE_FIELDNAME     => array('id', 'name', 'website', 'email_domain', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('Id', 'Name', 'Website', 'EmailDomain', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_CAMELNAME     => array('id', 'name', 'website', 'emailDomain', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(ClientTableMap::COL_ID, ClientTableMap::COL_NAME, ClientTableMap::COL_WEBSITE, ClientTableMap::COL_EMAIL_DOMAIN, ClientTableMap::COL_CREATED_AT, ClientTableMap::COL_UPDATED_AT, ),
+        self::TYPE_FIELDNAME     => array('id', 'name', 'website', 'email_domain', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -117,11 +127,11 @@ class ClientTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Name' => 1, 'Website' => 2, 'EmailDomain' => 3, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'name' => 1, 'website' => 2, 'emailDomain' => 3, ),
-        self::TYPE_COLNAME       => array(ClientTableMap::COL_ID => 0, ClientTableMap::COL_NAME => 1, ClientTableMap::COL_WEBSITE => 2, ClientTableMap::COL_EMAIL_DOMAIN => 3, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'name' => 1, 'website' => 2, 'email_domain' => 3, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Name' => 1, 'Website' => 2, 'EmailDomain' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'name' => 1, 'website' => 2, 'emailDomain' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
+        self::TYPE_COLNAME       => array(ClientTableMap::COL_ID => 0, ClientTableMap::COL_NAME => 1, ClientTableMap::COL_WEBSITE => 2, ClientTableMap::COL_EMAIL_DOMAIN => 3, ClientTableMap::COL_CREATED_AT => 4, ClientTableMap::COL_UPDATED_AT => 5, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'name' => 1, 'website' => 2, 'email_domain' => 3, 'created_at' => 4, 'updated_at' => 5, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -146,6 +156,8 @@ class ClientTableMap extends TableMap
         $this->addColumn('name', 'Name', 'VARCHAR', true, 255, null);
         $this->addColumn('website', 'Website', 'VARCHAR', false, 255, null);
         $this->addColumn('email_domain', 'EmailDomain', 'VARCHAR', false, 255, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
 
     /**
@@ -175,6 +187,19 @@ class ClientTableMap extends TableMap
   ),
 ), null, null, 'ClientCalendarUsers', false);
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_created_at' => 'false', 'disable_updated_at' => 'false', ),
+        );
+    } // getBehaviors()
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -321,11 +346,15 @@ class ClientTableMap extends TableMap
             $criteria->addSelectColumn(ClientTableMap::COL_NAME);
             $criteria->addSelectColumn(ClientTableMap::COL_WEBSITE);
             $criteria->addSelectColumn(ClientTableMap::COL_EMAIL_DOMAIN);
+            $criteria->addSelectColumn(ClientTableMap::COL_CREATED_AT);
+            $criteria->addSelectColumn(ClientTableMap::COL_UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.name');
             $criteria->addSelectColumn($alias . '.website');
             $criteria->addSelectColumn($alias . '.email_domain');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 

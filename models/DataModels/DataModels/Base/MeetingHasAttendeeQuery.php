@@ -22,9 +22,13 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildMeetingHasAttendeeQuery orderByMeetingId($order = Criteria::ASC) Order by the meeting_id column
  * @method     ChildMeetingHasAttendeeQuery orderByMeetingAttendeeId($order = Criteria::ASC) Order by the meeting_attendee_id column
+ * @method     ChildMeetingHasAttendeeQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
+ * @method     ChildMeetingHasAttendeeQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildMeetingHasAttendeeQuery groupByMeetingId() Group by the meeting_id column
  * @method     ChildMeetingHasAttendeeQuery groupByMeetingAttendeeId() Group by the meeting_attendee_id column
+ * @method     ChildMeetingHasAttendeeQuery groupByCreatedAt() Group by the created_at column
+ * @method     ChildMeetingHasAttendeeQuery groupByUpdatedAt() Group by the updated_at column
  *
  * @method     ChildMeetingHasAttendeeQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method     ChildMeetingHasAttendeeQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -60,17 +64,23 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildMeetingHasAttendee findOneOrCreate(ConnectionInterface $con = null) Return the first ChildMeetingHasAttendee matching the query, or a new ChildMeetingHasAttendee object populated from the query conditions when no match is found
  *
  * @method     ChildMeetingHasAttendee findOneByMeetingId(int $meeting_id) Return the first ChildMeetingHasAttendee filtered by the meeting_id column
- * @method     ChildMeetingHasAttendee findOneByMeetingAttendeeId(int $meeting_attendee_id) Return the first ChildMeetingHasAttendee filtered by the meeting_attendee_id column *
+ * @method     ChildMeetingHasAttendee findOneByMeetingAttendeeId(int $meeting_attendee_id) Return the first ChildMeetingHasAttendee filtered by the meeting_attendee_id column
+ * @method     ChildMeetingHasAttendee findOneByCreatedAt(string $created_at) Return the first ChildMeetingHasAttendee filtered by the created_at column
+ * @method     ChildMeetingHasAttendee findOneByUpdatedAt(string $updated_at) Return the first ChildMeetingHasAttendee filtered by the updated_at column *
 
  * @method     ChildMeetingHasAttendee requirePk($key, ConnectionInterface $con = null) Return the ChildMeetingHasAttendee by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildMeetingHasAttendee requireOne(ConnectionInterface $con = null) Return the first ChildMeetingHasAttendee matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildMeetingHasAttendee requireOneByMeetingId(int $meeting_id) Return the first ChildMeetingHasAttendee filtered by the meeting_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildMeetingHasAttendee requireOneByMeetingAttendeeId(int $meeting_attendee_id) Return the first ChildMeetingHasAttendee filtered by the meeting_attendee_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildMeetingHasAttendee requireOneByCreatedAt(string $created_at) Return the first ChildMeetingHasAttendee filtered by the created_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildMeetingHasAttendee requireOneByUpdatedAt(string $updated_at) Return the first ChildMeetingHasAttendee filtered by the updated_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildMeetingHasAttendee[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildMeetingHasAttendee objects based on current ModelCriteria
  * @method     ChildMeetingHasAttendee[]|ObjectCollection findByMeetingId(int $meeting_id) Return ChildMeetingHasAttendee objects filtered by the meeting_id column
  * @method     ChildMeetingHasAttendee[]|ObjectCollection findByMeetingAttendeeId(int $meeting_attendee_id) Return ChildMeetingHasAttendee objects filtered by the meeting_attendee_id column
+ * @method     ChildMeetingHasAttendee[]|ObjectCollection findByCreatedAt(string $created_at) Return ChildMeetingHasAttendee objects filtered by the created_at column
+ * @method     ChildMeetingHasAttendee[]|ObjectCollection findByUpdatedAt(string $updated_at) Return ChildMeetingHasAttendee objects filtered by the updated_at column
  * @method     ChildMeetingHasAttendee[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
  *
  */
@@ -169,7 +179,7 @@ abstract class MeetingHasAttendeeQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT meeting_id, meeting_attendee_id FROM meeting_has_attendee WHERE meeting_id = :p0 AND meeting_attendee_id = :p1';
+        $sql = 'SELECT meeting_id, meeting_attendee_id, created_at, updated_at FROM meeting_has_attendee WHERE meeting_id = :p0 AND meeting_attendee_id = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -355,6 +365,92 @@ abstract class MeetingHasAttendeeQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(MeetingHasAttendeeTableMap::COL_MEETING_ATTENDEE_ID, $meetingAttendeeId, $comparison);
+    }
+
+    /**
+     * Filter the query on the created_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByCreatedAt('2011-03-14'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt('now'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $createdAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildMeetingHasAttendeeQuery The current query, for fluid interface
+     */
+    public function filterByCreatedAt($createdAt = null, $comparison = null)
+    {
+        if (is_array($createdAt)) {
+            $useMinMax = false;
+            if (isset($createdAt['min'])) {
+                $this->addUsingAlias(MeetingHasAttendeeTableMap::COL_CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($createdAt['max'])) {
+                $this->addUsingAlias(MeetingHasAttendeeTableMap::COL_CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(MeetingHasAttendeeTableMap::COL_CREATED_AT, $createdAt, $comparison);
+    }
+
+    /**
+     * Filter the query on the updated_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt('now'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $updatedAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildMeetingHasAttendeeQuery The current query, for fluid interface
+     */
+    public function filterByUpdatedAt($updatedAt = null, $comparison = null)
+    {
+        if (is_array($updatedAt)) {
+            $useMinMax = false;
+            if (isset($updatedAt['min'])) {
+                $this->addUsingAlias(MeetingHasAttendeeTableMap::COL_UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($updatedAt['max'])) {
+                $this->addUsingAlias(MeetingHasAttendeeTableMap::COL_UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(MeetingHasAttendeeTableMap::COL_UPDATED_AT, $updatedAt, $comparison);
     }
 
     /**
@@ -588,6 +684,72 @@ abstract class MeetingHasAttendeeQuery extends ModelCriteria
 
             return $affectedRows;
         });
+    }
+
+    // timestampable behavior
+
+    /**
+     * Filter by the latest updated
+     *
+     * @param      int $nbDays Maximum age of the latest update in days
+     *
+     * @return     $this|ChildMeetingHasAttendeeQuery The current query, for fluid interface
+     */
+    public function recentlyUpdated($nbDays = 7)
+    {
+        return $this->addUsingAlias(MeetingHasAttendeeTableMap::COL_UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     $this|ChildMeetingHasAttendeeQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(MeetingHasAttendeeTableMap::COL_UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     $this|ChildMeetingHasAttendeeQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(MeetingHasAttendeeTableMap::COL_UPDATED_AT);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     $this|ChildMeetingHasAttendeeQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(MeetingHasAttendeeTableMap::COL_CREATED_AT);
+    }
+
+    /**
+     * Filter by the latest created
+     *
+     * @param      int $nbDays Maximum age of in days
+     *
+     * @return     $this|ChildMeetingHasAttendeeQuery The current query, for fluid interface
+     */
+    public function recentlyCreated($nbDays = 7)
+    {
+        return $this->addUsingAlias(MeetingHasAttendeeTableMap::COL_CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by create date asc
+     *
+     * @return     $this|ChildMeetingHasAttendeeQuery The current query, for fluid interface
+     */
+    public function firstCreatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(MeetingHasAttendeeTableMap::COL_CREATED_AT);
     }
 
 } // MeetingHasAttendeeQuery

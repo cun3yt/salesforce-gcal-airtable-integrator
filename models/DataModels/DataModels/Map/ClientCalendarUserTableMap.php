@@ -59,7 +59,7 @@ class ClientCalendarUserTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 6;
+    const NUM_COLUMNS = 8;
 
     /**
      * The number of lazy-loaded columns
@@ -69,7 +69,7 @@ class ClientCalendarUserTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 6;
+    const NUM_HYDRATE_COLUMNS = 8;
 
     /**
      * the column name for the client_id field
@@ -102,6 +102,16 @@ class ClientCalendarUserTableMap extends TableMap
     const COL_ID = 'client_calendar_user.id';
 
     /**
+     * the column name for the created_at field
+     */
+    const COL_CREATED_AT = 'client_calendar_user.created_at';
+
+    /**
+     * the column name for the updated_at field
+     */
+    const COL_UPDATED_AT = 'client_calendar_user.updated_at';
+
+    /**
      * The default string format for model objects of the related table
      */
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -113,11 +123,11 @@ class ClientCalendarUserTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('ClientId', 'Name', 'Surname', 'Title', 'Email', 'Id', ),
-        self::TYPE_CAMELNAME     => array('clientId', 'name', 'surname', 'title', 'email', 'id', ),
-        self::TYPE_COLNAME       => array(ClientCalendarUserTableMap::COL_CLIENT_ID, ClientCalendarUserTableMap::COL_NAME, ClientCalendarUserTableMap::COL_SURNAME, ClientCalendarUserTableMap::COL_TITLE, ClientCalendarUserTableMap::COL_EMAIL, ClientCalendarUserTableMap::COL_ID, ),
-        self::TYPE_FIELDNAME     => array('client_id', 'name', 'surname', 'title', 'email', 'id', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('ClientId', 'Name', 'Surname', 'Title', 'Email', 'Id', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_CAMELNAME     => array('clientId', 'name', 'surname', 'title', 'email', 'id', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(ClientCalendarUserTableMap::COL_CLIENT_ID, ClientCalendarUserTableMap::COL_NAME, ClientCalendarUserTableMap::COL_SURNAME, ClientCalendarUserTableMap::COL_TITLE, ClientCalendarUserTableMap::COL_EMAIL, ClientCalendarUserTableMap::COL_ID, ClientCalendarUserTableMap::COL_CREATED_AT, ClientCalendarUserTableMap::COL_UPDATED_AT, ),
+        self::TYPE_FIELDNAME     => array('client_id', 'name', 'surname', 'title', 'email', 'id', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
     /**
@@ -127,11 +137,11 @@ class ClientCalendarUserTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('ClientId' => 0, 'Name' => 1, 'Surname' => 2, 'Title' => 3, 'Email' => 4, 'Id' => 5, ),
-        self::TYPE_CAMELNAME     => array('clientId' => 0, 'name' => 1, 'surname' => 2, 'title' => 3, 'email' => 4, 'id' => 5, ),
-        self::TYPE_COLNAME       => array(ClientCalendarUserTableMap::COL_CLIENT_ID => 0, ClientCalendarUserTableMap::COL_NAME => 1, ClientCalendarUserTableMap::COL_SURNAME => 2, ClientCalendarUserTableMap::COL_TITLE => 3, ClientCalendarUserTableMap::COL_EMAIL => 4, ClientCalendarUserTableMap::COL_ID => 5, ),
-        self::TYPE_FIELDNAME     => array('client_id' => 0, 'name' => 1, 'surname' => 2, 'title' => 3, 'email' => 4, 'id' => 5, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('ClientId' => 0, 'Name' => 1, 'Surname' => 2, 'Title' => 3, 'Email' => 4, 'Id' => 5, 'CreatedAt' => 6, 'UpdatedAt' => 7, ),
+        self::TYPE_CAMELNAME     => array('clientId' => 0, 'name' => 1, 'surname' => 2, 'title' => 3, 'email' => 4, 'id' => 5, 'createdAt' => 6, 'updatedAt' => 7, ),
+        self::TYPE_COLNAME       => array(ClientCalendarUserTableMap::COL_CLIENT_ID => 0, ClientCalendarUserTableMap::COL_NAME => 1, ClientCalendarUserTableMap::COL_SURNAME => 2, ClientCalendarUserTableMap::COL_TITLE => 3, ClientCalendarUserTableMap::COL_EMAIL => 4, ClientCalendarUserTableMap::COL_ID => 5, ClientCalendarUserTableMap::COL_CREATED_AT => 6, ClientCalendarUserTableMap::COL_UPDATED_AT => 7, ),
+        self::TYPE_FIELDNAME     => array('client_id' => 0, 'name' => 1, 'surname' => 2, 'title' => 3, 'email' => 4, 'id' => 5, 'created_at' => 6, 'updated_at' => 7, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
     /**
@@ -157,6 +167,8 @@ class ClientCalendarUserTableMap extends TableMap
         $this->addColumn('title', 'Title', 'VARCHAR', false, 127, null);
         $this->addColumn('email', 'Email', 'VARCHAR', false, 255, null);
         $this->addForeignPrimaryKey('id', 'Id', 'INTEGER' , 'meeting_attendee', 'id', true, null, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
 
     /**
@@ -204,6 +216,7 @@ class ClientCalendarUserTableMap extends TableMap
     {
         return array(
             'concrete_inheritance' => array('extends' => 'meeting_attendee', 'descendant_column' => 'descendant_class', 'copy_data_to_parent' => 'true', 'copy_data_to_child' => 'false', 'schema' => '', 'exclude_behaviors' => '', ),
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_created_at' => 'false', 'disable_updated_at' => 'false', ),
         );
     } // getBehaviors()
 
@@ -354,6 +367,8 @@ class ClientCalendarUserTableMap extends TableMap
             $criteria->addSelectColumn(ClientCalendarUserTableMap::COL_TITLE);
             $criteria->addSelectColumn(ClientCalendarUserTableMap::COL_EMAIL);
             $criteria->addSelectColumn(ClientCalendarUserTableMap::COL_ID);
+            $criteria->addSelectColumn(ClientCalendarUserTableMap::COL_CREATED_AT);
+            $criteria->addSelectColumn(ClientCalendarUserTableMap::COL_UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.client_id');
             $criteria->addSelectColumn($alias . '.name');
@@ -361,6 +376,8 @@ class ClientCalendarUserTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.title');
             $criteria->addSelectColumn($alias . '.email');
             $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 

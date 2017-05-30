@@ -2,9 +2,13 @@
 
 namespace DataModels\DataModels\Base;
 
+use \DateTime;
 use \Exception;
 use \PDO;
+use DataModels\DataModels\Contact as ChildContact;
+use DataModels\DataModels\ContactHistory as ChildContactHistory;
 use DataModels\DataModels\ContactHistoryQuery as ChildContactHistoryQuery;
+use DataModels\DataModels\ContactQuery as ChildContactQuery;
 use DataModels\DataModels\Map\ContactHistoryTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -17,6 +21,7 @@ use Propel\Runtime\Exception\LogicException;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
+use Propel\Runtime\Util\PropelDateTime;
 
 /**
  * Base class that represents a row from the 'contact_history' table.
@@ -93,6 +98,25 @@ abstract class ContactHistory implements ActiveRecordInterface
      * @var        string
      */
     protected $sfdc_mailing_city;
+
+    /**
+     * The value for the created_at field.
+     *
+     * @var        DateTime
+     */
+    protected $created_at;
+
+    /**
+     * The value for the updated_at field.
+     *
+     * @var        DateTime
+     */
+    protected $updated_at;
+
+    /**
+     * @var        ChildContact
+     */
+    protected $aContact;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -378,6 +402,46 @@ abstract class ContactHistory implements ActiveRecordInterface
     }
 
     /**
+     * Get the [optionally formatted] temporal [created_at] column value.
+     *
+     *
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw DateTime object will be returned.
+     *
+     * @return string|DateTime Formatted date/time value as string or DateTime object (if format is NULL), NULL if column is NULL
+     *
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getCreatedAt($format = NULL)
+    {
+        if ($format === null) {
+            return $this->created_at;
+        } else {
+            return $this->created_at instanceof \DateTimeInterface ? $this->created_at->format($format) : null;
+        }
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [updated_at] column value.
+     *
+     *
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw DateTime object will be returned.
+     *
+     * @return string|DateTime Formatted date/time value as string or DateTime object (if format is NULL), NULL if column is NULL
+     *
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getUpdatedAt($format = NULL)
+    {
+        if ($format === null) {
+            return $this->updated_at;
+        } else {
+            return $this->updated_at instanceof \DateTimeInterface ? $this->updated_at->format($format) : null;
+        }
+    }
+
+    /**
      * Set the value of [id] column.
      *
      * @param int $v new value
@@ -412,6 +476,10 @@ abstract class ContactHistory implements ActiveRecordInterface
         if ($this->contact_id !== $v) {
             $this->contact_id = $v;
             $this->modifiedColumns[ContactHistoryTableMap::COL_CONTACT_ID] = true;
+        }
+
+        if ($this->aContact !== null && $this->aContact->getId() !== $v) {
+            $this->aContact = null;
         }
 
         return $this;
@@ -478,6 +546,46 @@ abstract class ContactHistory implements ActiveRecordInterface
     } // setSfdcMailingCity()
 
     /**
+     * Sets the value of [created_at] column to a normalized version of the date/time value specified.
+     *
+     * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
+     *               Empty strings are treated as NULL.
+     * @return $this|\DataModels\DataModels\ContactHistory The current object (for fluent API support)
+     */
+    public function setCreatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->created_at !== null || $dt !== null) {
+            if ($this->created_at === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->created_at->format("Y-m-d H:i:s.u")) {
+                $this->created_at = $dt === null ? null : clone $dt;
+                $this->modifiedColumns[ContactHistoryTableMap::COL_CREATED_AT] = true;
+            }
+        } // if either are not null
+
+        return $this;
+    } // setCreatedAt()
+
+    /**
+     * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
+     *
+     * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
+     *               Empty strings are treated as NULL.
+     * @return $this|\DataModels\DataModels\ContactHistory The current object (for fluent API support)
+     */
+    public function setUpdatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->updated_at !== null || $dt !== null) {
+            if ($this->updated_at === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->updated_at->format("Y-m-d H:i:s.u")) {
+                $this->updated_at = $dt === null ? null : clone $dt;
+                $this->modifiedColumns[ContactHistoryTableMap::COL_UPDATED_AT] = true;
+            }
+        } // if either are not null
+
+        return $this;
+    } // setUpdatedAt()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -527,6 +635,12 @@ abstract class ContactHistory implements ActiveRecordInterface
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ContactHistoryTableMap::translateFieldName('SfdcMailingCity', TableMap::TYPE_PHPNAME, $indexType)];
             $this->sfdc_mailing_city = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ContactHistoryTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : ContactHistoryTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -535,7 +649,7 @@ abstract class ContactHistory implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 5; // 5 = ContactHistoryTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 7; // 7 = ContactHistoryTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\DataModels\\DataModels\\ContactHistory'), 0, $e);
@@ -557,6 +671,9 @@ abstract class ContactHistory implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
+        if ($this->aContact !== null && $this->contact_id !== $this->aContact->getId()) {
+            $this->aContact = null;
+        }
     } // ensureConsistency
 
     /**
@@ -596,6 +713,7 @@ abstract class ContactHistory implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
+            $this->aContact = null;
         } // if (deep)
     }
 
@@ -662,8 +780,20 @@ abstract class ContactHistory implements ActiveRecordInterface
             $isInsert = $this->isNew();
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
+                // timestampable behavior
+
+                if (!$this->isColumnModified(ContactHistoryTableMap::COL_CREATED_AT)) {
+                    $this->setCreatedAt(\Propel\Runtime\Util\PropelDateTime::createHighPrecision());
+                }
+                if (!$this->isColumnModified(ContactHistoryTableMap::COL_UPDATED_AT)) {
+                    $this->setUpdatedAt(\Propel\Runtime\Util\PropelDateTime::createHighPrecision());
+                }
             } else {
                 $ret = $ret && $this->preUpdate($con);
+                // timestampable behavior
+                if ($this->isModified() && !$this->isColumnModified(ContactHistoryTableMap::COL_UPDATED_AT)) {
+                    $this->setUpdatedAt(\Propel\Runtime\Util\PropelDateTime::createHighPrecision());
+                }
             }
             if ($ret) {
                 $affectedRows = $this->doSave($con);
@@ -698,6 +828,18 @@ abstract class ContactHistory implements ActiveRecordInterface
         $affectedRows = 0; // initialize var to track total num of affected rows
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
+
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their corresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aContact !== null) {
+                if ($this->aContact->isModified() || $this->aContact->isNew()) {
+                    $affectedRows += $this->aContact->save($con);
+                }
+                $this->setContact($this->aContact);
+            }
 
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
@@ -760,6 +902,12 @@ abstract class ContactHistory implements ActiveRecordInterface
         if ($this->isColumnModified(ContactHistoryTableMap::COL_SFDC_MAILING_CITY)) {
             $modifiedColumns[':p' . $index++]  = 'sfdc_mailing_city';
         }
+        if ($this->isColumnModified(ContactHistoryTableMap::COL_CREATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = 'created_at';
+        }
+        if ($this->isColumnModified(ContactHistoryTableMap::COL_UPDATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = 'updated_at';
+        }
 
         $sql = sprintf(
             'INSERT INTO contact_history (%s) VALUES (%s)',
@@ -785,6 +933,12 @@ abstract class ContactHistory implements ActiveRecordInterface
                         break;
                     case 'sfdc_mailing_city':
                         $stmt->bindValue($identifier, $this->sfdc_mailing_city, PDO::PARAM_STR);
+                        break;
+                    case 'created_at':
+                        $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
+                        break;
+                    case 'updated_at':
+                        $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -856,6 +1010,12 @@ abstract class ContactHistory implements ActiveRecordInterface
             case 4:
                 return $this->getSfdcMailingCity();
                 break;
+            case 5:
+                return $this->getCreatedAt();
+                break;
+            case 6:
+                return $this->getUpdatedAt();
+                break;
             default:
                 return null;
                 break;
@@ -873,10 +1033,11 @@ abstract class ContactHistory implements ActiveRecordInterface
      *                    Defaults to TableMap::TYPE_PHPNAME.
      * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
      * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
+     * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
      *
      * @return array an associative array containing the field names (as keys) and field values
      */
-    public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array())
+    public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
 
         if (isset($alreadyDumpedObjects['ContactHistory'][$this->hashCode()])) {
@@ -890,12 +1051,39 @@ abstract class ContactHistory implements ActiveRecordInterface
             $keys[2] => $this->getAccountId(),
             $keys[3] => $this->getSfdcTitle(),
             $keys[4] => $this->getSfdcMailingCity(),
+            $keys[5] => $this->getCreatedAt(),
+            $keys[6] => $this->getUpdatedAt(),
         );
+        if ($result[$keys[5]] instanceof \DateTime) {
+            $result[$keys[5]] = $result[$keys[5]]->format('c');
+        }
+
+        if ($result[$keys[6]] instanceof \DateTime) {
+            $result[$keys[6]] = $result[$keys[6]]->format('c');
+        }
+
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
             $result[$key] = $virtualColumn;
         }
 
+        if ($includeForeignObjects) {
+            if (null !== $this->aContact) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'contact';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'contact';
+                        break;
+                    default:
+                        $key = 'Contact';
+                }
+
+                $result[$key] = $this->aContact->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+        }
 
         return $result;
     }
@@ -944,6 +1132,12 @@ abstract class ContactHistory implements ActiveRecordInterface
             case 4:
                 $this->setSfdcMailingCity($value);
                 break;
+            case 5:
+                $this->setCreatedAt($value);
+                break;
+            case 6:
+                $this->setUpdatedAt($value);
+                break;
         } // switch()
 
         return $this;
@@ -984,6 +1178,12 @@ abstract class ContactHistory implements ActiveRecordInterface
         }
         if (array_key_exists($keys[4], $arr)) {
             $this->setSfdcMailingCity($arr[$keys[4]]);
+        }
+        if (array_key_exists($keys[5], $arr)) {
+            $this->setCreatedAt($arr[$keys[5]]);
+        }
+        if (array_key_exists($keys[6], $arr)) {
+            $this->setUpdatedAt($arr[$keys[6]]);
         }
     }
 
@@ -1040,6 +1240,12 @@ abstract class ContactHistory implements ActiveRecordInterface
         }
         if ($this->isColumnModified(ContactHistoryTableMap::COL_SFDC_MAILING_CITY)) {
             $criteria->add(ContactHistoryTableMap::COL_SFDC_MAILING_CITY, $this->sfdc_mailing_city);
+        }
+        if ($this->isColumnModified(ContactHistoryTableMap::COL_CREATED_AT)) {
+            $criteria->add(ContactHistoryTableMap::COL_CREATED_AT, $this->created_at);
+        }
+        if ($this->isColumnModified(ContactHistoryTableMap::COL_UPDATED_AT)) {
+            $criteria->add(ContactHistoryTableMap::COL_UPDATED_AT, $this->updated_at);
         }
 
         return $criteria;
@@ -1131,6 +1337,8 @@ abstract class ContactHistory implements ActiveRecordInterface
         $copyObj->setAccountId($this->getAccountId());
         $copyObj->setSfdcTitle($this->getSfdcTitle());
         $copyObj->setSfdcMailingCity($this->getSfdcMailingCity());
+        $copyObj->setCreatedAt($this->getCreatedAt());
+        $copyObj->setUpdatedAt($this->getUpdatedAt());
         if ($makeNew) {
             $copyObj->setNew(true);
             $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
@@ -1160,17 +1368,73 @@ abstract class ContactHistory implements ActiveRecordInterface
     }
 
     /**
+     * Declares an association between this object and a ChildContact object.
+     *
+     * @param  ChildContact $v
+     * @return $this|\DataModels\DataModels\ContactHistory The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setContact(ChildContact $v = null)
+    {
+        if ($v === null) {
+            $this->setContactId(NULL);
+        } else {
+            $this->setContactId($v->getId());
+        }
+
+        $this->aContact = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildContact object, it will not be re-added.
+        if ($v !== null) {
+            $v->addContactHistory($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildContact object
+     *
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildContact The associated ChildContact object.
+     * @throws PropelException
+     */
+    public function getContact(ConnectionInterface $con = null)
+    {
+        if ($this->aContact === null && ($this->contact_id !== null)) {
+            $this->aContact = ChildContactQuery::create()->findPk($this->contact_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aContact->addContactHistories($this);
+             */
+        }
+
+        return $this->aContact;
+    }
+
+    /**
      * Clears the current object, sets all attributes to their default values and removes
      * outgoing references as well as back-references (from other objects to this one. Results probably in a database
      * change of those foreign objects when you call `save` there).
      */
     public function clear()
     {
+        if (null !== $this->aContact) {
+            $this->aContact->removeContactHistory($this);
+        }
         $this->id = null;
         $this->contact_id = null;
         $this->account_id = null;
         $this->sfdc_title = null;
         $this->sfdc_mailing_city = null;
+        $this->created_at = null;
+        $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
         $this->resetModified();
@@ -1191,6 +1455,7 @@ abstract class ContactHistory implements ActiveRecordInterface
         if ($deep) {
         } // if ($deep)
 
+        $this->aContact = null;
     }
 
     /**
@@ -1201,6 +1466,20 @@ abstract class ContactHistory implements ActiveRecordInterface
     public function __toString()
     {
         return (string) $this->exportTo(ContactHistoryTableMap::DEFAULT_STRING_FORMAT);
+    }
+
+    // timestampable behavior
+
+    /**
+     * Mark the current object so that the update date doesn't get updated during next save
+     *
+     * @return     $this|ChildContactHistory The current object (for fluent API support)
+     */
+    public function keepUpdateDateUnchanged()
+    {
+        $this->modifiedColumns[ContactHistoryTableMap::COL_UPDATED_AT] = true;
+
+        return $this;
     }
 
     /**

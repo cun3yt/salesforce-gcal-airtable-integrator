@@ -59,7 +59,7 @@ class ContactHistoryTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 5;
+    const NUM_COLUMNS = 7;
 
     /**
      * The number of lazy-loaded columns
@@ -69,7 +69,7 @@ class ContactHistoryTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 5;
+    const NUM_HYDRATE_COLUMNS = 7;
 
     /**
      * the column name for the id field
@@ -97,6 +97,16 @@ class ContactHistoryTableMap extends TableMap
     const COL_SFDC_MAILING_CITY = 'contact_history.sfdc_mailing_city';
 
     /**
+     * the column name for the created_at field
+     */
+    const COL_CREATED_AT = 'contact_history.created_at';
+
+    /**
+     * the column name for the updated_at field
+     */
+    const COL_UPDATED_AT = 'contact_history.updated_at';
+
+    /**
      * The default string format for model objects of the related table
      */
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -108,11 +118,11 @@ class ContactHistoryTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'ContactId', 'AccountId', 'SfdcTitle', 'SfdcMailingCity', ),
-        self::TYPE_CAMELNAME     => array('id', 'contactId', 'accountId', 'sfdcTitle', 'sfdcMailingCity', ),
-        self::TYPE_COLNAME       => array(ContactHistoryTableMap::COL_ID, ContactHistoryTableMap::COL_CONTACT_ID, ContactHistoryTableMap::COL_ACCOUNT_ID, ContactHistoryTableMap::COL_SFDC_TITLE, ContactHistoryTableMap::COL_SFDC_MAILING_CITY, ),
-        self::TYPE_FIELDNAME     => array('id', 'contact_id', 'account_id', 'sfdc_title', 'sfdc_mailing_city', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
+        self::TYPE_PHPNAME       => array('Id', 'ContactId', 'AccountId', 'SfdcTitle', 'SfdcMailingCity', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_CAMELNAME     => array('id', 'contactId', 'accountId', 'sfdcTitle', 'sfdcMailingCity', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(ContactHistoryTableMap::COL_ID, ContactHistoryTableMap::COL_CONTACT_ID, ContactHistoryTableMap::COL_ACCOUNT_ID, ContactHistoryTableMap::COL_SFDC_TITLE, ContactHistoryTableMap::COL_SFDC_MAILING_CITY, ContactHistoryTableMap::COL_CREATED_AT, ContactHistoryTableMap::COL_UPDATED_AT, ),
+        self::TYPE_FIELDNAME     => array('id', 'contact_id', 'account_id', 'sfdc_title', 'sfdc_mailing_city', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -122,11 +132,11 @@ class ContactHistoryTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'ContactId' => 1, 'AccountId' => 2, 'SfdcTitle' => 3, 'SfdcMailingCity' => 4, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'contactId' => 1, 'accountId' => 2, 'sfdcTitle' => 3, 'sfdcMailingCity' => 4, ),
-        self::TYPE_COLNAME       => array(ContactHistoryTableMap::COL_ID => 0, ContactHistoryTableMap::COL_CONTACT_ID => 1, ContactHistoryTableMap::COL_ACCOUNT_ID => 2, ContactHistoryTableMap::COL_SFDC_TITLE => 3, ContactHistoryTableMap::COL_SFDC_MAILING_CITY => 4, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'contact_id' => 1, 'account_id' => 2, 'sfdc_title' => 3, 'sfdc_mailing_city' => 4, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'ContactId' => 1, 'AccountId' => 2, 'SfdcTitle' => 3, 'SfdcMailingCity' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'contactId' => 1, 'accountId' => 2, 'sfdcTitle' => 3, 'sfdcMailingCity' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
+        self::TYPE_COLNAME       => array(ContactHistoryTableMap::COL_ID => 0, ContactHistoryTableMap::COL_CONTACT_ID => 1, ContactHistoryTableMap::COL_ACCOUNT_ID => 2, ContactHistoryTableMap::COL_SFDC_TITLE => 3, ContactHistoryTableMap::COL_SFDC_MAILING_CITY => 4, ContactHistoryTableMap::COL_CREATED_AT => 5, ContactHistoryTableMap::COL_UPDATED_AT => 6, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'contact_id' => 1, 'account_id' => 2, 'sfdc_title' => 3, 'sfdc_mailing_city' => 4, 'created_at' => 5, 'updated_at' => 6, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -148,10 +158,12 @@ class ContactHistoryTableMap extends TableMap
         $this->setPrimaryKeyMethodInfo('contact_history_id_seq');
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('contact_id', 'ContactId', 'INTEGER', false, null, null);
+        $this->addForeignKey('contact_id', 'ContactId', 'INTEGER', 'contact', 'id', false, null, null);
         $this->addColumn('account_id', 'AccountId', 'INTEGER', false, null, null);
         $this->addColumn('sfdc_title', 'SfdcTitle', 'LONGVARCHAR', false, null, null);
         $this->addColumn('sfdc_mailing_city', 'SfdcMailingCity', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
 
     /**
@@ -159,7 +171,27 @@ class ContactHistoryTableMap extends TableMap
      */
     public function buildRelations()
     {
+        $this->addRelation('Contact', '\\DataModels\\DataModels\\Contact', RelationMap::MANY_TO_ONE, array (
+  0 =>
+  array (
+    0 => ':contact_id',
+    1 => ':id',
+  ),
+), null, null, null, false);
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_created_at' => 'false', 'disable_updated_at' => 'false', ),
+        );
+    } // getBehaviors()
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -307,12 +339,16 @@ class ContactHistoryTableMap extends TableMap
             $criteria->addSelectColumn(ContactHistoryTableMap::COL_ACCOUNT_ID);
             $criteria->addSelectColumn(ContactHistoryTableMap::COL_SFDC_TITLE);
             $criteria->addSelectColumn(ContactHistoryTableMap::COL_SFDC_MAILING_CITY);
+            $criteria->addSelectColumn(ContactHistoryTableMap::COL_CREATED_AT);
+            $criteria->addSelectColumn(ContactHistoryTableMap::COL_UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.contact_id');
             $criteria->addSelectColumn($alias . '.account_id');
             $criteria->addSelectColumn($alias . '.sfdc_title');
             $criteria->addSelectColumn($alias . '.sfdc_mailing_city');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 

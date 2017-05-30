@@ -59,7 +59,7 @@ class MeetingAttendeeTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 2;
+    const NUM_COLUMNS = 4;
 
     /**
      * The number of lazy-loaded columns
@@ -69,7 +69,7 @@ class MeetingAttendeeTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 2;
+    const NUM_HYDRATE_COLUMNS = 4;
 
     /**
      * the column name for the id field
@@ -80,6 +80,16 @@ class MeetingAttendeeTableMap extends TableMap
      * the column name for the descendant_class field
      */
     const COL_DESCENDANT_CLASS = 'meeting_attendee.descendant_class';
+
+    /**
+     * the column name for the created_at field
+     */
+    const COL_CREATED_AT = 'meeting_attendee.created_at';
+
+    /**
+     * the column name for the updated_at field
+     */
+    const COL_UPDATED_AT = 'meeting_attendee.updated_at';
 
     /**
      * The default string format for model objects of the related table
@@ -93,11 +103,11 @@ class MeetingAttendeeTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'DescendantClass', ),
-        self::TYPE_CAMELNAME     => array('id', 'descendantClass', ),
-        self::TYPE_COLNAME       => array(MeetingAttendeeTableMap::COL_ID, MeetingAttendeeTableMap::COL_DESCENDANT_CLASS, ),
-        self::TYPE_FIELDNAME     => array('id', 'descendant_class', ),
-        self::TYPE_NUM           => array(0, 1, )
+        self::TYPE_PHPNAME       => array('Id', 'DescendantClass', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_CAMELNAME     => array('id', 'descendantClass', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(MeetingAttendeeTableMap::COL_ID, MeetingAttendeeTableMap::COL_DESCENDANT_CLASS, MeetingAttendeeTableMap::COL_CREATED_AT, MeetingAttendeeTableMap::COL_UPDATED_AT, ),
+        self::TYPE_FIELDNAME     => array('id', 'descendant_class', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
     /**
@@ -107,11 +117,11 @@ class MeetingAttendeeTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'DescendantClass' => 1, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'descendantClass' => 1, ),
-        self::TYPE_COLNAME       => array(MeetingAttendeeTableMap::COL_ID => 0, MeetingAttendeeTableMap::COL_DESCENDANT_CLASS => 1, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'descendant_class' => 1, ),
-        self::TYPE_NUM           => array(0, 1, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'DescendantClass' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'descendantClass' => 1, 'createdAt' => 2, 'updatedAt' => 3, ),
+        self::TYPE_COLNAME       => array(MeetingAttendeeTableMap::COL_ID => 0, MeetingAttendeeTableMap::COL_DESCENDANT_CLASS => 1, MeetingAttendeeTableMap::COL_CREATED_AT => 2, MeetingAttendeeTableMap::COL_UPDATED_AT => 3, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'descendant_class' => 1, 'created_at' => 2, 'updated_at' => 3, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
     /**
@@ -134,6 +144,8 @@ class MeetingAttendeeTableMap extends TableMap
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('descendant_class', 'DescendantClass', 'VARCHAR', false, 100, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
 
     /**
@@ -188,6 +200,7 @@ class MeetingAttendeeTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_created_at' => 'false', 'disable_updated_at' => 'false', ),
             'concrete_inheritance_parent' => array('descendant_column' => 'descendant_class', ),
         );
     } // getBehaviors()
@@ -345,9 +358,13 @@ class MeetingAttendeeTableMap extends TableMap
         if (null === $alias) {
             $criteria->addSelectColumn(MeetingAttendeeTableMap::COL_ID);
             $criteria->addSelectColumn(MeetingAttendeeTableMap::COL_DESCENDANT_CLASS);
+            $criteria->addSelectColumn(MeetingAttendeeTableMap::COL_CREATED_AT);
+            $criteria->addSelectColumn(MeetingAttendeeTableMap::COL_UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.descendant_class');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 

@@ -5,6 +5,7 @@ namespace DataModels\DataModels\Base;
 use \DateTime;
 use \Exception;
 use \PDO;
+use DataModels\DataModels\OpportunityHistory as ChildOpportunityHistory;
 use DataModels\DataModels\OpportunityHistoryQuery as ChildOpportunityHistoryQuery;
 use DataModels\DataModels\Map\OpportunityHistoryTableMap;
 use Propel\Runtime\Propel;
@@ -109,6 +110,20 @@ abstract class OpportunityHistory implements ActiveRecordInterface
      * @var        DateTime
      */
     protected $close_date;
+
+    /**
+     * The value for the created_at field.
+     *
+     * @var        DateTime
+     */
+    protected $created_at;
+
+    /**
+     * The value for the updated_at field.
+     *
+     * @var        DateTime
+     */
+    protected $updated_at;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -424,6 +439,46 @@ abstract class OpportunityHistory implements ActiveRecordInterface
     }
 
     /**
+     * Get the [optionally formatted] temporal [created_at] column value.
+     *
+     *
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw DateTime object will be returned.
+     *
+     * @return string|DateTime Formatted date/time value as string or DateTime object (if format is NULL), NULL if column is NULL
+     *
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getCreatedAt($format = NULL)
+    {
+        if ($format === null) {
+            return $this->created_at;
+        } else {
+            return $this->created_at instanceof \DateTimeInterface ? $this->created_at->format($format) : null;
+        }
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [updated_at] column value.
+     *
+     *
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw DateTime object will be returned.
+     *
+     * @return string|DateTime Formatted date/time value as string or DateTime object (if format is NULL), NULL if column is NULL
+     *
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getUpdatedAt($format = NULL)
+    {
+        if ($format === null) {
+            return $this->updated_at;
+        } else {
+            return $this->updated_at instanceof \DateTimeInterface ? $this->updated_at->format($format) : null;
+        }
+    }
+
+    /**
      * Set the value of [id] column.
      *
      * @param int $v new value
@@ -564,6 +619,46 @@ abstract class OpportunityHistory implements ActiveRecordInterface
     } // setCloseDate()
 
     /**
+     * Sets the value of [created_at] column to a normalized version of the date/time value specified.
+     *
+     * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
+     *               Empty strings are treated as NULL.
+     * @return $this|\DataModels\DataModels\OpportunityHistory The current object (for fluent API support)
+     */
+    public function setCreatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->created_at !== null || $dt !== null) {
+            if ($this->created_at === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->created_at->format("Y-m-d H:i:s.u")) {
+                $this->created_at = $dt === null ? null : clone $dt;
+                $this->modifiedColumns[OpportunityHistoryTableMap::COL_CREATED_AT] = true;
+            }
+        } // if either are not null
+
+        return $this;
+    } // setCreatedAt()
+
+    /**
+     * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
+     *
+     * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
+     *               Empty strings are treated as NULL.
+     * @return $this|\DataModels\DataModels\OpportunityHistory The current object (for fluent API support)
+     */
+    public function setUpdatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->updated_at !== null || $dt !== null) {
+            if ($this->updated_at === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->updated_at->format("Y-m-d H:i:s.u")) {
+                $this->updated_at = $dt === null ? null : clone $dt;
+                $this->modifiedColumns[OpportunityHistoryTableMap::COL_UPDATED_AT] = true;
+            }
+        } // if either are not null
+
+        return $this;
+    } // setUpdatedAt()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -619,6 +714,12 @@ abstract class OpportunityHistory implements ActiveRecordInterface
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : OpportunityHistoryTableMap::translateFieldName('CloseDate', TableMap::TYPE_PHPNAME, $indexType)];
             $this->close_date = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : OpportunityHistoryTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : OpportunityHistoryTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -627,7 +728,7 @@ abstract class OpportunityHistory implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 7; // 7 = OpportunityHistoryTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 9; // 9 = OpportunityHistoryTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\DataModels\\DataModels\\OpportunityHistory'), 0, $e);
@@ -754,8 +855,20 @@ abstract class OpportunityHistory implements ActiveRecordInterface
             $isInsert = $this->isNew();
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
+                // timestampable behavior
+
+                if (!$this->isColumnModified(OpportunityHistoryTableMap::COL_CREATED_AT)) {
+                    $this->setCreatedAt(\Propel\Runtime\Util\PropelDateTime::createHighPrecision());
+                }
+                if (!$this->isColumnModified(OpportunityHistoryTableMap::COL_UPDATED_AT)) {
+                    $this->setUpdatedAt(\Propel\Runtime\Util\PropelDateTime::createHighPrecision());
+                }
             } else {
                 $ret = $ret && $this->preUpdate($con);
+                // timestampable behavior
+                if ($this->isModified() && !$this->isColumnModified(OpportunityHistoryTableMap::COL_UPDATED_AT)) {
+                    $this->setUpdatedAt(\Propel\Runtime\Util\PropelDateTime::createHighPrecision());
+                }
             }
             if ($ret) {
                 $affectedRows = $this->doSave($con);
@@ -858,6 +971,12 @@ abstract class OpportunityHistory implements ActiveRecordInterface
         if ($this->isColumnModified(OpportunityHistoryTableMap::COL_CLOSE_DATE)) {
             $modifiedColumns[':p' . $index++]  = 'close_date';
         }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_CREATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = 'created_at';
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_UPDATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = 'updated_at';
+        }
 
         $sql = sprintf(
             'INSERT INTO opportunity_history (%s) VALUES (%s)',
@@ -889,6 +1008,12 @@ abstract class OpportunityHistory implements ActiveRecordInterface
                         break;
                     case 'close_date':
                         $stmt->bindValue($identifier, $this->close_date ? $this->close_date->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
+                        break;
+                    case 'created_at':
+                        $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
+                        break;
+                    case 'updated_at':
+                        $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -966,6 +1091,12 @@ abstract class OpportunityHistory implements ActiveRecordInterface
             case 6:
                 return $this->getCloseDate();
                 break;
+            case 7:
+                return $this->getCreatedAt();
+                break;
+            case 8:
+                return $this->getUpdatedAt();
+                break;
             default:
                 return null;
                 break;
@@ -1002,9 +1133,19 @@ abstract class OpportunityHistory implements ActiveRecordInterface
             $keys[4] => $this->getBuyerStageId(),
             $keys[5] => $this->getAmount(),
             $keys[6] => $this->getCloseDate(),
+            $keys[7] => $this->getCreatedAt(),
+            $keys[8] => $this->getUpdatedAt(),
         );
         if ($result[$keys[6]] instanceof \DateTime) {
             $result[$keys[6]] = $result[$keys[6]]->format('c');
+        }
+
+        if ($result[$keys[7]] instanceof \DateTime) {
+            $result[$keys[7]] = $result[$keys[7]]->format('c');
+        }
+
+        if ($result[$keys[8]] instanceof \DateTime) {
+            $result[$keys[8]] = $result[$keys[8]]->format('c');
         }
 
         $virtualColumns = $this->virtualColumns;
@@ -1066,6 +1207,12 @@ abstract class OpportunityHistory implements ActiveRecordInterface
             case 6:
                 $this->setCloseDate($value);
                 break;
+            case 7:
+                $this->setCreatedAt($value);
+                break;
+            case 8:
+                $this->setUpdatedAt($value);
+                break;
         } // switch()
 
         return $this;
@@ -1112,6 +1259,12 @@ abstract class OpportunityHistory implements ActiveRecordInterface
         }
         if (array_key_exists($keys[6], $arr)) {
             $this->setCloseDate($arr[$keys[6]]);
+        }
+        if (array_key_exists($keys[7], $arr)) {
+            $this->setCreatedAt($arr[$keys[7]]);
+        }
+        if (array_key_exists($keys[8], $arr)) {
+            $this->setUpdatedAt($arr[$keys[8]]);
         }
     }
 
@@ -1174,6 +1327,12 @@ abstract class OpportunityHistory implements ActiveRecordInterface
         }
         if ($this->isColumnModified(OpportunityHistoryTableMap::COL_CLOSE_DATE)) {
             $criteria->add(OpportunityHistoryTableMap::COL_CLOSE_DATE, $this->close_date);
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_CREATED_AT)) {
+            $criteria->add(OpportunityHistoryTableMap::COL_CREATED_AT, $this->created_at);
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_UPDATED_AT)) {
+            $criteria->add(OpportunityHistoryTableMap::COL_UPDATED_AT, $this->updated_at);
         }
 
         return $criteria;
@@ -1267,6 +1426,8 @@ abstract class OpportunityHistory implements ActiveRecordInterface
         $copyObj->setBuyerStageId($this->getBuyerStageId());
         $copyObj->setAmount($this->getAmount());
         $copyObj->setCloseDate($this->getCloseDate());
+        $copyObj->setCreatedAt($this->getCreatedAt());
+        $copyObj->setUpdatedAt($this->getUpdatedAt());
         if ($makeNew) {
             $copyObj->setNew(true);
             $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
@@ -1309,6 +1470,8 @@ abstract class OpportunityHistory implements ActiveRecordInterface
         $this->buyer_stage_id = null;
         $this->amount = null;
         $this->close_date = null;
+        $this->created_at = null;
+        $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
         $this->resetModified();
@@ -1339,6 +1502,20 @@ abstract class OpportunityHistory implements ActiveRecordInterface
     public function __toString()
     {
         return (string) $this->exportTo(OpportunityHistoryTableMap::DEFAULT_STRING_FORMAT);
+    }
+
+    // timestampable behavior
+
+    /**
+     * Mark the current object so that the update date doesn't get updated during next save
+     *
+     * @return     $this|ChildOpportunityHistory The current object (for fluent API support)
+     */
+    public function keepUpdateDateUnchanged()
+    {
+        $this->modifiedColumns[OpportunityHistoryTableMap::COL_UPDATED_AT] = true;
+
+        return $this;
     }
 
     /**
