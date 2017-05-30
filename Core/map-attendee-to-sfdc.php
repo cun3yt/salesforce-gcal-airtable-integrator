@@ -50,6 +50,8 @@ while($contactPage <= $contactPageNb) {
 
         $contact->setSfdcContactId($sfdcContact['records'][0]['Id'])
             ->setSfdcAccountId($sfdcContact['records'][0]['AccountId'])
+            ->setSfdcContactName($sfdcContact['records'][0]['Name'])
+            ->setSfdcTitle($sfdcContact['records'][0]['Title'])
             ->save();
     }
 

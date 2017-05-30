@@ -1,7 +1,7 @@
 <?
 /**
- * This file is responsible for processing meetings and fetching accounts and its respective account
- * from SFDC and than mapping it within DB for easy lookup and reference.
+ * Process meetings and fetching accounts and its respective account
+ * from SFDC and then map it for easy lookup and reference.
  *
  * @todo delete processcalendar.php entry on crontab
  */
