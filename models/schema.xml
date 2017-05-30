@@ -11,6 +11,8 @@
     <foreign-key foreignTable="client" onDelete="none" onUpdate="none">
       <reference local="client_id" foreign="id" />
     </foreign-key>
+
+    <behavior name="timestampable"/>
   </table>
   <table name="account_history" idMethod="native" phpName="AccountHistory" namespace="DataModels">
     <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
@@ -21,21 +23,29 @@
     <column name="renewal_date" phpName="RenewalDate" type="DATE"/>
     <column name="num_employees" phpName="NumEmployees" type="INTEGER"/>
     <column name="ARR" phpName="Arr" type="VARCHAR"/>
+
+    <behavior name="timestampable"/>
   </table>
   <table name="account_status" idMethod="native" phpName="AccountStatus" namespace="DataModels">
     <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
     <column name="client" phpName="ClientId" type="INTEGER"/>
     <column name="status" phpName="Status" type="VARCHAR" size="255"/>
+
+    <behavior name="timestampable"/>
   </table>
   <table name="billing_cycle" idMethod="native" phpName="BillingCycle" namespace="DataModels">
     <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
     <column name="client_id" phpName="ClientId" type="INTEGER"/>
     <column name="type" phpName="Type" type="VARCHAR" size="255"/>
+
+    <behavior name="timestampable"/>
   </table>
   <table name="buyer_stage" idMethod="native" phpName="BuyerStage" namespace="DataModels">
     <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
     <column name="client_id" phpName="ClientId" type="INTEGER"/>
     <column name="stage" phpName="Stage" type="VARCHAR" size="255"/>
+
+    <behavior name="timestampable"/>
   </table>
   <table name="contact" phpName="Contact" namespace="DataModels">
     <behavior name="concrete_inheritance">
@@ -48,7 +58,8 @@
     <column name="account_id" phpName="AccountId" type="INTEGER"/>
     <column name="sfdc_contact_id" phpName="SfdcContactId" type="VARCHAR" size="127"/>
     <column name="sfdc_account_id" phpName="SfdcAccountId" type="VARCHAR" size="127"/>
-    <column name="sfdc_contact_name" phpName="SfdcContactName" type="VARCHAR" size="255"/>
+    <column name="sfdc_contact_name" phpName="SfdcContactName" type="VARCHAR" size="127"/>
+    <column name="sfdc_contact_title" phpName="SfdcTitle" type="VARCHAR" size="127"/>
 
     <foreign-key foreignTable="account" onDelete="none" onUpdate="none">
       <reference local="account_id" foreign="id" />
@@ -56,6 +67,8 @@
     <foreign-key foreignTable="client" onDelete="none" onUpdate="none">
       <reference local="client_id" foreign="id" />
     </foreign-key>
+
+    <behavior name="timestampable"/>
   </table>
   <table name="contact_history" idMethod="native" phpName="ContactHistory" namespace="DataModels">
     <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
@@ -63,12 +76,20 @@
     <column name="account_id" phpName="AccountId" type="INTEGER"/>
     <column name="sfdc_title" phpName="SfdcTitle" type="LONGVARCHAR"/>
     <column name="sfdc_mailing_city" phpName="SfdcMailingCity" type="LONGVARCHAR"/>
+
+    <foreign-key foreignTable="contact" onDelete="none" onUpdate="none">
+      <reference local="contact_id" foreign="id" />
+    </foreign-key>
+
+    <behavior name="timestampable"/>
   </table>
   <table name="client" idMethod="native" phpName="Client" namespace="DataModels">
     <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
     <column name="name" phpName="Name" type="VARCHAR" size="255" required="true"/>
     <column name="website" phpName="Website" type="VARCHAR" size="255"/>
     <column name="email_domain" phpName="EmailDomain" type="VARCHAR" size="255"/>
+
+    <behavior name="timestampable"/>
   </table>
   <table name="client_calendar_user" phpName="ClientCalendarUser" namespace="DataModels">
     <behavior name="concrete_inheritance">
@@ -82,6 +103,8 @@
     <foreign-key foreignTable="client" onDelete="none" onUpdate="none">
       <reference local="client_id" foreign="id" />
     </foreign-key>
+
+    <behavior name="timestampable"/>
   </table>
   <table name="client_calendar_user_oauth" idMethod="native" phpName="ClientCalendarUserOAuth" namespace="DataModels">
     <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
@@ -93,6 +116,8 @@
     <foreign-key foreignTable="client_calendar_user" onDelete="none" onUpdate="none">
       <reference local="client_calendar_user_id" foreign="id" />
     </foreign-key>
+
+    <behavior name="timestampable"/>
   </table>
   <table name="meeting" idMethod="native" phpName="Meeting" namespace="DataModels">
     <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
@@ -109,7 +134,6 @@
     <column name="raw_data" phpName="RawData" type="VARCHAR"/>
     <column name="client_calendar_user_id" phpName="ClientCalendarUserId" type="INTEGER"/>
 
-    <behavior name="timestampable"/>
     <foreign-key foreignTable="meeting_attendee" onDelete="none" onUpdate="none" phpName="EventOwner">
       <reference local="event_owner_id" foreign="id" />
     </foreign-key>
@@ -123,14 +147,20 @@
     <index name="event_id_index">
       <index-column name="event_id" />
     </index>
+
+    <behavior name="timestampable"/>
   </table>
   <table name="meeting_attendee" phpName="MeetingAttendee" namespace="DataModels">
     <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" />
+
+    <behavior name="timestampable"/>
   </table>
   <table name="meeting_has_account_history" idMethod="native" phpName="MeetingHasAccountHistory" namespace="DataModels">
     <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
     <column name="meeting_id" phpName="MeetingId" type="INTEGER"/>
     <column name="account_history_id" phpName="AccountHistoryId" type="INTEGER"/>
+
+    <behavior name="timestampable"/>
   </table>
   <table name="meeting_has_attendee" isCrossRef="true" namespace="DataModels">
     <column name="meeting_id" type="INTEGER" primaryKey="true"/>
@@ -141,11 +171,15 @@
     <foreign-key foreignTable="meeting_attendee">
       <reference local="meeting_attendee_id" foreign="id"/>
     </foreign-key>
+
+    <behavior name="timestampable"/>
   </table>
   <table name="meeting_has_opportunity_history" idMethod="native" phpName="MeetingHasOpportunityHistory" namespace="DataModels">
     <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
     <column name="meeting_id" phpName="MeetingId" type="INTEGER"/>
     <column name="opportunity_history_id" phpName="OpportunityHistoryId" type="INTEGER"/>
+
+    <behavior name="timestampable"/>
   </table>
   <table name="opportunity" idMethod="native" phpName="Opportunity" namespace="DataModels">
     <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
@@ -154,6 +188,8 @@
     <column name="name" phpName="Name" type="VARCHAR" size="255"/>
     <column name="amount" phpName="Amount" type="VARCHAR"/>
     <column name="close_date" phpName="CloseDate" type="TIMESTAMP"/>
+
+    <behavior name="timestampable"/>
   </table>
   <table name="opportunity_history" idMethod="native" phpName="OpportunityHistory" namespace="DataModels">
     <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
@@ -163,10 +199,14 @@
     <column name="buyer_stage_id" phpName="BuyerStageId" type="INTEGER"/>
     <column name="amount" phpName="Amount" type="VARCHAR"/>
     <column name="close_date" phpName="CloseDate" type="DATE"/>
+
+    <behavior name="timestampable"/>
   </table>
   <table name="opportunity_stage" idMethod="native" phpName="OpportunityStage" namespace="DataModels">
     <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
     <column name="client_id" phpName="ClientId" type="LONGVARCHAR"/>
     <column name="stage" phpName="Stage" type="VARCHAR" size="255"/>
+
+    <behavior name="timestampable"/>
   </table>
 </database>
