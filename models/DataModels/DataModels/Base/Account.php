@@ -111,6 +111,13 @@ abstract class Account implements ActiveRecordInterface
     protected $client_id;
 
     /**
+     * The value for the sfdc_last_check_time field.
+     *
+     * @var        DateTime
+     */
+    protected $sfdc_last_check_time;
+
+    /**
      * The value for the created_at field.
      *
      * @var        DateTime
@@ -435,6 +442,26 @@ abstract class Account implements ActiveRecordInterface
     }
 
     /**
+     * Get the [optionally formatted] temporal [sfdc_last_check_time] column value.
+     *
+     *
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw DateTime object will be returned.
+     *
+     * @return string|DateTime Formatted date/time value as string or DateTime object (if format is NULL), NULL if column is NULL
+     *
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getSFDCLastCheckTime($format = NULL)
+    {
+        if ($format === null) {
+            return $this->sfdc_last_check_time;
+        } else {
+            return $this->sfdc_last_check_time instanceof \DateTimeInterface ? $this->sfdc_last_check_time->format($format) : null;
+        }
+    }
+
+    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
@@ -599,6 +626,26 @@ abstract class Account implements ActiveRecordInterface
     } // setClientId()
 
     /**
+     * Sets the value of [sfdc_last_check_time] column to a normalized version of the date/time value specified.
+     *
+     * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
+     *               Empty strings are treated as NULL.
+     * @return $this|\DataModels\DataModels\Account The current object (for fluent API support)
+     */
+    public function setSFDCLastCheckTime($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->sfdc_last_check_time !== null || $dt !== null) {
+            if ($this->sfdc_last_check_time === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->sfdc_last_check_time->format("Y-m-d H:i:s.u")) {
+                $this->sfdc_last_check_time = $dt === null ? null : clone $dt;
+                $this->modifiedColumns[AccountTableMap::COL_SFDC_LAST_CHECK_TIME] = true;
+            }
+        } // if either are not null
+
+        return $this;
+    } // setSFDCLastCheckTime()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
@@ -692,10 +739,13 @@ abstract class Account implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : AccountTableMap::translateFieldName('ClientId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->client_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : AccountTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : AccountTableMap::translateFieldName('SFDCLastCheckTime', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->sfdc_last_check_time = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : AccountTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : AccountTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : AccountTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
             $this->resetModified();
 
@@ -705,7 +755,7 @@ abstract class Account implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 8; // 8 = AccountTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 9; // 9 = AccountTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\DataModels\\DataModels\\Account'), 0, $e);
@@ -981,6 +1031,9 @@ abstract class Account implements ActiveRecordInterface
         if ($this->isColumnModified(AccountTableMap::COL_CLIENT_ID)) {
             $modifiedColumns[':p' . $index++]  = 'client_id';
         }
+        if ($this->isColumnModified(AccountTableMap::COL_SFDC_LAST_CHECK_TIME)) {
+            $modifiedColumns[':p' . $index++]  = 'sfdc_last_check_time';
+        }
         if ($this->isColumnModified(AccountTableMap::COL_CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'created_at';
         }
@@ -1015,6 +1068,9 @@ abstract class Account implements ActiveRecordInterface
                         break;
                     case 'client_id':
                         $stmt->bindValue($identifier, $this->client_id, PDO::PARAM_INT);
+                        break;
+                    case 'sfdc_last_check_time':
+                        $stmt->bindValue($identifier, $this->sfdc_last_check_time ? $this->sfdc_last_check_time->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
                         break;
                     case 'created_at':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
@@ -1096,9 +1152,12 @@ abstract class Account implements ActiveRecordInterface
                 return $this->getClientId();
                 break;
             case 6:
-                return $this->getCreatedAt();
+                return $this->getSFDCLastCheckTime();
                 break;
             case 7:
+                return $this->getCreatedAt();
+                break;
+            case 8:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1137,8 +1196,9 @@ abstract class Account implements ActiveRecordInterface
             $keys[3] => $this->getWebsite(),
             $keys[4] => $this->getSfdcAccountId(),
             $keys[5] => $this->getClientId(),
-            $keys[6] => $this->getCreatedAt(),
-            $keys[7] => $this->getUpdatedAt(),
+            $keys[6] => $this->getSFDCLastCheckTime(),
+            $keys[7] => $this->getCreatedAt(),
+            $keys[8] => $this->getUpdatedAt(),
         );
         if ($result[$keys[6]] instanceof \DateTime) {
             $result[$keys[6]] = $result[$keys[6]]->format('c');
@@ -1146,6 +1206,10 @@ abstract class Account implements ActiveRecordInterface
 
         if ($result[$keys[7]] instanceof \DateTime) {
             $result[$keys[7]] = $result[$keys[7]]->format('c');
+        }
+
+        if ($result[$keys[8]] instanceof \DateTime) {
+            $result[$keys[8]] = $result[$keys[8]]->format('c');
         }
 
         $virtualColumns = $this->virtualColumns;
@@ -1237,9 +1301,12 @@ abstract class Account implements ActiveRecordInterface
                 $this->setClientId($value);
                 break;
             case 6:
-                $this->setCreatedAt($value);
+                $this->setSFDCLastCheckTime($value);
                 break;
             case 7:
+                $this->setCreatedAt($value);
+                break;
+            case 8:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1287,10 +1354,13 @@ abstract class Account implements ActiveRecordInterface
             $this->setClientId($arr[$keys[5]]);
         }
         if (array_key_exists($keys[6], $arr)) {
-            $this->setCreatedAt($arr[$keys[6]]);
+            $this->setSFDCLastCheckTime($arr[$keys[6]]);
         }
         if (array_key_exists($keys[7], $arr)) {
-            $this->setUpdatedAt($arr[$keys[7]]);
+            $this->setCreatedAt($arr[$keys[7]]);
+        }
+        if (array_key_exists($keys[8], $arr)) {
+            $this->setUpdatedAt($arr[$keys[8]]);
         }
     }
 
@@ -1350,6 +1420,9 @@ abstract class Account implements ActiveRecordInterface
         }
         if ($this->isColumnModified(AccountTableMap::COL_CLIENT_ID)) {
             $criteria->add(AccountTableMap::COL_CLIENT_ID, $this->client_id);
+        }
+        if ($this->isColumnModified(AccountTableMap::COL_SFDC_LAST_CHECK_TIME)) {
+            $criteria->add(AccountTableMap::COL_SFDC_LAST_CHECK_TIME, $this->sfdc_last_check_time);
         }
         if ($this->isColumnModified(AccountTableMap::COL_CREATED_AT)) {
             $criteria->add(AccountTableMap::COL_CREATED_AT, $this->created_at);
@@ -1448,6 +1521,7 @@ abstract class Account implements ActiveRecordInterface
         $copyObj->setWebsite($this->getWebsite());
         $copyObj->setSfdcAccountId($this->getSfdcAccountId());
         $copyObj->setClientId($this->getClientId());
+        $copyObj->setSFDCLastCheckTime($this->getSFDCLastCheckTime());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
 
@@ -1850,6 +1924,7 @@ abstract class Account implements ActiveRecordInterface
         $this->website = null;
         $this->sfdc_account_id = null;
         $this->client_id = null;
+        $this->sfdc_last_check_time = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;

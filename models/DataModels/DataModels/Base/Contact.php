@@ -129,6 +129,13 @@ abstract class Contact extends ChildMeetingAttendee implements ActiveRecordInter
     protected $sfdc_contact_title;
 
     /**
+     * The value for the sfdc_last_check_time field.
+     *
+     * @var        DateTime
+     */
+    protected $sfdc_last_check_time;
+
+    /**
      * The value for the id field.
      *
      * @var        int
@@ -490,6 +497,26 @@ abstract class Contact extends ChildMeetingAttendee implements ActiveRecordInter
     }
 
     /**
+     * Get the [optionally formatted] temporal [sfdc_last_check_time] column value.
+     *
+     *
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw DateTime object will be returned.
+     *
+     * @return string|DateTime Formatted date/time value as string or DateTime object (if format is NULL), NULL if column is NULL
+     *
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getSFDCLastCheckTime($format = NULL)
+    {
+        if ($format === null) {
+            return $this->sfdc_last_check_time;
+        } else {
+            return $this->sfdc_last_check_time instanceof \DateTimeInterface ? $this->sfdc_last_check_time->format($format) : null;
+        }
+    }
+
+    /**
      * Get the [id] column value.
      *
      * @return int
@@ -708,6 +735,26 @@ abstract class Contact extends ChildMeetingAttendee implements ActiveRecordInter
     } // setSfdcTitle()
 
     /**
+     * Sets the value of [sfdc_last_check_time] column to a normalized version of the date/time value specified.
+     *
+     * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
+     *               Empty strings are treated as NULL.
+     * @return $this|\DataModels\DataModels\Contact The current object (for fluent API support)
+     */
+    public function setSFDCLastCheckTime($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->sfdc_last_check_time !== null || $dt !== null) {
+            if ($this->sfdc_last_check_time === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->sfdc_last_check_time->format("Y-m-d H:i:s.u")) {
+                $this->sfdc_last_check_time = $dt === null ? null : clone $dt;
+                $this->modifiedColumns[ContactTableMap::COL_SFDC_LAST_CHECK_TIME] = true;
+            }
+        } // if either are not null
+
+        return $this;
+    } // setSFDCLastCheckTime()
+
+    /**
      * Set the value of [id] column.
      *
      * @param int $v new value
@@ -831,13 +878,16 @@ abstract class Contact extends ChildMeetingAttendee implements ActiveRecordInter
             $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : ContactTableMap::translateFieldName('SfdcTitle', TableMap::TYPE_PHPNAME, $indexType)];
             $this->sfdc_contact_title = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : ContactTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : ContactTableMap::translateFieldName('SFDCLastCheckTime', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->sfdc_last_check_time = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : ContactTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : ContactTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : ContactTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : ContactTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : ContactTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
             $this->resetModified();
 
@@ -847,7 +897,7 @@ abstract class Contact extends ChildMeetingAttendee implements ActiveRecordInter
                 $this->ensureConsistency();
             }
 
-            return $startcol + 11; // 11 = ContactTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 12; // 12 = ContactTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\DataModels\\DataModels\\Contact'), 0, $e);
@@ -1146,6 +1196,9 @@ abstract class Contact extends ChildMeetingAttendee implements ActiveRecordInter
         if ($this->isColumnModified(ContactTableMap::COL_SFDC_CONTACT_TITLE)) {
             $modifiedColumns[':p' . $index++]  = 'sfdc_contact_title';
         }
+        if ($this->isColumnModified(ContactTableMap::COL_SFDC_LAST_CHECK_TIME)) {
+            $modifiedColumns[':p' . $index++]  = 'sfdc_last_check_time';
+        }
         if ($this->isColumnModified(ContactTableMap::COL_ID)) {
             $modifiedColumns[':p' . $index++]  = 'id';
         }
@@ -1189,6 +1242,9 @@ abstract class Contact extends ChildMeetingAttendee implements ActiveRecordInter
                         break;
                     case 'sfdc_contact_title':
                         $stmt->bindValue($identifier, $this->sfdc_contact_title, PDO::PARAM_STR);
+                        break;
+                    case 'sfdc_last_check_time':
+                        $stmt->bindValue($identifier, $this->sfdc_last_check_time ? $this->sfdc_last_check_time->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
                         break;
                     case 'id':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
@@ -1279,12 +1335,15 @@ abstract class Contact extends ChildMeetingAttendee implements ActiveRecordInter
                 return $this->getSfdcTitle();
                 break;
             case 8:
-                return $this->getId();
+                return $this->getSFDCLastCheckTime();
                 break;
             case 9:
-                return $this->getCreatedAt();
+                return $this->getId();
                 break;
             case 10:
+                return $this->getCreatedAt();
+                break;
+            case 11:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1325,16 +1384,21 @@ abstract class Contact extends ChildMeetingAttendee implements ActiveRecordInter
             $keys[5] => $this->getSfdcAccountId(),
             $keys[6] => $this->getSfdcContactName(),
             $keys[7] => $this->getSfdcTitle(),
-            $keys[8] => $this->getId(),
-            $keys[9] => $this->getCreatedAt(),
-            $keys[10] => $this->getUpdatedAt(),
+            $keys[8] => $this->getSFDCLastCheckTime(),
+            $keys[9] => $this->getId(),
+            $keys[10] => $this->getCreatedAt(),
+            $keys[11] => $this->getUpdatedAt(),
         );
-        if ($result[$keys[9]] instanceof \DateTime) {
-            $result[$keys[9]] = $result[$keys[9]]->format('c');
+        if ($result[$keys[8]] instanceof \DateTime) {
+            $result[$keys[8]] = $result[$keys[8]]->format('c');
         }
 
         if ($result[$keys[10]] instanceof \DateTime) {
             $result[$keys[10]] = $result[$keys[10]]->format('c');
+        }
+
+        if ($result[$keys[11]] instanceof \DateTime) {
+            $result[$keys[11]] = $result[$keys[11]]->format('c');
         }
 
         $virtualColumns = $this->virtualColumns;
@@ -1462,12 +1526,15 @@ abstract class Contact extends ChildMeetingAttendee implements ActiveRecordInter
                 $this->setSfdcTitle($value);
                 break;
             case 8:
-                $this->setId($value);
+                $this->setSFDCLastCheckTime($value);
                 break;
             case 9:
-                $this->setCreatedAt($value);
+                $this->setId($value);
                 break;
             case 10:
+                $this->setCreatedAt($value);
+                break;
+            case 11:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1521,13 +1588,16 @@ abstract class Contact extends ChildMeetingAttendee implements ActiveRecordInter
             $this->setSfdcTitle($arr[$keys[7]]);
         }
         if (array_key_exists($keys[8], $arr)) {
-            $this->setId($arr[$keys[8]]);
+            $this->setSFDCLastCheckTime($arr[$keys[8]]);
         }
         if (array_key_exists($keys[9], $arr)) {
-            $this->setCreatedAt($arr[$keys[9]]);
+            $this->setId($arr[$keys[9]]);
         }
         if (array_key_exists($keys[10], $arr)) {
-            $this->setUpdatedAt($arr[$keys[10]]);
+            $this->setCreatedAt($arr[$keys[10]]);
+        }
+        if (array_key_exists($keys[11], $arr)) {
+            $this->setUpdatedAt($arr[$keys[11]]);
         }
     }
 
@@ -1593,6 +1663,9 @@ abstract class Contact extends ChildMeetingAttendee implements ActiveRecordInter
         }
         if ($this->isColumnModified(ContactTableMap::COL_SFDC_CONTACT_TITLE)) {
             $criteria->add(ContactTableMap::COL_SFDC_CONTACT_TITLE, $this->sfdc_contact_title);
+        }
+        if ($this->isColumnModified(ContactTableMap::COL_SFDC_LAST_CHECK_TIME)) {
+            $criteria->add(ContactTableMap::COL_SFDC_LAST_CHECK_TIME, $this->sfdc_last_check_time);
         }
         if ($this->isColumnModified(ContactTableMap::COL_ID)) {
             $criteria->add(ContactTableMap::COL_ID, $this->id);
@@ -1704,6 +1777,7 @@ abstract class Contact extends ChildMeetingAttendee implements ActiveRecordInter
         $copyObj->setSfdcAccountId($this->getSfdcAccountId());
         $copyObj->setSfdcContactName($this->getSfdcContactName());
         $copyObj->setSfdcTitle($this->getSfdcTitle());
+        $copyObj->setSFDCLastCheckTime($this->getSFDCLastCheckTime());
         $copyObj->setId($this->getId());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
@@ -2160,6 +2234,7 @@ abstract class Contact extends ChildMeetingAttendee implements ActiveRecordInter
         $this->sfdc_account_id = null;
         $this->sfdc_contact_name = null;
         $this->sfdc_contact_title = null;
+        $this->sfdc_last_check_time = null;
         $this->id = null;
         $this->created_at = null;
         $this->updated_at = null;

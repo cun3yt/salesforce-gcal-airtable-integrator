@@ -29,6 +29,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildContactQuery orderBySfdcAccountId($order = Criteria::ASC) Order by the sfdc_account_id column
  * @method     ChildContactQuery orderBySfdcContactName($order = Criteria::ASC) Order by the sfdc_contact_name column
  * @method     ChildContactQuery orderBySfdcTitle($order = Criteria::ASC) Order by the sfdc_contact_title column
+ * @method     ChildContactQuery orderBySFDCLastCheckTime($order = Criteria::ASC) Order by the sfdc_last_check_time column
  * @method     ChildContactQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildContactQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildContactQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
@@ -41,6 +42,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildContactQuery groupBySfdcAccountId() Group by the sfdc_account_id column
  * @method     ChildContactQuery groupBySfdcContactName() Group by the sfdc_contact_name column
  * @method     ChildContactQuery groupBySfdcTitle() Group by the sfdc_contact_title column
+ * @method     ChildContactQuery groupBySFDCLastCheckTime() Group by the sfdc_last_check_time column
  * @method     ChildContactQuery groupById() Group by the id column
  * @method     ChildContactQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildContactQuery groupByUpdatedAt() Group by the updated_at column
@@ -106,6 +108,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildContact findOneBySfdcAccountId(string $sfdc_account_id) Return the first ChildContact filtered by the sfdc_account_id column
  * @method     ChildContact findOneBySfdcContactName(string $sfdc_contact_name) Return the first ChildContact filtered by the sfdc_contact_name column
  * @method     ChildContact findOneBySfdcTitle(string $sfdc_contact_title) Return the first ChildContact filtered by the sfdc_contact_title column
+ * @method     ChildContact findOneBySFDCLastCheckTime(string $sfdc_last_check_time) Return the first ChildContact filtered by the sfdc_last_check_time column
  * @method     ChildContact findOneById(int $id) Return the first ChildContact filtered by the id column
  * @method     ChildContact findOneByCreatedAt(string $created_at) Return the first ChildContact filtered by the created_at column
  * @method     ChildContact findOneByUpdatedAt(string $updated_at) Return the first ChildContact filtered by the updated_at column *
@@ -121,6 +124,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildContact requireOneBySfdcAccountId(string $sfdc_account_id) Return the first ChildContact filtered by the sfdc_account_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildContact requireOneBySfdcContactName(string $sfdc_contact_name) Return the first ChildContact filtered by the sfdc_contact_name column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildContact requireOneBySfdcTitle(string $sfdc_contact_title) Return the first ChildContact filtered by the sfdc_contact_title column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildContact requireOneBySFDCLastCheckTime(string $sfdc_last_check_time) Return the first ChildContact filtered by the sfdc_last_check_time column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildContact requireOneById(int $id) Return the first ChildContact filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildContact requireOneByCreatedAt(string $created_at) Return the first ChildContact filtered by the created_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildContact requireOneByUpdatedAt(string $updated_at) Return the first ChildContact filtered by the updated_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -134,6 +138,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildContact[]|ObjectCollection findBySfdcAccountId(string $sfdc_account_id) Return ChildContact objects filtered by the sfdc_account_id column
  * @method     ChildContact[]|ObjectCollection findBySfdcContactName(string $sfdc_contact_name) Return ChildContact objects filtered by the sfdc_contact_name column
  * @method     ChildContact[]|ObjectCollection findBySfdcTitle(string $sfdc_contact_title) Return ChildContact objects filtered by the sfdc_contact_title column
+ * @method     ChildContact[]|ObjectCollection findBySFDCLastCheckTime(string $sfdc_last_check_time) Return ChildContact objects filtered by the sfdc_last_check_time column
  * @method     ChildContact[]|ObjectCollection findById(int $id) Return ChildContact objects filtered by the id column
  * @method     ChildContact[]|ObjectCollection findByCreatedAt(string $created_at) Return ChildContact objects filtered by the created_at column
  * @method     ChildContact[]|ObjectCollection findByUpdatedAt(string $updated_at) Return ChildContact objects filtered by the updated_at column
@@ -235,7 +240,7 @@ abstract class ContactQuery extends ChildMeetingAttendeeQuery
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT email, full_name, client_id, account_id, sfdc_contact_id, sfdc_account_id, sfdc_contact_name, sfdc_contact_title, id, created_at, updated_at FROM contact WHERE id = :p0';
+        $sql = 'SELECT email, full_name, client_id, account_id, sfdc_contact_id, sfdc_account_id, sfdc_contact_name, sfdc_contact_title, sfdc_last_check_time, id, created_at, updated_at FROM contact WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -559,6 +564,49 @@ abstract class ContactQuery extends ChildMeetingAttendeeQuery
         }
 
         return $this->addUsingAlias(ContactTableMap::COL_SFDC_CONTACT_TITLE, $sfdcTitle, $comparison);
+    }
+
+    /**
+     * Filter the query on the sfdc_last_check_time column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterBySFDCLastCheckTime('2011-03-14'); // WHERE sfdc_last_check_time = '2011-03-14'
+     * $query->filterBySFDCLastCheckTime('now'); // WHERE sfdc_last_check_time = '2011-03-14'
+     * $query->filterBySFDCLastCheckTime(array('max' => 'yesterday')); // WHERE sfdc_last_check_time > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $sFDCLastCheckTime The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildContactQuery The current query, for fluid interface
+     */
+    public function filterBySFDCLastCheckTime($sFDCLastCheckTime = null, $comparison = null)
+    {
+        if (is_array($sFDCLastCheckTime)) {
+            $useMinMax = false;
+            if (isset($sFDCLastCheckTime['min'])) {
+                $this->addUsingAlias(ContactTableMap::COL_SFDC_LAST_CHECK_TIME, $sFDCLastCheckTime['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($sFDCLastCheckTime['max'])) {
+                $this->addUsingAlias(ContactTableMap::COL_SFDC_LAST_CHECK_TIME, $sFDCLastCheckTime['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(ContactTableMap::COL_SFDC_LAST_CHECK_TIME, $sFDCLastCheckTime, $comparison);
     }
 
     /**

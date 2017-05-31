@@ -2,11 +2,12 @@
 <database name="default" defaultIdMethod="native" namespace="DataModels" defaultPhpNamingMethod="underscore">
   <table name="account" idMethod="native" phpName="Account" namespace="DataModels">
     <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-    <column name="name" phpName="Name" type="VARCHAR" size="255"/>
+    <column name="sfdc_name" phpName="SFDCName" type="VARCHAR" size="127"/>
     <column name="email_domain" phpName="EmailDomain" type="VARCHAR" size="255"/>
     <column name="website" phpName="Website" type="VARCHAR" size="255"/>
     <column name="sfdc_account_id" phpName="SfdcAccountId" type="VARCHAR" size="127"/>
     <column name="client_id" phpName="ClientId" type="INTEGER"/>
+    <column name="sfdc_last_check_time" phpName="SFDCLastCheckTime" type="TIMESTAMP"/>
 
     <foreign-key foreignTable="client" onDelete="none" onUpdate="none">
       <reference local="client_id" foreign="id" />
@@ -60,6 +61,7 @@
     <column name="sfdc_account_id" phpName="SfdcAccountId" type="VARCHAR" size="127"/>
     <column name="sfdc_contact_name" phpName="SfdcContactName" type="VARCHAR" size="127"/>
     <column name="sfdc_contact_title" phpName="SfdcTitle" type="VARCHAR" size="127"/>
+    <column name="sfdc_last_check_time" phpName="SFDCLastCheckTime" type="TIMESTAMP"/>
 
     <foreign-key foreignTable="account" onDelete="none" onUpdate="none">
       <reference local="account_id" foreign="id" />
@@ -188,6 +190,7 @@
     <column name="name" phpName="Name" type="VARCHAR" size="255"/>
     <column name="amount" phpName="Amount" type="VARCHAR"/>
     <column name="close_date" phpName="CloseDate" type="TIMESTAMP"/>
+    <column name="sfdc_last_check_time" phpName="SFDCLastCheckTime" type="TIMESTAMP"/>
 
     <behavior name="timestampable"/>
   </table>
