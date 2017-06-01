@@ -52,6 +52,7 @@ while($contactPage <= $contactPageNb) {
             ->setSfdcAccountId($sfdcContact['records'][0]['AccountId'])
             ->setSfdcContactName($sfdcContact['records'][0]['Name'])
             ->setSfdcTitle($sfdcContact['records'][0]['Title'])
+            ->setSFDCLastCheckTime(time())
             ->save();
     }
 
@@ -69,7 +70,7 @@ function getContacts(Client $client, $page, $maxPerPage = 50) {
     $contactQ = new ContactQuery();
 
     $contactPager = $contactQ->filterByClient($client)
-        ->where('sfdc_contact_id IS NULL')
+        ->where("(sfdc_last_check_time IS NULL) OR (sfdc_last_check_time > CURRENT_TIMESTAMP - INTERVAL '3 DAYS')")
         ->paginate($page, $maxPerPage);
 
     return $contactPager;
