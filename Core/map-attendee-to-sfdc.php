@@ -1,6 +1,8 @@
 <?
 /**
  * map attendee (contact) to SFDC
+ *
+ * @todo add SFDC connection validation, i.e. Via OAuth User we can still access to SFDC
  */
 error_reporting(E_ALL);
 
@@ -45,6 +47,8 @@ while($contactPage <= $contactPageNb) {
         );
 
         if(!isset($sfdcContact['records'][0])) {
+            $contact->setSFDCLastCheckTime(time())
+                ->save();
             continue;
         }
 
