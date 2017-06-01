@@ -15,9 +15,6 @@ Helpers::setDebugParam($isDebugActive);
 use DataModels\DataModels\Client as Client;
 use DataModels\DataModels\ClientCalendarUserOAuth as ClientCalendarUserOAuth;
 
-$access_token = "";
-$instance_url = "";
-
 /**
  * @var $client Client
  */
@@ -25,13 +22,15 @@ list($client, $calendarUsers) = Helpers::loadClientData($strClientDomainName);
 
 $sfdcAuths = Helpers::getAuthentications($client, ClientCalendarUserOAuth::SFDC);
 
-if(count($sfdcAuths)>0) {
-    // if we get salesforce OAuth access data we iterate and use the access data
-    // and assign it out global variables declared.
-    $integrationDetails = json_decode($sfdcAuths[0]->getData());
-    $access_token = $integrationDetails->sfdc_access_token->access_token;
-    $instance_url = $integrationDetails->sfdc_access_token->instance_url;
+if(count($sfdcAuths) <= 0) {
+    trigger_error("No SFDC integration is found in ".__FILE__, E_USER_ERROR);
+    die;
 }
+
+$sfdcCredentialObject = json_decode($sfdcAuths[0]->getData());
+$sfdcToken = $sfdcCredentialObject->tokendata;
+$access_token = $sfdcToken->access_token;
+$instance_url = $sfdcToken->instance_url;
 
 // @todo The rest will be here...
 
