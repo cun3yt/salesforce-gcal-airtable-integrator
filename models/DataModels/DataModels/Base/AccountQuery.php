@@ -21,7 +21,6 @@ use Propel\Runtime\Exception\PropelException;
  *
  *
  * @method     ChildAccountQuery orderById($order = Criteria::ASC) Order by the id column
- * @method     ChildAccountQuery orderByName($order = Criteria::ASC) Order by the name column
  * @method     ChildAccountQuery orderByEmailDomain($order = Criteria::ASC) Order by the email_domain column
  * @method     ChildAccountQuery orderByWebsite($order = Criteria::ASC) Order by the website column
  * @method     ChildAccountQuery orderBySfdcAccountId($order = Criteria::ASC) Order by the sfdc_account_id column
@@ -31,7 +30,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccountQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildAccountQuery groupById() Group by the id column
- * @method     ChildAccountQuery groupByName() Group by the name column
  * @method     ChildAccountQuery groupByEmailDomain() Group by the email_domain column
  * @method     ChildAccountQuery groupByWebsite() Group by the website column
  * @method     ChildAccountQuery groupBySfdcAccountId() Group by the sfdc_account_id column
@@ -74,7 +72,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccount findOneOrCreate(ConnectionInterface $con = null) Return the first ChildAccount matching the query, or a new ChildAccount object populated from the query conditions when no match is found
  *
  * @method     ChildAccount findOneById(int $id) Return the first ChildAccount filtered by the id column
- * @method     ChildAccount findOneByName(string $name) Return the first ChildAccount filtered by the name column
  * @method     ChildAccount findOneByEmailDomain(string $email_domain) Return the first ChildAccount filtered by the email_domain column
  * @method     ChildAccount findOneByWebsite(string $website) Return the first ChildAccount filtered by the website column
  * @method     ChildAccount findOneBySfdcAccountId(string $sfdc_account_id) Return the first ChildAccount filtered by the sfdc_account_id column
@@ -87,7 +84,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccount requireOne(ConnectionInterface $con = null) Return the first ChildAccount matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildAccount requireOneById(int $id) Return the first ChildAccount filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildAccount requireOneByName(string $name) Return the first ChildAccount filtered by the name column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccount requireOneByEmailDomain(string $email_domain) Return the first ChildAccount filtered by the email_domain column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccount requireOneByWebsite(string $website) Return the first ChildAccount filtered by the website column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccount requireOneBySfdcAccountId(string $sfdc_account_id) Return the first ChildAccount filtered by the sfdc_account_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -98,7 +94,6 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildAccount[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildAccount objects based on current ModelCriteria
  * @method     ChildAccount[]|ObjectCollection findById(int $id) Return ChildAccount objects filtered by the id column
- * @method     ChildAccount[]|ObjectCollection findByName(string $name) Return ChildAccount objects filtered by the name column
  * @method     ChildAccount[]|ObjectCollection findByEmailDomain(string $email_domain) Return ChildAccount objects filtered by the email_domain column
  * @method     ChildAccount[]|ObjectCollection findByWebsite(string $website) Return ChildAccount objects filtered by the website column
  * @method     ChildAccount[]|ObjectCollection findBySfdcAccountId(string $sfdc_account_id) Return ChildAccount objects filtered by the sfdc_account_id column
@@ -204,7 +199,7 @@ abstract class AccountQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, name, email_domain, website, sfdc_account_id, client_id, sfdc_last_check_time, created_at, updated_at FROM account WHERE id = :p0';
+        $sql = 'SELECT id, email_domain, website, sfdc_account_id, client_id, sfdc_last_check_time, created_at, updated_at FROM account WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -333,31 +328,6 @@ abstract class AccountQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(AccountTableMap::COL_ID, $id, $comparison);
-    }
-
-    /**
-     * Filter the query on the name column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByName('fooValue');   // WHERE name = 'fooValue'
-     * $query->filterByName('%fooValue%', Criteria::LIKE); // WHERE name LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $name The value to use as filter.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return $this|ChildAccountQuery The current query, for fluid interface
-     */
-    public function filterByName($name = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($name)) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(AccountTableMap::COL_NAME, $name, $comparison);
     }
 
     /**

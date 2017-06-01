@@ -76,13 +76,6 @@ abstract class Account implements ActiveRecordInterface
     protected $id;
 
     /**
-     * The value for the name field.
-     *
-     * @var        string
-     */
-    protected $name;
-
-    /**
      * The value for the email_domain field.
      *
      * @var        string
@@ -392,16 +385,6 @@ abstract class Account implements ActiveRecordInterface
     }
 
     /**
-     * Get the [name] column value.
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
      * Get the [email_domain] column value.
      *
      * @return string
@@ -520,26 +503,6 @@ abstract class Account implements ActiveRecordInterface
 
         return $this;
     } // setId()
-
-    /**
-     * Set the value of [name] column.
-     *
-     * @param string $v new value
-     * @return $this|\DataModels\DataModels\Account The current object (for fluent API support)
-     */
-    public function setName($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->name !== $v) {
-            $this->name = $v;
-            $this->modifiedColumns[AccountTableMap::COL_NAME] = true;
-        }
-
-        return $this;
-    } // setName()
 
     /**
      * Set the value of [email_domain] column.
@@ -724,28 +687,25 @@ abstract class Account implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : AccountTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : AccountTableMap::translateFieldName('Name', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->name = (null !== $col) ? (string) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : AccountTableMap::translateFieldName('EmailDomain', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : AccountTableMap::translateFieldName('EmailDomain', TableMap::TYPE_PHPNAME, $indexType)];
             $this->email_domain = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : AccountTableMap::translateFieldName('Website', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : AccountTableMap::translateFieldName('Website', TableMap::TYPE_PHPNAME, $indexType)];
             $this->website = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : AccountTableMap::translateFieldName('SfdcAccountId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : AccountTableMap::translateFieldName('SfdcAccountId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->sfdc_account_id = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : AccountTableMap::translateFieldName('ClientId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : AccountTableMap::translateFieldName('ClientId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->client_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : AccountTableMap::translateFieldName('SFDCLastCheckTime', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : AccountTableMap::translateFieldName('SFDCLastCheckTime', TableMap::TYPE_PHPNAME, $indexType)];
             $this->sfdc_last_check_time = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : AccountTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : AccountTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : AccountTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : AccountTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
             $this->resetModified();
 
@@ -755,7 +715,7 @@ abstract class Account implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 9; // 9 = AccountTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 8; // 8 = AccountTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\DataModels\\DataModels\\Account'), 0, $e);
@@ -1016,9 +976,6 @@ abstract class Account implements ActiveRecordInterface
         if ($this->isColumnModified(AccountTableMap::COL_ID)) {
             $modifiedColumns[':p' . $index++]  = 'id';
         }
-        if ($this->isColumnModified(AccountTableMap::COL_NAME)) {
-            $modifiedColumns[':p' . $index++]  = 'name';
-        }
         if ($this->isColumnModified(AccountTableMap::COL_EMAIL_DOMAIN)) {
             $modifiedColumns[':p' . $index++]  = 'email_domain';
         }
@@ -1053,9 +1010,6 @@ abstract class Account implements ActiveRecordInterface
                 switch ($columnName) {
                     case 'id':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
-                        break;
-                    case 'name':
-                        $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
                         break;
                     case 'email_domain':
                         $stmt->bindValue($identifier, $this->email_domain, PDO::PARAM_STR);
@@ -1137,27 +1091,24 @@ abstract class Account implements ActiveRecordInterface
                 return $this->getId();
                 break;
             case 1:
-                return $this->getName();
-                break;
-            case 2:
                 return $this->getEmailDomain();
                 break;
-            case 3:
+            case 2:
                 return $this->getWebsite();
                 break;
-            case 4:
+            case 3:
                 return $this->getSfdcAccountId();
                 break;
-            case 5:
+            case 4:
                 return $this->getClientId();
                 break;
-            case 6:
+            case 5:
                 return $this->getSFDCLastCheckTime();
                 break;
-            case 7:
+            case 6:
                 return $this->getCreatedAt();
                 break;
-            case 8:
+            case 7:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1191,25 +1142,24 @@ abstract class Account implements ActiveRecordInterface
         $keys = AccountTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getName(),
-            $keys[2] => $this->getEmailDomain(),
-            $keys[3] => $this->getWebsite(),
-            $keys[4] => $this->getSfdcAccountId(),
-            $keys[5] => $this->getClientId(),
-            $keys[6] => $this->getSFDCLastCheckTime(),
-            $keys[7] => $this->getCreatedAt(),
-            $keys[8] => $this->getUpdatedAt(),
+            $keys[1] => $this->getEmailDomain(),
+            $keys[2] => $this->getWebsite(),
+            $keys[3] => $this->getSfdcAccountId(),
+            $keys[4] => $this->getClientId(),
+            $keys[5] => $this->getSFDCLastCheckTime(),
+            $keys[6] => $this->getCreatedAt(),
+            $keys[7] => $this->getUpdatedAt(),
         );
+        if ($result[$keys[5]] instanceof \DateTime) {
+            $result[$keys[5]] = $result[$keys[5]]->format('c');
+        }
+
         if ($result[$keys[6]] instanceof \DateTime) {
             $result[$keys[6]] = $result[$keys[6]]->format('c');
         }
 
         if ($result[$keys[7]] instanceof \DateTime) {
             $result[$keys[7]] = $result[$keys[7]]->format('c');
-        }
-
-        if ($result[$keys[8]] instanceof \DateTime) {
-            $result[$keys[8]] = $result[$keys[8]]->format('c');
         }
 
         $virtualColumns = $this->virtualColumns;
@@ -1286,27 +1236,24 @@ abstract class Account implements ActiveRecordInterface
                 $this->setId($value);
                 break;
             case 1:
-                $this->setName($value);
-                break;
-            case 2:
                 $this->setEmailDomain($value);
                 break;
-            case 3:
+            case 2:
                 $this->setWebsite($value);
                 break;
-            case 4:
+            case 3:
                 $this->setSfdcAccountId($value);
                 break;
-            case 5:
+            case 4:
                 $this->setClientId($value);
                 break;
-            case 6:
+            case 5:
                 $this->setSFDCLastCheckTime($value);
                 break;
-            case 7:
+            case 6:
                 $this->setCreatedAt($value);
                 break;
-            case 8:
+            case 7:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1339,28 +1286,25 @@ abstract class Account implements ActiveRecordInterface
             $this->setId($arr[$keys[0]]);
         }
         if (array_key_exists($keys[1], $arr)) {
-            $this->setName($arr[$keys[1]]);
+            $this->setEmailDomain($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
-            $this->setEmailDomain($arr[$keys[2]]);
+            $this->setWebsite($arr[$keys[2]]);
         }
         if (array_key_exists($keys[3], $arr)) {
-            $this->setWebsite($arr[$keys[3]]);
+            $this->setSfdcAccountId($arr[$keys[3]]);
         }
         if (array_key_exists($keys[4], $arr)) {
-            $this->setSfdcAccountId($arr[$keys[4]]);
+            $this->setClientId($arr[$keys[4]]);
         }
         if (array_key_exists($keys[5], $arr)) {
-            $this->setClientId($arr[$keys[5]]);
+            $this->setSFDCLastCheckTime($arr[$keys[5]]);
         }
         if (array_key_exists($keys[6], $arr)) {
-            $this->setSFDCLastCheckTime($arr[$keys[6]]);
+            $this->setCreatedAt($arr[$keys[6]]);
         }
         if (array_key_exists($keys[7], $arr)) {
-            $this->setCreatedAt($arr[$keys[7]]);
-        }
-        if (array_key_exists($keys[8], $arr)) {
-            $this->setUpdatedAt($arr[$keys[8]]);
+            $this->setUpdatedAt($arr[$keys[7]]);
         }
     }
 
@@ -1405,9 +1349,6 @@ abstract class Account implements ActiveRecordInterface
 
         if ($this->isColumnModified(AccountTableMap::COL_ID)) {
             $criteria->add(AccountTableMap::COL_ID, $this->id);
-        }
-        if ($this->isColumnModified(AccountTableMap::COL_NAME)) {
-            $criteria->add(AccountTableMap::COL_NAME, $this->name);
         }
         if ($this->isColumnModified(AccountTableMap::COL_EMAIL_DOMAIN)) {
             $criteria->add(AccountTableMap::COL_EMAIL_DOMAIN, $this->email_domain);
@@ -1516,7 +1457,6 @@ abstract class Account implements ActiveRecordInterface
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setName($this->getName());
         $copyObj->setEmailDomain($this->getEmailDomain());
         $copyObj->setWebsite($this->getWebsite());
         $copyObj->setSfdcAccountId($this->getSfdcAccountId());
@@ -1919,7 +1859,6 @@ abstract class Account implements ActiveRecordInterface
             $this->aClient->removeAccount($this);
         }
         $this->id = null;
-        $this->name = null;
         $this->email_domain = null;
         $this->website = null;
         $this->sfdc_account_id = null;

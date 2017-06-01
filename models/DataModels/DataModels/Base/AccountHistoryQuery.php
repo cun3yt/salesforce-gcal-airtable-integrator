@@ -21,6 +21,7 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildAccountHistoryQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildAccountHistoryQuery orderByAccountId($order = Criteria::ASC) Order by the account_id column
+ * @method     ChildAccountHistoryQuery orderBySFDCName($order = Criteria::ASC) Order by the sfdc_name column
  * @method     ChildAccountHistoryQuery orderByAccountStatusId($order = Criteria::ASC) Order by the account_status_id column
  * @method     ChildAccountHistoryQuery orderByBillingCycleId($order = Criteria::ASC) Order by the billing_cycle_id column
  * @method     ChildAccountHistoryQuery orderByBillingCity($order = Criteria::ASC) Order by the billing_city column
@@ -32,6 +33,7 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildAccountHistoryQuery groupById() Group by the id column
  * @method     ChildAccountHistoryQuery groupByAccountId() Group by the account_id column
+ * @method     ChildAccountHistoryQuery groupBySFDCName() Group by the sfdc_name column
  * @method     ChildAccountHistoryQuery groupByAccountStatusId() Group by the account_status_id column
  * @method     ChildAccountHistoryQuery groupByBillingCycleId() Group by the billing_cycle_id column
  * @method     ChildAccountHistoryQuery groupByBillingCity() Group by the billing_city column
@@ -54,6 +56,7 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildAccountHistory findOneById(int $id) Return the first ChildAccountHistory filtered by the id column
  * @method     ChildAccountHistory findOneByAccountId(int $account_id) Return the first ChildAccountHistory filtered by the account_id column
+ * @method     ChildAccountHistory findOneBySFDCName(string $sfdc_name) Return the first ChildAccountHistory filtered by the sfdc_name column
  * @method     ChildAccountHistory findOneByAccountStatusId(int $account_status_id) Return the first ChildAccountHistory filtered by the account_status_id column
  * @method     ChildAccountHistory findOneByBillingCycleId(int $billing_cycle_id) Return the first ChildAccountHistory filtered by the billing_cycle_id column
  * @method     ChildAccountHistory findOneByBillingCity(string $billing_city) Return the first ChildAccountHistory filtered by the billing_city column
@@ -68,6 +71,7 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildAccountHistory requireOneById(int $id) Return the first ChildAccountHistory filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccountHistory requireOneByAccountId(int $account_id) Return the first ChildAccountHistory filtered by the account_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildAccountHistory requireOneBySFDCName(string $sfdc_name) Return the first ChildAccountHistory filtered by the sfdc_name column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccountHistory requireOneByAccountStatusId(int $account_status_id) Return the first ChildAccountHistory filtered by the account_status_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccountHistory requireOneByBillingCycleId(int $billing_cycle_id) Return the first ChildAccountHistory filtered by the billing_cycle_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccountHistory requireOneByBillingCity(string $billing_city) Return the first ChildAccountHistory filtered by the billing_city column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -80,6 +84,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccountHistory[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildAccountHistory objects based on current ModelCriteria
  * @method     ChildAccountHistory[]|ObjectCollection findById(int $id) Return ChildAccountHistory objects filtered by the id column
  * @method     ChildAccountHistory[]|ObjectCollection findByAccountId(int $account_id) Return ChildAccountHistory objects filtered by the account_id column
+ * @method     ChildAccountHistory[]|ObjectCollection findBySFDCName(string $sfdc_name) Return ChildAccountHistory objects filtered by the sfdc_name column
  * @method     ChildAccountHistory[]|ObjectCollection findByAccountStatusId(int $account_status_id) Return ChildAccountHistory objects filtered by the account_status_id column
  * @method     ChildAccountHistory[]|ObjectCollection findByBillingCycleId(int $billing_cycle_id) Return ChildAccountHistory objects filtered by the billing_cycle_id column
  * @method     ChildAccountHistory[]|ObjectCollection findByBillingCity(string $billing_city) Return ChildAccountHistory objects filtered by the billing_city column
@@ -186,7 +191,7 @@ abstract class AccountHistoryQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, account_id, account_status_id, billing_cycle_id, billing_city, renewal_date, num_employees, ARR, created_at, updated_at FROM account_history WHERE id = :p0';
+        $sql = 'SELECT id, account_id, sfdc_name, account_status_id, billing_cycle_id, billing_city, renewal_date, num_employees, ARR, created_at, updated_at FROM account_history WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -356,6 +361,31 @@ abstract class AccountHistoryQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(AccountHistoryTableMap::COL_ACCOUNT_ID, $accountId, $comparison);
+    }
+
+    /**
+     * Filter the query on the sfdc_name column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterBySFDCName('fooValue');   // WHERE sfdc_name = 'fooValue'
+     * $query->filterBySFDCName('%fooValue%', Criteria::LIKE); // WHERE sfdc_name LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $sFDCName The value to use as filter.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildAccountHistoryQuery The current query, for fluid interface
+     */
+    public function filterBySFDCName($sFDCName = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($sFDCName)) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(AccountHistoryTableMap::COL_SFDC_NAME, $sFDCName, $comparison);
     }
 
     /**

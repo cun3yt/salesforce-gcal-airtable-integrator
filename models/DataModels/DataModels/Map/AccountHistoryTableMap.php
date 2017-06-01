@@ -59,7 +59,7 @@ class AccountHistoryTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 10;
+    const NUM_COLUMNS = 11;
 
     /**
      * The number of lazy-loaded columns
@@ -69,7 +69,7 @@ class AccountHistoryTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 10;
+    const NUM_HYDRATE_COLUMNS = 11;
 
     /**
      * the column name for the id field
@@ -80,6 +80,11 @@ class AccountHistoryTableMap extends TableMap
      * the column name for the account_id field
      */
     const COL_ACCOUNT_ID = 'account_history.account_id';
+
+    /**
+     * the column name for the sfdc_name field
+     */
+    const COL_SFDC_NAME = 'account_history.sfdc_name';
 
     /**
      * the column name for the account_status_id field
@@ -133,11 +138,11 @@ class AccountHistoryTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'AccountId', 'AccountStatusId', 'BillingCycleId', 'BillingCity', 'RenewalDate', 'NumEmployees', 'Arr', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_CAMELNAME     => array('id', 'accountId', 'accountStatusId', 'billingCycleId', 'billingCity', 'renewalDate', 'numEmployees', 'arr', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(AccountHistoryTableMap::COL_ID, AccountHistoryTableMap::COL_ACCOUNT_ID, AccountHistoryTableMap::COL_ACCOUNT_STATUS_ID, AccountHistoryTableMap::COL_BILLING_CYCLE_ID, AccountHistoryTableMap::COL_BILLING_CITY, AccountHistoryTableMap::COL_RENEWAL_DATE, AccountHistoryTableMap::COL_NUM_EMPLOYEES, AccountHistoryTableMap::COL_ARR, AccountHistoryTableMap::COL_CREATED_AT, AccountHistoryTableMap::COL_UPDATED_AT, ),
-        self::TYPE_FIELDNAME     => array('id', 'account_id', 'account_status_id', 'billing_cycle_id', 'billing_city', 'renewal_date', 'num_employees', 'ARR', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
+        self::TYPE_PHPNAME       => array('Id', 'AccountId', 'SFDCName', 'AccountStatusId', 'BillingCycleId', 'BillingCity', 'RenewalDate', 'NumEmployees', 'Arr', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_CAMELNAME     => array('id', 'accountId', 'sFDCName', 'accountStatusId', 'billingCycleId', 'billingCity', 'renewalDate', 'numEmployees', 'arr', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(AccountHistoryTableMap::COL_ID, AccountHistoryTableMap::COL_ACCOUNT_ID, AccountHistoryTableMap::COL_SFDC_NAME, AccountHistoryTableMap::COL_ACCOUNT_STATUS_ID, AccountHistoryTableMap::COL_BILLING_CYCLE_ID, AccountHistoryTableMap::COL_BILLING_CITY, AccountHistoryTableMap::COL_RENEWAL_DATE, AccountHistoryTableMap::COL_NUM_EMPLOYEES, AccountHistoryTableMap::COL_ARR, AccountHistoryTableMap::COL_CREATED_AT, AccountHistoryTableMap::COL_UPDATED_AT, ),
+        self::TYPE_FIELDNAME     => array('id', 'account_id', 'sfdc_name', 'account_status_id', 'billing_cycle_id', 'billing_city', 'renewal_date', 'num_employees', 'ARR', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
     );
 
     /**
@@ -147,11 +152,11 @@ class AccountHistoryTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'AccountId' => 1, 'AccountStatusId' => 2, 'BillingCycleId' => 3, 'BillingCity' => 4, 'RenewalDate' => 5, 'NumEmployees' => 6, 'Arr' => 7, 'CreatedAt' => 8, 'UpdatedAt' => 9, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'accountId' => 1, 'accountStatusId' => 2, 'billingCycleId' => 3, 'billingCity' => 4, 'renewalDate' => 5, 'numEmployees' => 6, 'arr' => 7, 'createdAt' => 8, 'updatedAt' => 9, ),
-        self::TYPE_COLNAME       => array(AccountHistoryTableMap::COL_ID => 0, AccountHistoryTableMap::COL_ACCOUNT_ID => 1, AccountHistoryTableMap::COL_ACCOUNT_STATUS_ID => 2, AccountHistoryTableMap::COL_BILLING_CYCLE_ID => 3, AccountHistoryTableMap::COL_BILLING_CITY => 4, AccountHistoryTableMap::COL_RENEWAL_DATE => 5, AccountHistoryTableMap::COL_NUM_EMPLOYEES => 6, AccountHistoryTableMap::COL_ARR => 7, AccountHistoryTableMap::COL_CREATED_AT => 8, AccountHistoryTableMap::COL_UPDATED_AT => 9, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'account_id' => 1, 'account_status_id' => 2, 'billing_cycle_id' => 3, 'billing_city' => 4, 'renewal_date' => 5, 'num_employees' => 6, 'ARR' => 7, 'created_at' => 8, 'updated_at' => 9, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'AccountId' => 1, 'SFDCName' => 2, 'AccountStatusId' => 3, 'BillingCycleId' => 4, 'BillingCity' => 5, 'RenewalDate' => 6, 'NumEmployees' => 7, 'Arr' => 8, 'CreatedAt' => 9, 'UpdatedAt' => 10, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'accountId' => 1, 'sFDCName' => 2, 'accountStatusId' => 3, 'billingCycleId' => 4, 'billingCity' => 5, 'renewalDate' => 6, 'numEmployees' => 7, 'arr' => 8, 'createdAt' => 9, 'updatedAt' => 10, ),
+        self::TYPE_COLNAME       => array(AccountHistoryTableMap::COL_ID => 0, AccountHistoryTableMap::COL_ACCOUNT_ID => 1, AccountHistoryTableMap::COL_SFDC_NAME => 2, AccountHistoryTableMap::COL_ACCOUNT_STATUS_ID => 3, AccountHistoryTableMap::COL_BILLING_CYCLE_ID => 4, AccountHistoryTableMap::COL_BILLING_CITY => 5, AccountHistoryTableMap::COL_RENEWAL_DATE => 6, AccountHistoryTableMap::COL_NUM_EMPLOYEES => 7, AccountHistoryTableMap::COL_ARR => 8, AccountHistoryTableMap::COL_CREATED_AT => 9, AccountHistoryTableMap::COL_UPDATED_AT => 10, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'account_id' => 1, 'sfdc_name' => 2, 'account_status_id' => 3, 'billing_cycle_id' => 4, 'billing_city' => 5, 'renewal_date' => 6, 'num_employees' => 7, 'ARR' => 8, 'created_at' => 9, 'updated_at' => 10, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
     );
 
     /**
@@ -174,6 +179,7 @@ class AccountHistoryTableMap extends TableMap
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('account_id', 'AccountId', 'INTEGER', false, null, null);
+        $this->addColumn('sfdc_name', 'SFDCName', 'VARCHAR', false, 127, null);
         $this->addColumn('account_status_id', 'AccountStatusId', 'INTEGER', false, null, null);
         $this->addColumn('billing_cycle_id', 'BillingCycleId', 'INTEGER', false, null, null);
         $this->addColumn('billing_city', 'BillingCity', 'VARCHAR', false, 255, null);
@@ -347,6 +353,7 @@ class AccountHistoryTableMap extends TableMap
         if (null === $alias) {
             $criteria->addSelectColumn(AccountHistoryTableMap::COL_ID);
             $criteria->addSelectColumn(AccountHistoryTableMap::COL_ACCOUNT_ID);
+            $criteria->addSelectColumn(AccountHistoryTableMap::COL_SFDC_NAME);
             $criteria->addSelectColumn(AccountHistoryTableMap::COL_ACCOUNT_STATUS_ID);
             $criteria->addSelectColumn(AccountHistoryTableMap::COL_BILLING_CYCLE_ID);
             $criteria->addSelectColumn(AccountHistoryTableMap::COL_BILLING_CITY);
@@ -358,6 +365,7 @@ class AccountHistoryTableMap extends TableMap
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.account_id');
+            $criteria->addSelectColumn($alias . '.sfdc_name');
             $criteria->addSelectColumn($alias . '.account_status_id');
             $criteria->addSelectColumn($alias . '.billing_cycle_id');
             $criteria->addSelectColumn($alias . '.billing_city');

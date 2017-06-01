@@ -59,7 +59,7 @@ class AccountTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 9;
+    const NUM_COLUMNS = 8;
 
     /**
      * The number of lazy-loaded columns
@@ -69,17 +69,12 @@ class AccountTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 9;
+    const NUM_HYDRATE_COLUMNS = 8;
 
     /**
      * the column name for the id field
      */
     const COL_ID = 'account.id';
-
-    /**
-     * the column name for the name field
-     */
-    const COL_NAME = 'account.name';
 
     /**
      * the column name for the email_domain field
@@ -128,11 +123,11 @@ class AccountTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Name', 'EmailDomain', 'Website', 'SfdcAccountId', 'ClientId', 'SFDCLastCheckTime', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_CAMELNAME     => array('id', 'name', 'emailDomain', 'website', 'sfdcAccountId', 'clientId', 'sFDCLastCheckTime', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(AccountTableMap::COL_ID, AccountTableMap::COL_NAME, AccountTableMap::COL_EMAIL_DOMAIN, AccountTableMap::COL_WEBSITE, AccountTableMap::COL_SFDC_ACCOUNT_ID, AccountTableMap::COL_CLIENT_ID, AccountTableMap::COL_SFDC_LAST_CHECK_TIME, AccountTableMap::COL_CREATED_AT, AccountTableMap::COL_UPDATED_AT, ),
-        self::TYPE_FIELDNAME     => array('id', 'name', 'email_domain', 'website', 'sfdc_account_id', 'client_id', 'sfdc_last_check_time', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
+        self::TYPE_PHPNAME       => array('Id', 'EmailDomain', 'Website', 'SfdcAccountId', 'ClientId', 'SFDCLastCheckTime', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_CAMELNAME     => array('id', 'emailDomain', 'website', 'sfdcAccountId', 'clientId', 'sFDCLastCheckTime', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(AccountTableMap::COL_ID, AccountTableMap::COL_EMAIL_DOMAIN, AccountTableMap::COL_WEBSITE, AccountTableMap::COL_SFDC_ACCOUNT_ID, AccountTableMap::COL_CLIENT_ID, AccountTableMap::COL_SFDC_LAST_CHECK_TIME, AccountTableMap::COL_CREATED_AT, AccountTableMap::COL_UPDATED_AT, ),
+        self::TYPE_FIELDNAME     => array('id', 'email_domain', 'website', 'sfdc_account_id', 'client_id', 'sfdc_last_check_time', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
     /**
@@ -142,11 +137,11 @@ class AccountTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Name' => 1, 'EmailDomain' => 2, 'Website' => 3, 'SfdcAccountId' => 4, 'ClientId' => 5, 'SFDCLastCheckTime' => 6, 'CreatedAt' => 7, 'UpdatedAt' => 8, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'name' => 1, 'emailDomain' => 2, 'website' => 3, 'sfdcAccountId' => 4, 'clientId' => 5, 'sFDCLastCheckTime' => 6, 'createdAt' => 7, 'updatedAt' => 8, ),
-        self::TYPE_COLNAME       => array(AccountTableMap::COL_ID => 0, AccountTableMap::COL_NAME => 1, AccountTableMap::COL_EMAIL_DOMAIN => 2, AccountTableMap::COL_WEBSITE => 3, AccountTableMap::COL_SFDC_ACCOUNT_ID => 4, AccountTableMap::COL_CLIENT_ID => 5, AccountTableMap::COL_SFDC_LAST_CHECK_TIME => 6, AccountTableMap::COL_CREATED_AT => 7, AccountTableMap::COL_UPDATED_AT => 8, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'name' => 1, 'email_domain' => 2, 'website' => 3, 'sfdc_account_id' => 4, 'client_id' => 5, 'sfdc_last_check_time' => 6, 'created_at' => 7, 'updated_at' => 8, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'EmailDomain' => 1, 'Website' => 2, 'SfdcAccountId' => 3, 'ClientId' => 4, 'SFDCLastCheckTime' => 5, 'CreatedAt' => 6, 'UpdatedAt' => 7, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'emailDomain' => 1, 'website' => 2, 'sfdcAccountId' => 3, 'clientId' => 4, 'sFDCLastCheckTime' => 5, 'createdAt' => 6, 'updatedAt' => 7, ),
+        self::TYPE_COLNAME       => array(AccountTableMap::COL_ID => 0, AccountTableMap::COL_EMAIL_DOMAIN => 1, AccountTableMap::COL_WEBSITE => 2, AccountTableMap::COL_SFDC_ACCOUNT_ID => 3, AccountTableMap::COL_CLIENT_ID => 4, AccountTableMap::COL_SFDC_LAST_CHECK_TIME => 5, AccountTableMap::COL_CREATED_AT => 6, AccountTableMap::COL_UPDATED_AT => 7, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'email_domain' => 1, 'website' => 2, 'sfdc_account_id' => 3, 'client_id' => 4, 'sfdc_last_check_time' => 5, 'created_at' => 6, 'updated_at' => 7, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
     /**
@@ -168,7 +163,6 @@ class AccountTableMap extends TableMap
         $this->setPrimaryKeyMethodInfo('account_id_seq');
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('name', 'Name', 'VARCHAR', false, 255, null);
         $this->addColumn('email_domain', 'EmailDomain', 'VARCHAR', false, 255, null);
         $this->addColumn('website', 'Website', 'VARCHAR', false, 255, null);
         $this->addColumn('sfdc_account_id', 'SfdcAccountId', 'VARCHAR', false, 127, null);
@@ -354,7 +348,6 @@ class AccountTableMap extends TableMap
     {
         if (null === $alias) {
             $criteria->addSelectColumn(AccountTableMap::COL_ID);
-            $criteria->addSelectColumn(AccountTableMap::COL_NAME);
             $criteria->addSelectColumn(AccountTableMap::COL_EMAIL_DOMAIN);
             $criteria->addSelectColumn(AccountTableMap::COL_WEBSITE);
             $criteria->addSelectColumn(AccountTableMap::COL_SFDC_ACCOUNT_ID);
@@ -364,7 +357,6 @@ class AccountTableMap extends TableMap
             $criteria->addSelectColumn(AccountTableMap::COL_UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
-            $criteria->addSelectColumn($alias . '.name');
             $criteria->addSelectColumn($alias . '.email_domain');
             $criteria->addSelectColumn($alias . '.website');
             $criteria->addSelectColumn($alias . '.sfdc_account_id');

@@ -77,6 +77,13 @@ abstract class AccountHistory implements ActiveRecordInterface
     protected $account_id;
 
     /**
+     * The value for the sfdc_name field.
+     *
+     * @var        string
+     */
+    protected $sfdc_name;
+
+    /**
      * The value for the account_status_id field.
      *
      * @var        int
@@ -386,6 +393,16 @@ abstract class AccountHistory implements ActiveRecordInterface
     }
 
     /**
+     * Get the [sfdc_name] column value.
+     *
+     * @return string
+     */
+    public function getSFDCName()
+    {
+        return $this->sfdc_name;
+    }
+
+    /**
      * Get the [account_status_id] column value.
      *
      * @return int
@@ -534,6 +551,26 @@ abstract class AccountHistory implements ActiveRecordInterface
 
         return $this;
     } // setAccountId()
+
+    /**
+     * Set the value of [sfdc_name] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\AccountHistory The current object (for fluent API support)
+     */
+    public function setSFDCName($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->sfdc_name !== $v) {
+            $this->sfdc_name = $v;
+            $this->modifiedColumns[AccountHistoryTableMap::COL_SFDC_NAME] = true;
+        }
+
+        return $this;
+    } // setSFDCName()
 
     /**
      * Set the value of [account_status_id] column.
@@ -737,28 +774,31 @@ abstract class AccountHistory implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : AccountHistoryTableMap::translateFieldName('AccountId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->account_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : AccountHistoryTableMap::translateFieldName('AccountStatusId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : AccountHistoryTableMap::translateFieldName('SFDCName', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->sfdc_name = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : AccountHistoryTableMap::translateFieldName('AccountStatusId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->account_status_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : AccountHistoryTableMap::translateFieldName('BillingCycleId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : AccountHistoryTableMap::translateFieldName('BillingCycleId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->billing_cycle_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : AccountHistoryTableMap::translateFieldName('BillingCity', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : AccountHistoryTableMap::translateFieldName('BillingCity', TableMap::TYPE_PHPNAME, $indexType)];
             $this->billing_city = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : AccountHistoryTableMap::translateFieldName('RenewalDate', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : AccountHistoryTableMap::translateFieldName('RenewalDate', TableMap::TYPE_PHPNAME, $indexType)];
             $this->renewal_date = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : AccountHistoryTableMap::translateFieldName('NumEmployees', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : AccountHistoryTableMap::translateFieldName('NumEmployees', TableMap::TYPE_PHPNAME, $indexType)];
             $this->num_employees = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : AccountHistoryTableMap::translateFieldName('Arr', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : AccountHistoryTableMap::translateFieldName('Arr', TableMap::TYPE_PHPNAME, $indexType)];
             $this->arr = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : AccountHistoryTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : AccountHistoryTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : AccountHistoryTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : AccountHistoryTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
             $this->resetModified();
 
@@ -768,7 +808,7 @@ abstract class AccountHistory implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 10; // 10 = AccountHistoryTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 11; // 11 = AccountHistoryTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\DataModels\\DataModels\\AccountHistory'), 0, $e);
@@ -996,6 +1036,9 @@ abstract class AccountHistory implements ActiveRecordInterface
         if ($this->isColumnModified(AccountHistoryTableMap::COL_ACCOUNT_ID)) {
             $modifiedColumns[':p' . $index++]  = 'account_id';
         }
+        if ($this->isColumnModified(AccountHistoryTableMap::COL_SFDC_NAME)) {
+            $modifiedColumns[':p' . $index++]  = 'sfdc_name';
+        }
         if ($this->isColumnModified(AccountHistoryTableMap::COL_ACCOUNT_STATUS_ID)) {
             $modifiedColumns[':p' . $index++]  = 'account_status_id';
         }
@@ -1036,6 +1079,9 @@ abstract class AccountHistory implements ActiveRecordInterface
                         break;
                     case 'account_id':
                         $stmt->bindValue($identifier, $this->account_id, PDO::PARAM_INT);
+                        break;
+                    case 'sfdc_name':
+                        $stmt->bindValue($identifier, $this->sfdc_name, PDO::PARAM_STR);
                         break;
                     case 'account_status_id':
                         $stmt->bindValue($identifier, $this->account_status_id, PDO::PARAM_INT);
@@ -1123,27 +1169,30 @@ abstract class AccountHistory implements ActiveRecordInterface
                 return $this->getAccountId();
                 break;
             case 2:
-                return $this->getAccountStatusId();
+                return $this->getSFDCName();
                 break;
             case 3:
-                return $this->getBillingCycleId();
+                return $this->getAccountStatusId();
                 break;
             case 4:
-                return $this->getBillingCity();
+                return $this->getBillingCycleId();
                 break;
             case 5:
-                return $this->getRenewalDate();
+                return $this->getBillingCity();
                 break;
             case 6:
-                return $this->getNumEmployees();
+                return $this->getRenewalDate();
                 break;
             case 7:
-                return $this->getArr();
+                return $this->getNumEmployees();
                 break;
             case 8:
-                return $this->getCreatedAt();
+                return $this->getArr();
                 break;
             case 9:
+                return $this->getCreatedAt();
+                break;
+            case 10:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1177,25 +1226,26 @@ abstract class AccountHistory implements ActiveRecordInterface
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getAccountId(),
-            $keys[2] => $this->getAccountStatusId(),
-            $keys[3] => $this->getBillingCycleId(),
-            $keys[4] => $this->getBillingCity(),
-            $keys[5] => $this->getRenewalDate(),
-            $keys[6] => $this->getNumEmployees(),
-            $keys[7] => $this->getArr(),
-            $keys[8] => $this->getCreatedAt(),
-            $keys[9] => $this->getUpdatedAt(),
+            $keys[2] => $this->getSFDCName(),
+            $keys[3] => $this->getAccountStatusId(),
+            $keys[4] => $this->getBillingCycleId(),
+            $keys[5] => $this->getBillingCity(),
+            $keys[6] => $this->getRenewalDate(),
+            $keys[7] => $this->getNumEmployees(),
+            $keys[8] => $this->getArr(),
+            $keys[9] => $this->getCreatedAt(),
+            $keys[10] => $this->getUpdatedAt(),
         );
-        if ($result[$keys[5]] instanceof \DateTime) {
-            $result[$keys[5]] = $result[$keys[5]]->format('c');
-        }
-
-        if ($result[$keys[8]] instanceof \DateTime) {
-            $result[$keys[8]] = $result[$keys[8]]->format('c');
+        if ($result[$keys[6]] instanceof \DateTime) {
+            $result[$keys[6]] = $result[$keys[6]]->format('c');
         }
 
         if ($result[$keys[9]] instanceof \DateTime) {
             $result[$keys[9]] = $result[$keys[9]]->format('c');
+        }
+
+        if ($result[$keys[10]] instanceof \DateTime) {
+            $result[$keys[10]] = $result[$keys[10]]->format('c');
         }
 
         $virtualColumns = $this->virtualColumns;
@@ -1243,27 +1293,30 @@ abstract class AccountHistory implements ActiveRecordInterface
                 $this->setAccountId($value);
                 break;
             case 2:
-                $this->setAccountStatusId($value);
+                $this->setSFDCName($value);
                 break;
             case 3:
-                $this->setBillingCycleId($value);
+                $this->setAccountStatusId($value);
                 break;
             case 4:
-                $this->setBillingCity($value);
+                $this->setBillingCycleId($value);
                 break;
             case 5:
-                $this->setRenewalDate($value);
+                $this->setBillingCity($value);
                 break;
             case 6:
-                $this->setNumEmployees($value);
+                $this->setRenewalDate($value);
                 break;
             case 7:
-                $this->setArr($value);
+                $this->setNumEmployees($value);
                 break;
             case 8:
-                $this->setCreatedAt($value);
+                $this->setArr($value);
                 break;
             case 9:
+                $this->setCreatedAt($value);
+                break;
+            case 10:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1299,28 +1352,31 @@ abstract class AccountHistory implements ActiveRecordInterface
             $this->setAccountId($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
-            $this->setAccountStatusId($arr[$keys[2]]);
+            $this->setSFDCName($arr[$keys[2]]);
         }
         if (array_key_exists($keys[3], $arr)) {
-            $this->setBillingCycleId($arr[$keys[3]]);
+            $this->setAccountStatusId($arr[$keys[3]]);
         }
         if (array_key_exists($keys[4], $arr)) {
-            $this->setBillingCity($arr[$keys[4]]);
+            $this->setBillingCycleId($arr[$keys[4]]);
         }
         if (array_key_exists($keys[5], $arr)) {
-            $this->setRenewalDate($arr[$keys[5]]);
+            $this->setBillingCity($arr[$keys[5]]);
         }
         if (array_key_exists($keys[6], $arr)) {
-            $this->setNumEmployees($arr[$keys[6]]);
+            $this->setRenewalDate($arr[$keys[6]]);
         }
         if (array_key_exists($keys[7], $arr)) {
-            $this->setArr($arr[$keys[7]]);
+            $this->setNumEmployees($arr[$keys[7]]);
         }
         if (array_key_exists($keys[8], $arr)) {
-            $this->setCreatedAt($arr[$keys[8]]);
+            $this->setArr($arr[$keys[8]]);
         }
         if (array_key_exists($keys[9], $arr)) {
-            $this->setUpdatedAt($arr[$keys[9]]);
+            $this->setCreatedAt($arr[$keys[9]]);
+        }
+        if (array_key_exists($keys[10], $arr)) {
+            $this->setUpdatedAt($arr[$keys[10]]);
         }
     }
 
@@ -1368,6 +1424,9 @@ abstract class AccountHistory implements ActiveRecordInterface
         }
         if ($this->isColumnModified(AccountHistoryTableMap::COL_ACCOUNT_ID)) {
             $criteria->add(AccountHistoryTableMap::COL_ACCOUNT_ID, $this->account_id);
+        }
+        if ($this->isColumnModified(AccountHistoryTableMap::COL_SFDC_NAME)) {
+            $criteria->add(AccountHistoryTableMap::COL_SFDC_NAME, $this->sfdc_name);
         }
         if ($this->isColumnModified(AccountHistoryTableMap::COL_ACCOUNT_STATUS_ID)) {
             $criteria->add(AccountHistoryTableMap::COL_ACCOUNT_STATUS_ID, $this->account_status_id);
@@ -1480,6 +1539,7 @@ abstract class AccountHistory implements ActiveRecordInterface
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setAccountId($this->getAccountId());
+        $copyObj->setSFDCName($this->getSFDCName());
         $copyObj->setAccountStatusId($this->getAccountStatusId());
         $copyObj->setBillingCycleId($this->getBillingCycleId());
         $copyObj->setBillingCity($this->getBillingCity());
@@ -1525,6 +1585,7 @@ abstract class AccountHistory implements ActiveRecordInterface
     {
         $this->id = null;
         $this->account_id = null;
+        $this->sfdc_name = null;
         $this->account_status_id = null;
         $this->billing_cycle_id = null;
         $this->billing_city = null;
