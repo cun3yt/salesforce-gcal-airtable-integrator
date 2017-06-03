@@ -184,6 +184,13 @@ class AccountTableMap extends TableMap
     1 => ':id',
   ),
 ), null, null, null, false);
+        $this->addRelation('AccountHistory', '\\DataModels\\DataModels\\AccountHistory', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':account_id',
+    1 => ':id',
+  ),
+), null, null, 'AccountHistories', false);
         $this->addRelation('Contact', '\\DataModels\\DataModels\\Contact', RelationMap::ONE_TO_MANY, array (
   0 =>
   array (

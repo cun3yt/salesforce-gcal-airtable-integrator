@@ -178,7 +178,7 @@ class AccountHistoryTableMap extends TableMap
         $this->setPrimaryKeyMethodInfo('account_history_id_seq');
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('account_id', 'AccountId', 'INTEGER', false, null, null);
+        $this->addForeignKey('account_id', 'AccountId', 'INTEGER', 'account', 'id', false, null, null);
         $this->addColumn('sfdc_name', 'SFDCName', 'VARCHAR', false, 127, null);
         $this->addColumn('account_status_id', 'AccountStatusId', 'INTEGER', false, null, null);
         $this->addColumn('billing_cycle_id', 'BillingCycleId', 'INTEGER', false, null, null);
@@ -195,6 +195,13 @@ class AccountHistoryTableMap extends TableMap
      */
     public function buildRelations()
     {
+        $this->addRelation('Account', '\\DataModels\\DataModels\\Account', RelationMap::MANY_TO_ONE, array (
+  0 =>
+  array (
+    0 => ':account_id',
+    1 => ':id',
+  ),
+), null, null, null, false);
     } // buildRelations()
 
     /**

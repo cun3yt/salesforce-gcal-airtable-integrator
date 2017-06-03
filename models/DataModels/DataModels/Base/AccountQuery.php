@@ -56,6 +56,16 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccountQuery rightJoinWithClient() Adds a RIGHT JOIN clause and with to the query using the Client relation
  * @method     ChildAccountQuery innerJoinWithClient() Adds a INNER JOIN clause and with to the query using the Client relation
  *
+ * @method     ChildAccountQuery leftJoinAccountHistory($relationAlias = null) Adds a LEFT JOIN clause to the query using the AccountHistory relation
+ * @method     ChildAccountQuery rightJoinAccountHistory($relationAlias = null) Adds a RIGHT JOIN clause to the query using the AccountHistory relation
+ * @method     ChildAccountQuery innerJoinAccountHistory($relationAlias = null) Adds a INNER JOIN clause to the query using the AccountHistory relation
+ *
+ * @method     ChildAccountQuery joinWithAccountHistory($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the AccountHistory relation
+ *
+ * @method     ChildAccountQuery leftJoinWithAccountHistory() Adds a LEFT JOIN clause and with to the query using the AccountHistory relation
+ * @method     ChildAccountQuery rightJoinWithAccountHistory() Adds a RIGHT JOIN clause and with to the query using the AccountHistory relation
+ * @method     ChildAccountQuery innerJoinWithAccountHistory() Adds a INNER JOIN clause and with to the query using the AccountHistory relation
+ *
  * @method     ChildAccountQuery leftJoinContact($relationAlias = null) Adds a LEFT JOIN clause to the query using the Contact relation
  * @method     ChildAccountQuery rightJoinContact($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Contact relation
  * @method     ChildAccountQuery innerJoinContact($relationAlias = null) Adds a INNER JOIN clause to the query using the Contact relation
@@ -66,7 +76,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccountQuery rightJoinWithContact() Adds a RIGHT JOIN clause and with to the query using the Contact relation
  * @method     ChildAccountQuery innerJoinWithContact() Adds a INNER JOIN clause and with to the query using the Contact relation
  *
- * @method     \DataModels\DataModels\ClientQuery|\DataModels\DataModels\ContactQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     \DataModels\DataModels\ClientQuery|\DataModels\DataModels\AccountHistoryQuery|\DataModels\DataModels\ContactQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildAccount findOne(ConnectionInterface $con = null) Return the first ChildAccount matching the query
  * @method     ChildAccount findOneOrCreate(ConnectionInterface $con = null) Return the first ChildAccount matching the query, or a new ChildAccount object populated from the query conditions when no match is found
@@ -652,6 +662,79 @@ abstract class AccountQuery extends ModelCriteria
         return $this
             ->joinClient($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Client', '\DataModels\DataModels\ClientQuery');
+    }
+
+    /**
+     * Filter the query by a related \DataModels\DataModels\AccountHistory object
+     *
+     * @param \DataModels\DataModels\AccountHistory|ObjectCollection $accountHistory the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildAccountQuery The current query, for fluid interface
+     */
+    public function filterByAccountHistory($accountHistory, $comparison = null)
+    {
+        if ($accountHistory instanceof \DataModels\DataModels\AccountHistory) {
+            return $this
+                ->addUsingAlias(AccountTableMap::COL_ID, $accountHistory->getAccountId(), $comparison);
+        } elseif ($accountHistory instanceof ObjectCollection) {
+            return $this
+                ->useAccountHistoryQuery()
+                ->filterByPrimaryKeys($accountHistory->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByAccountHistory() only accepts arguments of type \DataModels\DataModels\AccountHistory or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the AccountHistory relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildAccountQuery The current query, for fluid interface
+     */
+    public function joinAccountHistory($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('AccountHistory');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'AccountHistory');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the AccountHistory relation AccountHistory object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \DataModels\DataModels\AccountHistoryQuery A secondary query class using the current class as primary query
+     */
+    public function useAccountHistoryQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinAccountHistory($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'AccountHistory', '\DataModels\DataModels\AccountHistoryQuery');
     }
 
     /**

@@ -26,6 +26,10 @@
     <column name="num_employees" phpName="NumEmployees" type="INTEGER"/>
     <column name="ARR" phpName="Arr" type="VARCHAR"/>
 
+    <foreign-key foreignTable="account" onDelete="none" onUpdate="none">
+      <reference local="account_id" foreign="id" />
+    </foreign-key>
+
     <behavior name="timestampable"/>
   </table>
   <table name="account_status" idMethod="native" phpName="AccountStatus" namespace="DataModels">

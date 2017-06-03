@@ -6,11 +6,14 @@ use \DateTime;
 use \Exception;
 use \PDO;
 use DataModels\DataModels\Account as ChildAccount;
+use DataModels\DataModels\AccountHistory as ChildAccountHistory;
+use DataModels\DataModels\AccountHistoryQuery as ChildAccountHistoryQuery;
 use DataModels\DataModels\AccountQuery as ChildAccountQuery;
 use DataModels\DataModels\Client as ChildClient;
 use DataModels\DataModels\ClientQuery as ChildClientQuery;
 use DataModels\DataModels\Contact as ChildContact;
 use DataModels\DataModels\ContactQuery as ChildContactQuery;
+use DataModels\DataModels\Map\AccountHistoryTableMap;
 use DataModels\DataModels\Map\AccountTableMap;
 use DataModels\DataModels\Map\ContactTableMap;
 use Propel\Runtime\Propel;
@@ -130,6 +133,12 @@ abstract class Account implements ActiveRecordInterface
     protected $aClient;
 
     /**
+     * @var        ObjectCollection|ChildAccountHistory[] Collection to store aggregation of ChildAccountHistory objects.
+     */
+    protected $collAccountHistories;
+    protected $collAccountHistoriesPartial;
+
+    /**
      * @var        ObjectCollection|ChildContact[] Collection to store aggregation of ChildContact objects.
      */
     protected $collContacts;
@@ -142,6 +151,12 @@ abstract class Account implements ActiveRecordInterface
      * @var boolean
      */
     protected $alreadyInSave = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildAccountHistory[]
+     */
+    protected $accountHistoriesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -780,6 +795,8 @@ abstract class Account implements ActiveRecordInterface
         if ($deep) {  // also de-associate any related objects?
 
             $this->aClient = null;
+            $this->collAccountHistories = null;
+
             $this->collContacts = null;
 
         } // if (deep)
@@ -918,6 +935,24 @@ abstract class Account implements ActiveRecordInterface
                     $affectedRows += $this->doUpdate($con);
                 }
                 $this->resetModified();
+            }
+
+            if ($this->accountHistoriesScheduledForDeletion !== null) {
+                if (!$this->accountHistoriesScheduledForDeletion->isEmpty()) {
+                    foreach ($this->accountHistoriesScheduledForDeletion as $accountHistory) {
+                        // need to save related object because we set the relation to null
+                        $accountHistory->save($con);
+                    }
+                    $this->accountHistoriesScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collAccountHistories !== null) {
+                foreach ($this->collAccountHistories as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
             }
 
             if ($this->contactsScheduledForDeletion !== null) {
@@ -1182,6 +1217,21 @@ abstract class Account implements ActiveRecordInterface
                 }
 
                 $result[$key] = $this->aClient->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->collAccountHistories) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'accountHistories';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'account_histories';
+                        break;
+                    default:
+                        $key = 'AccountHistories';
+                }
+
+                $result[$key] = $this->collAccountHistories->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collContacts) {
 
@@ -1470,6 +1520,12 @@ abstract class Account implements ActiveRecordInterface
             // the getter/setter methods for fkey referrer objects.
             $copyObj->setNew(false);
 
+            foreach ($this->getAccountHistories() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addAccountHistory($relObj->copy($deepCopy));
+                }
+            }
+
             foreach ($this->getContacts() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addContact($relObj->copy($deepCopy));
@@ -1568,9 +1624,237 @@ abstract class Account implements ActiveRecordInterface
      */
     public function initRelation($relationName)
     {
+        if ('AccountHistory' == $relationName) {
+            return $this->initAccountHistories();
+        }
         if ('Contact' == $relationName) {
             return $this->initContacts();
         }
+    }
+
+    /**
+     * Clears out the collAccountHistories collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addAccountHistories()
+     */
+    public function clearAccountHistories()
+    {
+        $this->collAccountHistories = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collAccountHistories collection loaded partially.
+     */
+    public function resetPartialAccountHistories($v = true)
+    {
+        $this->collAccountHistoriesPartial = $v;
+    }
+
+    /**
+     * Initializes the collAccountHistories collection.
+     *
+     * By default this just sets the collAccountHistories collection to an empty array (like clearcollAccountHistories());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initAccountHistories($overrideExisting = true)
+    {
+        if (null !== $this->collAccountHistories && !$overrideExisting) {
+            return;
+        }
+
+        $collectionClassName = AccountHistoryTableMap::getTableMap()->getCollectionClassName();
+
+        $this->collAccountHistories = new $collectionClassName;
+        $this->collAccountHistories->setModel('\DataModels\DataModels\AccountHistory');
+    }
+
+    /**
+     * Gets an array of ChildAccountHistory objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildAccount is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildAccountHistory[] List of ChildAccountHistory objects
+     * @throws PropelException
+     */
+    public function getAccountHistories(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collAccountHistoriesPartial && !$this->isNew();
+        if (null === $this->collAccountHistories || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collAccountHistories) {
+                // return empty collection
+                $this->initAccountHistories();
+            } else {
+                $collAccountHistories = ChildAccountHistoryQuery::create(null, $criteria)
+                    ->filterByAccount($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collAccountHistoriesPartial && count($collAccountHistories)) {
+                        $this->initAccountHistories(false);
+
+                        foreach ($collAccountHistories as $obj) {
+                            if (false == $this->collAccountHistories->contains($obj)) {
+                                $this->collAccountHistories->append($obj);
+                            }
+                        }
+
+                        $this->collAccountHistoriesPartial = true;
+                    }
+
+                    return $collAccountHistories;
+                }
+
+                if ($partial && $this->collAccountHistories) {
+                    foreach ($this->collAccountHistories as $obj) {
+                        if ($obj->isNew()) {
+                            $collAccountHistories[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collAccountHistories = $collAccountHistories;
+                $this->collAccountHistoriesPartial = false;
+            }
+        }
+
+        return $this->collAccountHistories;
+    }
+
+    /**
+     * Sets a collection of ChildAccountHistory objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $accountHistories A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return $this|ChildAccount The current object (for fluent API support)
+     */
+    public function setAccountHistories(Collection $accountHistories, ConnectionInterface $con = null)
+    {
+        /** @var ChildAccountHistory[] $accountHistoriesToDelete */
+        $accountHistoriesToDelete = $this->getAccountHistories(new Criteria(), $con)->diff($accountHistories);
+
+
+        $this->accountHistoriesScheduledForDeletion = $accountHistoriesToDelete;
+
+        foreach ($accountHistoriesToDelete as $accountHistoryRemoved) {
+            $accountHistoryRemoved->setAccount(null);
+        }
+
+        $this->collAccountHistories = null;
+        foreach ($accountHistories as $accountHistory) {
+            $this->addAccountHistory($accountHistory);
+        }
+
+        $this->collAccountHistories = $accountHistories;
+        $this->collAccountHistoriesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related AccountHistory objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related AccountHistory objects.
+     * @throws PropelException
+     */
+    public function countAccountHistories(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collAccountHistoriesPartial && !$this->isNew();
+        if (null === $this->collAccountHistories || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collAccountHistories) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getAccountHistories());
+            }
+
+            $query = ChildAccountHistoryQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByAccount($this)
+                ->count($con);
+        }
+
+        return count($this->collAccountHistories);
+    }
+
+    /**
+     * Method called to associate a ChildAccountHistory object to this object
+     * through the ChildAccountHistory foreign key attribute.
+     *
+     * @param  ChildAccountHistory $l ChildAccountHistory
+     * @return $this|\DataModels\DataModels\Account The current object (for fluent API support)
+     */
+    public function addAccountHistory(ChildAccountHistory $l)
+    {
+        if ($this->collAccountHistories === null) {
+            $this->initAccountHistories();
+            $this->collAccountHistoriesPartial = true;
+        }
+
+        if (!$this->collAccountHistories->contains($l)) {
+            $this->doAddAccountHistory($l);
+
+            if ($this->accountHistoriesScheduledForDeletion and $this->accountHistoriesScheduledForDeletion->contains($l)) {
+                $this->accountHistoriesScheduledForDeletion->remove($this->accountHistoriesScheduledForDeletion->search($l));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ChildAccountHistory $accountHistory The ChildAccountHistory object to add.
+     */
+    protected function doAddAccountHistory(ChildAccountHistory $accountHistory)
+    {
+        $this->collAccountHistories[]= $accountHistory;
+        $accountHistory->setAccount($this);
+    }
+
+    /**
+     * @param  ChildAccountHistory $accountHistory The ChildAccountHistory object to remove.
+     * @return $this|ChildAccount The current object (for fluent API support)
+     */
+    public function removeAccountHistory(ChildAccountHistory $accountHistory)
+    {
+        if ($this->getAccountHistories()->contains($accountHistory)) {
+            $pos = $this->collAccountHistories->search($accountHistory);
+            $this->collAccountHistories->remove($pos);
+            if (null === $this->accountHistoriesScheduledForDeletion) {
+                $this->accountHistoriesScheduledForDeletion = clone $this->collAccountHistories;
+                $this->accountHistoriesScheduledForDeletion->clear();
+            }
+            $this->accountHistoriesScheduledForDeletion[]= $accountHistory;
+            $accountHistory->setAccount(null);
+        }
+
+        return $this;
     }
 
     /**
@@ -1884,6 +2168,11 @@ abstract class Account implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collAccountHistories) {
+                foreach ($this->collAccountHistories as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collContacts) {
                 foreach ($this->collContacts as $o) {
                     $o->clearAllReferences($deep);
@@ -1891,6 +2180,7 @@ abstract class Account implements ActiveRecordInterface
             }
         } // if ($deep)
 
+        $this->collAccountHistories = null;
         $this->collContacts = null;
         $this->aClient = null;
     }
