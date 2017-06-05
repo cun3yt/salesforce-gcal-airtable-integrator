@@ -26,9 +26,8 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccountHistoryQuery orderByAccountStatusId($order = Criteria::ASC) Order by the account_status_id column
  * @method     ChildAccountHistoryQuery orderByBillingCycleId($order = Criteria::ASC) Order by the billing_cycle_id column
  * @method     ChildAccountHistoryQuery orderByBillingCity($order = Criteria::ASC) Order by the billing_city column
- * @method     ChildAccountHistoryQuery orderByRenewalDate($order = Criteria::ASC) Order by the renewal_date column
  * @method     ChildAccountHistoryQuery orderByNumEmployees($order = Criteria::ASC) Order by the num_employees column
- * @method     ChildAccountHistoryQuery orderByArr($order = Criteria::ASC) Order by the ARR column
+ * @method     ChildAccountHistoryQuery orderByArr($order = Criteria::ASC) Order by the arr column
  * @method     ChildAccountHistoryQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildAccountHistoryQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
@@ -38,9 +37,8 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccountHistoryQuery groupByAccountStatusId() Group by the account_status_id column
  * @method     ChildAccountHistoryQuery groupByBillingCycleId() Group by the billing_cycle_id column
  * @method     ChildAccountHistoryQuery groupByBillingCity() Group by the billing_city column
- * @method     ChildAccountHistoryQuery groupByRenewalDate() Group by the renewal_date column
  * @method     ChildAccountHistoryQuery groupByNumEmployees() Group by the num_employees column
- * @method     ChildAccountHistoryQuery groupByArr() Group by the ARR column
+ * @method     ChildAccountHistoryQuery groupByArr() Group by the arr column
  * @method     ChildAccountHistoryQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildAccountHistoryQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -73,9 +71,8 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccountHistory findOneByAccountStatusId(int $account_status_id) Return the first ChildAccountHistory filtered by the account_status_id column
  * @method     ChildAccountHistory findOneByBillingCycleId(int $billing_cycle_id) Return the first ChildAccountHistory filtered by the billing_cycle_id column
  * @method     ChildAccountHistory findOneByBillingCity(string $billing_city) Return the first ChildAccountHistory filtered by the billing_city column
- * @method     ChildAccountHistory findOneByRenewalDate(string $renewal_date) Return the first ChildAccountHistory filtered by the renewal_date column
  * @method     ChildAccountHistory findOneByNumEmployees(int $num_employees) Return the first ChildAccountHistory filtered by the num_employees column
- * @method     ChildAccountHistory findOneByArr(string $ARR) Return the first ChildAccountHistory filtered by the ARR column
+ * @method     ChildAccountHistory findOneByArr(string $arr) Return the first ChildAccountHistory filtered by the arr column
  * @method     ChildAccountHistory findOneByCreatedAt(string $created_at) Return the first ChildAccountHistory filtered by the created_at column
  * @method     ChildAccountHistory findOneByUpdatedAt(string $updated_at) Return the first ChildAccountHistory filtered by the updated_at column *
 
@@ -88,9 +85,8 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccountHistory requireOneByAccountStatusId(int $account_status_id) Return the first ChildAccountHistory filtered by the account_status_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccountHistory requireOneByBillingCycleId(int $billing_cycle_id) Return the first ChildAccountHistory filtered by the billing_cycle_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccountHistory requireOneByBillingCity(string $billing_city) Return the first ChildAccountHistory filtered by the billing_city column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildAccountHistory requireOneByRenewalDate(string $renewal_date) Return the first ChildAccountHistory filtered by the renewal_date column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccountHistory requireOneByNumEmployees(int $num_employees) Return the first ChildAccountHistory filtered by the num_employees column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildAccountHistory requireOneByArr(string $ARR) Return the first ChildAccountHistory filtered by the ARR column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildAccountHistory requireOneByArr(string $arr) Return the first ChildAccountHistory filtered by the arr column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccountHistory requireOneByCreatedAt(string $created_at) Return the first ChildAccountHistory filtered by the created_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccountHistory requireOneByUpdatedAt(string $updated_at) Return the first ChildAccountHistory filtered by the updated_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
@@ -101,9 +97,8 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccountHistory[]|ObjectCollection findByAccountStatusId(int $account_status_id) Return ChildAccountHistory objects filtered by the account_status_id column
  * @method     ChildAccountHistory[]|ObjectCollection findByBillingCycleId(int $billing_cycle_id) Return ChildAccountHistory objects filtered by the billing_cycle_id column
  * @method     ChildAccountHistory[]|ObjectCollection findByBillingCity(string $billing_city) Return ChildAccountHistory objects filtered by the billing_city column
- * @method     ChildAccountHistory[]|ObjectCollection findByRenewalDate(string $renewal_date) Return ChildAccountHistory objects filtered by the renewal_date column
  * @method     ChildAccountHistory[]|ObjectCollection findByNumEmployees(int $num_employees) Return ChildAccountHistory objects filtered by the num_employees column
- * @method     ChildAccountHistory[]|ObjectCollection findByArr(string $ARR) Return ChildAccountHistory objects filtered by the ARR column
+ * @method     ChildAccountHistory[]|ObjectCollection findByArr(string $arr) Return ChildAccountHistory objects filtered by the arr column
  * @method     ChildAccountHistory[]|ObjectCollection findByCreatedAt(string $created_at) Return ChildAccountHistory objects filtered by the created_at column
  * @method     ChildAccountHistory[]|ObjectCollection findByUpdatedAt(string $updated_at) Return ChildAccountHistory objects filtered by the updated_at column
  * @method     ChildAccountHistory[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
@@ -204,7 +199,7 @@ abstract class AccountHistoryQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, account_id, sfdc_name, account_status_id, billing_cycle_id, billing_city, renewal_date, num_employees, ARR, created_at, updated_at FROM account_history WHERE id = :p0';
+        $sql = 'SELECT id, account_id, sfdc_name, account_status_id, billing_cycle_id, billing_city, num_employees, arr, created_at, updated_at FROM account_history WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -511,49 +506,6 @@ abstract class AccountHistoryQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the renewal_date column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByRenewalDate('2011-03-14'); // WHERE renewal_date = '2011-03-14'
-     * $query->filterByRenewalDate('now'); // WHERE renewal_date = '2011-03-14'
-     * $query->filterByRenewalDate(array('max' => 'yesterday')); // WHERE renewal_date > '2011-03-13'
-     * </code>
-     *
-     * @param     mixed $renewalDate The value to use as filter.
-     *              Values can be integers (unix timestamps), DateTime objects, or strings.
-     *              Empty strings are treated as NULL.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return $this|ChildAccountHistoryQuery The current query, for fluid interface
-     */
-    public function filterByRenewalDate($renewalDate = null, $comparison = null)
-    {
-        if (is_array($renewalDate)) {
-            $useMinMax = false;
-            if (isset($renewalDate['min'])) {
-                $this->addUsingAlias(AccountHistoryTableMap::COL_RENEWAL_DATE, $renewalDate['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($renewalDate['max'])) {
-                $this->addUsingAlias(AccountHistoryTableMap::COL_RENEWAL_DATE, $renewalDate['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(AccountHistoryTableMap::COL_RENEWAL_DATE, $renewalDate, $comparison);
-    }
-
-    /**
      * Filter the query on the num_employees column
      *
      * Example usage:
@@ -595,12 +547,12 @@ abstract class AccountHistoryQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the ARR column
+     * Filter the query on the arr column
      *
      * Example usage:
      * <code>
-     * $query->filterByArr('fooValue');   // WHERE ARR = 'fooValue'
-     * $query->filterByArr('%fooValue%', Criteria::LIKE); // WHERE ARR LIKE '%fooValue%'
+     * $query->filterByArr('fooValue');   // WHERE arr = 'fooValue'
+     * $query->filterByArr('%fooValue%', Criteria::LIKE); // WHERE arr LIKE '%fooValue%'
      * </code>
      *
      * @param     string $arr The value to use as filter.

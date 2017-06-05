@@ -22,9 +22,8 @@
     <column name="account_status_id" phpName="AccountStatusId" type="INTEGER"/>
     <column name="billing_cycle_id" phpName="BillingCycleId" type="INTEGER"/>
     <column name="billing_city" phpName="BillingCity" type="VARCHAR" size="255"/>
-    <column name="renewal_date" phpName="RenewalDate" type="DATE"/>
     <column name="num_employees" phpName="NumEmployees" type="INTEGER"/>
-    <column name="ARR" phpName="Arr" type="VARCHAR"/>
+    <column name="arr" phpName="Arr" type="VARCHAR"/>
 
     <foreign-key foreignTable="account" onDelete="none" onUpdate="none">
       <reference local="account_id" foreign="id" />
