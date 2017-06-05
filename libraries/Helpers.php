@@ -12,6 +12,9 @@ use DataModels\DataModels\ClientQuery as ClientQuery;
 use Propel\Runtime\ActiveQuery\Criteria as Criteria;
 
 class Helpers {
+    // @todo Update this version change to all SFDC calls
+    const SFDC_API_VERSION = 'v39.0';
+
     /**
      * @param $emailDomain String
      * @return array
@@ -969,24 +972,58 @@ class Helpers {
         return false;
     }
 
-    static function fnGetAccountDetailFromSf($instance_url, $access_token, $strAccDomain = "") {
-        if(!$strAccDomain) {
-            return false;
-        }
+    /**
+     * @param string $instance_url
+     * @param string $access_token
+     * @param string $query
+     * @return mixed
+     */
+    static function sfdcExecuteGetQuery($instance_url, $access_token, $query) {
+        $apiVersion = self::SFDC_API_VERSION;
 
-        $query = "SELECT Name, Id, NumberOfEmployees, BillingCity from Account WHERE Website LIKE '%" . $strAccDomain . "%' ORDER BY lastmodifieddate DESC LIMIT 1";
-        $url = "$instance_url/services/data/v20.0/query?q=" . urlencode($query);
+        $url = "$instance_url/services/data/{$apiVersion}/query?q=" . urlencode($query);
         $curl = curl_init($url);
         curl_setopt($curl, CURLOPT_HEADER, false);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_HTTPHEADER, array("Authorization: OAuth $access_token"));
         $json_response = curl_exec($curl);
-        if (!$json_response) {
-            echo "--error---" . curl_error($curl);
+
+        if( !$json_response ) {
+            trigger_error(
+                "There is no response from the API: " . curl_error($curl),
+                E_USER_ERROR
+            );
         }
+
         curl_close($curl);
         $response = json_decode($json_response, true);
         return $response;
+    }
+
+    static function SFDCGetAccountHistoryLatest($instance_url, $access_token, $accountId) {
+        $query = "SELECT CreatedDate FROM AccountHistory WHERE AccountId = '{$accountId}' ORDER BY CreatedDate DESC NULLS LAST LIMIT 1";
+        return self::sfdcExecuteGetQuery($instance_url, $access_token, $query);
+    }
+
+    static function fnGetAccountDetailFromSf($instance_url, $access_token, $strAccDomain = "") {
+        if(!$strAccDomain) {
+            return false;
+        }
+
+        $query = "SELECT 
+              Id, Name, AnnualRevenue, NumberOfEmployees, Industry, Type, Website,
+              BillingLatitude, BillingLongitude, BillingPostalCode, 
+              BillingState, BillingCity, BillingStreet, BillingCountry,
+              LastActivityDate, OwnerId
+            FROM 
+              Account 
+            WHERE 
+              Website LIKE '%{$strAccDomain}%'
+            ORDER BY 
+              lastmodifieddate DESC 
+            LIMIT 1";
+
+        return self::sfdcExecuteGetQuery($instance_url, $access_token, $query);
     }
 
     static function fnGetAccountDetailFromSfId($instance_url, $access_token, $strId = "") {
