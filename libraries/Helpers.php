@@ -1026,26 +1026,6 @@ class Helpers {
         return self::sfdcExecuteGetQuery($instance_url, $access_token, $query);
     }
 
-    static function fnGetAccountDetailFromSfId($instance_url, $access_token, $strId = "") {
-        if(!$strId) {
-            return false;
-        }
-
-        $query = "SELECT Name, Id, NumberOfEmployees, BillingCity, AnnualRevenue from Account WHERE Id = '" . $strId . "' LIMIT 1";
-        $url = "$instance_url/services/data/v20.0/query?q=" . urlencode($query);
-        $curl = curl_init($url);
-        curl_setopt($curl, CURLOPT_HEADER, false);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array("Authorization: OAuth $access_token"));
-        $json_response = curl_exec($curl);
-        if (!$json_response) {
-            echo "--error---" . curl_error($curl);
-        }
-        curl_close($curl);
-        $response = json_decode($json_response, true);
-        return $response;
-    }
-
     /**
      * Function to flag meeting record as processed under opportunity_processed column in meeting history airtable
      * Please not the flagg here is proccess and not yes, it gets sets only when for a given record there is no account or
