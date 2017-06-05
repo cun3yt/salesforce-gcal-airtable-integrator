@@ -22,7 +22,6 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildAccountQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildAccountQuery orderByEmailDomain($order = Criteria::ASC) Order by the email_domain column
- * @method     ChildAccountQuery orderByWebsite($order = Criteria::ASC) Order by the website column
  * @method     ChildAccountQuery orderBySfdcAccountId($order = Criteria::ASC) Order by the sfdc_account_id column
  * @method     ChildAccountQuery orderByClientId($order = Criteria::ASC) Order by the client_id column
  * @method     ChildAccountQuery orderBySFDCLastCheckTime($order = Criteria::ASC) Order by the sfdc_last_check_time column
@@ -31,7 +30,6 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildAccountQuery groupById() Group by the id column
  * @method     ChildAccountQuery groupByEmailDomain() Group by the email_domain column
- * @method     ChildAccountQuery groupByWebsite() Group by the website column
  * @method     ChildAccountQuery groupBySfdcAccountId() Group by the sfdc_account_id column
  * @method     ChildAccountQuery groupByClientId() Group by the client_id column
  * @method     ChildAccountQuery groupBySFDCLastCheckTime() Group by the sfdc_last_check_time column
@@ -83,7 +81,6 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildAccount findOneById(int $id) Return the first ChildAccount filtered by the id column
  * @method     ChildAccount findOneByEmailDomain(string $email_domain) Return the first ChildAccount filtered by the email_domain column
- * @method     ChildAccount findOneByWebsite(string $website) Return the first ChildAccount filtered by the website column
  * @method     ChildAccount findOneBySfdcAccountId(string $sfdc_account_id) Return the first ChildAccount filtered by the sfdc_account_id column
  * @method     ChildAccount findOneByClientId(int $client_id) Return the first ChildAccount filtered by the client_id column
  * @method     ChildAccount findOneBySFDCLastCheckTime(string $sfdc_last_check_time) Return the first ChildAccount filtered by the sfdc_last_check_time column
@@ -95,7 +92,6 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildAccount requireOneById(int $id) Return the first ChildAccount filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccount requireOneByEmailDomain(string $email_domain) Return the first ChildAccount filtered by the email_domain column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildAccount requireOneByWebsite(string $website) Return the first ChildAccount filtered by the website column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccount requireOneBySfdcAccountId(string $sfdc_account_id) Return the first ChildAccount filtered by the sfdc_account_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccount requireOneByClientId(int $client_id) Return the first ChildAccount filtered by the client_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccount requireOneBySFDCLastCheckTime(string $sfdc_last_check_time) Return the first ChildAccount filtered by the sfdc_last_check_time column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -105,7 +101,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccount[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildAccount objects based on current ModelCriteria
  * @method     ChildAccount[]|ObjectCollection findById(int $id) Return ChildAccount objects filtered by the id column
  * @method     ChildAccount[]|ObjectCollection findByEmailDomain(string $email_domain) Return ChildAccount objects filtered by the email_domain column
- * @method     ChildAccount[]|ObjectCollection findByWebsite(string $website) Return ChildAccount objects filtered by the website column
  * @method     ChildAccount[]|ObjectCollection findBySfdcAccountId(string $sfdc_account_id) Return ChildAccount objects filtered by the sfdc_account_id column
  * @method     ChildAccount[]|ObjectCollection findByClientId(int $client_id) Return ChildAccount objects filtered by the client_id column
  * @method     ChildAccount[]|ObjectCollection findBySFDCLastCheckTime(string $sfdc_last_check_time) Return ChildAccount objects filtered by the sfdc_last_check_time column
@@ -209,7 +204,7 @@ abstract class AccountQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, email_domain, website, sfdc_account_id, client_id, sfdc_last_check_time, created_at, updated_at FROM account WHERE id = :p0';
+        $sql = 'SELECT id, email_domain, sfdc_account_id, client_id, sfdc_last_check_time, created_at, updated_at FROM account WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -363,31 +358,6 @@ abstract class AccountQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(AccountTableMap::COL_EMAIL_DOMAIN, $emailDomain, $comparison);
-    }
-
-    /**
-     * Filter the query on the website column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByWebsite('fooValue');   // WHERE website = 'fooValue'
-     * $query->filterByWebsite('%fooValue%', Criteria::LIKE); // WHERE website LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $website The value to use as filter.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return $this|ChildAccountQuery The current query, for fluid interface
-     */
-    public function filterByWebsite($website = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($website)) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(AccountTableMap::COL_WEBSITE, $website, $comparison);
     }
 
     /**

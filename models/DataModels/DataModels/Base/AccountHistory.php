@@ -79,18 +79,81 @@ abstract class AccountHistory implements ActiveRecordInterface
     protected $account_id;
 
     /**
-     * The value for the sfdc_name field.
+     * The value for the name field.
      *
      * @var        string
      */
-    protected $sfdc_name;
+    protected $name;
 
     /**
-     * The value for the account_status_id field.
+     * The value for the num_employees field.
      *
      * @var        int
      */
-    protected $account_status_id;
+    protected $num_employees;
+
+    /**
+     * The value for the arr field.
+     *
+     * @var        string
+     */
+    protected $arr;
+
+    /**
+     * The value for the website field.
+     *
+     * @var        string
+     */
+    protected $website;
+
+    /**
+     * The value for the annual_revenue field.
+     *
+     * @var        string
+     */
+    protected $annual_revenue;
+
+    /**
+     * The value for the industry field.
+     *
+     * @var        string
+     */
+    protected $industry;
+
+    /**
+     * The value for the type field.
+     *
+     * @var        string
+     */
+    protected $type;
+
+    /**
+     * The value for the billing_latitude field.
+     *
+     * @var        string
+     */
+    protected $billing_latitude;
+
+    /**
+     * The value for the billing_longitude field.
+     *
+     * @var        string
+     */
+    protected $billing_longitude;
+
+    /**
+     * The value for the billing_postal_code field.
+     *
+     * @var        string
+     */
+    protected $billing_postal_code;
+
+    /**
+     * The value for the billing_state field.
+     *
+     * @var        string
+     */
+    protected $billing_state;
 
     /**
      * The value for the billing_cycle_id field.
@@ -107,18 +170,32 @@ abstract class AccountHistory implements ActiveRecordInterface
     protected $billing_city;
 
     /**
-     * The value for the num_employees field.
-     *
-     * @var        int
-     */
-    protected $num_employees;
-
-    /**
-     * The value for the arr field.
+     * The value for the billing_street field.
      *
      * @var        string
      */
-    protected $arr;
+    protected $billing_street;
+
+    /**
+     * The value for the billing_country field.
+     *
+     * @var        string
+     */
+    protected $billing_country;
+
+    /**
+     * The value for the last_activity_date field.
+     *
+     * @var        DateTime
+     */
+    protected $last_activity_date;
+
+    /**
+     * The value for the owner_id field.
+     *
+     * @var        string
+     */
+    protected $owner_id;
 
     /**
      * The value for the created_at field.
@@ -393,23 +470,113 @@ abstract class AccountHistory implements ActiveRecordInterface
     }
 
     /**
-     * Get the [sfdc_name] column value.
+     * Get the [name] column value.
      *
      * @return string
      */
-    public function getSFDCName()
+    public function getName()
     {
-        return $this->sfdc_name;
+        return $this->name;
     }
 
     /**
-     * Get the [account_status_id] column value.
+     * Get the [num_employees] column value.
      *
      * @return int
      */
-    public function getAccountStatusId()
+    public function getNumEmployees()
     {
-        return $this->account_status_id;
+        return $this->num_employees;
+    }
+
+    /**
+     * Get the [arr] column value.
+     *
+     * @return string
+     */
+    public function getArr()
+    {
+        return $this->arr;
+    }
+
+    /**
+     * Get the [website] column value.
+     *
+     * @return string
+     */
+    public function getWebsite()
+    {
+        return $this->website;
+    }
+
+    /**
+     * Get the [annual_revenue] column value.
+     *
+     * @return string
+     */
+    public function getAnnualRevenue()
+    {
+        return $this->annual_revenue;
+    }
+
+    /**
+     * Get the [industry] column value.
+     *
+     * @return string
+     */
+    public function getIndustry()
+    {
+        return $this->industry;
+    }
+
+    /**
+     * Get the [type] column value.
+     *
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * Get the [billing_latitude] column value.
+     *
+     * @return string
+     */
+    public function getBillingLatitude()
+    {
+        return $this->billing_latitude;
+    }
+
+    /**
+     * Get the [billing_longitude] column value.
+     *
+     * @return string
+     */
+    public function getBillingLongitude()
+    {
+        return $this->billing_longitude;
+    }
+
+    /**
+     * Get the [billing_postal_code] column value.
+     *
+     * @return string
+     */
+    public function getBillingPostalCode()
+    {
+        return $this->billing_postal_code;
+    }
+
+    /**
+     * Get the [billing_state] column value.
+     *
+     * @return string
+     */
+    public function getBillingState()
+    {
+        return $this->billing_state;
     }
 
     /**
@@ -433,23 +600,53 @@ abstract class AccountHistory implements ActiveRecordInterface
     }
 
     /**
-     * Get the [num_employees] column value.
-     *
-     * @return int
-     */
-    public function getNumEmployees()
-    {
-        return $this->num_employees;
-    }
-
-    /**
-     * Get the [arr] column value.
+     * Get the [billing_street] column value.
      *
      * @return string
      */
-    public function getArr()
+    public function getBillingStreet()
     {
-        return $this->arr;
+        return $this->billing_street;
+    }
+
+    /**
+     * Get the [billing_country] column value.
+     *
+     * @return string
+     */
+    public function getBillingCountry()
+    {
+        return $this->billing_country;
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [last_activity_date] column value.
+     *
+     *
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw DateTime object will be returned.
+     *
+     * @return string|DateTime Formatted date/time value as string or DateTime object (if format is NULL), NULL if column is NULL
+     *
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getLastActivityDate($format = NULL)
+    {
+        if ($format === null) {
+            return $this->last_activity_date;
+        } else {
+            return $this->last_activity_date instanceof \DateTimeInterface ? $this->last_activity_date->format($format) : null;
+        }
+    }
+
+    /**
+     * Get the [owner_id] column value.
+     *
+     * @return string
+     */
+    public function getOwnerId()
+    {
+        return $this->owner_id;
     }
 
     /**
@@ -537,44 +734,224 @@ abstract class AccountHistory implements ActiveRecordInterface
     } // setAccountId()
 
     /**
-     * Set the value of [sfdc_name] column.
+     * Set the value of [name] column.
      *
      * @param string $v new value
      * @return $this|\DataModels\DataModels\AccountHistory The current object (for fluent API support)
      */
-    public function setSFDCName($v)
+    public function setName($v)
     {
         if ($v !== null) {
             $v = (string) $v;
         }
 
-        if ($this->sfdc_name !== $v) {
-            $this->sfdc_name = $v;
-            $this->modifiedColumns[AccountHistoryTableMap::COL_SFDC_NAME] = true;
+        if ($this->name !== $v) {
+            $this->name = $v;
+            $this->modifiedColumns[AccountHistoryTableMap::COL_NAME] = true;
         }
 
         return $this;
-    } // setSFDCName()
+    } // setName()
 
     /**
-     * Set the value of [account_status_id] column.
+     * Set the value of [num_employees] column.
      *
      * @param int $v new value
      * @return $this|\DataModels\DataModels\AccountHistory The current object (for fluent API support)
      */
-    public function setAccountStatusId($v)
+    public function setNumEmployees($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->account_status_id !== $v) {
-            $this->account_status_id = $v;
-            $this->modifiedColumns[AccountHistoryTableMap::COL_ACCOUNT_STATUS_ID] = true;
+        if ($this->num_employees !== $v) {
+            $this->num_employees = $v;
+            $this->modifiedColumns[AccountHistoryTableMap::COL_NUM_EMPLOYEES] = true;
         }
 
         return $this;
-    } // setAccountStatusId()
+    } // setNumEmployees()
+
+    /**
+     * Set the value of [arr] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\AccountHistory The current object (for fluent API support)
+     */
+    public function setArr($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->arr !== $v) {
+            $this->arr = $v;
+            $this->modifiedColumns[AccountHistoryTableMap::COL_ARR] = true;
+        }
+
+        return $this;
+    } // setArr()
+
+    /**
+     * Set the value of [website] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\AccountHistory The current object (for fluent API support)
+     */
+    public function setWebsite($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->website !== $v) {
+            $this->website = $v;
+            $this->modifiedColumns[AccountHistoryTableMap::COL_WEBSITE] = true;
+        }
+
+        return $this;
+    } // setWebsite()
+
+    /**
+     * Set the value of [annual_revenue] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\AccountHistory The current object (for fluent API support)
+     */
+    public function setAnnualRevenue($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->annual_revenue !== $v) {
+            $this->annual_revenue = $v;
+            $this->modifiedColumns[AccountHistoryTableMap::COL_ANNUAL_REVENUE] = true;
+        }
+
+        return $this;
+    } // setAnnualRevenue()
+
+    /**
+     * Set the value of [industry] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\AccountHistory The current object (for fluent API support)
+     */
+    public function setIndustry($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->industry !== $v) {
+            $this->industry = $v;
+            $this->modifiedColumns[AccountHistoryTableMap::COL_INDUSTRY] = true;
+        }
+
+        return $this;
+    } // setIndustry()
+
+    /**
+     * Set the value of [type] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\AccountHistory The current object (for fluent API support)
+     */
+    public function setType($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->type !== $v) {
+            $this->type = $v;
+            $this->modifiedColumns[AccountHistoryTableMap::COL_TYPE] = true;
+        }
+
+        return $this;
+    } // setType()
+
+    /**
+     * Set the value of [billing_latitude] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\AccountHistory The current object (for fluent API support)
+     */
+    public function setBillingLatitude($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->billing_latitude !== $v) {
+            $this->billing_latitude = $v;
+            $this->modifiedColumns[AccountHistoryTableMap::COL_BILLING_LATITUDE] = true;
+        }
+
+        return $this;
+    } // setBillingLatitude()
+
+    /**
+     * Set the value of [billing_longitude] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\AccountHistory The current object (for fluent API support)
+     */
+    public function setBillingLongitude($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->billing_longitude !== $v) {
+            $this->billing_longitude = $v;
+            $this->modifiedColumns[AccountHistoryTableMap::COL_BILLING_LONGITUDE] = true;
+        }
+
+        return $this;
+    } // setBillingLongitude()
+
+    /**
+     * Set the value of [billing_postal_code] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\AccountHistory The current object (for fluent API support)
+     */
+    public function setBillingPostalCode($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->billing_postal_code !== $v) {
+            $this->billing_postal_code = $v;
+            $this->modifiedColumns[AccountHistoryTableMap::COL_BILLING_POSTAL_CODE] = true;
+        }
+
+        return $this;
+    } // setBillingPostalCode()
+
+    /**
+     * Set the value of [billing_state] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\AccountHistory The current object (for fluent API support)
+     */
+    public function setBillingState($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->billing_state !== $v) {
+            $this->billing_state = $v;
+            $this->modifiedColumns[AccountHistoryTableMap::COL_BILLING_STATE] = true;
+        }
+
+        return $this;
+    } // setBillingState()
 
     /**
      * Set the value of [billing_cycle_id] column.
@@ -617,44 +994,84 @@ abstract class AccountHistory implements ActiveRecordInterface
     } // setBillingCity()
 
     /**
-     * Set the value of [num_employees] column.
-     *
-     * @param int $v new value
-     * @return $this|\DataModels\DataModels\AccountHistory The current object (for fluent API support)
-     */
-    public function setNumEmployees($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->num_employees !== $v) {
-            $this->num_employees = $v;
-            $this->modifiedColumns[AccountHistoryTableMap::COL_NUM_EMPLOYEES] = true;
-        }
-
-        return $this;
-    } // setNumEmployees()
-
-    /**
-     * Set the value of [arr] column.
+     * Set the value of [billing_street] column.
      *
      * @param string $v new value
      * @return $this|\DataModels\DataModels\AccountHistory The current object (for fluent API support)
      */
-    public function setArr($v)
+    public function setBillingStreet($v)
     {
         if ($v !== null) {
             $v = (string) $v;
         }
 
-        if ($this->arr !== $v) {
-            $this->arr = $v;
-            $this->modifiedColumns[AccountHistoryTableMap::COL_ARR] = true;
+        if ($this->billing_street !== $v) {
+            $this->billing_street = $v;
+            $this->modifiedColumns[AccountHistoryTableMap::COL_BILLING_STREET] = true;
         }
 
         return $this;
-    } // setArr()
+    } // setBillingStreet()
+
+    /**
+     * Set the value of [billing_country] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\AccountHistory The current object (for fluent API support)
+     */
+    public function setBillingCountry($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->billing_country !== $v) {
+            $this->billing_country = $v;
+            $this->modifiedColumns[AccountHistoryTableMap::COL_BILLING_COUNTRY] = true;
+        }
+
+        return $this;
+    } // setBillingCountry()
+
+    /**
+     * Sets the value of [last_activity_date] column to a normalized version of the date/time value specified.
+     *
+     * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
+     *               Empty strings are treated as NULL.
+     * @return $this|\DataModels\DataModels\AccountHistory The current object (for fluent API support)
+     */
+    public function setLastActivityDate($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->last_activity_date !== null || $dt !== null) {
+            if ($this->last_activity_date === null || $dt === null || $dt->format("Y-m-d") !== $this->last_activity_date->format("Y-m-d")) {
+                $this->last_activity_date = $dt === null ? null : clone $dt;
+                $this->modifiedColumns[AccountHistoryTableMap::COL_LAST_ACTIVITY_DATE] = true;
+            }
+        } // if either are not null
+
+        return $this;
+    } // setLastActivityDate()
+
+    /**
+     * Set the value of [owner_id] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\AccountHistory The current object (for fluent API support)
+     */
+    public function setOwnerId($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->owner_id !== $v) {
+            $this->owner_id = $v;
+            $this->modifiedColumns[AccountHistoryTableMap::COL_OWNER_ID] = true;
+        }
+
+        return $this;
+    } // setOwnerId()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
@@ -738,28 +1155,61 @@ abstract class AccountHistory implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : AccountHistoryTableMap::translateFieldName('AccountId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->account_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : AccountHistoryTableMap::translateFieldName('SFDCName', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->sfdc_name = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : AccountHistoryTableMap::translateFieldName('Name', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->name = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : AccountHistoryTableMap::translateFieldName('AccountStatusId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->account_status_id = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : AccountHistoryTableMap::translateFieldName('BillingCycleId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->billing_cycle_id = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : AccountHistoryTableMap::translateFieldName('BillingCity', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->billing_city = (null !== $col) ? (string) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : AccountHistoryTableMap::translateFieldName('NumEmployees', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : AccountHistoryTableMap::translateFieldName('NumEmployees', TableMap::TYPE_PHPNAME, $indexType)];
             $this->num_employees = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : AccountHistoryTableMap::translateFieldName('Arr', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : AccountHistoryTableMap::translateFieldName('Arr', TableMap::TYPE_PHPNAME, $indexType)];
             $this->arr = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : AccountHistoryTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : AccountHistoryTableMap::translateFieldName('Website', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->website = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : AccountHistoryTableMap::translateFieldName('AnnualRevenue', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->annual_revenue = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : AccountHistoryTableMap::translateFieldName('Industry', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->industry = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : AccountHistoryTableMap::translateFieldName('Type', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->type = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : AccountHistoryTableMap::translateFieldName('BillingLatitude', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->billing_latitude = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : AccountHistoryTableMap::translateFieldName('BillingLongitude', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->billing_longitude = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : AccountHistoryTableMap::translateFieldName('BillingPostalCode', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->billing_postal_code = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : AccountHistoryTableMap::translateFieldName('BillingState', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->billing_state = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : AccountHistoryTableMap::translateFieldName('BillingCycleId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->billing_cycle_id = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : AccountHistoryTableMap::translateFieldName('BillingCity', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->billing_city = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : AccountHistoryTableMap::translateFieldName('BillingStreet', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->billing_street = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 16 + $startcol : AccountHistoryTableMap::translateFieldName('BillingCountry', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->billing_country = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 17 + $startcol : AccountHistoryTableMap::translateFieldName('LastActivityDate', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->last_activity_date = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 18 + $startcol : AccountHistoryTableMap::translateFieldName('OwnerId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->owner_id = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 19 + $startcol : AccountHistoryTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : AccountHistoryTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 20 + $startcol : AccountHistoryTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
             $this->resetModified();
 
@@ -769,7 +1219,7 @@ abstract class AccountHistory implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 10; // 10 = AccountHistoryTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 21; // 21 = AccountHistoryTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\DataModels\\DataModels\\AccountHistory'), 0, $e);
@@ -1013,11 +1463,38 @@ abstract class AccountHistory implements ActiveRecordInterface
         if ($this->isColumnModified(AccountHistoryTableMap::COL_ACCOUNT_ID)) {
             $modifiedColumns[':p' . $index++]  = 'account_id';
         }
-        if ($this->isColumnModified(AccountHistoryTableMap::COL_SFDC_NAME)) {
-            $modifiedColumns[':p' . $index++]  = 'sfdc_name';
+        if ($this->isColumnModified(AccountHistoryTableMap::COL_NAME)) {
+            $modifiedColumns[':p' . $index++]  = 'name';
         }
-        if ($this->isColumnModified(AccountHistoryTableMap::COL_ACCOUNT_STATUS_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'account_status_id';
+        if ($this->isColumnModified(AccountHistoryTableMap::COL_NUM_EMPLOYEES)) {
+            $modifiedColumns[':p' . $index++]  = 'num_employees';
+        }
+        if ($this->isColumnModified(AccountHistoryTableMap::COL_ARR)) {
+            $modifiedColumns[':p' . $index++]  = 'arr';
+        }
+        if ($this->isColumnModified(AccountHistoryTableMap::COL_WEBSITE)) {
+            $modifiedColumns[':p' . $index++]  = 'website';
+        }
+        if ($this->isColumnModified(AccountHistoryTableMap::COL_ANNUAL_REVENUE)) {
+            $modifiedColumns[':p' . $index++]  = 'annual_revenue';
+        }
+        if ($this->isColumnModified(AccountHistoryTableMap::COL_INDUSTRY)) {
+            $modifiedColumns[':p' . $index++]  = 'industry';
+        }
+        if ($this->isColumnModified(AccountHistoryTableMap::COL_TYPE)) {
+            $modifiedColumns[':p' . $index++]  = 'type';
+        }
+        if ($this->isColumnModified(AccountHistoryTableMap::COL_BILLING_LATITUDE)) {
+            $modifiedColumns[':p' . $index++]  = 'billing_latitude';
+        }
+        if ($this->isColumnModified(AccountHistoryTableMap::COL_BILLING_LONGITUDE)) {
+            $modifiedColumns[':p' . $index++]  = 'billing_longitude';
+        }
+        if ($this->isColumnModified(AccountHistoryTableMap::COL_BILLING_POSTAL_CODE)) {
+            $modifiedColumns[':p' . $index++]  = 'billing_postal_code';
+        }
+        if ($this->isColumnModified(AccountHistoryTableMap::COL_BILLING_STATE)) {
+            $modifiedColumns[':p' . $index++]  = 'billing_state';
         }
         if ($this->isColumnModified(AccountHistoryTableMap::COL_BILLING_CYCLE_ID)) {
             $modifiedColumns[':p' . $index++]  = 'billing_cycle_id';
@@ -1025,11 +1502,17 @@ abstract class AccountHistory implements ActiveRecordInterface
         if ($this->isColumnModified(AccountHistoryTableMap::COL_BILLING_CITY)) {
             $modifiedColumns[':p' . $index++]  = 'billing_city';
         }
-        if ($this->isColumnModified(AccountHistoryTableMap::COL_NUM_EMPLOYEES)) {
-            $modifiedColumns[':p' . $index++]  = 'num_employees';
+        if ($this->isColumnModified(AccountHistoryTableMap::COL_BILLING_STREET)) {
+            $modifiedColumns[':p' . $index++]  = 'billing_street';
         }
-        if ($this->isColumnModified(AccountHistoryTableMap::COL_ARR)) {
-            $modifiedColumns[':p' . $index++]  = 'arr';
+        if ($this->isColumnModified(AccountHistoryTableMap::COL_BILLING_COUNTRY)) {
+            $modifiedColumns[':p' . $index++]  = 'billing_country';
+        }
+        if ($this->isColumnModified(AccountHistoryTableMap::COL_LAST_ACTIVITY_DATE)) {
+            $modifiedColumns[':p' . $index++]  = 'last_activity_date';
+        }
+        if ($this->isColumnModified(AccountHistoryTableMap::COL_OWNER_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'owner_id';
         }
         if ($this->isColumnModified(AccountHistoryTableMap::COL_CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'created_at';
@@ -1054,11 +1537,38 @@ abstract class AccountHistory implements ActiveRecordInterface
                     case 'account_id':
                         $stmt->bindValue($identifier, $this->account_id, PDO::PARAM_INT);
                         break;
-                    case 'sfdc_name':
-                        $stmt->bindValue($identifier, $this->sfdc_name, PDO::PARAM_STR);
+                    case 'name':
+                        $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
                         break;
-                    case 'account_status_id':
-                        $stmt->bindValue($identifier, $this->account_status_id, PDO::PARAM_INT);
+                    case 'num_employees':
+                        $stmt->bindValue($identifier, $this->num_employees, PDO::PARAM_INT);
+                        break;
+                    case 'arr':
+                        $stmt->bindValue($identifier, $this->arr, PDO::PARAM_STR);
+                        break;
+                    case 'website':
+                        $stmt->bindValue($identifier, $this->website, PDO::PARAM_STR);
+                        break;
+                    case 'annual_revenue':
+                        $stmt->bindValue($identifier, $this->annual_revenue, PDO::PARAM_STR);
+                        break;
+                    case 'industry':
+                        $stmt->bindValue($identifier, $this->industry, PDO::PARAM_STR);
+                        break;
+                    case 'type':
+                        $stmt->bindValue($identifier, $this->type, PDO::PARAM_STR);
+                        break;
+                    case 'billing_latitude':
+                        $stmt->bindValue($identifier, $this->billing_latitude, PDO::PARAM_STR);
+                        break;
+                    case 'billing_longitude':
+                        $stmt->bindValue($identifier, $this->billing_longitude, PDO::PARAM_STR);
+                        break;
+                    case 'billing_postal_code':
+                        $stmt->bindValue($identifier, $this->billing_postal_code, PDO::PARAM_STR);
+                        break;
+                    case 'billing_state':
+                        $stmt->bindValue($identifier, $this->billing_state, PDO::PARAM_STR);
                         break;
                     case 'billing_cycle_id':
                         $stmt->bindValue($identifier, $this->billing_cycle_id, PDO::PARAM_INT);
@@ -1066,11 +1576,17 @@ abstract class AccountHistory implements ActiveRecordInterface
                     case 'billing_city':
                         $stmt->bindValue($identifier, $this->billing_city, PDO::PARAM_STR);
                         break;
-                    case 'num_employees':
-                        $stmt->bindValue($identifier, $this->num_employees, PDO::PARAM_INT);
+                    case 'billing_street':
+                        $stmt->bindValue($identifier, $this->billing_street, PDO::PARAM_STR);
                         break;
-                    case 'arr':
-                        $stmt->bindValue($identifier, $this->arr, PDO::PARAM_STR);
+                    case 'billing_country':
+                        $stmt->bindValue($identifier, $this->billing_country, PDO::PARAM_STR);
+                        break;
+                    case 'last_activity_date':
+                        $stmt->bindValue($identifier, $this->last_activity_date ? $this->last_activity_date->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
+                        break;
+                    case 'owner_id':
+                        $stmt->bindValue($identifier, $this->owner_id, PDO::PARAM_STR);
                         break;
                     case 'created_at':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
@@ -1140,27 +1656,60 @@ abstract class AccountHistory implements ActiveRecordInterface
                 return $this->getAccountId();
                 break;
             case 2:
-                return $this->getSFDCName();
+                return $this->getName();
                 break;
             case 3:
-                return $this->getAccountStatusId();
-                break;
-            case 4:
-                return $this->getBillingCycleId();
-                break;
-            case 5:
-                return $this->getBillingCity();
-                break;
-            case 6:
                 return $this->getNumEmployees();
                 break;
-            case 7:
+            case 4:
                 return $this->getArr();
                 break;
+            case 5:
+                return $this->getWebsite();
+                break;
+            case 6:
+                return $this->getAnnualRevenue();
+                break;
+            case 7:
+                return $this->getIndustry();
+                break;
             case 8:
-                return $this->getCreatedAt();
+                return $this->getType();
                 break;
             case 9:
+                return $this->getBillingLatitude();
+                break;
+            case 10:
+                return $this->getBillingLongitude();
+                break;
+            case 11:
+                return $this->getBillingPostalCode();
+                break;
+            case 12:
+                return $this->getBillingState();
+                break;
+            case 13:
+                return $this->getBillingCycleId();
+                break;
+            case 14:
+                return $this->getBillingCity();
+                break;
+            case 15:
+                return $this->getBillingStreet();
+                break;
+            case 16:
+                return $this->getBillingCountry();
+                break;
+            case 17:
+                return $this->getLastActivityDate();
+                break;
+            case 18:
+                return $this->getOwnerId();
+                break;
+            case 19:
+                return $this->getCreatedAt();
+                break;
+            case 20:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1195,21 +1744,36 @@ abstract class AccountHistory implements ActiveRecordInterface
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getAccountId(),
-            $keys[2] => $this->getSFDCName(),
-            $keys[3] => $this->getAccountStatusId(),
-            $keys[4] => $this->getBillingCycleId(),
-            $keys[5] => $this->getBillingCity(),
-            $keys[6] => $this->getNumEmployees(),
-            $keys[7] => $this->getArr(),
-            $keys[8] => $this->getCreatedAt(),
-            $keys[9] => $this->getUpdatedAt(),
+            $keys[2] => $this->getName(),
+            $keys[3] => $this->getNumEmployees(),
+            $keys[4] => $this->getArr(),
+            $keys[5] => $this->getWebsite(),
+            $keys[6] => $this->getAnnualRevenue(),
+            $keys[7] => $this->getIndustry(),
+            $keys[8] => $this->getType(),
+            $keys[9] => $this->getBillingLatitude(),
+            $keys[10] => $this->getBillingLongitude(),
+            $keys[11] => $this->getBillingPostalCode(),
+            $keys[12] => $this->getBillingState(),
+            $keys[13] => $this->getBillingCycleId(),
+            $keys[14] => $this->getBillingCity(),
+            $keys[15] => $this->getBillingStreet(),
+            $keys[16] => $this->getBillingCountry(),
+            $keys[17] => $this->getLastActivityDate(),
+            $keys[18] => $this->getOwnerId(),
+            $keys[19] => $this->getCreatedAt(),
+            $keys[20] => $this->getUpdatedAt(),
         );
-        if ($result[$keys[8]] instanceof \DateTime) {
-            $result[$keys[8]] = $result[$keys[8]]->format('c');
+        if ($result[$keys[17]] instanceof \DateTime) {
+            $result[$keys[17]] = $result[$keys[17]]->format('c');
         }
 
-        if ($result[$keys[9]] instanceof \DateTime) {
-            $result[$keys[9]] = $result[$keys[9]]->format('c');
+        if ($result[$keys[19]] instanceof \DateTime) {
+            $result[$keys[19]] = $result[$keys[19]]->format('c');
+        }
+
+        if ($result[$keys[20]] instanceof \DateTime) {
+            $result[$keys[20]] = $result[$keys[20]]->format('c');
         }
 
         $virtualColumns = $this->virtualColumns;
@@ -1274,27 +1838,60 @@ abstract class AccountHistory implements ActiveRecordInterface
                 $this->setAccountId($value);
                 break;
             case 2:
-                $this->setSFDCName($value);
+                $this->setName($value);
                 break;
             case 3:
-                $this->setAccountStatusId($value);
-                break;
-            case 4:
-                $this->setBillingCycleId($value);
-                break;
-            case 5:
-                $this->setBillingCity($value);
-                break;
-            case 6:
                 $this->setNumEmployees($value);
                 break;
-            case 7:
+            case 4:
                 $this->setArr($value);
                 break;
+            case 5:
+                $this->setWebsite($value);
+                break;
+            case 6:
+                $this->setAnnualRevenue($value);
+                break;
+            case 7:
+                $this->setIndustry($value);
+                break;
             case 8:
-                $this->setCreatedAt($value);
+                $this->setType($value);
                 break;
             case 9:
+                $this->setBillingLatitude($value);
+                break;
+            case 10:
+                $this->setBillingLongitude($value);
+                break;
+            case 11:
+                $this->setBillingPostalCode($value);
+                break;
+            case 12:
+                $this->setBillingState($value);
+                break;
+            case 13:
+                $this->setBillingCycleId($value);
+                break;
+            case 14:
+                $this->setBillingCity($value);
+                break;
+            case 15:
+                $this->setBillingStreet($value);
+                break;
+            case 16:
+                $this->setBillingCountry($value);
+                break;
+            case 17:
+                $this->setLastActivityDate($value);
+                break;
+            case 18:
+                $this->setOwnerId($value);
+                break;
+            case 19:
+                $this->setCreatedAt($value);
+                break;
+            case 20:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1330,28 +1927,61 @@ abstract class AccountHistory implements ActiveRecordInterface
             $this->setAccountId($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
-            $this->setSFDCName($arr[$keys[2]]);
+            $this->setName($arr[$keys[2]]);
         }
         if (array_key_exists($keys[3], $arr)) {
-            $this->setAccountStatusId($arr[$keys[3]]);
+            $this->setNumEmployees($arr[$keys[3]]);
         }
         if (array_key_exists($keys[4], $arr)) {
-            $this->setBillingCycleId($arr[$keys[4]]);
+            $this->setArr($arr[$keys[4]]);
         }
         if (array_key_exists($keys[5], $arr)) {
-            $this->setBillingCity($arr[$keys[5]]);
+            $this->setWebsite($arr[$keys[5]]);
         }
         if (array_key_exists($keys[6], $arr)) {
-            $this->setNumEmployees($arr[$keys[6]]);
+            $this->setAnnualRevenue($arr[$keys[6]]);
         }
         if (array_key_exists($keys[7], $arr)) {
-            $this->setArr($arr[$keys[7]]);
+            $this->setIndustry($arr[$keys[7]]);
         }
         if (array_key_exists($keys[8], $arr)) {
-            $this->setCreatedAt($arr[$keys[8]]);
+            $this->setType($arr[$keys[8]]);
         }
         if (array_key_exists($keys[9], $arr)) {
-            $this->setUpdatedAt($arr[$keys[9]]);
+            $this->setBillingLatitude($arr[$keys[9]]);
+        }
+        if (array_key_exists($keys[10], $arr)) {
+            $this->setBillingLongitude($arr[$keys[10]]);
+        }
+        if (array_key_exists($keys[11], $arr)) {
+            $this->setBillingPostalCode($arr[$keys[11]]);
+        }
+        if (array_key_exists($keys[12], $arr)) {
+            $this->setBillingState($arr[$keys[12]]);
+        }
+        if (array_key_exists($keys[13], $arr)) {
+            $this->setBillingCycleId($arr[$keys[13]]);
+        }
+        if (array_key_exists($keys[14], $arr)) {
+            $this->setBillingCity($arr[$keys[14]]);
+        }
+        if (array_key_exists($keys[15], $arr)) {
+            $this->setBillingStreet($arr[$keys[15]]);
+        }
+        if (array_key_exists($keys[16], $arr)) {
+            $this->setBillingCountry($arr[$keys[16]]);
+        }
+        if (array_key_exists($keys[17], $arr)) {
+            $this->setLastActivityDate($arr[$keys[17]]);
+        }
+        if (array_key_exists($keys[18], $arr)) {
+            $this->setOwnerId($arr[$keys[18]]);
+        }
+        if (array_key_exists($keys[19], $arr)) {
+            $this->setCreatedAt($arr[$keys[19]]);
+        }
+        if (array_key_exists($keys[20], $arr)) {
+            $this->setUpdatedAt($arr[$keys[20]]);
         }
     }
 
@@ -1400,11 +2030,38 @@ abstract class AccountHistory implements ActiveRecordInterface
         if ($this->isColumnModified(AccountHistoryTableMap::COL_ACCOUNT_ID)) {
             $criteria->add(AccountHistoryTableMap::COL_ACCOUNT_ID, $this->account_id);
         }
-        if ($this->isColumnModified(AccountHistoryTableMap::COL_SFDC_NAME)) {
-            $criteria->add(AccountHistoryTableMap::COL_SFDC_NAME, $this->sfdc_name);
+        if ($this->isColumnModified(AccountHistoryTableMap::COL_NAME)) {
+            $criteria->add(AccountHistoryTableMap::COL_NAME, $this->name);
         }
-        if ($this->isColumnModified(AccountHistoryTableMap::COL_ACCOUNT_STATUS_ID)) {
-            $criteria->add(AccountHistoryTableMap::COL_ACCOUNT_STATUS_ID, $this->account_status_id);
+        if ($this->isColumnModified(AccountHistoryTableMap::COL_NUM_EMPLOYEES)) {
+            $criteria->add(AccountHistoryTableMap::COL_NUM_EMPLOYEES, $this->num_employees);
+        }
+        if ($this->isColumnModified(AccountHistoryTableMap::COL_ARR)) {
+            $criteria->add(AccountHistoryTableMap::COL_ARR, $this->arr);
+        }
+        if ($this->isColumnModified(AccountHistoryTableMap::COL_WEBSITE)) {
+            $criteria->add(AccountHistoryTableMap::COL_WEBSITE, $this->website);
+        }
+        if ($this->isColumnModified(AccountHistoryTableMap::COL_ANNUAL_REVENUE)) {
+            $criteria->add(AccountHistoryTableMap::COL_ANNUAL_REVENUE, $this->annual_revenue);
+        }
+        if ($this->isColumnModified(AccountHistoryTableMap::COL_INDUSTRY)) {
+            $criteria->add(AccountHistoryTableMap::COL_INDUSTRY, $this->industry);
+        }
+        if ($this->isColumnModified(AccountHistoryTableMap::COL_TYPE)) {
+            $criteria->add(AccountHistoryTableMap::COL_TYPE, $this->type);
+        }
+        if ($this->isColumnModified(AccountHistoryTableMap::COL_BILLING_LATITUDE)) {
+            $criteria->add(AccountHistoryTableMap::COL_BILLING_LATITUDE, $this->billing_latitude);
+        }
+        if ($this->isColumnModified(AccountHistoryTableMap::COL_BILLING_LONGITUDE)) {
+            $criteria->add(AccountHistoryTableMap::COL_BILLING_LONGITUDE, $this->billing_longitude);
+        }
+        if ($this->isColumnModified(AccountHistoryTableMap::COL_BILLING_POSTAL_CODE)) {
+            $criteria->add(AccountHistoryTableMap::COL_BILLING_POSTAL_CODE, $this->billing_postal_code);
+        }
+        if ($this->isColumnModified(AccountHistoryTableMap::COL_BILLING_STATE)) {
+            $criteria->add(AccountHistoryTableMap::COL_BILLING_STATE, $this->billing_state);
         }
         if ($this->isColumnModified(AccountHistoryTableMap::COL_BILLING_CYCLE_ID)) {
             $criteria->add(AccountHistoryTableMap::COL_BILLING_CYCLE_ID, $this->billing_cycle_id);
@@ -1412,11 +2069,17 @@ abstract class AccountHistory implements ActiveRecordInterface
         if ($this->isColumnModified(AccountHistoryTableMap::COL_BILLING_CITY)) {
             $criteria->add(AccountHistoryTableMap::COL_BILLING_CITY, $this->billing_city);
         }
-        if ($this->isColumnModified(AccountHistoryTableMap::COL_NUM_EMPLOYEES)) {
-            $criteria->add(AccountHistoryTableMap::COL_NUM_EMPLOYEES, $this->num_employees);
+        if ($this->isColumnModified(AccountHistoryTableMap::COL_BILLING_STREET)) {
+            $criteria->add(AccountHistoryTableMap::COL_BILLING_STREET, $this->billing_street);
         }
-        if ($this->isColumnModified(AccountHistoryTableMap::COL_ARR)) {
-            $criteria->add(AccountHistoryTableMap::COL_ARR, $this->arr);
+        if ($this->isColumnModified(AccountHistoryTableMap::COL_BILLING_COUNTRY)) {
+            $criteria->add(AccountHistoryTableMap::COL_BILLING_COUNTRY, $this->billing_country);
+        }
+        if ($this->isColumnModified(AccountHistoryTableMap::COL_LAST_ACTIVITY_DATE)) {
+            $criteria->add(AccountHistoryTableMap::COL_LAST_ACTIVITY_DATE, $this->last_activity_date);
+        }
+        if ($this->isColumnModified(AccountHistoryTableMap::COL_OWNER_ID)) {
+            $criteria->add(AccountHistoryTableMap::COL_OWNER_ID, $this->owner_id);
         }
         if ($this->isColumnModified(AccountHistoryTableMap::COL_CREATED_AT)) {
             $criteria->add(AccountHistoryTableMap::COL_CREATED_AT, $this->created_at);
@@ -1511,12 +2174,23 @@ abstract class AccountHistory implements ActiveRecordInterface
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setAccountId($this->getAccountId());
-        $copyObj->setSFDCName($this->getSFDCName());
-        $copyObj->setAccountStatusId($this->getAccountStatusId());
-        $copyObj->setBillingCycleId($this->getBillingCycleId());
-        $copyObj->setBillingCity($this->getBillingCity());
+        $copyObj->setName($this->getName());
         $copyObj->setNumEmployees($this->getNumEmployees());
         $copyObj->setArr($this->getArr());
+        $copyObj->setWebsite($this->getWebsite());
+        $copyObj->setAnnualRevenue($this->getAnnualRevenue());
+        $copyObj->setIndustry($this->getIndustry());
+        $copyObj->setType($this->getType());
+        $copyObj->setBillingLatitude($this->getBillingLatitude());
+        $copyObj->setBillingLongitude($this->getBillingLongitude());
+        $copyObj->setBillingPostalCode($this->getBillingPostalCode());
+        $copyObj->setBillingState($this->getBillingState());
+        $copyObj->setBillingCycleId($this->getBillingCycleId());
+        $copyObj->setBillingCity($this->getBillingCity());
+        $copyObj->setBillingStreet($this->getBillingStreet());
+        $copyObj->setBillingCountry($this->getBillingCountry());
+        $copyObj->setLastActivityDate($this->getLastActivityDate());
+        $copyObj->setOwnerId($this->getOwnerId());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         if ($makeNew) {
@@ -1610,12 +2284,23 @@ abstract class AccountHistory implements ActiveRecordInterface
         }
         $this->id = null;
         $this->account_id = null;
-        $this->sfdc_name = null;
-        $this->account_status_id = null;
-        $this->billing_cycle_id = null;
-        $this->billing_city = null;
+        $this->name = null;
         $this->num_employees = null;
         $this->arr = null;
+        $this->website = null;
+        $this->annual_revenue = null;
+        $this->industry = null;
+        $this->type = null;
+        $this->billing_latitude = null;
+        $this->billing_longitude = null;
+        $this->billing_postal_code = null;
+        $this->billing_state = null;
+        $this->billing_cycle_id = null;
+        $this->billing_city = null;
+        $this->billing_street = null;
+        $this->billing_country = null;
+        $this->last_activity_date = null;
+        $this->owner_id = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;

@@ -3,7 +3,6 @@
   <table name="account" idMethod="native" phpName="Account" namespace="DataModels">
     <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
     <column name="email_domain" phpName="EmailDomain" type="VARCHAR" size="255"/>
-    <column name="website" phpName="Website" type="VARCHAR" size="255"/>
     <column name="sfdc_account_id" phpName="SfdcAccountId" type="VARCHAR" size="127"/>
     <column name="client_id" phpName="ClientId" type="INTEGER"/>
     <column name="sfdc_last_check_time" phpName="SFDCLastCheckTime" type="TIMESTAMP"/>
@@ -18,12 +17,24 @@
     <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
     <column name="account_id" phpName="AccountId" type="INTEGER"/>
 
-    <column name="sfdc_name" phpName="SFDCName" type="VARCHAR" size="127"/>
-    <column name="account_status_id" phpName="AccountStatusId" type="INTEGER"/>
-    <column name="billing_cycle_id" phpName="BillingCycleId" type="INTEGER"/>
-    <column name="billing_city" phpName="BillingCity" type="VARCHAR" size="255"/>
+    <column name="name" phpName="Name" type="VARCHAR" size="127"/>
     <column name="num_employees" phpName="NumEmployees" type="INTEGER"/>
     <column name="arr" phpName="Arr" type="VARCHAR"/>
+    <column name="website" phpName="Website" type="VARCHAR" size="255"/>
+    <column name="annual_revenue" phpName="AnnualRevenue" type="VARCHAR" size="63"/>
+    <column name="industry" phpName="Industry" type="VARCHAR" size="63"/>
+    <column name="type" phpName="Type" type="VARCHAR" size="63"/>
+    <column name="billing_latitude" phpName="BillingLatitude" type="VARCHAR" size="63"/>
+    <column name="billing_longitude" phpName="BillingLongitude" type="VARCHAR" size="63"/>
+    <column name="billing_postal_code" phpName="BillingPostalCode" type="VARCHAR" size="63"/>
+    <column name="billing_state" phpName="BillingState" type="VARCHAR" size="63"/>
+    <column name="billing_cycle_id" phpName="BillingCycleId" type="INTEGER"/>
+    <column name="billing_city" phpName="BillingCity" type="VARCHAR" size="255"/>
+    <column name="billing_street" phpName="BillingStreet" type="VARCHAR" size="255"/>
+    <column name="billing_country" phpName="BillingCountry" type="VARCHAR" size="255"/>
+    <column name="last_activity_date" phpName="LastActivityDate" type="DATE" />
+    <column name="owner_id" phpName="OwnerId" type="VARCHAR" size="127"/>
+
 
     <foreign-key foreignTable="account" onDelete="none" onUpdate="none">
       <reference local="account_id" foreign="id" />
