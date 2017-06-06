@@ -25,6 +25,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccountQuery orderBySfdcAccountId($order = Criteria::ASC) Order by the sfdc_account_id column
  * @method     ChildAccountQuery orderByClientId($order = Criteria::ASC) Order by the client_id column
  * @method     ChildAccountQuery orderBySFDCLastCheckTime($order = Criteria::ASC) Order by the sfdc_last_check_time column
+ * @method     ChildAccountQuery orderBySFDCOpptyLastCheckTime($order = Criteria::ASC) Order by the sfdc_oppty_last_check_time column
  * @method     ChildAccountQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildAccountQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
@@ -33,6 +34,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccountQuery groupBySfdcAccountId() Group by the sfdc_account_id column
  * @method     ChildAccountQuery groupByClientId() Group by the client_id column
  * @method     ChildAccountQuery groupBySFDCLastCheckTime() Group by the sfdc_last_check_time column
+ * @method     ChildAccountQuery groupBySFDCOpptyLastCheckTime() Group by the sfdc_oppty_last_check_time column
  * @method     ChildAccountQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildAccountQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -84,6 +86,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccount findOneBySfdcAccountId(string $sfdc_account_id) Return the first ChildAccount filtered by the sfdc_account_id column
  * @method     ChildAccount findOneByClientId(int $client_id) Return the first ChildAccount filtered by the client_id column
  * @method     ChildAccount findOneBySFDCLastCheckTime(string $sfdc_last_check_time) Return the first ChildAccount filtered by the sfdc_last_check_time column
+ * @method     ChildAccount findOneBySFDCOpptyLastCheckTime(string $sfdc_oppty_last_check_time) Return the first ChildAccount filtered by the sfdc_oppty_last_check_time column
  * @method     ChildAccount findOneByCreatedAt(string $created_at) Return the first ChildAccount filtered by the created_at column
  * @method     ChildAccount findOneByUpdatedAt(string $updated_at) Return the first ChildAccount filtered by the updated_at column *
 
@@ -95,6 +98,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccount requireOneBySfdcAccountId(string $sfdc_account_id) Return the first ChildAccount filtered by the sfdc_account_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccount requireOneByClientId(int $client_id) Return the first ChildAccount filtered by the client_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccount requireOneBySFDCLastCheckTime(string $sfdc_last_check_time) Return the first ChildAccount filtered by the sfdc_last_check_time column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildAccount requireOneBySFDCOpptyLastCheckTime(string $sfdc_oppty_last_check_time) Return the first ChildAccount filtered by the sfdc_oppty_last_check_time column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccount requireOneByCreatedAt(string $created_at) Return the first ChildAccount filtered by the created_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccount requireOneByUpdatedAt(string $updated_at) Return the first ChildAccount filtered by the updated_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
@@ -104,6 +108,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccount[]|ObjectCollection findBySfdcAccountId(string $sfdc_account_id) Return ChildAccount objects filtered by the sfdc_account_id column
  * @method     ChildAccount[]|ObjectCollection findByClientId(int $client_id) Return ChildAccount objects filtered by the client_id column
  * @method     ChildAccount[]|ObjectCollection findBySFDCLastCheckTime(string $sfdc_last_check_time) Return ChildAccount objects filtered by the sfdc_last_check_time column
+ * @method     ChildAccount[]|ObjectCollection findBySFDCOpptyLastCheckTime(string $sfdc_oppty_last_check_time) Return ChildAccount objects filtered by the sfdc_oppty_last_check_time column
  * @method     ChildAccount[]|ObjectCollection findByCreatedAt(string $created_at) Return ChildAccount objects filtered by the created_at column
  * @method     ChildAccount[]|ObjectCollection findByUpdatedAt(string $updated_at) Return ChildAccount objects filtered by the updated_at column
  * @method     ChildAccount[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
@@ -204,7 +209,7 @@ abstract class AccountQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, email_domain, sfdc_account_id, client_id, sfdc_last_check_time, created_at, updated_at FROM account WHERE id = :p0';
+        $sql = 'SELECT id, email_domain, sfdc_account_id, client_id, sfdc_last_check_time, sfdc_oppty_last_check_time, created_at, updated_at FROM account WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -469,6 +474,49 @@ abstract class AccountQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(AccountTableMap::COL_SFDC_LAST_CHECK_TIME, $sFDCLastCheckTime, $comparison);
+    }
+
+    /**
+     * Filter the query on the sfdc_oppty_last_check_time column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterBySFDCOpptyLastCheckTime('2011-03-14'); // WHERE sfdc_oppty_last_check_time = '2011-03-14'
+     * $query->filterBySFDCOpptyLastCheckTime('now'); // WHERE sfdc_oppty_last_check_time = '2011-03-14'
+     * $query->filterBySFDCOpptyLastCheckTime(array('max' => 'yesterday')); // WHERE sfdc_oppty_last_check_time > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $sFDCOpptyLastCheckTime The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildAccountQuery The current query, for fluid interface
+     */
+    public function filterBySFDCOpptyLastCheckTime($sFDCOpptyLastCheckTime = null, $comparison = null)
+    {
+        if (is_array($sFDCOpptyLastCheckTime)) {
+            $useMinMax = false;
+            if (isset($sFDCOpptyLastCheckTime['min'])) {
+                $this->addUsingAlias(AccountTableMap::COL_SFDC_OPPTY_LAST_CHECK_TIME, $sFDCOpptyLastCheckTime['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($sFDCOpptyLastCheckTime['max'])) {
+                $this->addUsingAlias(AccountTableMap::COL_SFDC_OPPTY_LAST_CHECK_TIME, $sFDCOpptyLastCheckTime['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(AccountTableMap::COL_SFDC_OPPTY_LAST_CHECK_TIME, $sFDCOpptyLastCheckTime, $comparison);
     }
 
     /**

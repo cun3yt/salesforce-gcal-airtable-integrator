@@ -6,6 +6,7 @@
     <column name="sfdc_account_id" phpName="SfdcAccountId" type="VARCHAR" size="127"/>
     <column name="client_id" phpName="ClientId" type="INTEGER"/>
     <column name="sfdc_last_check_time" phpName="SFDCLastCheckTime" type="TIMESTAMP"/>
+    <column name="sfdc_oppty_last_check_time" phpName="SFDCOpptyLastCheckTime" type="TIMESTAMP"/>
 
     <foreign-key foreignTable="client" onDelete="none" onUpdate="none">
       <reference local="client_id" foreign="id" />
