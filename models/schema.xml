@@ -200,7 +200,6 @@
     <column name="account_id" phpName="AccountId" type="INTEGER"/>
     <column name="sfdc_id" phpName="SFDCId" type="VARCHAR" size="127"/>
     <column name="sfdc_last_check_time" phpName="SFDCLastCheckTime" type="TIMESTAMP"/>
-    <column name="sfdc_opportunity_id" phpName="SFDCOpportunityId"  type="VARCHAR" size="127"/>
 
     <foreign-key foreignTable="account">
       <reference local="account_id" foreign="id"/>
