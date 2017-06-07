@@ -76,7 +76,17 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccountQuery rightJoinWithContact() Adds a RIGHT JOIN clause and with to the query using the Contact relation
  * @method     ChildAccountQuery innerJoinWithContact() Adds a INNER JOIN clause and with to the query using the Contact relation
  *
- * @method     \DataModels\DataModels\ClientQuery|\DataModels\DataModels\AccountHistoryQuery|\DataModels\DataModels\ContactQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     ChildAccountQuery leftJoinOpportunity($relationAlias = null) Adds a LEFT JOIN clause to the query using the Opportunity relation
+ * @method     ChildAccountQuery rightJoinOpportunity($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Opportunity relation
+ * @method     ChildAccountQuery innerJoinOpportunity($relationAlias = null) Adds a INNER JOIN clause to the query using the Opportunity relation
+ *
+ * @method     ChildAccountQuery joinWithOpportunity($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the Opportunity relation
+ *
+ * @method     ChildAccountQuery leftJoinWithOpportunity() Adds a LEFT JOIN clause and with to the query using the Opportunity relation
+ * @method     ChildAccountQuery rightJoinWithOpportunity() Adds a RIGHT JOIN clause and with to the query using the Opportunity relation
+ * @method     ChildAccountQuery innerJoinWithOpportunity() Adds a INNER JOIN clause and with to the query using the Opportunity relation
+ *
+ * @method     \DataModels\DataModels\ClientQuery|\DataModels\DataModels\AccountHistoryQuery|\DataModels\DataModels\ContactQuery|\DataModels\DataModels\OpportunityQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildAccount findOne(ConnectionInterface $con = null) Return the first ChildAccount matching the query
  * @method     ChildAccount findOneOrCreate(ConnectionInterface $con = null) Return the first ChildAccount matching the query, or a new ChildAccount object populated from the query conditions when no match is found
@@ -826,6 +836,79 @@ abstract class AccountQuery extends ModelCriteria
         return $this
             ->joinContact($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Contact', '\DataModels\DataModels\ContactQuery');
+    }
+
+    /**
+     * Filter the query by a related \DataModels\DataModels\Opportunity object
+     *
+     * @param \DataModels\DataModels\Opportunity|ObjectCollection $opportunity the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildAccountQuery The current query, for fluid interface
+     */
+    public function filterByOpportunity($opportunity, $comparison = null)
+    {
+        if ($opportunity instanceof \DataModels\DataModels\Opportunity) {
+            return $this
+                ->addUsingAlias(AccountTableMap::COL_ID, $opportunity->getAccountId(), $comparison);
+        } elseif ($opportunity instanceof ObjectCollection) {
+            return $this
+                ->useOpportunityQuery()
+                ->filterByPrimaryKeys($opportunity->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByOpportunity() only accepts arguments of type \DataModels\DataModels\Opportunity or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Opportunity relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildAccountQuery The current query, for fluid interface
+     */
+    public function joinOpportunity($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Opportunity');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Opportunity');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Opportunity relation Opportunity object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \DataModels\DataModels\OpportunityQuery A secondary query class using the current class as primary query
+     */
+    public function useOpportunityQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinOpportunity($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Opportunity', '\DataModels\DataModels\OpportunityQuery');
     }
 
     /**

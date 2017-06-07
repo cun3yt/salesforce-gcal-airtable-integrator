@@ -10,10 +10,7 @@ use DataModels\DataModels\Client as Client;
 
 $userDataArray = isset($_SESSION['userdata']) ? $_SESSION['userdata'] : null;
 
-/**
- * @var $client Client
- */
-list($client, $calendarUsers) = Helpers::loadClientData($strClientDomainName);
+$client = Helpers::loadClientData($strClientDomainName);
 
 if(is_array($userDataArray) && (count($userDataArray)>0)) {
     foreach($userDataArray as $token => $emailAddress) {

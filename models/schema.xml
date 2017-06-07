@@ -36,6 +36,9 @@
     <column name="last_activity_date" phpName="LastActivityDate" type="DATE" />
     <column name="owner_id" phpName="OwnerId" type="VARCHAR" size="127"/>
 
+    <index>
+      <index-column name="created_at" />
+    </index>
 
     <foreign-key foreignTable="account" onDelete="none" onUpdate="none">
       <reference local="account_id" foreign="id" />
@@ -54,13 +57,6 @@
     <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
     <column name="client_id" phpName="ClientId" type="INTEGER"/>
     <column name="type" phpName="Type" type="VARCHAR" size="255"/>
-
-    <behavior name="timestampable"/>
-  </table>
-  <table name="buyer_stage" idMethod="native" phpName="BuyerStage" namespace="DataModels">
-    <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-    <column name="client_id" phpName="ClientId" type="INTEGER"/>
-    <column name="stage" phpName="Stage" type="VARCHAR" size="255"/>
 
     <behavior name="timestampable"/>
   </table>
@@ -202,29 +198,45 @@
   <table name="opportunity" idMethod="native" phpName="Opportunity" namespace="DataModels">
     <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
     <column name="account_id" phpName="AccountId" type="INTEGER"/>
-    <column name="stage_id" phpName="StageId" type="INTEGER"/>
-    <column name="name" phpName="Name" type="VARCHAR" size="255"/>
-    <column name="amount" phpName="Amount" type="VARCHAR"/>
-    <column name="close_date" phpName="CloseDate" type="TIMESTAMP"/>
+    <column name="sfdc_id" phpName="SFDCId" type="VARCHAR" size="127"/>
     <column name="sfdc_last_check_time" phpName="SFDCLastCheckTime" type="TIMESTAMP"/>
+    <column name="sfdc_opportunity_id" phpName="SFDCOpportunityId"  type="VARCHAR" size="127"/>
+
+    <foreign-key foreignTable="account">
+      <reference local="account_id" foreign="id"/>
+    </foreign-key>
 
     <behavior name="timestampable"/>
   </table>
   <table name="opportunity_history" idMethod="native" phpName="OpportunityHistory" namespace="DataModels">
     <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
     <column name="opportunity_id" phpName="OpportunityId" type="INTEGER"/>
-    <column name="user_account_id" phpName="UserAccountId" type="INTEGER"/>
-    <column name="opportunity_stage_id" phpName="OpportunityStageId" type="INTEGER"/>
-    <column name="buyer_stage_id" phpName="BuyerStageId" type="INTEGER"/>
-    <column name="amount" phpName="Amount" type="VARCHAR"/>
+    <column name="sfdc_opportunity_id" phpName="SFDCOpportunityId" type="VARCHAR" size="127"/>
+    <column name="account_sfdc_id" phpName="AccountSFDCId" type="VARCHAR" size="127"/>
+    <column name="amount" phpName="Amount" type="NUMERIC" size="16" scale="2"/>
     <column name="close_date" phpName="CloseDate" type="DATE"/>
+    <column name="last_modified_by" phpName="LastModifiedBy" type="VARCHAR" size="127"/>
+    <column name="next_step" phpName="NextStep" type="VARCHAR" size="255"/>
+    <column name="name" phpName="Name" type="VARCHAR" size="120"/>
+    <column name="owner_id" phpName="OwnerId" type="VARCHAR" size="127"/>
+    <column name="stage" phpName="Stage" type="VARCHAR" size="63"/>
+    <column name="type" phpName="Type" type="VARCHAR" size="63"/>
+    <column name="contact" phpName="Contact" type="VARCHAR" size="127"/>
+    <column name="created_by" phpName="CreatedBy" type="VARCHAR" size="127"/>
+    <column name="description" phpName="Description" type="VARCHAR"/>
+    <column name="expected_revenue" phpName="ExpectedRevenue" type="NUMERIC" size="16" scale="2"/>
+    <column name="forecast_category" phpName="ForecastCategory" type="VARCHAR" size="127"/>
+    <column name="lead_source" phpName="LeadSource" type="VARCHAR" size="127"/>
+    <column name="price_book" phpName="PriceBook" type="VARCHAR" size="127"/>
+    <column name="primary_campaign_source" phpName="PrimaryCampaignSource" type="VARCHAR" size="127"/>
+    <column name="is_private" phpName="IsPrivate" type="BOOLEAN" phpType="boolean"/>
+    <column name="probability" phpName="Probability" type="NUMERIC" size="5" scale="2"/>
+    <column name="quantity" phpName="Quantity" type="NUMERIC" size="16" scale="2"/>
+    <column name="synced_quote" phpName="SyncedQuote" type="VARCHAR" size="63"/>
 
-    <behavior name="timestampable"/>
-  </table>
-  <table name="opportunity_stage" idMethod="native" phpName="OpportunityStage" namespace="DataModels">
-    <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-    <column name="client_id" phpName="ClientId" type="LONGVARCHAR"/>
-    <column name="stage" phpName="Stage" type="VARCHAR" size="255"/>
+    <foreign-key foreignTable="opportunity">
+      <reference local="opportunity_id" foreign="id"/>
+    </foreign-key>
 
     <behavior name="timestampable"/>
   </table>

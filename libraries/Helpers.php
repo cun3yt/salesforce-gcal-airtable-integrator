@@ -16,8 +16,8 @@ class Helpers {
     const SFDC_API_VERSION = 'v39.0';
 
     /**
-     * @param $emailDomain String
-     * @return array
+     * @param string $emailDomain
+     * @return Client
      * @throws Exception
      */
     static function loadClientData($emailDomain) {
@@ -29,9 +29,7 @@ class Helpers {
         }
 
         $client = $clientSet[0];
-        $calendarUsers = $client->getClientCalendarUsers();
-
-        return [$client, $calendarUsers];
+        return $client;
     }
 
     /**
@@ -41,18 +39,12 @@ class Helpers {
      */
     static function getAuthentications(Client $client,
                                     $authType = ClientCalendarUserOAuth::GCAL) {
-        $calendarUsers = $client->getClientCalendarUsers();
-        $integrations = array();
 
-        /**
-         * @var $calendarUser ClientCalendarUser
-         */
-        foreach($calendarUsers as $calendarUser) {
-            $q = new ClientCalendarUserOAuthQuery();
-            $collection = $q->filterByClientCalendarUser($calendarUser)->filterByType($authType)->find();
-            $integrations = array_merge($integrations, $collection->getArrayCopy());
-        }
-        return $integrations;
+        $q = ClientCalendarUserOAuthQuery::create();
+        return $q->filterByType($authType)
+            ->innerJoinClientCalendarUser()
+            ->where('ClientCalendarUser.ClientId = ?', $client->getId())
+            ->find();
     }
 
     /**
@@ -251,7 +243,7 @@ class Helpers {
 
         return array();
     }
-    
+
     /**
      * Function to check if the fetched contact details from SFDC
      * and existing `contact` detail in attendee history table
@@ -543,24 +535,26 @@ class Helpers {
         return false;
     }
 
-    static function fnGetOpportunityDetailFromSf($instance_url, $access_token, $strAccId = "") {
-        if(!$strAccId) {
+    static function getOpptyDetailFromSFDC($instance_url, $access_token, $accountId) {
+        if( !$accountId ) {
+            trigger_error("Account ID cannot be empty!", E_USER_ERROR);
             return false;
         }
 
-        $query = "SELECT Name, Id, Owner.Name, StageName, Amount, Buyer_Stage__c, CloseDate from Opportunity WHERE AccountId = '" . $strAccId . "' ORDER BY lastmodifieddate DESC LIMIT 1";
-        $url = "$instance_url/services/data/v20.0/query?q=" . urlencode($query);
-        $curl = curl_init($url);
-        curl_setopt($curl, CURLOPT_HEADER, false);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array("Authorization: OAuth $access_token"));
-        $json_response = curl_exec($curl);
-        if (!$json_response) {
-            echo "--error---" . curl_error($curl);
-        }
-        curl_close($curl);
-        $response = json_decode($json_response, true);
-        return $response;
+        $query = "
+          SELECT 
+              AccountId, Amount, CloseDate, CreatedById, Description, Id,
+              LastModifiedById, LeadSource, Name, NextStep, OwnerId, StageName,
+              SyncedQuoteId, Type, Probability, Pricebook2Id
+          FROM
+              Opportunity
+          WHERE
+              AccountId = '{$accountId}' 
+          ORDER BY 
+              lastmodifieddate DESC
+          LIMIT 1";
+
+        return self::sfdcExecuteGetQuery($instance_url, $access_token, $query);
     }
 
     static function fnGetOpportunityDetail($strAccId = "") {
@@ -1005,7 +999,12 @@ class Helpers {
         return self::sfdcExecuteGetQuery($instance_url, $access_token, $query);
     }
 
-    static function fnGetAccountDetailFromSf($instance_url, $access_token, $strAccDomain = "") {
+    static function SFDCGetOpptyHistoryLatest($instance_url, $access_token, $sfdcOpptyId) {
+        $query = "SELECT CreatedDate FROM OpportunityHistory WHERE OpportunityId = '{$sfdcOpptyId}' ORDER BY CreatedDate DESC NULLS LAST LIMIT 1";
+        return self::sfdcExecuteGetQuery($instance_url, $access_token, $query);
+    }
+
+    static function getAccountDetailFromSFDC($instance_url, $access_token, $strAccDomain = "") {
         if(!$strAccDomain) {
             return false;
         }

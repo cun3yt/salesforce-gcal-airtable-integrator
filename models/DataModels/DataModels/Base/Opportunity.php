@@ -5,14 +5,20 @@ namespace DataModels\DataModels\Base;
 use \DateTime;
 use \Exception;
 use \PDO;
+use DataModels\DataModels\Account as ChildAccount;
+use DataModels\DataModels\AccountQuery as ChildAccountQuery;
 use DataModels\DataModels\Opportunity as ChildOpportunity;
+use DataModels\DataModels\OpportunityHistory as ChildOpportunityHistory;
+use DataModels\DataModels\OpportunityHistoryQuery as ChildOpportunityHistoryQuery;
 use DataModels\DataModels\OpportunityQuery as ChildOpportunityQuery;
+use DataModels\DataModels\Map\OpportunityHistoryTableMap;
 use DataModels\DataModels\Map\OpportunityTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
+use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\BadMethodCallException;
 use Propel\Runtime\Exception\LogicException;
@@ -77,32 +83,11 @@ abstract class Opportunity implements ActiveRecordInterface
     protected $account_id;
 
     /**
-     * The value for the stage_id field.
-     *
-     * @var        int
-     */
-    protected $stage_id;
-
-    /**
-     * The value for the name field.
+     * The value for the sfdc_id field.
      *
      * @var        string
      */
-    protected $name;
-
-    /**
-     * The value for the amount field.
-     *
-     * @var        string
-     */
-    protected $amount;
-
-    /**
-     * The value for the close_date field.
-     *
-     * @var        DateTime
-     */
-    protected $close_date;
+    protected $sfdc_id;
 
     /**
      * The value for the sfdc_last_check_time field.
@@ -110,6 +95,13 @@ abstract class Opportunity implements ActiveRecordInterface
      * @var        DateTime
      */
     protected $sfdc_last_check_time;
+
+    /**
+     * The value for the sfdc_opportunity_id field.
+     *
+     * @var        string
+     */
+    protected $sfdc_opportunity_id;
 
     /**
      * The value for the created_at field.
@@ -126,12 +118,29 @@ abstract class Opportunity implements ActiveRecordInterface
     protected $updated_at;
 
     /**
+     * @var        ChildAccount
+     */
+    protected $aAccount;
+
+    /**
+     * @var        ObjectCollection|ChildOpportunityHistory[] Collection to store aggregation of ChildOpportunityHistory objects.
+     */
+    protected $collOpportunityHistories;
+    protected $collOpportunityHistoriesPartial;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      *
      * @var boolean
      */
     protected $alreadyInSave = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildOpportunityHistory[]
+     */
+    protected $opportunityHistoriesScheduledForDeletion = null;
 
     /**
      * Initializes internal state of DataModels\DataModels\Base\Opportunity object.
@@ -379,53 +388,13 @@ abstract class Opportunity implements ActiveRecordInterface
     }
 
     /**
-     * Get the [stage_id] column value.
-     *
-     * @return int
-     */
-    public function getStageId()
-    {
-        return $this->stage_id;
-    }
-
-    /**
-     * Get the [name] column value.
+     * Get the [sfdc_id] column value.
      *
      * @return string
      */
-    public function getName()
+    public function getSFDCId()
     {
-        return $this->name;
-    }
-
-    /**
-     * Get the [amount] column value.
-     *
-     * @return string
-     */
-    public function getAmount()
-    {
-        return $this->amount;
-    }
-
-    /**
-     * Get the [optionally formatted] temporal [close_date] column value.
-     *
-     *
-     * @param      string $format The date/time format string (either date()-style or strftime()-style).
-     *                            If format is NULL, then the raw DateTime object will be returned.
-     *
-     * @return string|DateTime Formatted date/time value as string or DateTime object (if format is NULL), NULL if column is NULL
-     *
-     * @throws PropelException - if unable to parse/validate the date/time value.
-     */
-    public function getCloseDate($format = NULL)
-    {
-        if ($format === null) {
-            return $this->close_date;
-        } else {
-            return $this->close_date instanceof \DateTimeInterface ? $this->close_date->format($format) : null;
-        }
+        return $this->sfdc_id;
     }
 
     /**
@@ -446,6 +415,16 @@ abstract class Opportunity implements ActiveRecordInterface
         } else {
             return $this->sfdc_last_check_time instanceof \DateTimeInterface ? $this->sfdc_last_check_time->format($format) : null;
         }
+    }
+
+    /**
+     * Get the [sfdc_opportunity_id] column value.
+     *
+     * @return string
+     */
+    public function getSFDCOpportunityId()
+    {
+        return $this->sfdc_opportunity_id;
     }
 
     /**
@@ -525,88 +504,32 @@ abstract class Opportunity implements ActiveRecordInterface
             $this->modifiedColumns[OpportunityTableMap::COL_ACCOUNT_ID] = true;
         }
 
+        if ($this->aAccount !== null && $this->aAccount->getId() !== $v) {
+            $this->aAccount = null;
+        }
+
         return $this;
     } // setAccountId()
 
     /**
-     * Set the value of [stage_id] column.
-     *
-     * @param int $v new value
-     * @return $this|\DataModels\DataModels\Opportunity The current object (for fluent API support)
-     */
-    public function setStageId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->stage_id !== $v) {
-            $this->stage_id = $v;
-            $this->modifiedColumns[OpportunityTableMap::COL_STAGE_ID] = true;
-        }
-
-        return $this;
-    } // setStageId()
-
-    /**
-     * Set the value of [name] column.
+     * Set the value of [sfdc_id] column.
      *
      * @param string $v new value
      * @return $this|\DataModels\DataModels\Opportunity The current object (for fluent API support)
      */
-    public function setName($v)
+    public function setSFDCId($v)
     {
         if ($v !== null) {
             $v = (string) $v;
         }
 
-        if ($this->name !== $v) {
-            $this->name = $v;
-            $this->modifiedColumns[OpportunityTableMap::COL_NAME] = true;
+        if ($this->sfdc_id !== $v) {
+            $this->sfdc_id = $v;
+            $this->modifiedColumns[OpportunityTableMap::COL_SFDC_ID] = true;
         }
 
         return $this;
-    } // setName()
-
-    /**
-     * Set the value of [amount] column.
-     *
-     * @param string $v new value
-     * @return $this|\DataModels\DataModels\Opportunity The current object (for fluent API support)
-     */
-    public function setAmount($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->amount !== $v) {
-            $this->amount = $v;
-            $this->modifiedColumns[OpportunityTableMap::COL_AMOUNT] = true;
-        }
-
-        return $this;
-    } // setAmount()
-
-    /**
-     * Sets the value of [close_date] column to a normalized version of the date/time value specified.
-     *
-     * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
-     *               Empty strings are treated as NULL.
-     * @return $this|\DataModels\DataModels\Opportunity The current object (for fluent API support)
-     */
-    public function setCloseDate($v)
-    {
-        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
-        if ($this->close_date !== null || $dt !== null) {
-            if ($this->close_date === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->close_date->format("Y-m-d H:i:s.u")) {
-                $this->close_date = $dt === null ? null : clone $dt;
-                $this->modifiedColumns[OpportunityTableMap::COL_CLOSE_DATE] = true;
-            }
-        } // if either are not null
-
-        return $this;
-    } // setCloseDate()
+    } // setSFDCId()
 
     /**
      * Sets the value of [sfdc_last_check_time] column to a normalized version of the date/time value specified.
@@ -627,6 +550,26 @@ abstract class Opportunity implements ActiveRecordInterface
 
         return $this;
     } // setSFDCLastCheckTime()
+
+    /**
+     * Set the value of [sfdc_opportunity_id] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\Opportunity The current object (for fluent API support)
+     */
+    public function setSFDCOpportunityId($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->sfdc_opportunity_id !== $v) {
+            $this->sfdc_opportunity_id = $v;
+            $this->modifiedColumns[OpportunityTableMap::COL_SFDC_OPPORTUNITY_ID] = true;
+        }
+
+        return $this;
+    } // setSFDCOpportunityId()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
@@ -710,25 +653,19 @@ abstract class Opportunity implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : OpportunityTableMap::translateFieldName('AccountId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->account_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : OpportunityTableMap::translateFieldName('StageId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->stage_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : OpportunityTableMap::translateFieldName('SFDCId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->sfdc_id = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : OpportunityTableMap::translateFieldName('Name', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->name = (null !== $col) ? (string) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : OpportunityTableMap::translateFieldName('Amount', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->amount = (null !== $col) ? (string) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : OpportunityTableMap::translateFieldName('CloseDate', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->close_date = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : OpportunityTableMap::translateFieldName('SFDCLastCheckTime', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : OpportunityTableMap::translateFieldName('SFDCLastCheckTime', TableMap::TYPE_PHPNAME, $indexType)];
             $this->sfdc_last_check_time = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : OpportunityTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : OpportunityTableMap::translateFieldName('SFDCOpportunityId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->sfdc_opportunity_id = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : OpportunityTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : OpportunityTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : OpportunityTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
             $this->resetModified();
 
@@ -738,7 +675,7 @@ abstract class Opportunity implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 9; // 9 = OpportunityTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 7; // 7 = OpportunityTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\DataModels\\DataModels\\Opportunity'), 0, $e);
@@ -760,6 +697,9 @@ abstract class Opportunity implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
+        if ($this->aAccount !== null && $this->account_id !== $this->aAccount->getId()) {
+            $this->aAccount = null;
+        }
     } // ensureConsistency
 
     /**
@@ -798,6 +738,9 @@ abstract class Opportunity implements ActiveRecordInterface
         $this->hydrate($row, 0, true, $dataFetcher->getIndexType()); // rehydrate
 
         if ($deep) {  // also de-associate any related objects?
+
+            $this->aAccount = null;
+            $this->collOpportunityHistories = null;
 
         } // if (deep)
     }
@@ -914,6 +857,18 @@ abstract class Opportunity implements ActiveRecordInterface
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their corresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aAccount !== null) {
+                if ($this->aAccount->isModified() || $this->aAccount->isNew()) {
+                    $affectedRows += $this->aAccount->save($con);
+                }
+                $this->setAccount($this->aAccount);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -923,6 +878,24 @@ abstract class Opportunity implements ActiveRecordInterface
                     $affectedRows += $this->doUpdate($con);
                 }
                 $this->resetModified();
+            }
+
+            if ($this->opportunityHistoriesScheduledForDeletion !== null) {
+                if (!$this->opportunityHistoriesScheduledForDeletion->isEmpty()) {
+                    foreach ($this->opportunityHistoriesScheduledForDeletion as $opportunityHistory) {
+                        // need to save related object because we set the relation to null
+                        $opportunityHistory->save($con);
+                    }
+                    $this->opportunityHistoriesScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collOpportunityHistories !== null) {
+                foreach ($this->collOpportunityHistories as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
             }
 
             $this->alreadyInSave = false;
@@ -966,20 +939,14 @@ abstract class Opportunity implements ActiveRecordInterface
         if ($this->isColumnModified(OpportunityTableMap::COL_ACCOUNT_ID)) {
             $modifiedColumns[':p' . $index++]  = 'account_id';
         }
-        if ($this->isColumnModified(OpportunityTableMap::COL_STAGE_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'stage_id';
-        }
-        if ($this->isColumnModified(OpportunityTableMap::COL_NAME)) {
-            $modifiedColumns[':p' . $index++]  = 'name';
-        }
-        if ($this->isColumnModified(OpportunityTableMap::COL_AMOUNT)) {
-            $modifiedColumns[':p' . $index++]  = 'amount';
-        }
-        if ($this->isColumnModified(OpportunityTableMap::COL_CLOSE_DATE)) {
-            $modifiedColumns[':p' . $index++]  = 'close_date';
+        if ($this->isColumnModified(OpportunityTableMap::COL_SFDC_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'sfdc_id';
         }
         if ($this->isColumnModified(OpportunityTableMap::COL_SFDC_LAST_CHECK_TIME)) {
             $modifiedColumns[':p' . $index++]  = 'sfdc_last_check_time';
+        }
+        if ($this->isColumnModified(OpportunityTableMap::COL_SFDC_OPPORTUNITY_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'sfdc_opportunity_id';
         }
         if ($this->isColumnModified(OpportunityTableMap::COL_CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'created_at';
@@ -1004,20 +971,14 @@ abstract class Opportunity implements ActiveRecordInterface
                     case 'account_id':
                         $stmt->bindValue($identifier, $this->account_id, PDO::PARAM_INT);
                         break;
-                    case 'stage_id':
-                        $stmt->bindValue($identifier, $this->stage_id, PDO::PARAM_INT);
-                        break;
-                    case 'name':
-                        $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
-                        break;
-                    case 'amount':
-                        $stmt->bindValue($identifier, $this->amount, PDO::PARAM_STR);
-                        break;
-                    case 'close_date':
-                        $stmt->bindValue($identifier, $this->close_date ? $this->close_date->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
+                    case 'sfdc_id':
+                        $stmt->bindValue($identifier, $this->sfdc_id, PDO::PARAM_STR);
                         break;
                     case 'sfdc_last_check_time':
                         $stmt->bindValue($identifier, $this->sfdc_last_check_time ? $this->sfdc_last_check_time->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
+                        break;
+                    case 'sfdc_opportunity_id':
+                        $stmt->bindValue($identifier, $this->sfdc_opportunity_id, PDO::PARAM_STR);
                         break;
                     case 'created_at':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
@@ -1087,24 +1048,18 @@ abstract class Opportunity implements ActiveRecordInterface
                 return $this->getAccountId();
                 break;
             case 2:
-                return $this->getStageId();
+                return $this->getSFDCId();
                 break;
             case 3:
-                return $this->getName();
-                break;
-            case 4:
-                return $this->getAmount();
-                break;
-            case 5:
-                return $this->getCloseDate();
-                break;
-            case 6:
                 return $this->getSFDCLastCheckTime();
                 break;
-            case 7:
+            case 4:
+                return $this->getSFDCOpportunityId();
+                break;
+            case 5:
                 return $this->getCreatedAt();
                 break;
-            case 8:
+            case 6:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1124,10 +1079,11 @@ abstract class Opportunity implements ActiveRecordInterface
      *                    Defaults to TableMap::TYPE_PHPNAME.
      * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
      * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
+     * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
      *
      * @return array an associative array containing the field names (as keys) and field values
      */
-    public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array())
+    public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
 
         if (isset($alreadyDumpedObjects['Opportunity'][$this->hashCode()])) {
@@ -1138,14 +1094,16 @@ abstract class Opportunity implements ActiveRecordInterface
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getAccountId(),
-            $keys[2] => $this->getStageId(),
-            $keys[3] => $this->getName(),
-            $keys[4] => $this->getAmount(),
-            $keys[5] => $this->getCloseDate(),
-            $keys[6] => $this->getSFDCLastCheckTime(),
-            $keys[7] => $this->getCreatedAt(),
-            $keys[8] => $this->getUpdatedAt(),
+            $keys[2] => $this->getSFDCId(),
+            $keys[3] => $this->getSFDCLastCheckTime(),
+            $keys[4] => $this->getSFDCOpportunityId(),
+            $keys[5] => $this->getCreatedAt(),
+            $keys[6] => $this->getUpdatedAt(),
         );
+        if ($result[$keys[3]] instanceof \DateTime) {
+            $result[$keys[3]] = $result[$keys[3]]->format('c');
+        }
+
         if ($result[$keys[5]] instanceof \DateTime) {
             $result[$keys[5]] = $result[$keys[5]]->format('c');
         }
@@ -1154,19 +1112,43 @@ abstract class Opportunity implements ActiveRecordInterface
             $result[$keys[6]] = $result[$keys[6]]->format('c');
         }
 
-        if ($result[$keys[7]] instanceof \DateTime) {
-            $result[$keys[7]] = $result[$keys[7]]->format('c');
-        }
-
-        if ($result[$keys[8]] instanceof \DateTime) {
-            $result[$keys[8]] = $result[$keys[8]]->format('c');
-        }
-
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
             $result[$key] = $virtualColumn;
         }
 
+        if ($includeForeignObjects) {
+            if (null !== $this->aAccount) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'account';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'account';
+                        break;
+                    default:
+                        $key = 'Account';
+                }
+
+                $result[$key] = $this->aAccount->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->collOpportunityHistories) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'opportunityHistories';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'opportunity_histories';
+                        break;
+                    default:
+                        $key = 'OpportunityHistories';
+                }
+
+                $result[$key] = $this->collOpportunityHistories->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+        }
 
         return $result;
     }
@@ -1207,24 +1189,18 @@ abstract class Opportunity implements ActiveRecordInterface
                 $this->setAccountId($value);
                 break;
             case 2:
-                $this->setStageId($value);
+                $this->setSFDCId($value);
                 break;
             case 3:
-                $this->setName($value);
-                break;
-            case 4:
-                $this->setAmount($value);
-                break;
-            case 5:
-                $this->setCloseDate($value);
-                break;
-            case 6:
                 $this->setSFDCLastCheckTime($value);
                 break;
-            case 7:
+            case 4:
+                $this->setSFDCOpportunityId($value);
+                break;
+            case 5:
                 $this->setCreatedAt($value);
                 break;
-            case 8:
+            case 6:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1260,25 +1236,19 @@ abstract class Opportunity implements ActiveRecordInterface
             $this->setAccountId($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
-            $this->setStageId($arr[$keys[2]]);
+            $this->setSFDCId($arr[$keys[2]]);
         }
         if (array_key_exists($keys[3], $arr)) {
-            $this->setName($arr[$keys[3]]);
+            $this->setSFDCLastCheckTime($arr[$keys[3]]);
         }
         if (array_key_exists($keys[4], $arr)) {
-            $this->setAmount($arr[$keys[4]]);
+            $this->setSFDCOpportunityId($arr[$keys[4]]);
         }
         if (array_key_exists($keys[5], $arr)) {
-            $this->setCloseDate($arr[$keys[5]]);
+            $this->setCreatedAt($arr[$keys[5]]);
         }
         if (array_key_exists($keys[6], $arr)) {
-            $this->setSFDCLastCheckTime($arr[$keys[6]]);
-        }
-        if (array_key_exists($keys[7], $arr)) {
-            $this->setCreatedAt($arr[$keys[7]]);
-        }
-        if (array_key_exists($keys[8], $arr)) {
-            $this->setUpdatedAt($arr[$keys[8]]);
+            $this->setUpdatedAt($arr[$keys[6]]);
         }
     }
 
@@ -1327,20 +1297,14 @@ abstract class Opportunity implements ActiveRecordInterface
         if ($this->isColumnModified(OpportunityTableMap::COL_ACCOUNT_ID)) {
             $criteria->add(OpportunityTableMap::COL_ACCOUNT_ID, $this->account_id);
         }
-        if ($this->isColumnModified(OpportunityTableMap::COL_STAGE_ID)) {
-            $criteria->add(OpportunityTableMap::COL_STAGE_ID, $this->stage_id);
-        }
-        if ($this->isColumnModified(OpportunityTableMap::COL_NAME)) {
-            $criteria->add(OpportunityTableMap::COL_NAME, $this->name);
-        }
-        if ($this->isColumnModified(OpportunityTableMap::COL_AMOUNT)) {
-            $criteria->add(OpportunityTableMap::COL_AMOUNT, $this->amount);
-        }
-        if ($this->isColumnModified(OpportunityTableMap::COL_CLOSE_DATE)) {
-            $criteria->add(OpportunityTableMap::COL_CLOSE_DATE, $this->close_date);
+        if ($this->isColumnModified(OpportunityTableMap::COL_SFDC_ID)) {
+            $criteria->add(OpportunityTableMap::COL_SFDC_ID, $this->sfdc_id);
         }
         if ($this->isColumnModified(OpportunityTableMap::COL_SFDC_LAST_CHECK_TIME)) {
             $criteria->add(OpportunityTableMap::COL_SFDC_LAST_CHECK_TIME, $this->sfdc_last_check_time);
+        }
+        if ($this->isColumnModified(OpportunityTableMap::COL_SFDC_OPPORTUNITY_ID)) {
+            $criteria->add(OpportunityTableMap::COL_SFDC_OPPORTUNITY_ID, $this->sfdc_opportunity_id);
         }
         if ($this->isColumnModified(OpportunityTableMap::COL_CREATED_AT)) {
             $criteria->add(OpportunityTableMap::COL_CREATED_AT, $this->created_at);
@@ -1435,13 +1399,25 @@ abstract class Opportunity implements ActiveRecordInterface
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setAccountId($this->getAccountId());
-        $copyObj->setStageId($this->getStageId());
-        $copyObj->setName($this->getName());
-        $copyObj->setAmount($this->getAmount());
-        $copyObj->setCloseDate($this->getCloseDate());
+        $copyObj->setSFDCId($this->getSFDCId());
         $copyObj->setSFDCLastCheckTime($this->getSFDCLastCheckTime());
+        $copyObj->setSFDCOpportunityId($this->getSFDCOpportunityId());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
+
+        if ($deepCopy) {
+            // important: temporarily setNew(false) because this affects the behavior of
+            // the getter/setter methods for fkey referrer objects.
+            $copyObj->setNew(false);
+
+            foreach ($this->getOpportunityHistories() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addOpportunityHistory($relObj->copy($deepCopy));
+                }
+            }
+
+        } // if ($deepCopy)
+
         if ($makeNew) {
             $copyObj->setNew(true);
             $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
@@ -1471,19 +1447,312 @@ abstract class Opportunity implements ActiveRecordInterface
     }
 
     /**
+     * Declares an association between this object and a ChildAccount object.
+     *
+     * @param  ChildAccount $v
+     * @return $this|\DataModels\DataModels\Opportunity The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setAccount(ChildAccount $v = null)
+    {
+        if ($v === null) {
+            $this->setAccountId(NULL);
+        } else {
+            $this->setAccountId($v->getId());
+        }
+
+        $this->aAccount = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildAccount object, it will not be re-added.
+        if ($v !== null) {
+            $v->addOpportunity($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildAccount object
+     *
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildAccount The associated ChildAccount object.
+     * @throws PropelException
+     */
+    public function getAccount(ConnectionInterface $con = null)
+    {
+        if ($this->aAccount === null && ($this->account_id !== null)) {
+            $this->aAccount = ChildAccountQuery::create()->findPk($this->account_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aAccount->addOpportunities($this);
+             */
+        }
+
+        return $this->aAccount;
+    }
+
+
+    /**
+     * Initializes a collection based on the name of a relation.
+     * Avoids crafting an 'init[$relationName]s' method name
+     * that wouldn't work when StandardEnglishPluralizer is used.
+     *
+     * @param      string $relationName The name of the relation to initialize
+     * @return void
+     */
+    public function initRelation($relationName)
+    {
+        if ('OpportunityHistory' == $relationName) {
+            return $this->initOpportunityHistories();
+        }
+    }
+
+    /**
+     * Clears out the collOpportunityHistories collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addOpportunityHistories()
+     */
+    public function clearOpportunityHistories()
+    {
+        $this->collOpportunityHistories = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collOpportunityHistories collection loaded partially.
+     */
+    public function resetPartialOpportunityHistories($v = true)
+    {
+        $this->collOpportunityHistoriesPartial = $v;
+    }
+
+    /**
+     * Initializes the collOpportunityHistories collection.
+     *
+     * By default this just sets the collOpportunityHistories collection to an empty array (like clearcollOpportunityHistories());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initOpportunityHistories($overrideExisting = true)
+    {
+        if (null !== $this->collOpportunityHistories && !$overrideExisting) {
+            return;
+        }
+
+        $collectionClassName = OpportunityHistoryTableMap::getTableMap()->getCollectionClassName();
+
+        $this->collOpportunityHistories = new $collectionClassName;
+        $this->collOpportunityHistories->setModel('\DataModels\DataModels\OpportunityHistory');
+    }
+
+    /**
+     * Gets an array of ChildOpportunityHistory objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildOpportunity is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildOpportunityHistory[] List of ChildOpportunityHistory objects
+     * @throws PropelException
+     */
+    public function getOpportunityHistories(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collOpportunityHistoriesPartial && !$this->isNew();
+        if (null === $this->collOpportunityHistories || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collOpportunityHistories) {
+                // return empty collection
+                $this->initOpportunityHistories();
+            } else {
+                $collOpportunityHistories = ChildOpportunityHistoryQuery::create(null, $criteria)
+                    ->filterByOpportunity($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collOpportunityHistoriesPartial && count($collOpportunityHistories)) {
+                        $this->initOpportunityHistories(false);
+
+                        foreach ($collOpportunityHistories as $obj) {
+                            if (false == $this->collOpportunityHistories->contains($obj)) {
+                                $this->collOpportunityHistories->append($obj);
+                            }
+                        }
+
+                        $this->collOpportunityHistoriesPartial = true;
+                    }
+
+                    return $collOpportunityHistories;
+                }
+
+                if ($partial && $this->collOpportunityHistories) {
+                    foreach ($this->collOpportunityHistories as $obj) {
+                        if ($obj->isNew()) {
+                            $collOpportunityHistories[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collOpportunityHistories = $collOpportunityHistories;
+                $this->collOpportunityHistoriesPartial = false;
+            }
+        }
+
+        return $this->collOpportunityHistories;
+    }
+
+    /**
+     * Sets a collection of ChildOpportunityHistory objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $opportunityHistories A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return $this|ChildOpportunity The current object (for fluent API support)
+     */
+    public function setOpportunityHistories(Collection $opportunityHistories, ConnectionInterface $con = null)
+    {
+        /** @var ChildOpportunityHistory[] $opportunityHistoriesToDelete */
+        $opportunityHistoriesToDelete = $this->getOpportunityHistories(new Criteria(), $con)->diff($opportunityHistories);
+
+
+        $this->opportunityHistoriesScheduledForDeletion = $opportunityHistoriesToDelete;
+
+        foreach ($opportunityHistoriesToDelete as $opportunityHistoryRemoved) {
+            $opportunityHistoryRemoved->setOpportunity(null);
+        }
+
+        $this->collOpportunityHistories = null;
+        foreach ($opportunityHistories as $opportunityHistory) {
+            $this->addOpportunityHistory($opportunityHistory);
+        }
+
+        $this->collOpportunityHistories = $opportunityHistories;
+        $this->collOpportunityHistoriesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related OpportunityHistory objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related OpportunityHistory objects.
+     * @throws PropelException
+     */
+    public function countOpportunityHistories(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collOpportunityHistoriesPartial && !$this->isNew();
+        if (null === $this->collOpportunityHistories || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collOpportunityHistories) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getOpportunityHistories());
+            }
+
+            $query = ChildOpportunityHistoryQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByOpportunity($this)
+                ->count($con);
+        }
+
+        return count($this->collOpportunityHistories);
+    }
+
+    /**
+     * Method called to associate a ChildOpportunityHistory object to this object
+     * through the ChildOpportunityHistory foreign key attribute.
+     *
+     * @param  ChildOpportunityHistory $l ChildOpportunityHistory
+     * @return $this|\DataModels\DataModels\Opportunity The current object (for fluent API support)
+     */
+    public function addOpportunityHistory(ChildOpportunityHistory $l)
+    {
+        if ($this->collOpportunityHistories === null) {
+            $this->initOpportunityHistories();
+            $this->collOpportunityHistoriesPartial = true;
+        }
+
+        if (!$this->collOpportunityHistories->contains($l)) {
+            $this->doAddOpportunityHistory($l);
+
+            if ($this->opportunityHistoriesScheduledForDeletion and $this->opportunityHistoriesScheduledForDeletion->contains($l)) {
+                $this->opportunityHistoriesScheduledForDeletion->remove($this->opportunityHistoriesScheduledForDeletion->search($l));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ChildOpportunityHistory $opportunityHistory The ChildOpportunityHistory object to add.
+     */
+    protected function doAddOpportunityHistory(ChildOpportunityHistory $opportunityHistory)
+    {
+        $this->collOpportunityHistories[]= $opportunityHistory;
+        $opportunityHistory->setOpportunity($this);
+    }
+
+    /**
+     * @param  ChildOpportunityHistory $opportunityHistory The ChildOpportunityHistory object to remove.
+     * @return $this|ChildOpportunity The current object (for fluent API support)
+     */
+    public function removeOpportunityHistory(ChildOpportunityHistory $opportunityHistory)
+    {
+        if ($this->getOpportunityHistories()->contains($opportunityHistory)) {
+            $pos = $this->collOpportunityHistories->search($opportunityHistory);
+            $this->collOpportunityHistories->remove($pos);
+            if (null === $this->opportunityHistoriesScheduledForDeletion) {
+                $this->opportunityHistoriesScheduledForDeletion = clone $this->collOpportunityHistories;
+                $this->opportunityHistoriesScheduledForDeletion->clear();
+            }
+            $this->opportunityHistoriesScheduledForDeletion[]= $opportunityHistory;
+            $opportunityHistory->setOpportunity(null);
+        }
+
+        return $this;
+    }
+
+    /**
      * Clears the current object, sets all attributes to their default values and removes
      * outgoing references as well as back-references (from other objects to this one. Results probably in a database
      * change of those foreign objects when you call `save` there).
      */
     public function clear()
     {
+        if (null !== $this->aAccount) {
+            $this->aAccount->removeOpportunity($this);
+        }
         $this->id = null;
         $this->account_id = null;
-        $this->stage_id = null;
-        $this->name = null;
-        $this->amount = null;
-        $this->close_date = null;
+        $this->sfdc_id = null;
         $this->sfdc_last_check_time = null;
+        $this->sfdc_opportunity_id = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
@@ -1504,8 +1773,15 @@ abstract class Opportunity implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collOpportunityHistories) {
+                foreach ($this->collOpportunityHistories as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
+        $this->collOpportunityHistories = null;
+        $this->aAccount = null;
     }
 
     /**

@@ -14,10 +14,7 @@ use DataModels\DataModels\Account as Account;
 use DataModels\DataModels\ContactQuery as ContactQuery;
 use DataModels\DataModels\Client as Client;
 
-/**
- * @var $client Client
- */
-list($client, $calendarUsers) = Helpers::loadClientData($strClientDomainName);
+$client = Helpers::loadClientData($strClientDomainName);
 
 $contactQ = new ContactQuery();
 

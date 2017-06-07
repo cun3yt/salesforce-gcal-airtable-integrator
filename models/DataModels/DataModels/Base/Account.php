@@ -13,9 +13,12 @@ use DataModels\DataModels\Client as ChildClient;
 use DataModels\DataModels\ClientQuery as ChildClientQuery;
 use DataModels\DataModels\Contact as ChildContact;
 use DataModels\DataModels\ContactQuery as ChildContactQuery;
+use DataModels\DataModels\Opportunity as ChildOpportunity;
+use DataModels\DataModels\OpportunityQuery as ChildOpportunityQuery;
 use DataModels\DataModels\Map\AccountHistoryTableMap;
 use DataModels\DataModels\Map\AccountTableMap;
 use DataModels\DataModels\Map\ContactTableMap;
+use DataModels\DataModels\Map\OpportunityTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -145,6 +148,12 @@ abstract class Account implements ActiveRecordInterface
     protected $collContactsPartial;
 
     /**
+     * @var        ObjectCollection|ChildOpportunity[] Collection to store aggregation of ChildOpportunity objects.
+     */
+    protected $collOpportunities;
+    protected $collOpportunitiesPartial;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      *
@@ -163,6 +172,12 @@ abstract class Account implements ActiveRecordInterface
      * @var ObjectCollection|ChildContact[]
      */
     protected $contactsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildOpportunity[]
+     */
+    protected $opportunitiesScheduledForDeletion = null;
 
     /**
      * Initializes internal state of DataModels\DataModels\Base\Account object.
@@ -809,6 +824,8 @@ abstract class Account implements ActiveRecordInterface
 
             $this->collContacts = null;
 
+            $this->collOpportunities = null;
+
         } // if (deep)
     }
 
@@ -977,6 +994,24 @@ abstract class Account implements ActiveRecordInterface
 
             if ($this->collContacts !== null) {
                 foreach ($this->collContacts as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->opportunitiesScheduledForDeletion !== null) {
+                if (!$this->opportunitiesScheduledForDeletion->isEmpty()) {
+                    foreach ($this->opportunitiesScheduledForDeletion as $opportunity) {
+                        // need to save related object because we set the relation to null
+                        $opportunity->save($con);
+                    }
+                    $this->opportunitiesScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collOpportunities !== null) {
+                foreach ($this->collOpportunities as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1262,6 +1297,21 @@ abstract class Account implements ActiveRecordInterface
 
                 $result[$key] = $this->collContacts->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
+            if (null !== $this->collOpportunities) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'opportunities';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'opportunities';
+                        break;
+                    default:
+                        $key = 'Opportunities';
+                }
+
+                $result[$key] = $this->collOpportunities->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
         }
 
         return $result;
@@ -1546,6 +1596,12 @@ abstract class Account implements ActiveRecordInterface
                 }
             }
 
+            foreach ($this->getOpportunities() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addOpportunity($relObj->copy($deepCopy));
+                }
+            }
+
         } // if ($deepCopy)
 
         if ($makeNew) {
@@ -1643,6 +1699,9 @@ abstract class Account implements ActiveRecordInterface
         }
         if ('Contact' == $relationName) {
             return $this->initContacts();
+        }
+        if ('Opportunity' == $relationName) {
+            return $this->initOpportunities();
         }
     }
 
@@ -2147,6 +2206,231 @@ abstract class Account implements ActiveRecordInterface
     }
 
     /**
+     * Clears out the collOpportunities collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addOpportunities()
+     */
+    public function clearOpportunities()
+    {
+        $this->collOpportunities = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collOpportunities collection loaded partially.
+     */
+    public function resetPartialOpportunities($v = true)
+    {
+        $this->collOpportunitiesPartial = $v;
+    }
+
+    /**
+     * Initializes the collOpportunities collection.
+     *
+     * By default this just sets the collOpportunities collection to an empty array (like clearcollOpportunities());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initOpportunities($overrideExisting = true)
+    {
+        if (null !== $this->collOpportunities && !$overrideExisting) {
+            return;
+        }
+
+        $collectionClassName = OpportunityTableMap::getTableMap()->getCollectionClassName();
+
+        $this->collOpportunities = new $collectionClassName;
+        $this->collOpportunities->setModel('\DataModels\DataModels\Opportunity');
+    }
+
+    /**
+     * Gets an array of ChildOpportunity objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildAccount is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildOpportunity[] List of ChildOpportunity objects
+     * @throws PropelException
+     */
+    public function getOpportunities(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collOpportunitiesPartial && !$this->isNew();
+        if (null === $this->collOpportunities || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collOpportunities) {
+                // return empty collection
+                $this->initOpportunities();
+            } else {
+                $collOpportunities = ChildOpportunityQuery::create(null, $criteria)
+                    ->filterByAccount($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collOpportunitiesPartial && count($collOpportunities)) {
+                        $this->initOpportunities(false);
+
+                        foreach ($collOpportunities as $obj) {
+                            if (false == $this->collOpportunities->contains($obj)) {
+                                $this->collOpportunities->append($obj);
+                            }
+                        }
+
+                        $this->collOpportunitiesPartial = true;
+                    }
+
+                    return $collOpportunities;
+                }
+
+                if ($partial && $this->collOpportunities) {
+                    foreach ($this->collOpportunities as $obj) {
+                        if ($obj->isNew()) {
+                            $collOpportunities[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collOpportunities = $collOpportunities;
+                $this->collOpportunitiesPartial = false;
+            }
+        }
+
+        return $this->collOpportunities;
+    }
+
+    /**
+     * Sets a collection of ChildOpportunity objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $opportunities A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return $this|ChildAccount The current object (for fluent API support)
+     */
+    public function setOpportunities(Collection $opportunities, ConnectionInterface $con = null)
+    {
+        /** @var ChildOpportunity[] $opportunitiesToDelete */
+        $opportunitiesToDelete = $this->getOpportunities(new Criteria(), $con)->diff($opportunities);
+
+
+        $this->opportunitiesScheduledForDeletion = $opportunitiesToDelete;
+
+        foreach ($opportunitiesToDelete as $opportunityRemoved) {
+            $opportunityRemoved->setAccount(null);
+        }
+
+        $this->collOpportunities = null;
+        foreach ($opportunities as $opportunity) {
+            $this->addOpportunity($opportunity);
+        }
+
+        $this->collOpportunities = $opportunities;
+        $this->collOpportunitiesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Opportunity objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related Opportunity objects.
+     * @throws PropelException
+     */
+    public function countOpportunities(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collOpportunitiesPartial && !$this->isNew();
+        if (null === $this->collOpportunities || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collOpportunities) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getOpportunities());
+            }
+
+            $query = ChildOpportunityQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByAccount($this)
+                ->count($con);
+        }
+
+        return count($this->collOpportunities);
+    }
+
+    /**
+     * Method called to associate a ChildOpportunity object to this object
+     * through the ChildOpportunity foreign key attribute.
+     *
+     * @param  ChildOpportunity $l ChildOpportunity
+     * @return $this|\DataModels\DataModels\Account The current object (for fluent API support)
+     */
+    public function addOpportunity(ChildOpportunity $l)
+    {
+        if ($this->collOpportunities === null) {
+            $this->initOpportunities();
+            $this->collOpportunitiesPartial = true;
+        }
+
+        if (!$this->collOpportunities->contains($l)) {
+            $this->doAddOpportunity($l);
+
+            if ($this->opportunitiesScheduledForDeletion and $this->opportunitiesScheduledForDeletion->contains($l)) {
+                $this->opportunitiesScheduledForDeletion->remove($this->opportunitiesScheduledForDeletion->search($l));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ChildOpportunity $opportunity The ChildOpportunity object to add.
+     */
+    protected function doAddOpportunity(ChildOpportunity $opportunity)
+    {
+        $this->collOpportunities[]= $opportunity;
+        $opportunity->setAccount($this);
+    }
+
+    /**
+     * @param  ChildOpportunity $opportunity The ChildOpportunity object to remove.
+     * @return $this|ChildAccount The current object (for fluent API support)
+     */
+    public function removeOpportunity(ChildOpportunity $opportunity)
+    {
+        if ($this->getOpportunities()->contains($opportunity)) {
+            $pos = $this->collOpportunities->search($opportunity);
+            $this->collOpportunities->remove($pos);
+            if (null === $this->opportunitiesScheduledForDeletion) {
+                $this->opportunitiesScheduledForDeletion = clone $this->collOpportunities;
+                $this->opportunitiesScheduledForDeletion->clear();
+            }
+            $this->opportunitiesScheduledForDeletion[]= $opportunity;
+            $opportunity->setAccount(null);
+        }
+
+        return $this;
+    }
+
+    /**
      * Clears the current object, sets all attributes to their default values and removes
      * outgoing references as well as back-references (from other objects to this one. Results probably in a database
      * change of those foreign objects when you call `save` there).
@@ -2192,10 +2476,16 @@ abstract class Account implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collOpportunities) {
+                foreach ($this->collOpportunities as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
         $this->collAccountHistories = null;
         $this->collContacts = null;
+        $this->collOpportunities = null;
         $this->aClient = null;
     }
 

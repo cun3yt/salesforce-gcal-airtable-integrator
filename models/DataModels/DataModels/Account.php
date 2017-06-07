@@ -3,6 +3,7 @@
 namespace DataModels\DataModels;
 
 use DataModels\DataModels\Base\Account as BaseAccount;
+use Propel\Runtime\ActiveQuery\Criteria;
 use DataModels\DataModels\AccountHistoryQuery as AccountHistoryQuery;
 
 /**
@@ -22,6 +23,6 @@ class Account extends BaseAccount
      */
     public function getLatestAccountHistory() {
         $q = new AccountHistoryQuery();
-        return $q->filterByAccount($this)->orderByCreatedAt()->findOne();
+        return $q->filterByAccount($this)->orderByCreatedAt(Criteria::DESC)->findOne();
     }
 }

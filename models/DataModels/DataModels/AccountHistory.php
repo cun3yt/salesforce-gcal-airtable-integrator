@@ -2,9 +2,8 @@
 
 namespace DataModels\DataModels;
 
-use Helpers;
 use DataModels\DataModels\Base\AccountHistory as BaseAccountHistory;
-use Symfony\Component\Config\Definition\Exception\Exception;
+use DataModels\DataModels\IHistoryTrackAbility as IHistoryTrackAbility;
 
 /**
  * Skeleton subclass for representing a row from the 'account_history' table.
@@ -16,8 +15,14 @@ use Symfony\Component\Config\Definition\Exception\Exception;
  * long as it does not already exist in the output directory.
  *
  */
-class AccountHistory extends BaseAccountHistory
+class AccountHistory extends BaseAccountHistory implements IHistoryTrackAbility
 {
+    /**
+     * Association of object attributes to Salesforce API response array items.
+     * These items are the ones on which the changes we care.
+     *
+     * @var array
+     */
     private $historyTrack = array(
         'billing_street' => 'BillingStreet',
         'billing_city' => 'BillingCity',
@@ -34,24 +39,22 @@ class AccountHistory extends BaseAccountHistory
         'website' => 'Website'
     );
 
+    /**
+     * @var HistoryTrackDelegate HistoryTrackDelegate
+     */
+    private $historyTrackDelegate = null;
+
+    public function __construct() {
+        parent::__construct();
+        $this->historyTrackDelegate = new HistoryTrackDelegate($this);
+    }
+
+    public function getHistoryTrack() {
+        return $this->historyTrack;
+    }
+
     public function isThereAnyUpdate(array $SFDCResponse, $sfdcHistoryList) {
-        if($sfdcHistoryList['totalSize'] < 1) {
-            return false;
-        }
-
-        $accountHistLatest = $sfdcHistoryList['records'][0];
-
-        if( strtotime($accountHistLatest['CreatedDate']) <= $this->getCreatedAt()->getTimeStamp() ) {
-            return false;
-        }
-
-        foreach($this->historyTrack as $objField => $responseField) {
-            if($this->{$objField} != $SFDCResponse[$responseField]) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->historyTrackDelegate->isThereAnyUpdate($SFDCResponse, $sfdcHistoryList);
     }
 
     public static function createAccountHistory(Account $account, array $SFDCResponse) {

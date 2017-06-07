@@ -8,10 +8,7 @@ Helpers::setDebugParam($isDebugActive);
 use DataModels\DataModels\ClientCalendarUserOAuth as ClientCalendarUserOAuth;
 use DataModels\DataModels\Client as Client;
 
-/**
- * @var $client Client
- */
-list($client, $calendarUsers) = Helpers::loadClientData($strClientDomainName);
+$client = Helpers::loadClientData($strClientDomainName);
 
 $SFDCAuths = Helpers::getAuthentications($client, ClientCalendarUserOAuth::SFDC);
 

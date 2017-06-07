@@ -35,7 +35,7 @@ $apiClient = Helpers::setupGoogleAPIClient($googleCalAPICredentialFile, true);
 /**
  * @var $client Client
  */
-list($client, $calendarUsers) = Helpers::loadClientData($strClientDomainName);
+$client = Helpers::loadClientData($strClientDomainName);
 $calendarAuths = Helpers::getAuthentications($client);
 
 /**

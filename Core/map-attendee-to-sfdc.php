@@ -16,10 +16,7 @@ use DataModels\DataModels\ClientCalendarUserOAuth as ClientCalendarUserOAuth;
 use DataModels\DataModels\Contact as Contact;
 use DataModels\DataModels\ContactQuery as ContactQuery;
 
-/**
- * @var $client Client
- */
-list($client, $calendarUsers) = Helpers::loadClientData($strClientDomainName);
+$client = Helpers::loadClientData($strClientDomainName);
 
 $SFDCAuths = Helpers::getAuthentications($client, ClientCalendarUserOAuth::SFDC);
 

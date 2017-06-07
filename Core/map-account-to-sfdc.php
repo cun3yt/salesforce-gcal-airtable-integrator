@@ -14,10 +14,7 @@ use DataModels\DataModels\AccountHistory as AccountHistory;
 use DataModels\DataModels\Client as Client;
 use DataModels\DataModels\ClientCalendarUserOAuth as ClientCalendarUserOAuth;
 
-/**
- * @var $client Client
- */
-list($client, $calendarUsers) = Helpers::loadClientData($strClientDomainName);
+$client = Helpers::loadClientData($strClientDomainName);
 
 $SFDCAuths = Helpers::getAuthentications($client, ClientCalendarUserOAuth::SFDC);
 
@@ -29,17 +26,22 @@ if(count($SFDCAuths) <= 0) {
 $sfdcCredentialObject = json_decode($SFDCAuths[0]->getData());
 $sfdcToken = $sfdcCredentialObject->tokendata;
 
-$pager = getAccounts($client, $page = 1);
+$pager = getAccountsNotRecentlySFDCChecked($client);
 
-$pageNb = $pager->getLastPage();
+while(1) {
+    if($pager->getNbResults() < 1) {
+        echo "No unprocessed pages remain. Finished";
+        break;
+    }
 
-while($page < $pageNb) {
-    echo "Processing Accounts: page {$page} of {$pageNb}\n";
+    $pageNb = $pager->getLastPage();
 
-     foreach($pager as $account) {
+    echo "Processing... Number of pages remaining: {$pageNb}\n";
+
+    foreach($pager as $account) {
         $emailDomainSegment = Helpers::getEmailDomainSegment($account->getEmailDomain());
 
-        $accountDetailSF = Helpers::fnGetAccountDetailFromSf($sfdcToken->instance_url,
+        $accountDetailSF = Helpers::getAccountDetailFromSFDC($sfdcToken->instance_url,
             $sfdcToken->access_token,
             $emailDomainSegment);
 
@@ -79,9 +81,11 @@ while($page < $pageNb) {
             }
         }
 
-        $account->setSfdcAccountId($sfdcAccount['id'])
+        $account->setSfdcAccountId($sfdcAccount['Id'])
             ->save();
     }
+
+    $pager = getAccountsNotRecentlySFDCChecked($client, 1);
 }
 
 /**
@@ -90,11 +94,11 @@ while($page < $pageNb) {
  * @param int $pageSize
  * @return \DataModels\DataModels\Account[]|\Propel\Runtime\Util\PropelModelPager
  */
-function getAccounts(Client $client, int $page, $pageSize = 50) {
+function getAccountsNotRecentlySFDCChecked(Client $client, int $page = 1, $pageSize = 50) {
     $q = new AccountQuery();
 
     return $q->filterByClient($client)
-        ->where("(sfdc_last_check_time IS NULL) OR (sfdc_last_check_time > CURRENT_TIMESTAMP - INTERVAL '3 DAYS')")
+        ->where("(sfdc_last_check_time IS NULL) OR (sfdc_last_check_time < CURRENT_TIMESTAMP - INTERVAL '3 DAYS')")
+        ->orderById(\Propel\Runtime\ActiveQuery\Criteria::ASC)
         ->paginate($page, $pageSize);
 }
-

@@ -13,12 +13,14 @@ require_once("${_SERVER['DOCUMENT_ROOT']}/libraries/Helpers.php");
 Helpers::setDebugParam($isDebugActive);
 
 use DataModels\DataModels\Client as Client;
+use DataModels\DataModels\AccountQuery as AccountQuery;
 use DataModels\DataModels\ClientCalendarUserOAuth as ClientCalendarUserOAuth;
+use DataModels\DataModels\Opportunity as Opportunity;
+use DataModels\DataModels\OpportunityHistory as OpportunityHistory;
+use Propel\Runtime\ActiveQuery\Criteria as Criteria;
 
-/**
- * @var $client Client
- */
-list($client, $calendarUsers) = Helpers::loadClientData($strClientDomainName);
+
+$client = Helpers::loadClientData($strClientDomainName);
 
 $sfdcAuths = Helpers::getAuthentications($client, ClientCalendarUserOAuth::SFDC);
 
@@ -32,14 +34,92 @@ $sfdcToken = $sfdcCredentialObject->tokendata;
 $access_token = $sfdcToken->access_token;
 $instance_url = $sfdcToken->instance_url;
 
-// @todo The rest will be here...
+$pager = getAccountsWithOpptyNotRecentlySFDCChecked($client);
+
+$pageNb = $pager->getLastPage();
+
+while(1) {
+    if($pager->getNbResults() < 1) {
+        echo "No unprocessed pages remain. Finished";
+        break;
+    }
+
+    $pageNb = $pager->getLastPage();
+
+    echo "Processing... Number of pages remaining: {$pageNb}\n";
+
+    foreach($pager as $account) {
+        $opptyDetailSFDC = Helpers::getOpptyDetailFromSFDC(
+            $sfdcToken->instance_url,
+            $sfdcToken->access_token,
+            $account->getSfdcAccountId()
+        );
+
+        if(!isset($opptyDetailSFDC['records'])) {
+            $errorCode = $opptyDetailSFDC[0]['errorCode'];
+            $errorMsg = $opptyDetailSFDC[0]['message'];
+
+            $msg = "Fatal Error: [Code: {$errorCode}, Message: {$errorMsg} ]";
+            trigger_error($msg, E_USER_ERROR);
+            die;
+        }
+
+        $account->setSFDCOpptyLastCheckTime(time());
+
+        if($opptyDetailSFDC['totalSize'] < 1) {
+            $account->save();
+            continue;
+        }
+
+        $sfdcOppty = $opptyDetailSFDC['records'][0];
+
+        $oppty = Opportunity::findByAccountAndSFDCId($account, $sfdcOppty['Id']);
+
+        if( !$oppty ) {
+            $oppty = Opportunity::createOpportunity($account, $sfdcOppty);
+        }
+
+        $opptyHistory = $oppty->getLatestOpportunityHistory();
+
+        if( !$opptyHistory ) {
+            OpportunityHistory::createOpportunityHistory($oppty, $sfdcOppty);
+        } else {
+            $sfdcHistoryList = Helpers::SFDCGetOpptyHistoryLatest($sfcdToken->instance_url, $sfdcToken->access_token,
+                $oppty->getSFDCOpportunityId());
+
+            if( $opptyHistory->isThereAnyUpdate($sfdcOppty, $sfdcHistoryList) ) {
+                OpportunityHistory::createOpportunityHistory($oppty, $sfdcOppty);
+            }
+        }
+
+        $account->save();
+    }
+
+    $pager = getAccountsNotRecentlySFDCChecked($client, 1);
+}
+
+/**
+ * @param Client $client
+ * @param int $page
+ * @param int $pageSize
+ * @return \DataModels\DataModels\Account[]|\Propel\Runtime\Util\PropelModelPager
+ */
+function getAccountsWithOpptyNotRecentlySFDCChecked(Client $client, int $page = 1, $pageSize = 50) {
+    $q = new AccountQuery();
+
+    return $q->filterByClient($client)
+        ->filterBySfdcAccountId(NULL, Criteria::NOT_EQUAL)
+        ->where("(sfdc_oppty_last_check_time IS NULL) OR (sfdc_oppty_last_check_time < CURRENT_TIMESTAMP - INTERVAL '3 DAYS')")
+        ->paginate($page, $pageSize);
+}
+
+
+
 
 die;
 
 // vvvv DANGER! Techila Code Below vvvv
 
-
-$arrGcalUser = Helpers::fnGetProcessAccountsForOppties();
 
 foreach ($arrGcalUser as $arrUser) {
     $arrUpdatedIds = array();
@@ -48,24 +128,15 @@ foreach ($arrGcalUser as $arrUser) {
     $strARecId = $arrUser['id'];
     $arrAccountDetail = $arrUser['fields']['acoount_id'];
 
-    if( !(is_array($arrAccountDetail) && (count($arrAccountDetail) > 0)) ) {
-        continue;
-    }
-
     foreach ($arrAccountDetail as $arrAccount) {
-        if (!$arrAccount) {
-            continue;
-        }
-
         $intAccCnts++;
         $arrAccDetail = Helpers::fnGetAccountDetail($arrAccount);
         $arrOpportunityDetail = Helpers::fnGetOpportunityDetail($arrAccDetail['fields']['Account']);
         if (is_array($arrOpportunityDetail) && (count($arrOpportunityDetail) > 0)) {
-            $arrAccountDetailSF = Helpers::fnGetOpportunityDetailFromSf($instance_url, $access_token, $arrAccDetail['fields']['Account ID']);
+            $arrAccountDetailSF = Helpers::getOpptyDetailFromSFDC($instance_url, $access_token, $arrAccDetail['fields']['Account ID']);
             if (is_array($arrAccountDetailSF['records']) && (count($arrAccountDetailSF['records']) > 0)) {
                 $arrOppHIds = $arrOpportunityDetail[0]['fields']['Opportunity History'];
                 $IsToBeInserted = Helpers::fnCheckIfOppHistoryToBeInserted($arrAccountDetailSF['records']);
-
 
                 if ($IsToBeInserted && $IsToBeInserted == "1") {
                     $isUpdatedAccountHistory = Helpers::fnInsertOppHistory($arrAccountDetailSF['records'], $$arrOpportunityDetail[0]['id']);
@@ -81,13 +152,13 @@ foreach ($arrGcalUser as $arrUser) {
                     $arrUpdatedIds[] = $IsToBeInserted;
                 }
 
-                $boolUpdateAccount = Helpers::fnUpdateAccountRecordForOppties($arrOpportunityDetail[0]['id'], $arrOppHIds);
+                Helpers::fnUpdateAccountRecordForOppties($arrOpportunityDetail[0]['id'], $arrOppHIds);
             }
 
             continue;
         }
 
-        $arrAccountDetailSF = Helpers::fnGetOpportunityDetailFromSf($instance_url, $access_token, $arrAccDetail['fields']['Account ID']);
+        $arrAccountDetailSF = Helpers::getOpptyDetailFromSFDC($instance_url, $access_token, $arrAccDetail['fields']['Account ID']);
 
         if( !(is_array($arrAccountDetailSF['records']) && (count($arrAccountDetailSF['records']) > 0)) ) {
             $arrProcessIds[] = $strARecId;
@@ -97,7 +168,7 @@ foreach ($arrGcalUser as $arrUser) {
         $arrUpdatedAccountHistory = Helpers::fnInsertOpportunity($arrAccountDetailSF['records'], $arrAccDetail['id']);
         $isUpdatedAccountHistory = Helpers::fnInsertOppHistory($arrAccountDetailSF['records'], $arrUpdatedAccountHistory['id']);
         $arrUpdatedIds[] = $isUpdatedAccountHistory['id'];
-        $boolUpdateAccount = Helpers::fnUpdateAccountRecordForOppties($arrUpdatedAccountHistory['id'], array($isUpdatedAccountHistory['id']));
+        Helpers::fnUpdateAccountRecordForOppties($arrUpdatedAccountHistory['id'], array($isUpdatedAccountHistory['id']));
     }
 
     if(!is_array($arrProcessIds)) {
@@ -105,9 +176,9 @@ foreach ($arrGcalUser as $arrUser) {
     }
 
     if (count($arrProcessIds) == $intAccCnts) {
-        $boolUpdateAccount = Helpers::fnUpdateOppProcessedRecord($strARecId);
+        Helpers::fnUpdateOppProcessedRecord($strARecId);
     } elseif(count($arrUpdatedIds) > 0) {
         $arrUpdatedIds = array_unique($arrUpdatedIds);
-        $boolUpdateAccount = Helpers::fnUpdateMeetingRecord($strARecId, $arrUpdatedIds);
+        Helpers::fnUpdateMeetingRecord($strARecId, $arrUpdatedIds);
     }
 }

@@ -16,10 +16,7 @@ require_once('config.php');
 
 $apiClient = Helpers::setupGoogleAPIClient($googleCalAPICredentialFile, false);
 
-/**
- * @var $client Client
- */
-list($client, $calendarUsers) = Helpers::loadClientData($strClientDomainName);
+$client = Helpers::loadClientData($strClientDomainName);
 
 $calendarAuths = Helpers::getAuthentications($client, ClientCalendarUserOAuth::GCAL);
 

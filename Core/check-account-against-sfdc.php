@@ -23,7 +23,8 @@ use DataModels\DataModels\Client as Client;
 /**
  * @var $client Client
  */
-list($client, $calendarUsers) = Helpers::loadClientData($strClientDomainName);
+$client = Helpers::loadClientData($strClientDomainName);
+
 $SFDCAuths = Helpers::getAuthentications($client, ClientCalendarUserOAuth::SFDC);
 
 if(count($SFDCAuths) <= 0) {
@@ -53,7 +54,7 @@ while($page <= $accountPagesNb) {
         $account->checkAgainstSFDC();
 
         if($account->getSfdcAccountId() == null) {
-            $accountDetailSF = Helpers::fnGetAccountDetailFromSf($sfdcToken->instance_url,
+            $accountDetailSF = Helpers::getAccountDetailFromSFDC($sfdcToken->instance_url,
                                                                 $sfdcToken->access_token,
                                                                 Helpers::getEmailDomainSegment($account->getEmailDomain()));
 

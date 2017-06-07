@@ -37,10 +37,7 @@ if($userDetails && isset($userDetails['email'])) {
 
 $sales['userid'] = end($userUrlDetail);
 
-/**
- * @var $client Client
- */
-list($client, $contacts) = Helpers::loadClientData($strClientDomainName);
+$client = Helpers::loadClientData($strClientDomainName);
 
 $authentication = Helpers::getOAuthIfPresent($client, $sales['email'],
     ClientCalendarUserOAuth::SFDC);

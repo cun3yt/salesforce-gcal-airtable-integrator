@@ -198,6 +198,13 @@ class AccountTableMap extends TableMap
     1 => ':id',
   ),
 ), null, null, 'Contacts', false);
+        $this->addRelation('Opportunity', '\\DataModels\\DataModels\\Opportunity', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':account_id',
+    1 => ':id',
+  ),
+), null, null, 'Opportunities', false);
     } // buildRelations()
 
     /**
