@@ -2,21 +2,34 @@
 
 namespace DataModels\DataModels\Base;
 
+use \DateTime;
 use \Exception;
 use \PDO;
+use DataModels\DataModels\Account as ChildAccount;
+use DataModels\DataModels\AccountQuery as ChildAccountQuery;
+use DataModels\DataModels\Client as ChildClient;
+use DataModels\DataModels\ClientQuery as ChildClientQuery;
+use DataModels\DataModels\Contact as ChildContact;
+use DataModels\DataModels\ContactHistory as ChildContactHistory;
+use DataModels\DataModels\ContactHistoryQuery as ChildContactHistoryQuery;
 use DataModels\DataModels\ContactQuery as ChildContactQuery;
+use DataModels\DataModels\MeetingAttendee as ChildMeetingAttendee;
+use DataModels\DataModels\MeetingAttendeeQuery as ChildMeetingAttendeeQuery;
+use DataModels\DataModels\Map\ContactHistoryTableMap;
 use DataModels\DataModels\Map\ContactTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
+use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\BadMethodCallException;
 use Propel\Runtime\Exception\LogicException;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
+use Propel\Runtime\Util\PropelDateTime;
 
 /**
  * Base class that represents a row from the 'contact' table.
@@ -25,7 +38,7 @@ use Propel\Runtime\Parser\AbstractParser;
  *
  * @package    propel.generator.DataModels.DataModels.Base
  */
-abstract class Contact implements ActiveRecordInterface
+abstract class Contact extends ChildMeetingAttendee implements ActiveRecordInterface
 {
     /**
      * TableMap class name
@@ -60,13 +73,6 @@ abstract class Contact implements ActiveRecordInterface
     protected $virtualColumns = array();
 
     /**
-     * The value for the id field.
-     *
-     * @var        int
-     */
-    protected $id;
-
-    /**
      * The value for the email field.
      *
      * @var        string
@@ -81,6 +87,13 @@ abstract class Contact implements ActiveRecordInterface
     protected $full_name;
 
     /**
+     * The value for the client_id field.
+     *
+     * @var        int
+     */
+    protected $client_id;
+
+    /**
      * The value for the account_id field.
      *
      * @var        int
@@ -90,9 +103,16 @@ abstract class Contact implements ActiveRecordInterface
     /**
      * The value for the sfdc_contact_id field.
      *
-     * @var        int
+     * @var        string
      */
     protected $sfdc_contact_id;
+
+    /**
+     * The value for the sfdc_account_id field.
+     *
+     * @var        string
+     */
+    protected $sfdc_account_id;
 
     /**
      * The value for the sfdc_contact_name field.
@@ -102,12 +122,74 @@ abstract class Contact implements ActiveRecordInterface
     protected $sfdc_contact_name;
 
     /**
+     * The value for the sfdc_contact_title field.
+     *
+     * @var        string
+     */
+    protected $sfdc_contact_title;
+
+    /**
+     * The value for the sfdc_last_check_time field.
+     *
+     * @var        DateTime
+     */
+    protected $sfdc_last_check_time;
+
+    /**
+     * The value for the id field.
+     *
+     * @var        int
+     */
+    protected $id;
+
+    /**
+     * The value for the created_at field.
+     *
+     * @var        DateTime
+     */
+    protected $created_at;
+
+    /**
+     * The value for the updated_at field.
+     *
+     * @var        DateTime
+     */
+    protected $updated_at;
+
+    /**
+     * @var        ChildAccount
+     */
+    protected $aAccount;
+
+    /**
+     * @var        ChildClient
+     */
+    protected $aClient;
+
+    /**
+     * @var        ChildMeetingAttendee
+     */
+    protected $aMeetingAttendee;
+
+    /**
+     * @var        ObjectCollection|ChildContactHistory[] Collection to store aggregation of ChildContactHistory objects.
+     */
+    protected $collContactHistories;
+    protected $collContactHistoriesPartial;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      *
      * @var boolean
      */
     protected $alreadyInSave = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildContactHistory[]
+     */
+    protected $contactHistoriesScheduledForDeletion = null;
 
     /**
      * Initializes internal state of DataModels\DataModels\Base\Contact object.
@@ -335,16 +417,6 @@ abstract class Contact implements ActiveRecordInterface
     }
 
     /**
-     * Get the [id] column value.
-     *
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
      * Get the [email] column value.
      *
      * @return string
@@ -365,6 +437,16 @@ abstract class Contact implements ActiveRecordInterface
     }
 
     /**
+     * Get the [client_id] column value.
+     *
+     * @return int
+     */
+    public function getClientId()
+    {
+        return $this->client_id;
+    }
+
+    /**
      * Get the [account_id] column value.
      *
      * @return int
@@ -377,11 +459,21 @@ abstract class Contact implements ActiveRecordInterface
     /**
      * Get the [sfdc_contact_id] column value.
      *
-     * @return int
+     * @return string
      */
     public function getSfdcContactId()
     {
         return $this->sfdc_contact_id;
+    }
+
+    /**
+     * Get the [sfdc_account_id] column value.
+     *
+     * @return string
+     */
+    public function getSfdcAccountId()
+    {
+        return $this->sfdc_account_id;
     }
 
     /**
@@ -395,24 +487,84 @@ abstract class Contact implements ActiveRecordInterface
     }
 
     /**
-     * Set the value of [id] column.
+     * Get the [sfdc_contact_title] column value.
      *
-     * @param int $v new value
-     * @return $this|\DataModels\DataModels\Contact The current object (for fluent API support)
+     * @return string
      */
-    public function setId($v)
+    public function getSfdcTitle()
     {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
+        return $this->sfdc_contact_title;
+    }
 
-        if ($this->id !== $v) {
-            $this->id = $v;
-            $this->modifiedColumns[ContactTableMap::COL_ID] = true;
+    /**
+     * Get the [optionally formatted] temporal [sfdc_last_check_time] column value.
+     *
+     *
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw DateTime object will be returned.
+     *
+     * @return string|DateTime Formatted date/time value as string or DateTime object (if format is NULL), NULL if column is NULL
+     *
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getSFDCLastCheckTime($format = NULL)
+    {
+        if ($format === null) {
+            return $this->sfdc_last_check_time;
+        } else {
+            return $this->sfdc_last_check_time instanceof \DateTimeInterface ? $this->sfdc_last_check_time->format($format) : null;
         }
+    }
 
-        return $this;
-    } // setId()
+    /**
+     * Get the [id] column value.
+     *
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [created_at] column value.
+     *
+     *
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw DateTime object will be returned.
+     *
+     * @return string|DateTime Formatted date/time value as string or DateTime object (if format is NULL), NULL if column is NULL
+     *
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getCreatedAt($format = NULL)
+    {
+        if ($format === null) {
+            return $this->created_at;
+        } else {
+            return $this->created_at instanceof \DateTimeInterface ? $this->created_at->format($format) : null;
+        }
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [updated_at] column value.
+     *
+     *
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw DateTime object will be returned.
+     *
+     * @return string|DateTime Formatted date/time value as string or DateTime object (if format is NULL), NULL if column is NULL
+     *
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getUpdatedAt($format = NULL)
+    {
+        if ($format === null) {
+            return $this->updated_at;
+        } else {
+            return $this->updated_at instanceof \DateTimeInterface ? $this->updated_at->format($format) : null;
+        }
+    }
 
     /**
      * Set the value of [email] column.
@@ -455,6 +607,30 @@ abstract class Contact implements ActiveRecordInterface
     } // setFullName()
 
     /**
+     * Set the value of [client_id] column.
+     *
+     * @param int $v new value
+     * @return $this|\DataModels\DataModels\Contact The current object (for fluent API support)
+     */
+    public function setClientId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->client_id !== $v) {
+            $this->client_id = $v;
+            $this->modifiedColumns[ContactTableMap::COL_CLIENT_ID] = true;
+        }
+
+        if ($this->aClient !== null && $this->aClient->getId() !== $v) {
+            $this->aClient = null;
+        }
+
+        return $this;
+    } // setClientId()
+
+    /**
      * Set the value of [account_id] column.
      *
      * @param int $v new value
@@ -471,19 +647,23 @@ abstract class Contact implements ActiveRecordInterface
             $this->modifiedColumns[ContactTableMap::COL_ACCOUNT_ID] = true;
         }
 
+        if ($this->aAccount !== null && $this->aAccount->getId() !== $v) {
+            $this->aAccount = null;
+        }
+
         return $this;
     } // setAccountId()
 
     /**
      * Set the value of [sfdc_contact_id] column.
      *
-     * @param int $v new value
+     * @param string $v new value
      * @return $this|\DataModels\DataModels\Contact The current object (for fluent API support)
      */
     public function setSfdcContactId($v)
     {
         if ($v !== null) {
-            $v = (int) $v;
+            $v = (string) $v;
         }
 
         if ($this->sfdc_contact_id !== $v) {
@@ -493,6 +673,26 @@ abstract class Contact implements ActiveRecordInterface
 
         return $this;
     } // setSfdcContactId()
+
+    /**
+     * Set the value of [sfdc_account_id] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\Contact The current object (for fluent API support)
+     */
+    public function setSfdcAccountId($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->sfdc_account_id !== $v) {
+            $this->sfdc_account_id = $v;
+            $this->modifiedColumns[ContactTableMap::COL_SFDC_ACCOUNT_ID] = true;
+        }
+
+        return $this;
+    } // setSfdcAccountId()
 
     /**
      * Set the value of [sfdc_contact_name] column.
@@ -513,6 +713,110 @@ abstract class Contact implements ActiveRecordInterface
 
         return $this;
     } // setSfdcContactName()
+
+    /**
+     * Set the value of [sfdc_contact_title] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\Contact The current object (for fluent API support)
+     */
+    public function setSfdcTitle($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->sfdc_contact_title !== $v) {
+            $this->sfdc_contact_title = $v;
+            $this->modifiedColumns[ContactTableMap::COL_SFDC_CONTACT_TITLE] = true;
+        }
+
+        return $this;
+    } // setSfdcTitle()
+
+    /**
+     * Sets the value of [sfdc_last_check_time] column to a normalized version of the date/time value specified.
+     *
+     * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
+     *               Empty strings are treated as NULL.
+     * @return $this|\DataModels\DataModels\Contact The current object (for fluent API support)
+     */
+    public function setSFDCLastCheckTime($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->sfdc_last_check_time !== null || $dt !== null) {
+            if ($this->sfdc_last_check_time === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->sfdc_last_check_time->format("Y-m-d H:i:s.u")) {
+                $this->sfdc_last_check_time = $dt === null ? null : clone $dt;
+                $this->modifiedColumns[ContactTableMap::COL_SFDC_LAST_CHECK_TIME] = true;
+            }
+        } // if either are not null
+
+        return $this;
+    } // setSFDCLastCheckTime()
+
+    /**
+     * Set the value of [id] column.
+     *
+     * @param int $v new value
+     * @return $this|\DataModels\DataModels\Contact The current object (for fluent API support)
+     */
+    public function setId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->id !== $v) {
+            $this->id = $v;
+            $this->modifiedColumns[ContactTableMap::COL_ID] = true;
+        }
+
+        if ($this->aMeetingAttendee !== null && $this->aMeetingAttendee->getId() !== $v) {
+            $this->aMeetingAttendee = null;
+        }
+
+        return $this;
+    } // setId()
+
+    /**
+     * Sets the value of [created_at] column to a normalized version of the date/time value specified.
+     *
+     * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
+     *               Empty strings are treated as NULL.
+     * @return $this|\DataModels\DataModels\Contact The current object (for fluent API support)
+     */
+    public function setCreatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->created_at !== null || $dt !== null) {
+            if ($this->created_at === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->created_at->format("Y-m-d H:i:s.u")) {
+                $this->created_at = $dt === null ? null : clone $dt;
+                $this->modifiedColumns[ContactTableMap::COL_CREATED_AT] = true;
+            }
+        } // if either are not null
+
+        return $this;
+    } // setCreatedAt()
+
+    /**
+     * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
+     *
+     * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
+     *               Empty strings are treated as NULL.
+     * @return $this|\DataModels\DataModels\Contact The current object (for fluent API support)
+     */
+    public function setUpdatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->updated_at !== null || $dt !== null) {
+            if ($this->updated_at === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->updated_at->format("Y-m-d H:i:s.u")) {
+                $this->updated_at = $dt === null ? null : clone $dt;
+                $this->modifiedColumns[ContactTableMap::COL_UPDATED_AT] = true;
+            }
+        } // if either are not null
+
+        return $this;
+    } // setUpdatedAt()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -550,23 +854,41 @@ abstract class Contact implements ActiveRecordInterface
     {
         try {
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ContactTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->id = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ContactTableMap::translateFieldName('Email', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ContactTableMap::translateFieldName('Email', TableMap::TYPE_PHPNAME, $indexType)];
             $this->email = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ContactTableMap::translateFieldName('FullName', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ContactTableMap::translateFieldName('FullName', TableMap::TYPE_PHPNAME, $indexType)];
             $this->full_name = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ContactTableMap::translateFieldName('ClientId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->client_id = (null !== $col) ? (int) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ContactTableMap::translateFieldName('AccountId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->account_id = (null !== $col) ? (int) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ContactTableMap::translateFieldName('SfdcContactId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->sfdc_contact_id = (null !== $col) ? (int) $col : null;
+            $this->sfdc_contact_id = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ContactTableMap::translateFieldName('SfdcContactName', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ContactTableMap::translateFieldName('SfdcAccountId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->sfdc_account_id = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : ContactTableMap::translateFieldName('SfdcContactName', TableMap::TYPE_PHPNAME, $indexType)];
             $this->sfdc_contact_name = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : ContactTableMap::translateFieldName('SfdcTitle', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->sfdc_contact_title = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : ContactTableMap::translateFieldName('SFDCLastCheckTime', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->sfdc_last_check_time = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : ContactTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->id = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : ContactTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : ContactTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -575,7 +897,7 @@ abstract class Contact implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 6; // 6 = ContactTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 12; // 12 = ContactTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\DataModels\\DataModels\\Contact'), 0, $e);
@@ -597,6 +919,15 @@ abstract class Contact implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
+        if ($this->aClient !== null && $this->client_id !== $this->aClient->getId()) {
+            $this->aClient = null;
+        }
+        if ($this->aAccount !== null && $this->account_id !== $this->aAccount->getId()) {
+            $this->aAccount = null;
+        }
+        if ($this->aMeetingAttendee !== null && $this->id !== $this->aMeetingAttendee->getId()) {
+            $this->aMeetingAttendee = null;
+        }
     } // ensureConsistency
 
     /**
@@ -636,6 +967,11 @@ abstract class Contact implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
+            $this->aAccount = null;
+            $this->aClient = null;
+            $this->aMeetingAttendee = null;
+            $this->collContactHistories = null;
+
         } // if (deep)
     }
 
@@ -665,6 +1001,9 @@ abstract class Contact implements ActiveRecordInterface
             if ($ret) {
                 $deleteQuery->delete($con);
                 $this->postDelete($con);
+                // concrete_inheritance behavior
+                $this->getParentOrCreate($con)->delete($con);
+
                 $this->setDeleted(true);
             }
         });
@@ -700,10 +1039,27 @@ abstract class Contact implements ActiveRecordInterface
         return $con->transaction(function () use ($con) {
             $ret = $this->preSave($con);
             $isInsert = $this->isNew();
+            // concrete_inheritance behavior
+            $parent = $this->getSyncParent($con);
+            $parent->save($con);
+            $this->setPrimaryKey($parent->getPrimaryKey());
+
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
+                // timestampable behavior
+
+                if (!$this->isColumnModified(ContactTableMap::COL_CREATED_AT)) {
+                    $this->setCreatedAt(\Propel\Runtime\Util\PropelDateTime::createHighPrecision());
+                }
+                if (!$this->isColumnModified(ContactTableMap::COL_UPDATED_AT)) {
+                    $this->setUpdatedAt(\Propel\Runtime\Util\PropelDateTime::createHighPrecision());
+                }
             } else {
                 $ret = $ret && $this->preUpdate($con);
+                // timestampable behavior
+                if ($this->isModified() && !$this->isColumnModified(ContactTableMap::COL_UPDATED_AT)) {
+                    $this->setUpdatedAt(\Propel\Runtime\Util\PropelDateTime::createHighPrecision());
+                }
             }
             if ($ret) {
                 $affectedRows = $this->doSave($con);
@@ -739,6 +1095,32 @@ abstract class Contact implements ActiveRecordInterface
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their corresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aAccount !== null) {
+                if ($this->aAccount->isModified() || $this->aAccount->isNew()) {
+                    $affectedRows += $this->aAccount->save($con);
+                }
+                $this->setAccount($this->aAccount);
+            }
+
+            if ($this->aClient !== null) {
+                if ($this->aClient->isModified() || $this->aClient->isNew()) {
+                    $affectedRows += $this->aClient->save($con);
+                }
+                $this->setClient($this->aClient);
+            }
+
+            if ($this->aMeetingAttendee !== null) {
+                if ($this->aMeetingAttendee->isModified() || $this->aMeetingAttendee->isNew()) {
+                    $affectedRows += $this->aMeetingAttendee->save($con);
+                }
+                $this->setMeetingAttendee($this->aMeetingAttendee);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -748,6 +1130,24 @@ abstract class Contact implements ActiveRecordInterface
                     $affectedRows += $this->doUpdate($con);
                 }
                 $this->resetModified();
+            }
+
+            if ($this->contactHistoriesScheduledForDeletion !== null) {
+                if (!$this->contactHistoriesScheduledForDeletion->isEmpty()) {
+                    foreach ($this->contactHistoriesScheduledForDeletion as $contactHistory) {
+                        // need to save related object because we set the relation to null
+                        $contactHistory->save($con);
+                    }
+                    $this->contactHistoriesScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collContactHistories !== null) {
+                foreach ($this->collContactHistories as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
             }
 
             $this->alreadyInSave = false;
@@ -770,29 +1170,16 @@ abstract class Contact implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[ContactTableMap::COL_ID] = true;
-        if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . ContactTableMap::COL_ID . ')');
-        }
-        if (null === $this->id) {
-            try {
-                $dataFetcher = $con->query("SELECT nextval('contact_id_seq')");
-                $this->id = (int) $dataFetcher->fetchColumn();
-            } catch (Exception $e) {
-                throw new PropelException('Unable to get sequence id.', 0, $e);
-            }
-        }
-
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(ContactTableMap::COL_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'id';
-        }
         if ($this->isColumnModified(ContactTableMap::COL_EMAIL)) {
             $modifiedColumns[':p' . $index++]  = 'email';
         }
         if ($this->isColumnModified(ContactTableMap::COL_FULL_NAME)) {
             $modifiedColumns[':p' . $index++]  = 'full_name';
+        }
+        if ($this->isColumnModified(ContactTableMap::COL_CLIENT_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'client_id';
         }
         if ($this->isColumnModified(ContactTableMap::COL_ACCOUNT_ID)) {
             $modifiedColumns[':p' . $index++]  = 'account_id';
@@ -800,8 +1187,26 @@ abstract class Contact implements ActiveRecordInterface
         if ($this->isColumnModified(ContactTableMap::COL_SFDC_CONTACT_ID)) {
             $modifiedColumns[':p' . $index++]  = 'sfdc_contact_id';
         }
+        if ($this->isColumnModified(ContactTableMap::COL_SFDC_ACCOUNT_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'sfdc_account_id';
+        }
         if ($this->isColumnModified(ContactTableMap::COL_SFDC_CONTACT_NAME)) {
             $modifiedColumns[':p' . $index++]  = 'sfdc_contact_name';
+        }
+        if ($this->isColumnModified(ContactTableMap::COL_SFDC_CONTACT_TITLE)) {
+            $modifiedColumns[':p' . $index++]  = 'sfdc_contact_title';
+        }
+        if ($this->isColumnModified(ContactTableMap::COL_SFDC_LAST_CHECK_TIME)) {
+            $modifiedColumns[':p' . $index++]  = 'sfdc_last_check_time';
+        }
+        if ($this->isColumnModified(ContactTableMap::COL_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'id';
+        }
+        if ($this->isColumnModified(ContactTableMap::COL_CREATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = 'created_at';
+        }
+        if ($this->isColumnModified(ContactTableMap::COL_UPDATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = 'updated_at';
         }
 
         $sql = sprintf(
@@ -814,23 +1219,41 @@ abstract class Contact implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'id':
-                        $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
-                        break;
                     case 'email':
                         $stmt->bindValue($identifier, $this->email, PDO::PARAM_STR);
                         break;
                     case 'full_name':
                         $stmt->bindValue($identifier, $this->full_name, PDO::PARAM_STR);
                         break;
+                    case 'client_id':
+                        $stmt->bindValue($identifier, $this->client_id, PDO::PARAM_INT);
+                        break;
                     case 'account_id':
                         $stmt->bindValue($identifier, $this->account_id, PDO::PARAM_INT);
                         break;
                     case 'sfdc_contact_id':
-                        $stmt->bindValue($identifier, $this->sfdc_contact_id, PDO::PARAM_INT);
+                        $stmt->bindValue($identifier, $this->sfdc_contact_id, PDO::PARAM_STR);
+                        break;
+                    case 'sfdc_account_id':
+                        $stmt->bindValue($identifier, $this->sfdc_account_id, PDO::PARAM_STR);
                         break;
                     case 'sfdc_contact_name':
                         $stmt->bindValue($identifier, $this->sfdc_contact_name, PDO::PARAM_STR);
+                        break;
+                    case 'sfdc_contact_title':
+                        $stmt->bindValue($identifier, $this->sfdc_contact_title, PDO::PARAM_STR);
+                        break;
+                    case 'sfdc_last_check_time':
+                        $stmt->bindValue($identifier, $this->sfdc_last_check_time ? $this->sfdc_last_check_time->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
+                        break;
+                    case 'id':
+                        $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
+                        break;
+                    case 'created_at':
+                        $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
+                        break;
+                    case 'updated_at':
+                        $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -888,13 +1311,13 @@ abstract class Contact implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                return $this->getId();
-                break;
-            case 1:
                 return $this->getEmail();
                 break;
-            case 2:
+            case 1:
                 return $this->getFullName();
+                break;
+            case 2:
+                return $this->getClientId();
                 break;
             case 3:
                 return $this->getAccountId();
@@ -903,7 +1326,25 @@ abstract class Contact implements ActiveRecordInterface
                 return $this->getSfdcContactId();
                 break;
             case 5:
+                return $this->getSfdcAccountId();
+                break;
+            case 6:
                 return $this->getSfdcContactName();
+                break;
+            case 7:
+                return $this->getSfdcTitle();
+                break;
+            case 8:
+                return $this->getSFDCLastCheckTime();
+                break;
+            case 9:
+                return $this->getId();
+                break;
+            case 10:
+                return $this->getCreatedAt();
+                break;
+            case 11:
+                return $this->getUpdatedAt();
                 break;
             default:
                 return null;
@@ -922,10 +1363,11 @@ abstract class Contact implements ActiveRecordInterface
      *                    Defaults to TableMap::TYPE_PHPNAME.
      * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
      * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
+     * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
      *
      * @return array an associative array containing the field names (as keys) and field values
      */
-    public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array())
+    public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
 
         if (isset($alreadyDumpedObjects['Contact'][$this->hashCode()])) {
@@ -934,18 +1376,98 @@ abstract class Contact implements ActiveRecordInterface
         $alreadyDumpedObjects['Contact'][$this->hashCode()] = true;
         $keys = ContactTableMap::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getId(),
-            $keys[1] => $this->getEmail(),
-            $keys[2] => $this->getFullName(),
+            $keys[0] => $this->getEmail(),
+            $keys[1] => $this->getFullName(),
+            $keys[2] => $this->getClientId(),
             $keys[3] => $this->getAccountId(),
             $keys[4] => $this->getSfdcContactId(),
-            $keys[5] => $this->getSfdcContactName(),
+            $keys[5] => $this->getSfdcAccountId(),
+            $keys[6] => $this->getSfdcContactName(),
+            $keys[7] => $this->getSfdcTitle(),
+            $keys[8] => $this->getSFDCLastCheckTime(),
+            $keys[9] => $this->getId(),
+            $keys[10] => $this->getCreatedAt(),
+            $keys[11] => $this->getUpdatedAt(),
         );
+        if ($result[$keys[8]] instanceof \DateTime) {
+            $result[$keys[8]] = $result[$keys[8]]->format('c');
+        }
+
+        if ($result[$keys[10]] instanceof \DateTime) {
+            $result[$keys[10]] = $result[$keys[10]]->format('c');
+        }
+
+        if ($result[$keys[11]] instanceof \DateTime) {
+            $result[$keys[11]] = $result[$keys[11]]->format('c');
+        }
+
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
             $result[$key] = $virtualColumn;
         }
 
+        if ($includeForeignObjects) {
+            if (null !== $this->aAccount) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'account';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'account';
+                        break;
+                    default:
+                        $key = 'Account';
+                }
+
+                $result[$key] = $this->aAccount->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aClient) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'client';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'client';
+                        break;
+                    default:
+                        $key = 'Client';
+                }
+
+                $result[$key] = $this->aClient->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aMeetingAttendee) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'meetingAttendee';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'meeting_attendee';
+                        break;
+                    default:
+                        $key = 'MeetingAttendee';
+                }
+
+                $result[$key] = $this->aMeetingAttendee->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->collContactHistories) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'contactHistories';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'contact_histories';
+                        break;
+                    default:
+                        $key = 'ContactHistories';
+                }
+
+                $result[$key] = $this->collContactHistories->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+        }
 
         return $result;
     }
@@ -980,13 +1502,13 @@ abstract class Contact implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                $this->setId($value);
-                break;
-            case 1:
                 $this->setEmail($value);
                 break;
-            case 2:
+            case 1:
                 $this->setFullName($value);
+                break;
+            case 2:
+                $this->setClientId($value);
                 break;
             case 3:
                 $this->setAccountId($value);
@@ -995,7 +1517,25 @@ abstract class Contact implements ActiveRecordInterface
                 $this->setSfdcContactId($value);
                 break;
             case 5:
+                $this->setSfdcAccountId($value);
+                break;
+            case 6:
                 $this->setSfdcContactName($value);
+                break;
+            case 7:
+                $this->setSfdcTitle($value);
+                break;
+            case 8:
+                $this->setSFDCLastCheckTime($value);
+                break;
+            case 9:
+                $this->setId($value);
+                break;
+            case 10:
+                $this->setCreatedAt($value);
+                break;
+            case 11:
+                $this->setUpdatedAt($value);
                 break;
         } // switch()
 
@@ -1024,13 +1564,13 @@ abstract class Contact implements ActiveRecordInterface
         $keys = ContactTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) {
-            $this->setId($arr[$keys[0]]);
+            $this->setEmail($arr[$keys[0]]);
         }
         if (array_key_exists($keys[1], $arr)) {
-            $this->setEmail($arr[$keys[1]]);
+            $this->setFullName($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
-            $this->setFullName($arr[$keys[2]]);
+            $this->setClientId($arr[$keys[2]]);
         }
         if (array_key_exists($keys[3], $arr)) {
             $this->setAccountId($arr[$keys[3]]);
@@ -1039,7 +1579,25 @@ abstract class Contact implements ActiveRecordInterface
             $this->setSfdcContactId($arr[$keys[4]]);
         }
         if (array_key_exists($keys[5], $arr)) {
-            $this->setSfdcContactName($arr[$keys[5]]);
+            $this->setSfdcAccountId($arr[$keys[5]]);
+        }
+        if (array_key_exists($keys[6], $arr)) {
+            $this->setSfdcContactName($arr[$keys[6]]);
+        }
+        if (array_key_exists($keys[7], $arr)) {
+            $this->setSfdcTitle($arr[$keys[7]]);
+        }
+        if (array_key_exists($keys[8], $arr)) {
+            $this->setSFDCLastCheckTime($arr[$keys[8]]);
+        }
+        if (array_key_exists($keys[9], $arr)) {
+            $this->setId($arr[$keys[9]]);
+        }
+        if (array_key_exists($keys[10], $arr)) {
+            $this->setCreatedAt($arr[$keys[10]]);
+        }
+        if (array_key_exists($keys[11], $arr)) {
+            $this->setUpdatedAt($arr[$keys[11]]);
         }
     }
 
@@ -1082,14 +1640,14 @@ abstract class Contact implements ActiveRecordInterface
     {
         $criteria = new Criteria(ContactTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(ContactTableMap::COL_ID)) {
-            $criteria->add(ContactTableMap::COL_ID, $this->id);
-        }
         if ($this->isColumnModified(ContactTableMap::COL_EMAIL)) {
             $criteria->add(ContactTableMap::COL_EMAIL, $this->email);
         }
         if ($this->isColumnModified(ContactTableMap::COL_FULL_NAME)) {
             $criteria->add(ContactTableMap::COL_FULL_NAME, $this->full_name);
+        }
+        if ($this->isColumnModified(ContactTableMap::COL_CLIENT_ID)) {
+            $criteria->add(ContactTableMap::COL_CLIENT_ID, $this->client_id);
         }
         if ($this->isColumnModified(ContactTableMap::COL_ACCOUNT_ID)) {
             $criteria->add(ContactTableMap::COL_ACCOUNT_ID, $this->account_id);
@@ -1097,8 +1655,26 @@ abstract class Contact implements ActiveRecordInterface
         if ($this->isColumnModified(ContactTableMap::COL_SFDC_CONTACT_ID)) {
             $criteria->add(ContactTableMap::COL_SFDC_CONTACT_ID, $this->sfdc_contact_id);
         }
+        if ($this->isColumnModified(ContactTableMap::COL_SFDC_ACCOUNT_ID)) {
+            $criteria->add(ContactTableMap::COL_SFDC_ACCOUNT_ID, $this->sfdc_account_id);
+        }
         if ($this->isColumnModified(ContactTableMap::COL_SFDC_CONTACT_NAME)) {
             $criteria->add(ContactTableMap::COL_SFDC_CONTACT_NAME, $this->sfdc_contact_name);
+        }
+        if ($this->isColumnModified(ContactTableMap::COL_SFDC_CONTACT_TITLE)) {
+            $criteria->add(ContactTableMap::COL_SFDC_CONTACT_TITLE, $this->sfdc_contact_title);
+        }
+        if ($this->isColumnModified(ContactTableMap::COL_SFDC_LAST_CHECK_TIME)) {
+            $criteria->add(ContactTableMap::COL_SFDC_LAST_CHECK_TIME, $this->sfdc_last_check_time);
+        }
+        if ($this->isColumnModified(ContactTableMap::COL_ID)) {
+            $criteria->add(ContactTableMap::COL_ID, $this->id);
+        }
+        if ($this->isColumnModified(ContactTableMap::COL_CREATED_AT)) {
+            $criteria->add(ContactTableMap::COL_CREATED_AT, $this->created_at);
+        }
+        if ($this->isColumnModified(ContactTableMap::COL_UPDATED_AT)) {
+            $criteria->add(ContactTableMap::COL_UPDATED_AT, $this->updated_at);
         }
 
         return $criteria;
@@ -1132,8 +1708,15 @@ abstract class Contact implements ActiveRecordInterface
     {
         $validPk = null !== $this->getId();
 
-        $validPrimaryKeyFKs = 0;
+        $validPrimaryKeyFKs = 1;
         $primaryKeyFKs = [];
+
+        //relation contact_fk_5860de to table meeting_attendee
+        if ($this->aMeetingAttendee && $hash = spl_object_hash($this->aMeetingAttendee)) {
+            $primaryKeyFKs[] = $hash;
+        } else {
+            $validPrimaryKeyFKs = false;
+        }
 
         if ($validPk) {
             return crc32(json_encode($this->getPrimaryKey(), JSON_UNESCAPED_UNICODE));
@@ -1188,12 +1771,32 @@ abstract class Contact implements ActiveRecordInterface
     {
         $copyObj->setEmail($this->getEmail());
         $copyObj->setFullName($this->getFullName());
+        $copyObj->setClientId($this->getClientId());
         $copyObj->setAccountId($this->getAccountId());
         $copyObj->setSfdcContactId($this->getSfdcContactId());
+        $copyObj->setSfdcAccountId($this->getSfdcAccountId());
         $copyObj->setSfdcContactName($this->getSfdcContactName());
+        $copyObj->setSfdcTitle($this->getSfdcTitle());
+        $copyObj->setSFDCLastCheckTime($this->getSFDCLastCheckTime());
+        $copyObj->setId($this->getId());
+        $copyObj->setCreatedAt($this->getCreatedAt());
+        $copyObj->setUpdatedAt($this->getUpdatedAt());
+
+        if ($deepCopy) {
+            // important: temporarily setNew(false) because this affects the behavior of
+            // the getter/setter methods for fkey referrer objects.
+            $copyObj->setNew(false);
+
+            foreach ($this->getContactHistories() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addContactHistory($relObj->copy($deepCopy));
+                }
+            }
+
+        } // if ($deepCopy)
+
         if ($makeNew) {
             $copyObj->setNew(true);
-            $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
         }
     }
 
@@ -1220,18 +1823,421 @@ abstract class Contact implements ActiveRecordInterface
     }
 
     /**
+     * Declares an association between this object and a ChildAccount object.
+     *
+     * @param  ChildAccount $v
+     * @return $this|\DataModels\DataModels\Contact The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setAccount(ChildAccount $v = null)
+    {
+        if ($v === null) {
+            $this->setAccountId(NULL);
+        } else {
+            $this->setAccountId($v->getId());
+        }
+
+        $this->aAccount = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildAccount object, it will not be re-added.
+        if ($v !== null) {
+            $v->addContact($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildAccount object
+     *
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildAccount The associated ChildAccount object.
+     * @throws PropelException
+     */
+    public function getAccount(ConnectionInterface $con = null)
+    {
+        if ($this->aAccount === null && ($this->account_id !== null)) {
+            $this->aAccount = ChildAccountQuery::create()->findPk($this->account_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aAccount->addContacts($this);
+             */
+        }
+
+        return $this->aAccount;
+    }
+
+    /**
+     * Declares an association between this object and a ChildClient object.
+     *
+     * @param  ChildClient $v
+     * @return $this|\DataModels\DataModels\Contact The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setClient(ChildClient $v = null)
+    {
+        if ($v === null) {
+            $this->setClientId(NULL);
+        } else {
+            $this->setClientId($v->getId());
+        }
+
+        $this->aClient = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildClient object, it will not be re-added.
+        if ($v !== null) {
+            $v->addContact($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildClient object
+     *
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildClient The associated ChildClient object.
+     * @throws PropelException
+     */
+    public function getClient(ConnectionInterface $con = null)
+    {
+        if ($this->aClient === null && ($this->client_id !== null)) {
+            $this->aClient = ChildClientQuery::create()->findPk($this->client_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aClient->addContacts($this);
+             */
+        }
+
+        return $this->aClient;
+    }
+
+    /**
+     * Declares an association between this object and a ChildMeetingAttendee object.
+     *
+     * @param  ChildMeetingAttendee $v
+     * @return $this|\DataModels\DataModels\Contact The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setMeetingAttendee(ChildMeetingAttendee $v = null)
+    {
+        if ($v === null) {
+            $this->setId(NULL);
+        } else {
+            $this->setId($v->getId());
+        }
+
+        $this->aMeetingAttendee = $v;
+
+        // Add binding for other direction of this 1:1 relationship.
+        if ($v !== null) {
+            $v->setContact($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildMeetingAttendee object
+     *
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildMeetingAttendee The associated ChildMeetingAttendee object.
+     * @throws PropelException
+     */
+    public function getMeetingAttendee(ConnectionInterface $con = null)
+    {
+        if ($this->aMeetingAttendee === null && ($this->id !== null)) {
+            $this->aMeetingAttendee = ChildMeetingAttendeeQuery::create()->findPk($this->id, $con);
+            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
+            $this->aMeetingAttendee->setContact($this);
+        }
+
+        return $this->aMeetingAttendee;
+    }
+
+
+    /**
+     * Initializes a collection based on the name of a relation.
+     * Avoids crafting an 'init[$relationName]s' method name
+     * that wouldn't work when StandardEnglishPluralizer is used.
+     *
+     * @param      string $relationName The name of the relation to initialize
+     * @return void
+     */
+    public function initRelation($relationName)
+    {
+        if ('ContactHistory' == $relationName) {
+            return $this->initContactHistories();
+        }
+    }
+
+    /**
+     * Clears out the collContactHistories collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addContactHistories()
+     */
+    public function clearContactHistories()
+    {
+        $this->collContactHistories = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collContactHistories collection loaded partially.
+     */
+    public function resetPartialContactHistories($v = true)
+    {
+        $this->collContactHistoriesPartial = $v;
+    }
+
+    /**
+     * Initializes the collContactHistories collection.
+     *
+     * By default this just sets the collContactHistories collection to an empty array (like clearcollContactHistories());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initContactHistories($overrideExisting = true)
+    {
+        if (null !== $this->collContactHistories && !$overrideExisting) {
+            return;
+        }
+
+        $collectionClassName = ContactHistoryTableMap::getTableMap()->getCollectionClassName();
+
+        $this->collContactHistories = new $collectionClassName;
+        $this->collContactHistories->setModel('\DataModels\DataModels\ContactHistory');
+    }
+
+    /**
+     * Gets an array of ChildContactHistory objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildContact is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildContactHistory[] List of ChildContactHistory objects
+     * @throws PropelException
+     */
+    public function getContactHistories(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collContactHistoriesPartial && !$this->isNew();
+        if (null === $this->collContactHistories || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collContactHistories) {
+                // return empty collection
+                $this->initContactHistories();
+            } else {
+                $collContactHistories = ChildContactHistoryQuery::create(null, $criteria)
+                    ->filterByContact($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collContactHistoriesPartial && count($collContactHistories)) {
+                        $this->initContactHistories(false);
+
+                        foreach ($collContactHistories as $obj) {
+                            if (false == $this->collContactHistories->contains($obj)) {
+                                $this->collContactHistories->append($obj);
+                            }
+                        }
+
+                        $this->collContactHistoriesPartial = true;
+                    }
+
+                    return $collContactHistories;
+                }
+
+                if ($partial && $this->collContactHistories) {
+                    foreach ($this->collContactHistories as $obj) {
+                        if ($obj->isNew()) {
+                            $collContactHistories[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collContactHistories = $collContactHistories;
+                $this->collContactHistoriesPartial = false;
+            }
+        }
+
+        return $this->collContactHistories;
+    }
+
+    /**
+     * Sets a collection of ChildContactHistory objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $contactHistories A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return $this|ChildContact The current object (for fluent API support)
+     */
+    public function setContactHistories(Collection $contactHistories, ConnectionInterface $con = null)
+    {
+        /** @var ChildContactHistory[] $contactHistoriesToDelete */
+        $contactHistoriesToDelete = $this->getContactHistories(new Criteria(), $con)->diff($contactHistories);
+
+
+        $this->contactHistoriesScheduledForDeletion = $contactHistoriesToDelete;
+
+        foreach ($contactHistoriesToDelete as $contactHistoryRemoved) {
+            $contactHistoryRemoved->setContact(null);
+        }
+
+        $this->collContactHistories = null;
+        foreach ($contactHistories as $contactHistory) {
+            $this->addContactHistory($contactHistory);
+        }
+
+        $this->collContactHistories = $contactHistories;
+        $this->collContactHistoriesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related ContactHistory objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related ContactHistory objects.
+     * @throws PropelException
+     */
+    public function countContactHistories(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collContactHistoriesPartial && !$this->isNew();
+        if (null === $this->collContactHistories || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collContactHistories) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getContactHistories());
+            }
+
+            $query = ChildContactHistoryQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByContact($this)
+                ->count($con);
+        }
+
+        return count($this->collContactHistories);
+    }
+
+    /**
+     * Method called to associate a ChildContactHistory object to this object
+     * through the ChildContactHistory foreign key attribute.
+     *
+     * @param  ChildContactHistory $l ChildContactHistory
+     * @return $this|\DataModels\DataModels\Contact The current object (for fluent API support)
+     */
+    public function addContactHistory(ChildContactHistory $l)
+    {
+        if ($this->collContactHistories === null) {
+            $this->initContactHistories();
+            $this->collContactHistoriesPartial = true;
+        }
+
+        if (!$this->collContactHistories->contains($l)) {
+            $this->doAddContactHistory($l);
+
+            if ($this->contactHistoriesScheduledForDeletion and $this->contactHistoriesScheduledForDeletion->contains($l)) {
+                $this->contactHistoriesScheduledForDeletion->remove($this->contactHistoriesScheduledForDeletion->search($l));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ChildContactHistory $contactHistory The ChildContactHistory object to add.
+     */
+    protected function doAddContactHistory(ChildContactHistory $contactHistory)
+    {
+        $this->collContactHistories[]= $contactHistory;
+        $contactHistory->setContact($this);
+    }
+
+    /**
+     * @param  ChildContactHistory $contactHistory The ChildContactHistory object to remove.
+     * @return $this|ChildContact The current object (for fluent API support)
+     */
+    public function removeContactHistory(ChildContactHistory $contactHistory)
+    {
+        if ($this->getContactHistories()->contains($contactHistory)) {
+            $pos = $this->collContactHistories->search($contactHistory);
+            $this->collContactHistories->remove($pos);
+            if (null === $this->contactHistoriesScheduledForDeletion) {
+                $this->contactHistoriesScheduledForDeletion = clone $this->collContactHistories;
+                $this->contactHistoriesScheduledForDeletion->clear();
+            }
+            $this->contactHistoriesScheduledForDeletion[]= $contactHistory;
+            $contactHistory->setContact(null);
+        }
+
+        return $this;
+    }
+
+    /**
      * Clears the current object, sets all attributes to their default values and removes
      * outgoing references as well as back-references (from other objects to this one. Results probably in a database
      * change of those foreign objects when you call `save` there).
      */
     public function clear()
     {
-        $this->id = null;
+        if (null !== $this->aAccount) {
+            $this->aAccount->removeContact($this);
+        }
+        if (null !== $this->aClient) {
+            $this->aClient->removeContact($this);
+        }
+        if (null !== $this->aMeetingAttendee) {
+            $this->aMeetingAttendee->removeContact($this);
+        }
         $this->email = null;
         $this->full_name = null;
+        $this->client_id = null;
         $this->account_id = null;
         $this->sfdc_contact_id = null;
+        $this->sfdc_account_id = null;
         $this->sfdc_contact_name = null;
+        $this->sfdc_contact_title = null;
+        $this->sfdc_last_check_time = null;
+        $this->id = null;
+        $this->created_at = null;
+        $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
         $this->resetModified();
@@ -1250,8 +2256,17 @@ abstract class Contact implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collContactHistories) {
+                foreach ($this->collContactHistories as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
+        $this->collContactHistories = null;
+        $this->aAccount = null;
+        $this->aClient = null;
+        $this->aMeetingAttendee = null;
     }
 
     /**
@@ -1262,6 +2277,65 @@ abstract class Contact implements ActiveRecordInterface
     public function __toString()
     {
         return (string) $this->exportTo(ContactTableMap::DEFAULT_STRING_FORMAT);
+    }
+
+    // concrete_inheritance behavior
+
+    /**
+     * Get or Create the parent ChildMeetingAttendee object of the current object
+     *
+     * @return    ChildMeetingAttendee The parent object
+     */
+    public function getParentOrCreate($con = null)
+    {
+        if ($this->isNew()) {
+            if ($this->isPrimaryKeyNull()) {
+                $parent = new ChildMeetingAttendee();
+                $parent->setDescendantClass('DataModels\DataModels\Contact');
+
+                return $parent;
+            } else {
+                $parent = \DataModels\DataModels\MeetingAttendeeQuery::create()->findPk($this->getPrimaryKey(), $con);
+                if (null === $parent || null !== $parent->getDescendantClass()) {
+                    $parent = new ChildMeetingAttendee();
+                    $parent->setPrimaryKey($this->getPrimaryKey());
+                    $parent->setDescendantClass('DataModels\DataModels\Contact');
+                }
+
+                return $parent;
+            }
+        } else {
+            return ChildMeetingAttendeeQuery::create()->findPk($this->getPrimaryKey(), $con);
+        }
+    }
+
+    /**
+     * Create or Update the parent MeetingAttendee object
+     * And return its primary key
+     *
+     * @return    int The primary key of the parent object
+     */
+    public function getSyncParent($con = null)
+    {
+        $parent = $this->getParentOrCreate($con);
+        $parent->setCreatedAt($this->getCreatedAt());
+        $parent->setUpdatedAt($this->getUpdatedAt());
+
+        return $parent;
+    }
+
+    // timestampable behavior
+
+    /**
+     * Mark the current object so that the update date doesn't get updated during next save
+     *
+     * @return     $this|ChildContact The current object (for fluent API support)
+     */
+    public function keepUpdateDateUnchanged()
+    {
+        $this->modifiedColumns[ContactTableMap::COL_UPDATED_AT] = true;
+
+        return $this;
     }
 
     /**

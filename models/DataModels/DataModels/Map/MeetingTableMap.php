@@ -59,7 +59,7 @@ class MeetingTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 10;
+    const NUM_COLUMNS = 15;
 
     /**
      * The number of lazy-loaded columns
@@ -69,12 +69,22 @@ class MeetingTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 10;
+    const NUM_HYDRATE_COLUMNS = 15;
 
     /**
      * the column name for the id field
      */
     const COL_ID = 'meeting.id';
+
+    /**
+     * the column name for the event_id field
+     */
+    const COL_EVENT_ID = 'meeting.event_id';
+
+    /**
+     * the column name for the event_type field
+     */
+    const COL_EVENT_TYPE = 'meeting.event_type';
 
     /**
      * the column name for the name field
@@ -102,24 +112,39 @@ class MeetingTableMap extends TableMap
     const COL_EVENT_DESCRIPTION = 'meeting.event_description';
 
     /**
-     * the column name for the account_id field
-     */
-    const COL_ACCOUNT_ID = 'meeting.account_id';
-
-    /**
      * the column name for the additional_data field
      */
     const COL_ADDITIONAL_DATA = 'meeting.additional_data';
 
     /**
-     * the column name for the created field
+     * the column name for the event_created_at field
      */
-    const COL_CREATED = 'meeting.created';
+    const COL_EVENT_CREATED_AT = 'meeting.event_created_at';
 
     /**
-     * the column name for the updated field
+     * the column name for the event_updated_at field
      */
-    const COL_UPDATED = 'meeting.updated';
+    const COL_EVENT_UPDATED_AT = 'meeting.event_updated_at';
+
+    /**
+     * the column name for the raw_data field
+     */
+    const COL_RAW_DATA = 'meeting.raw_data';
+
+    /**
+     * the column name for the client_calendar_user_id field
+     */
+    const COL_CLIENT_CALENDAR_USER_ID = 'meeting.client_calendar_user_id';
+
+    /**
+     * the column name for the created_at field
+     */
+    const COL_CREATED_AT = 'meeting.created_at';
+
+    /**
+     * the column name for the updated_at field
+     */
+    const COL_UPDATED_AT = 'meeting.updated_at';
 
     /**
      * The default string format for model objects of the related table
@@ -133,11 +158,11 @@ class MeetingTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Name', 'EventDatetime', 'EventCreatorId', 'EventOwnerId', 'EventDescription', 'AccountId', 'AdditionalData', 'Created', 'Updated', ),
-        self::TYPE_CAMELNAME     => array('id', 'name', 'eventDatetime', 'eventCreatorId', 'eventOwnerId', 'eventDescription', 'accountId', 'additionalData', 'created', 'updated', ),
-        self::TYPE_COLNAME       => array(MeetingTableMap::COL_ID, MeetingTableMap::COL_NAME, MeetingTableMap::COL_EVENT_DATETIME, MeetingTableMap::COL_EVENT_CREATOR_ID, MeetingTableMap::COL_EVENT_OWNER_ID, MeetingTableMap::COL_EVENT_DESCRIPTION, MeetingTableMap::COL_ACCOUNT_ID, MeetingTableMap::COL_ADDITIONAL_DATA, MeetingTableMap::COL_CREATED, MeetingTableMap::COL_UPDATED, ),
-        self::TYPE_FIELDNAME     => array('id', 'name', 'event_datetime', 'event_creator_id', 'event_owner_id', 'event_description', 'account_id', 'additional_data', 'created', 'updated', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
+        self::TYPE_PHPNAME       => array('Id', 'EventId', 'EventType', 'Name', 'EventDatetime', 'EventCreatorId', 'EventOwnerId', 'EventDescription', 'AdditionalData', 'EventCreatedAt', 'EventUpdatedAt', 'RawData', 'ClientCalendarUserId', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_CAMELNAME     => array('id', 'eventId', 'eventType', 'name', 'eventDatetime', 'eventCreatorId', 'eventOwnerId', 'eventDescription', 'additionalData', 'eventCreatedAt', 'eventUpdatedAt', 'rawData', 'clientCalendarUserId', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(MeetingTableMap::COL_ID, MeetingTableMap::COL_EVENT_ID, MeetingTableMap::COL_EVENT_TYPE, MeetingTableMap::COL_NAME, MeetingTableMap::COL_EVENT_DATETIME, MeetingTableMap::COL_EVENT_CREATOR_ID, MeetingTableMap::COL_EVENT_OWNER_ID, MeetingTableMap::COL_EVENT_DESCRIPTION, MeetingTableMap::COL_ADDITIONAL_DATA, MeetingTableMap::COL_EVENT_CREATED_AT, MeetingTableMap::COL_EVENT_UPDATED_AT, MeetingTableMap::COL_RAW_DATA, MeetingTableMap::COL_CLIENT_CALENDAR_USER_ID, MeetingTableMap::COL_CREATED_AT, MeetingTableMap::COL_UPDATED_AT, ),
+        self::TYPE_FIELDNAME     => array('id', 'event_id', 'event_type', 'name', 'event_datetime', 'event_creator_id', 'event_owner_id', 'event_description', 'additional_data', 'event_created_at', 'event_updated_at', 'raw_data', 'client_calendar_user_id', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, )
     );
 
     /**
@@ -147,11 +172,11 @@ class MeetingTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Name' => 1, 'EventDatetime' => 2, 'EventCreatorId' => 3, 'EventOwnerId' => 4, 'EventDescription' => 5, 'AccountId' => 6, 'AdditionalData' => 7, 'Created' => 8, 'Updated' => 9, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'name' => 1, 'eventDatetime' => 2, 'eventCreatorId' => 3, 'eventOwnerId' => 4, 'eventDescription' => 5, 'accountId' => 6, 'additionalData' => 7, 'created' => 8, 'updated' => 9, ),
-        self::TYPE_COLNAME       => array(MeetingTableMap::COL_ID => 0, MeetingTableMap::COL_NAME => 1, MeetingTableMap::COL_EVENT_DATETIME => 2, MeetingTableMap::COL_EVENT_CREATOR_ID => 3, MeetingTableMap::COL_EVENT_OWNER_ID => 4, MeetingTableMap::COL_EVENT_DESCRIPTION => 5, MeetingTableMap::COL_ACCOUNT_ID => 6, MeetingTableMap::COL_ADDITIONAL_DATA => 7, MeetingTableMap::COL_CREATED => 8, MeetingTableMap::COL_UPDATED => 9, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'name' => 1, 'event_datetime' => 2, 'event_creator_id' => 3, 'event_owner_id' => 4, 'event_description' => 5, 'account_id' => 6, 'additional_data' => 7, 'created' => 8, 'updated' => 9, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'EventId' => 1, 'EventType' => 2, 'Name' => 3, 'EventDatetime' => 4, 'EventCreatorId' => 5, 'EventOwnerId' => 6, 'EventDescription' => 7, 'AdditionalData' => 8, 'EventCreatedAt' => 9, 'EventUpdatedAt' => 10, 'RawData' => 11, 'ClientCalendarUserId' => 12, 'CreatedAt' => 13, 'UpdatedAt' => 14, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'eventId' => 1, 'eventType' => 2, 'name' => 3, 'eventDatetime' => 4, 'eventCreatorId' => 5, 'eventOwnerId' => 6, 'eventDescription' => 7, 'additionalData' => 8, 'eventCreatedAt' => 9, 'eventUpdatedAt' => 10, 'rawData' => 11, 'clientCalendarUserId' => 12, 'createdAt' => 13, 'updatedAt' => 14, ),
+        self::TYPE_COLNAME       => array(MeetingTableMap::COL_ID => 0, MeetingTableMap::COL_EVENT_ID => 1, MeetingTableMap::COL_EVENT_TYPE => 2, MeetingTableMap::COL_NAME => 3, MeetingTableMap::COL_EVENT_DATETIME => 4, MeetingTableMap::COL_EVENT_CREATOR_ID => 5, MeetingTableMap::COL_EVENT_OWNER_ID => 6, MeetingTableMap::COL_EVENT_DESCRIPTION => 7, MeetingTableMap::COL_ADDITIONAL_DATA => 8, MeetingTableMap::COL_EVENT_CREATED_AT => 9, MeetingTableMap::COL_EVENT_UPDATED_AT => 10, MeetingTableMap::COL_RAW_DATA => 11, MeetingTableMap::COL_CLIENT_CALENDAR_USER_ID => 12, MeetingTableMap::COL_CREATED_AT => 13, MeetingTableMap::COL_UPDATED_AT => 14, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'event_id' => 1, 'event_type' => 2, 'name' => 3, 'event_datetime' => 4, 'event_creator_id' => 5, 'event_owner_id' => 6, 'event_description' => 7, 'additional_data' => 8, 'event_created_at' => 9, 'event_updated_at' => 10, 'raw_data' => 11, 'client_calendar_user_id' => 12, 'created_at' => 13, 'updated_at' => 14, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, )
     );
 
     /**
@@ -173,15 +198,20 @@ class MeetingTableMap extends TableMap
         $this->setPrimaryKeyMethodInfo('meeting_id_seq');
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
+        $this->addColumn('event_id', 'EventId', 'VARCHAR', false, 255, null);
+        $this->addColumn('event_type', 'EventType', 'VARCHAR', false, 16, null);
         $this->addColumn('name', 'Name', 'VARCHAR', false, 255, null);
         $this->addColumn('event_datetime', 'EventDatetime', 'TIMESTAMP', false, null, null);
-        $this->addColumn('event_creator_id', 'EventCreatorId', 'INTEGER', false, null, null);
-        $this->addColumn('event_owner_id', 'EventOwnerId', 'INTEGER', false, null, null);
+        $this->addForeignKey('event_creator_id', 'EventCreatorId', 'INTEGER', 'meeting_attendee', 'id', false, null, null);
+        $this->addForeignKey('event_owner_id', 'EventOwnerId', 'INTEGER', 'meeting_attendee', 'id', false, null, null);
         $this->addColumn('event_description', 'EventDescription', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('account_id', 'AccountId', 'INTEGER', false, null, null);
         $this->addColumn('additional_data', 'AdditionalData', 'VARCHAR', false, null, null);
-        $this->addColumn('created', 'Created', 'TIMESTAMP', false, null, null);
-        $this->addColumn('updated', 'Updated', 'TIMESTAMP', false, null, null);
+        $this->addColumn('event_created_at', 'EventCreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('event_updated_at', 'EventUpdatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('raw_data', 'RawData', 'VARCHAR', false, null, null);
+        $this->addForeignKey('client_calendar_user_id', 'ClientCalendarUserId', 'INTEGER', 'client_calendar_user', 'id', false, null, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
 
     /**
@@ -189,7 +219,49 @@ class MeetingTableMap extends TableMap
      */
     public function buildRelations()
     {
+        $this->addRelation('EventOwner', '\\DataModels\\DataModels\\MeetingAttendee', RelationMap::MANY_TO_ONE, array (
+  0 =>
+  array (
+    0 => ':event_owner_id',
+    1 => ':id',
+  ),
+), null, null, null, false);
+        $this->addRelation('EventCreator', '\\DataModels\\DataModels\\MeetingAttendee', RelationMap::MANY_TO_ONE, array (
+  0 =>
+  array (
+    0 => ':event_creator_id',
+    1 => ':id',
+  ),
+), null, null, null, false);
+        $this->addRelation('ClientCalendarUser', '\\DataModels\\DataModels\\ClientCalendarUser', RelationMap::MANY_TO_ONE, array (
+  0 =>
+  array (
+    0 => ':client_calendar_user_id',
+    1 => ':id',
+  ),
+), null, null, null, false);
+        $this->addRelation('MeetingHasAttendee', '\\DataModels\\DataModels\\MeetingHasAttendee', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':meeting_id',
+    1 => ':id',
+  ),
+), null, null, 'MeetingHasAttendees', false);
+        $this->addRelation('MeetingAttendee', '\\DataModels\\DataModels\\MeetingAttendee', RelationMap::MANY_TO_MANY, array(), null, null, 'MeetingAttendees');
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_created_at' => 'false', 'disable_updated_at' => 'false', ),
+        );
+    } // getBehaviors()
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -333,26 +405,36 @@ class MeetingTableMap extends TableMap
     {
         if (null === $alias) {
             $criteria->addSelectColumn(MeetingTableMap::COL_ID);
+            $criteria->addSelectColumn(MeetingTableMap::COL_EVENT_ID);
+            $criteria->addSelectColumn(MeetingTableMap::COL_EVENT_TYPE);
             $criteria->addSelectColumn(MeetingTableMap::COL_NAME);
             $criteria->addSelectColumn(MeetingTableMap::COL_EVENT_DATETIME);
             $criteria->addSelectColumn(MeetingTableMap::COL_EVENT_CREATOR_ID);
             $criteria->addSelectColumn(MeetingTableMap::COL_EVENT_OWNER_ID);
             $criteria->addSelectColumn(MeetingTableMap::COL_EVENT_DESCRIPTION);
-            $criteria->addSelectColumn(MeetingTableMap::COL_ACCOUNT_ID);
             $criteria->addSelectColumn(MeetingTableMap::COL_ADDITIONAL_DATA);
-            $criteria->addSelectColumn(MeetingTableMap::COL_CREATED);
-            $criteria->addSelectColumn(MeetingTableMap::COL_UPDATED);
+            $criteria->addSelectColumn(MeetingTableMap::COL_EVENT_CREATED_AT);
+            $criteria->addSelectColumn(MeetingTableMap::COL_EVENT_UPDATED_AT);
+            $criteria->addSelectColumn(MeetingTableMap::COL_RAW_DATA);
+            $criteria->addSelectColumn(MeetingTableMap::COL_CLIENT_CALENDAR_USER_ID);
+            $criteria->addSelectColumn(MeetingTableMap::COL_CREATED_AT);
+            $criteria->addSelectColumn(MeetingTableMap::COL_UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.event_id');
+            $criteria->addSelectColumn($alias . '.event_type');
             $criteria->addSelectColumn($alias . '.name');
             $criteria->addSelectColumn($alias . '.event_datetime');
             $criteria->addSelectColumn($alias . '.event_creator_id');
             $criteria->addSelectColumn($alias . '.event_owner_id');
             $criteria->addSelectColumn($alias . '.event_description');
-            $criteria->addSelectColumn($alias . '.account_id');
             $criteria->addSelectColumn($alias . '.additional_data');
-            $criteria->addSelectColumn($alias . '.created');
-            $criteria->addSelectColumn($alias . '.updated');
+            $criteria->addSelectColumn($alias . '.event_created_at');
+            $criteria->addSelectColumn($alias . '.event_updated_at');
+            $criteria->addSelectColumn($alias . '.raw_data');
+            $criteria->addSelectColumn($alias . '.client_calendar_user_id');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 

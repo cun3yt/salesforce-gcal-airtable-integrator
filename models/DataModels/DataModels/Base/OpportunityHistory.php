@@ -5,7 +5,10 @@ namespace DataModels\DataModels\Base;
 use \DateTime;
 use \Exception;
 use \PDO;
+use DataModels\DataModels\Opportunity as ChildOpportunity;
+use DataModels\DataModels\OpportunityHistory as ChildOpportunityHistory;
 use DataModels\DataModels\OpportunityHistoryQuery as ChildOpportunityHistoryQuery;
+use DataModels\DataModels\OpportunityQuery as ChildOpportunityQuery;
 use DataModels\DataModels\Map\OpportunityHistoryTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -76,25 +79,18 @@ abstract class OpportunityHistory implements ActiveRecordInterface
     protected $opportunity_id;
 
     /**
-     * The value for the user_account_id field.
+     * The value for the sfdc_opportunity_id field.
      *
-     * @var        int
+     * @var        string
      */
-    protected $user_account_id;
+    protected $sfdc_opportunity_id;
 
     /**
-     * The value for the opportunity_stage_id field.
+     * The value for the account_sfdc_id field.
      *
-     * @var        int
+     * @var        string
      */
-    protected $opportunity_stage_id;
-
-    /**
-     * The value for the buyer_stage_id field.
-     *
-     * @var        int
-     */
-    protected $buyer_stage_id;
+    protected $account_sfdc_id;
 
     /**
      * The value for the amount field.
@@ -109,6 +105,151 @@ abstract class OpportunityHistory implements ActiveRecordInterface
      * @var        DateTime
      */
     protected $close_date;
+
+    /**
+     * The value for the last_modified_by field.
+     *
+     * @var        string
+     */
+    protected $last_modified_by;
+
+    /**
+     * The value for the next_step field.
+     *
+     * @var        string
+     */
+    protected $next_step;
+
+    /**
+     * The value for the name field.
+     *
+     * @var        string
+     */
+    protected $name;
+
+    /**
+     * The value for the owner_id field.
+     *
+     * @var        string
+     */
+    protected $owner_id;
+
+    /**
+     * The value for the stage field.
+     *
+     * @var        string
+     */
+    protected $stage;
+
+    /**
+     * The value for the type field.
+     *
+     * @var        string
+     */
+    protected $type;
+
+    /**
+     * The value for the contact field.
+     *
+     * @var        string
+     */
+    protected $contact;
+
+    /**
+     * The value for the created_by field.
+     *
+     * @var        string
+     */
+    protected $created_by;
+
+    /**
+     * The value for the description field.
+     *
+     * @var        string
+     */
+    protected $description;
+
+    /**
+     * The value for the expected_revenue field.
+     *
+     * @var        string
+     */
+    protected $expected_revenue;
+
+    /**
+     * The value for the forecast_category field.
+     *
+     * @var        string
+     */
+    protected $forecast_category;
+
+    /**
+     * The value for the lead_source field.
+     *
+     * @var        string
+     */
+    protected $lead_source;
+
+    /**
+     * The value for the price_book field.
+     *
+     * @var        string
+     */
+    protected $price_book;
+
+    /**
+     * The value for the primary_campaign_source field.
+     *
+     * @var        string
+     */
+    protected $primary_campaign_source;
+
+    /**
+     * The value for the is_private field.
+     *
+     * @var        boolean
+     */
+    protected $is_private;
+
+    /**
+     * The value for the probability field.
+     *
+     * @var        string
+     */
+    protected $probability;
+
+    /**
+     * The value for the quantity field.
+     *
+     * @var        string
+     */
+    protected $quantity;
+
+    /**
+     * The value for the synced_quote field.
+     *
+     * @var        string
+     */
+    protected $synced_quote;
+
+    /**
+     * The value for the created_at field.
+     *
+     * @var        DateTime
+     */
+    protected $created_at;
+
+    /**
+     * The value for the updated_at field.
+     *
+     * @var        DateTime
+     */
+    protected $updated_at;
+
+    /**
+     * @var        ChildOpportunity
+     */
+    protected $aOpportunity;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -364,33 +505,23 @@ abstract class OpportunityHistory implements ActiveRecordInterface
     }
 
     /**
-     * Get the [user_account_id] column value.
+     * Get the [sfdc_opportunity_id] column value.
      *
-     * @return int
+     * @return string
      */
-    public function getUserAccountId()
+    public function getSFDCOpportunityId()
     {
-        return $this->user_account_id;
+        return $this->sfdc_opportunity_id;
     }
 
     /**
-     * Get the [opportunity_stage_id] column value.
+     * Get the [account_sfdc_id] column value.
      *
-     * @return int
+     * @return string
      */
-    public function getOpportunityStageId()
+    public function getAccountSFDCId()
     {
-        return $this->opportunity_stage_id;
-    }
-
-    /**
-     * Get the [buyer_stage_id] column value.
-     *
-     * @return int
-     */
-    public function getBuyerStageId()
-    {
-        return $this->buyer_stage_id;
+        return $this->account_sfdc_id;
     }
 
     /**
@@ -420,6 +551,236 @@ abstract class OpportunityHistory implements ActiveRecordInterface
             return $this->close_date;
         } else {
             return $this->close_date instanceof \DateTimeInterface ? $this->close_date->format($format) : null;
+        }
+    }
+
+    /**
+     * Get the [last_modified_by] column value.
+     *
+     * @return string
+     */
+    public function getLastModifiedBy()
+    {
+        return $this->last_modified_by;
+    }
+
+    /**
+     * Get the [next_step] column value.
+     *
+     * @return string
+     */
+    public function getNextStep()
+    {
+        return $this->next_step;
+    }
+
+    /**
+     * Get the [name] column value.
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * Get the [owner_id] column value.
+     *
+     * @return string
+     */
+    public function getOwnerId()
+    {
+        return $this->owner_id;
+    }
+
+    /**
+     * Get the [stage] column value.
+     *
+     * @return string
+     */
+    public function getStage()
+    {
+        return $this->stage;
+    }
+
+    /**
+     * Get the [type] column value.
+     *
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * Get the [contact] column value.
+     *
+     * @return string
+     */
+    public function getContact()
+    {
+        return $this->contact;
+    }
+
+    /**
+     * Get the [created_by] column value.
+     *
+     * @return string
+     */
+    public function getCreatedBy()
+    {
+        return $this->created_by;
+    }
+
+    /**
+     * Get the [description] column value.
+     *
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * Get the [expected_revenue] column value.
+     *
+     * @return string
+     */
+    public function getExpectedRevenue()
+    {
+        return $this->expected_revenue;
+    }
+
+    /**
+     * Get the [forecast_category] column value.
+     *
+     * @return string
+     */
+    public function getForecastCategory()
+    {
+        return $this->forecast_category;
+    }
+
+    /**
+     * Get the [lead_source] column value.
+     *
+     * @return string
+     */
+    public function getLeadSource()
+    {
+        return $this->lead_source;
+    }
+
+    /**
+     * Get the [price_book] column value.
+     *
+     * @return string
+     */
+    public function getPriceBook()
+    {
+        return $this->price_book;
+    }
+
+    /**
+     * Get the [primary_campaign_source] column value.
+     *
+     * @return string
+     */
+    public function getPrimaryCampaignSource()
+    {
+        return $this->primary_campaign_source;
+    }
+
+    /**
+     * Get the [is_private] column value.
+     *
+     * @return boolean
+     */
+    public function getIsPrivate()
+    {
+        return $this->is_private;
+    }
+
+    /**
+     * Get the [is_private] column value.
+     *
+     * @return boolean
+     */
+    public function isPrivate()
+    {
+        return $this->getIsPrivate();
+    }
+
+    /**
+     * Get the [probability] column value.
+     *
+     * @return string
+     */
+    public function getProbability()
+    {
+        return $this->probability;
+    }
+
+    /**
+     * Get the [quantity] column value.
+     *
+     * @return string
+     */
+    public function getQuantity()
+    {
+        return $this->quantity;
+    }
+
+    /**
+     * Get the [synced_quote] column value.
+     *
+     * @return string
+     */
+    public function getSyncedQuote()
+    {
+        return $this->synced_quote;
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [created_at] column value.
+     *
+     *
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw DateTime object will be returned.
+     *
+     * @return string|DateTime Formatted date/time value as string or DateTime object (if format is NULL), NULL if column is NULL
+     *
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getCreatedAt($format = NULL)
+    {
+        if ($format === null) {
+            return $this->created_at;
+        } else {
+            return $this->created_at instanceof \DateTimeInterface ? $this->created_at->format($format) : null;
+        }
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [updated_at] column value.
+     *
+     *
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw DateTime object will be returned.
+     *
+     * @return string|DateTime Formatted date/time value as string or DateTime object (if format is NULL), NULL if column is NULL
+     *
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getUpdatedAt($format = NULL)
+    {
+        if ($format === null) {
+            return $this->updated_at;
+        } else {
+            return $this->updated_at instanceof \DateTimeInterface ? $this->updated_at->format($format) : null;
         }
     }
 
@@ -460,68 +821,52 @@ abstract class OpportunityHistory implements ActiveRecordInterface
             $this->modifiedColumns[OpportunityHistoryTableMap::COL_OPPORTUNITY_ID] = true;
         }
 
+        if ($this->aOpportunity !== null && $this->aOpportunity->getId() !== $v) {
+            $this->aOpportunity = null;
+        }
+
         return $this;
     } // setOpportunityId()
 
     /**
-     * Set the value of [user_account_id] column.
+     * Set the value of [sfdc_opportunity_id] column.
      *
-     * @param int $v new value
+     * @param string $v new value
      * @return $this|\DataModels\DataModels\OpportunityHistory The current object (for fluent API support)
      */
-    public function setUserAccountId($v)
+    public function setSFDCOpportunityId($v)
     {
         if ($v !== null) {
-            $v = (int) $v;
+            $v = (string) $v;
         }
 
-        if ($this->user_account_id !== $v) {
-            $this->user_account_id = $v;
-            $this->modifiedColumns[OpportunityHistoryTableMap::COL_USER_ACCOUNT_ID] = true;
+        if ($this->sfdc_opportunity_id !== $v) {
+            $this->sfdc_opportunity_id = $v;
+            $this->modifiedColumns[OpportunityHistoryTableMap::COL_SFDC_OPPORTUNITY_ID] = true;
         }
 
         return $this;
-    } // setUserAccountId()
+    } // setSFDCOpportunityId()
 
     /**
-     * Set the value of [opportunity_stage_id] column.
+     * Set the value of [account_sfdc_id] column.
      *
-     * @param int $v new value
+     * @param string $v new value
      * @return $this|\DataModels\DataModels\OpportunityHistory The current object (for fluent API support)
      */
-    public function setOpportunityStageId($v)
+    public function setAccountSFDCId($v)
     {
         if ($v !== null) {
-            $v = (int) $v;
+            $v = (string) $v;
         }
 
-        if ($this->opportunity_stage_id !== $v) {
-            $this->opportunity_stage_id = $v;
-            $this->modifiedColumns[OpportunityHistoryTableMap::COL_OPPORTUNITY_STAGE_ID] = true;
+        if ($this->account_sfdc_id !== $v) {
+            $this->account_sfdc_id = $v;
+            $this->modifiedColumns[OpportunityHistoryTableMap::COL_ACCOUNT_SFDC_ID] = true;
         }
 
         return $this;
-    } // setOpportunityStageId()
-
-    /**
-     * Set the value of [buyer_stage_id] column.
-     *
-     * @param int $v new value
-     * @return $this|\DataModels\DataModels\OpportunityHistory The current object (for fluent API support)
-     */
-    public function setBuyerStageId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->buyer_stage_id !== $v) {
-            $this->buyer_stage_id = $v;
-            $this->modifiedColumns[OpportunityHistoryTableMap::COL_BUYER_STAGE_ID] = true;
-        }
-
-        return $this;
-    } // setBuyerStageId()
+    } // setAccountSFDCId()
 
     /**
      * Set the value of [amount] column.
@@ -562,6 +907,414 @@ abstract class OpportunityHistory implements ActiveRecordInterface
 
         return $this;
     } // setCloseDate()
+
+    /**
+     * Set the value of [last_modified_by] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\OpportunityHistory The current object (for fluent API support)
+     */
+    public function setLastModifiedBy($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->last_modified_by !== $v) {
+            $this->last_modified_by = $v;
+            $this->modifiedColumns[OpportunityHistoryTableMap::COL_LAST_MODIFIED_BY] = true;
+        }
+
+        return $this;
+    } // setLastModifiedBy()
+
+    /**
+     * Set the value of [next_step] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\OpportunityHistory The current object (for fluent API support)
+     */
+    public function setNextStep($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->next_step !== $v) {
+            $this->next_step = $v;
+            $this->modifiedColumns[OpportunityHistoryTableMap::COL_NEXT_STEP] = true;
+        }
+
+        return $this;
+    } // setNextStep()
+
+    /**
+     * Set the value of [name] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\OpportunityHistory The current object (for fluent API support)
+     */
+    public function setName($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->name !== $v) {
+            $this->name = $v;
+            $this->modifiedColumns[OpportunityHistoryTableMap::COL_NAME] = true;
+        }
+
+        return $this;
+    } // setName()
+
+    /**
+     * Set the value of [owner_id] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\OpportunityHistory The current object (for fluent API support)
+     */
+    public function setOwnerId($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->owner_id !== $v) {
+            $this->owner_id = $v;
+            $this->modifiedColumns[OpportunityHistoryTableMap::COL_OWNER_ID] = true;
+        }
+
+        return $this;
+    } // setOwnerId()
+
+    /**
+     * Set the value of [stage] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\OpportunityHistory The current object (for fluent API support)
+     */
+    public function setStage($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->stage !== $v) {
+            $this->stage = $v;
+            $this->modifiedColumns[OpportunityHistoryTableMap::COL_STAGE] = true;
+        }
+
+        return $this;
+    } // setStage()
+
+    /**
+     * Set the value of [type] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\OpportunityHistory The current object (for fluent API support)
+     */
+    public function setType($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->type !== $v) {
+            $this->type = $v;
+            $this->modifiedColumns[OpportunityHistoryTableMap::COL_TYPE] = true;
+        }
+
+        return $this;
+    } // setType()
+
+    /**
+     * Set the value of [contact] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\OpportunityHistory The current object (for fluent API support)
+     */
+    public function setContact($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->contact !== $v) {
+            $this->contact = $v;
+            $this->modifiedColumns[OpportunityHistoryTableMap::COL_CONTACT] = true;
+        }
+
+        return $this;
+    } // setContact()
+
+    /**
+     * Set the value of [created_by] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\OpportunityHistory The current object (for fluent API support)
+     */
+    public function setCreatedBy($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->created_by !== $v) {
+            $this->created_by = $v;
+            $this->modifiedColumns[OpportunityHistoryTableMap::COL_CREATED_BY] = true;
+        }
+
+        return $this;
+    } // setCreatedBy()
+
+    /**
+     * Set the value of [description] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\OpportunityHistory The current object (for fluent API support)
+     */
+    public function setDescription($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->description !== $v) {
+            $this->description = $v;
+            $this->modifiedColumns[OpportunityHistoryTableMap::COL_DESCRIPTION] = true;
+        }
+
+        return $this;
+    } // setDescription()
+
+    /**
+     * Set the value of [expected_revenue] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\OpportunityHistory The current object (for fluent API support)
+     */
+    public function setExpectedRevenue($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->expected_revenue !== $v) {
+            $this->expected_revenue = $v;
+            $this->modifiedColumns[OpportunityHistoryTableMap::COL_EXPECTED_REVENUE] = true;
+        }
+
+        return $this;
+    } // setExpectedRevenue()
+
+    /**
+     * Set the value of [forecast_category] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\OpportunityHistory The current object (for fluent API support)
+     */
+    public function setForecastCategory($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->forecast_category !== $v) {
+            $this->forecast_category = $v;
+            $this->modifiedColumns[OpportunityHistoryTableMap::COL_FORECAST_CATEGORY] = true;
+        }
+
+        return $this;
+    } // setForecastCategory()
+
+    /**
+     * Set the value of [lead_source] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\OpportunityHistory The current object (for fluent API support)
+     */
+    public function setLeadSource($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->lead_source !== $v) {
+            $this->lead_source = $v;
+            $this->modifiedColumns[OpportunityHistoryTableMap::COL_LEAD_SOURCE] = true;
+        }
+
+        return $this;
+    } // setLeadSource()
+
+    /**
+     * Set the value of [price_book] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\OpportunityHistory The current object (for fluent API support)
+     */
+    public function setPriceBook($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->price_book !== $v) {
+            $this->price_book = $v;
+            $this->modifiedColumns[OpportunityHistoryTableMap::COL_PRICE_BOOK] = true;
+        }
+
+        return $this;
+    } // setPriceBook()
+
+    /**
+     * Set the value of [primary_campaign_source] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\OpportunityHistory The current object (for fluent API support)
+     */
+    public function setPrimaryCampaignSource($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->primary_campaign_source !== $v) {
+            $this->primary_campaign_source = $v;
+            $this->modifiedColumns[OpportunityHistoryTableMap::COL_PRIMARY_CAMPAIGN_SOURCE] = true;
+        }
+
+        return $this;
+    } // setPrimaryCampaignSource()
+
+    /**
+     * Sets the value of the [is_private] column.
+     * Non-boolean arguments are converted using the following rules:
+     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     *
+     * @param  boolean|integer|string $v The new value
+     * @return $this|\DataModels\DataModels\OpportunityHistory The current object (for fluent API support)
+     */
+    public function setIsPrivate($v)
+    {
+        if ($v !== null) {
+            if (is_string($v)) {
+                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+            } else {
+                $v = (boolean) $v;
+            }
+        }
+
+        if ($this->is_private !== $v) {
+            $this->is_private = $v;
+            $this->modifiedColumns[OpportunityHistoryTableMap::COL_IS_PRIVATE] = true;
+        }
+
+        return $this;
+    } // setIsPrivate()
+
+    /**
+     * Set the value of [probability] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\OpportunityHistory The current object (for fluent API support)
+     */
+    public function setProbability($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->probability !== $v) {
+            $this->probability = $v;
+            $this->modifiedColumns[OpportunityHistoryTableMap::COL_PROBABILITY] = true;
+        }
+
+        return $this;
+    } // setProbability()
+
+    /**
+     * Set the value of [quantity] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\OpportunityHistory The current object (for fluent API support)
+     */
+    public function setQuantity($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->quantity !== $v) {
+            $this->quantity = $v;
+            $this->modifiedColumns[OpportunityHistoryTableMap::COL_QUANTITY] = true;
+        }
+
+        return $this;
+    } // setQuantity()
+
+    /**
+     * Set the value of [synced_quote] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\OpportunityHistory The current object (for fluent API support)
+     */
+    public function setSyncedQuote($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->synced_quote !== $v) {
+            $this->synced_quote = $v;
+            $this->modifiedColumns[OpportunityHistoryTableMap::COL_SYNCED_QUOTE] = true;
+        }
+
+        return $this;
+    } // setSyncedQuote()
+
+    /**
+     * Sets the value of [created_at] column to a normalized version of the date/time value specified.
+     *
+     * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
+     *               Empty strings are treated as NULL.
+     * @return $this|\DataModels\DataModels\OpportunityHistory The current object (for fluent API support)
+     */
+    public function setCreatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->created_at !== null || $dt !== null) {
+            if ($this->created_at === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->created_at->format("Y-m-d H:i:s.u")) {
+                $this->created_at = $dt === null ? null : clone $dt;
+                $this->modifiedColumns[OpportunityHistoryTableMap::COL_CREATED_AT] = true;
+            }
+        } // if either are not null
+
+        return $this;
+    } // setCreatedAt()
+
+    /**
+     * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
+     *
+     * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
+     *               Empty strings are treated as NULL.
+     * @return $this|\DataModels\DataModels\OpportunityHistory The current object (for fluent API support)
+     */
+    public function setUpdatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->updated_at !== null || $dt !== null) {
+            if ($this->updated_at === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->updated_at->format("Y-m-d H:i:s.u")) {
+                $this->updated_at = $dt === null ? null : clone $dt;
+                $this->modifiedColumns[OpportunityHistoryTableMap::COL_UPDATED_AT] = true;
+            }
+        } // if either are not null
+
+        return $this;
+    } // setUpdatedAt()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -605,20 +1358,77 @@ abstract class OpportunityHistory implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : OpportunityHistoryTableMap::translateFieldName('OpportunityId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->opportunity_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : OpportunityHistoryTableMap::translateFieldName('UserAccountId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->user_account_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : OpportunityHistoryTableMap::translateFieldName('SFDCOpportunityId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->sfdc_opportunity_id = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : OpportunityHistoryTableMap::translateFieldName('OpportunityStageId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->opportunity_stage_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : OpportunityHistoryTableMap::translateFieldName('AccountSFDCId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->account_sfdc_id = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : OpportunityHistoryTableMap::translateFieldName('BuyerStageId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->buyer_stage_id = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : OpportunityHistoryTableMap::translateFieldName('Amount', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : OpportunityHistoryTableMap::translateFieldName('Amount', TableMap::TYPE_PHPNAME, $indexType)];
             $this->amount = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : OpportunityHistoryTableMap::translateFieldName('CloseDate', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : OpportunityHistoryTableMap::translateFieldName('CloseDate', TableMap::TYPE_PHPNAME, $indexType)];
             $this->close_date = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : OpportunityHistoryTableMap::translateFieldName('LastModifiedBy', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->last_modified_by = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : OpportunityHistoryTableMap::translateFieldName('NextStep', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->next_step = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : OpportunityHistoryTableMap::translateFieldName('Name', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->name = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : OpportunityHistoryTableMap::translateFieldName('OwnerId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->owner_id = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : OpportunityHistoryTableMap::translateFieldName('Stage', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->stage = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : OpportunityHistoryTableMap::translateFieldName('Type', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->type = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : OpportunityHistoryTableMap::translateFieldName('Contact', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->contact = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : OpportunityHistoryTableMap::translateFieldName('CreatedBy', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->created_by = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : OpportunityHistoryTableMap::translateFieldName('Description', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->description = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : OpportunityHistoryTableMap::translateFieldName('ExpectedRevenue', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->expected_revenue = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 16 + $startcol : OpportunityHistoryTableMap::translateFieldName('ForecastCategory', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->forecast_category = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 17 + $startcol : OpportunityHistoryTableMap::translateFieldName('LeadSource', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->lead_source = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 18 + $startcol : OpportunityHistoryTableMap::translateFieldName('PriceBook', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->price_book = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 19 + $startcol : OpportunityHistoryTableMap::translateFieldName('PrimaryCampaignSource', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->primary_campaign_source = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 20 + $startcol : OpportunityHistoryTableMap::translateFieldName('IsPrivate', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->is_private = (null !== $col) ? (boolean) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 21 + $startcol : OpportunityHistoryTableMap::translateFieldName('Probability', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->probability = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 22 + $startcol : OpportunityHistoryTableMap::translateFieldName('Quantity', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->quantity = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 23 + $startcol : OpportunityHistoryTableMap::translateFieldName('SyncedQuote', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->synced_quote = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 24 + $startcol : OpportunityHistoryTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 25 + $startcol : OpportunityHistoryTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -627,7 +1437,7 @@ abstract class OpportunityHistory implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 7; // 7 = OpportunityHistoryTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 26; // 26 = OpportunityHistoryTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\DataModels\\DataModels\\OpportunityHistory'), 0, $e);
@@ -649,6 +1459,9 @@ abstract class OpportunityHistory implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
+        if ($this->aOpportunity !== null && $this->opportunity_id !== $this->aOpportunity->getId()) {
+            $this->aOpportunity = null;
+        }
     } // ensureConsistency
 
     /**
@@ -688,6 +1501,7 @@ abstract class OpportunityHistory implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
+            $this->aOpportunity = null;
         } // if (deep)
     }
 
@@ -754,8 +1568,20 @@ abstract class OpportunityHistory implements ActiveRecordInterface
             $isInsert = $this->isNew();
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
+                // timestampable behavior
+
+                if (!$this->isColumnModified(OpportunityHistoryTableMap::COL_CREATED_AT)) {
+                    $this->setCreatedAt(\Propel\Runtime\Util\PropelDateTime::createHighPrecision());
+                }
+                if (!$this->isColumnModified(OpportunityHistoryTableMap::COL_UPDATED_AT)) {
+                    $this->setUpdatedAt(\Propel\Runtime\Util\PropelDateTime::createHighPrecision());
+                }
             } else {
                 $ret = $ret && $this->preUpdate($con);
+                // timestampable behavior
+                if ($this->isModified() && !$this->isColumnModified(OpportunityHistoryTableMap::COL_UPDATED_AT)) {
+                    $this->setUpdatedAt(\Propel\Runtime\Util\PropelDateTime::createHighPrecision());
+                }
             }
             if ($ret) {
                 $affectedRows = $this->doSave($con);
@@ -790,6 +1616,18 @@ abstract class OpportunityHistory implements ActiveRecordInterface
         $affectedRows = 0; // initialize var to track total num of affected rows
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
+
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their corresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aOpportunity !== null) {
+                if ($this->aOpportunity->isModified() || $this->aOpportunity->isNew()) {
+                    $affectedRows += $this->aOpportunity->save($con);
+                }
+                $this->setOpportunity($this->aOpportunity);
+            }
 
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
@@ -843,20 +1681,77 @@ abstract class OpportunityHistory implements ActiveRecordInterface
         if ($this->isColumnModified(OpportunityHistoryTableMap::COL_OPPORTUNITY_ID)) {
             $modifiedColumns[':p' . $index++]  = 'opportunity_id';
         }
-        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_USER_ACCOUNT_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'user_account_id';
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_SFDC_OPPORTUNITY_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'sfdc_opportunity_id';
         }
-        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_OPPORTUNITY_STAGE_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'opportunity_stage_id';
-        }
-        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_BUYER_STAGE_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'buyer_stage_id';
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_ACCOUNT_SFDC_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'account_sfdc_id';
         }
         if ($this->isColumnModified(OpportunityHistoryTableMap::COL_AMOUNT)) {
             $modifiedColumns[':p' . $index++]  = 'amount';
         }
         if ($this->isColumnModified(OpportunityHistoryTableMap::COL_CLOSE_DATE)) {
             $modifiedColumns[':p' . $index++]  = 'close_date';
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_LAST_MODIFIED_BY)) {
+            $modifiedColumns[':p' . $index++]  = 'last_modified_by';
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_NEXT_STEP)) {
+            $modifiedColumns[':p' . $index++]  = 'next_step';
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_NAME)) {
+            $modifiedColumns[':p' . $index++]  = 'name';
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_OWNER_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'owner_id';
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_STAGE)) {
+            $modifiedColumns[':p' . $index++]  = 'stage';
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_TYPE)) {
+            $modifiedColumns[':p' . $index++]  = 'type';
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_CONTACT)) {
+            $modifiedColumns[':p' . $index++]  = 'contact';
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_CREATED_BY)) {
+            $modifiedColumns[':p' . $index++]  = 'created_by';
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_DESCRIPTION)) {
+            $modifiedColumns[':p' . $index++]  = 'description';
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_EXPECTED_REVENUE)) {
+            $modifiedColumns[':p' . $index++]  = 'expected_revenue';
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_FORECAST_CATEGORY)) {
+            $modifiedColumns[':p' . $index++]  = 'forecast_category';
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_LEAD_SOURCE)) {
+            $modifiedColumns[':p' . $index++]  = 'lead_source';
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_PRICE_BOOK)) {
+            $modifiedColumns[':p' . $index++]  = 'price_book';
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_PRIMARY_CAMPAIGN_SOURCE)) {
+            $modifiedColumns[':p' . $index++]  = 'primary_campaign_source';
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_IS_PRIVATE)) {
+            $modifiedColumns[':p' . $index++]  = 'is_private';
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_PROBABILITY)) {
+            $modifiedColumns[':p' . $index++]  = 'probability';
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_QUANTITY)) {
+            $modifiedColumns[':p' . $index++]  = 'quantity';
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_SYNCED_QUOTE)) {
+            $modifiedColumns[':p' . $index++]  = 'synced_quote';
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_CREATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = 'created_at';
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_UPDATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = 'updated_at';
         }
 
         $sql = sprintf(
@@ -875,20 +1770,77 @@ abstract class OpportunityHistory implements ActiveRecordInterface
                     case 'opportunity_id':
                         $stmt->bindValue($identifier, $this->opportunity_id, PDO::PARAM_INT);
                         break;
-                    case 'user_account_id':
-                        $stmt->bindValue($identifier, $this->user_account_id, PDO::PARAM_INT);
+                    case 'sfdc_opportunity_id':
+                        $stmt->bindValue($identifier, $this->sfdc_opportunity_id, PDO::PARAM_STR);
                         break;
-                    case 'opportunity_stage_id':
-                        $stmt->bindValue($identifier, $this->opportunity_stage_id, PDO::PARAM_INT);
-                        break;
-                    case 'buyer_stage_id':
-                        $stmt->bindValue($identifier, $this->buyer_stage_id, PDO::PARAM_INT);
+                    case 'account_sfdc_id':
+                        $stmt->bindValue($identifier, $this->account_sfdc_id, PDO::PARAM_STR);
                         break;
                     case 'amount':
-                        $stmt->bindValue($identifier, $this->amount, PDO::PARAM_STR);
+                        $stmt->bindValue($identifier, $this->amount, PDO::PARAM_INT);
                         break;
                     case 'close_date':
                         $stmt->bindValue($identifier, $this->close_date ? $this->close_date->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
+                        break;
+                    case 'last_modified_by':
+                        $stmt->bindValue($identifier, $this->last_modified_by, PDO::PARAM_STR);
+                        break;
+                    case 'next_step':
+                        $stmt->bindValue($identifier, $this->next_step, PDO::PARAM_STR);
+                        break;
+                    case 'name':
+                        $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
+                        break;
+                    case 'owner_id':
+                        $stmt->bindValue($identifier, $this->owner_id, PDO::PARAM_STR);
+                        break;
+                    case 'stage':
+                        $stmt->bindValue($identifier, $this->stage, PDO::PARAM_STR);
+                        break;
+                    case 'type':
+                        $stmt->bindValue($identifier, $this->type, PDO::PARAM_STR);
+                        break;
+                    case 'contact':
+                        $stmt->bindValue($identifier, $this->contact, PDO::PARAM_STR);
+                        break;
+                    case 'created_by':
+                        $stmt->bindValue($identifier, $this->created_by, PDO::PARAM_STR);
+                        break;
+                    case 'description':
+                        $stmt->bindValue($identifier, $this->description, PDO::PARAM_STR);
+                        break;
+                    case 'expected_revenue':
+                        $stmt->bindValue($identifier, $this->expected_revenue, PDO::PARAM_INT);
+                        break;
+                    case 'forecast_category':
+                        $stmt->bindValue($identifier, $this->forecast_category, PDO::PARAM_STR);
+                        break;
+                    case 'lead_source':
+                        $stmt->bindValue($identifier, $this->lead_source, PDO::PARAM_STR);
+                        break;
+                    case 'price_book':
+                        $stmt->bindValue($identifier, $this->price_book, PDO::PARAM_STR);
+                        break;
+                    case 'primary_campaign_source':
+                        $stmt->bindValue($identifier, $this->primary_campaign_source, PDO::PARAM_STR);
+                        break;
+                    case 'is_private':
+                        $stmt->bindValue($identifier, $this->is_private, PDO::PARAM_BOOL);
+                        break;
+                    case 'probability':
+                        $stmt->bindValue($identifier, $this->probability, PDO::PARAM_INT);
+                        break;
+                    case 'quantity':
+                        $stmt->bindValue($identifier, $this->quantity, PDO::PARAM_INT);
+                        break;
+                    case 'synced_quote':
+                        $stmt->bindValue($identifier, $this->synced_quote, PDO::PARAM_STR);
+                        break;
+                    case 'created_at':
+                        $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
+                        break;
+                    case 'updated_at':
+                        $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -952,19 +1904,76 @@ abstract class OpportunityHistory implements ActiveRecordInterface
                 return $this->getOpportunityId();
                 break;
             case 2:
-                return $this->getUserAccountId();
+                return $this->getSFDCOpportunityId();
                 break;
             case 3:
-                return $this->getOpportunityStageId();
+                return $this->getAccountSFDCId();
                 break;
             case 4:
-                return $this->getBuyerStageId();
-                break;
-            case 5:
                 return $this->getAmount();
                 break;
-            case 6:
+            case 5:
                 return $this->getCloseDate();
+                break;
+            case 6:
+                return $this->getLastModifiedBy();
+                break;
+            case 7:
+                return $this->getNextStep();
+                break;
+            case 8:
+                return $this->getName();
+                break;
+            case 9:
+                return $this->getOwnerId();
+                break;
+            case 10:
+                return $this->getStage();
+                break;
+            case 11:
+                return $this->getType();
+                break;
+            case 12:
+                return $this->getContact();
+                break;
+            case 13:
+                return $this->getCreatedBy();
+                break;
+            case 14:
+                return $this->getDescription();
+                break;
+            case 15:
+                return $this->getExpectedRevenue();
+                break;
+            case 16:
+                return $this->getForecastCategory();
+                break;
+            case 17:
+                return $this->getLeadSource();
+                break;
+            case 18:
+                return $this->getPriceBook();
+                break;
+            case 19:
+                return $this->getPrimaryCampaignSource();
+                break;
+            case 20:
+                return $this->getIsPrivate();
+                break;
+            case 21:
+                return $this->getProbability();
+                break;
+            case 22:
+                return $this->getQuantity();
+                break;
+            case 23:
+                return $this->getSyncedQuote();
+                break;
+            case 24:
+                return $this->getCreatedAt();
+                break;
+            case 25:
+                return $this->getUpdatedAt();
                 break;
             default:
                 return null;
@@ -983,10 +1992,11 @@ abstract class OpportunityHistory implements ActiveRecordInterface
      *                    Defaults to TableMap::TYPE_PHPNAME.
      * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
      * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
+     * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
      *
      * @return array an associative array containing the field names (as keys) and field values
      */
-    public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array())
+    public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
 
         if (isset($alreadyDumpedObjects['OpportunityHistory'][$this->hashCode()])) {
@@ -997,14 +2007,41 @@ abstract class OpportunityHistory implements ActiveRecordInterface
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getOpportunityId(),
-            $keys[2] => $this->getUserAccountId(),
-            $keys[3] => $this->getOpportunityStageId(),
-            $keys[4] => $this->getBuyerStageId(),
-            $keys[5] => $this->getAmount(),
-            $keys[6] => $this->getCloseDate(),
+            $keys[2] => $this->getSFDCOpportunityId(),
+            $keys[3] => $this->getAccountSFDCId(),
+            $keys[4] => $this->getAmount(),
+            $keys[5] => $this->getCloseDate(),
+            $keys[6] => $this->getLastModifiedBy(),
+            $keys[7] => $this->getNextStep(),
+            $keys[8] => $this->getName(),
+            $keys[9] => $this->getOwnerId(),
+            $keys[10] => $this->getStage(),
+            $keys[11] => $this->getType(),
+            $keys[12] => $this->getContact(),
+            $keys[13] => $this->getCreatedBy(),
+            $keys[14] => $this->getDescription(),
+            $keys[15] => $this->getExpectedRevenue(),
+            $keys[16] => $this->getForecastCategory(),
+            $keys[17] => $this->getLeadSource(),
+            $keys[18] => $this->getPriceBook(),
+            $keys[19] => $this->getPrimaryCampaignSource(),
+            $keys[20] => $this->getIsPrivate(),
+            $keys[21] => $this->getProbability(),
+            $keys[22] => $this->getQuantity(),
+            $keys[23] => $this->getSyncedQuote(),
+            $keys[24] => $this->getCreatedAt(),
+            $keys[25] => $this->getUpdatedAt(),
         );
-        if ($result[$keys[6]] instanceof \DateTime) {
-            $result[$keys[6]] = $result[$keys[6]]->format('c');
+        if ($result[$keys[5]] instanceof \DateTime) {
+            $result[$keys[5]] = $result[$keys[5]]->format('c');
+        }
+
+        if ($result[$keys[24]] instanceof \DateTime) {
+            $result[$keys[24]] = $result[$keys[24]]->format('c');
+        }
+
+        if ($result[$keys[25]] instanceof \DateTime) {
+            $result[$keys[25]] = $result[$keys[25]]->format('c');
         }
 
         $virtualColumns = $this->virtualColumns;
@@ -1012,6 +2049,23 @@ abstract class OpportunityHistory implements ActiveRecordInterface
             $result[$key] = $virtualColumn;
         }
 
+        if ($includeForeignObjects) {
+            if (null !== $this->aOpportunity) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'opportunity';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'opportunity';
+                        break;
+                    default:
+                        $key = 'Opportunity';
+                }
+
+                $result[$key] = $this->aOpportunity->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+        }
 
         return $result;
     }
@@ -1052,19 +2106,76 @@ abstract class OpportunityHistory implements ActiveRecordInterface
                 $this->setOpportunityId($value);
                 break;
             case 2:
-                $this->setUserAccountId($value);
+                $this->setSFDCOpportunityId($value);
                 break;
             case 3:
-                $this->setOpportunityStageId($value);
+                $this->setAccountSFDCId($value);
                 break;
             case 4:
-                $this->setBuyerStageId($value);
-                break;
-            case 5:
                 $this->setAmount($value);
                 break;
-            case 6:
+            case 5:
                 $this->setCloseDate($value);
+                break;
+            case 6:
+                $this->setLastModifiedBy($value);
+                break;
+            case 7:
+                $this->setNextStep($value);
+                break;
+            case 8:
+                $this->setName($value);
+                break;
+            case 9:
+                $this->setOwnerId($value);
+                break;
+            case 10:
+                $this->setStage($value);
+                break;
+            case 11:
+                $this->setType($value);
+                break;
+            case 12:
+                $this->setContact($value);
+                break;
+            case 13:
+                $this->setCreatedBy($value);
+                break;
+            case 14:
+                $this->setDescription($value);
+                break;
+            case 15:
+                $this->setExpectedRevenue($value);
+                break;
+            case 16:
+                $this->setForecastCategory($value);
+                break;
+            case 17:
+                $this->setLeadSource($value);
+                break;
+            case 18:
+                $this->setPriceBook($value);
+                break;
+            case 19:
+                $this->setPrimaryCampaignSource($value);
+                break;
+            case 20:
+                $this->setIsPrivate($value);
+                break;
+            case 21:
+                $this->setProbability($value);
+                break;
+            case 22:
+                $this->setQuantity($value);
+                break;
+            case 23:
+                $this->setSyncedQuote($value);
+                break;
+            case 24:
+                $this->setCreatedAt($value);
+                break;
+            case 25:
+                $this->setUpdatedAt($value);
                 break;
         } // switch()
 
@@ -1099,19 +2210,76 @@ abstract class OpportunityHistory implements ActiveRecordInterface
             $this->setOpportunityId($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
-            $this->setUserAccountId($arr[$keys[2]]);
+            $this->setSFDCOpportunityId($arr[$keys[2]]);
         }
         if (array_key_exists($keys[3], $arr)) {
-            $this->setOpportunityStageId($arr[$keys[3]]);
+            $this->setAccountSFDCId($arr[$keys[3]]);
         }
         if (array_key_exists($keys[4], $arr)) {
-            $this->setBuyerStageId($arr[$keys[4]]);
+            $this->setAmount($arr[$keys[4]]);
         }
         if (array_key_exists($keys[5], $arr)) {
-            $this->setAmount($arr[$keys[5]]);
+            $this->setCloseDate($arr[$keys[5]]);
         }
         if (array_key_exists($keys[6], $arr)) {
-            $this->setCloseDate($arr[$keys[6]]);
+            $this->setLastModifiedBy($arr[$keys[6]]);
+        }
+        if (array_key_exists($keys[7], $arr)) {
+            $this->setNextStep($arr[$keys[7]]);
+        }
+        if (array_key_exists($keys[8], $arr)) {
+            $this->setName($arr[$keys[8]]);
+        }
+        if (array_key_exists($keys[9], $arr)) {
+            $this->setOwnerId($arr[$keys[9]]);
+        }
+        if (array_key_exists($keys[10], $arr)) {
+            $this->setStage($arr[$keys[10]]);
+        }
+        if (array_key_exists($keys[11], $arr)) {
+            $this->setType($arr[$keys[11]]);
+        }
+        if (array_key_exists($keys[12], $arr)) {
+            $this->setContact($arr[$keys[12]]);
+        }
+        if (array_key_exists($keys[13], $arr)) {
+            $this->setCreatedBy($arr[$keys[13]]);
+        }
+        if (array_key_exists($keys[14], $arr)) {
+            $this->setDescription($arr[$keys[14]]);
+        }
+        if (array_key_exists($keys[15], $arr)) {
+            $this->setExpectedRevenue($arr[$keys[15]]);
+        }
+        if (array_key_exists($keys[16], $arr)) {
+            $this->setForecastCategory($arr[$keys[16]]);
+        }
+        if (array_key_exists($keys[17], $arr)) {
+            $this->setLeadSource($arr[$keys[17]]);
+        }
+        if (array_key_exists($keys[18], $arr)) {
+            $this->setPriceBook($arr[$keys[18]]);
+        }
+        if (array_key_exists($keys[19], $arr)) {
+            $this->setPrimaryCampaignSource($arr[$keys[19]]);
+        }
+        if (array_key_exists($keys[20], $arr)) {
+            $this->setIsPrivate($arr[$keys[20]]);
+        }
+        if (array_key_exists($keys[21], $arr)) {
+            $this->setProbability($arr[$keys[21]]);
+        }
+        if (array_key_exists($keys[22], $arr)) {
+            $this->setQuantity($arr[$keys[22]]);
+        }
+        if (array_key_exists($keys[23], $arr)) {
+            $this->setSyncedQuote($arr[$keys[23]]);
+        }
+        if (array_key_exists($keys[24], $arr)) {
+            $this->setCreatedAt($arr[$keys[24]]);
+        }
+        if (array_key_exists($keys[25], $arr)) {
+            $this->setUpdatedAt($arr[$keys[25]]);
         }
     }
 
@@ -1160,20 +2328,77 @@ abstract class OpportunityHistory implements ActiveRecordInterface
         if ($this->isColumnModified(OpportunityHistoryTableMap::COL_OPPORTUNITY_ID)) {
             $criteria->add(OpportunityHistoryTableMap::COL_OPPORTUNITY_ID, $this->opportunity_id);
         }
-        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_USER_ACCOUNT_ID)) {
-            $criteria->add(OpportunityHistoryTableMap::COL_USER_ACCOUNT_ID, $this->user_account_id);
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_SFDC_OPPORTUNITY_ID)) {
+            $criteria->add(OpportunityHistoryTableMap::COL_SFDC_OPPORTUNITY_ID, $this->sfdc_opportunity_id);
         }
-        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_OPPORTUNITY_STAGE_ID)) {
-            $criteria->add(OpportunityHistoryTableMap::COL_OPPORTUNITY_STAGE_ID, $this->opportunity_stage_id);
-        }
-        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_BUYER_STAGE_ID)) {
-            $criteria->add(OpportunityHistoryTableMap::COL_BUYER_STAGE_ID, $this->buyer_stage_id);
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_ACCOUNT_SFDC_ID)) {
+            $criteria->add(OpportunityHistoryTableMap::COL_ACCOUNT_SFDC_ID, $this->account_sfdc_id);
         }
         if ($this->isColumnModified(OpportunityHistoryTableMap::COL_AMOUNT)) {
             $criteria->add(OpportunityHistoryTableMap::COL_AMOUNT, $this->amount);
         }
         if ($this->isColumnModified(OpportunityHistoryTableMap::COL_CLOSE_DATE)) {
             $criteria->add(OpportunityHistoryTableMap::COL_CLOSE_DATE, $this->close_date);
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_LAST_MODIFIED_BY)) {
+            $criteria->add(OpportunityHistoryTableMap::COL_LAST_MODIFIED_BY, $this->last_modified_by);
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_NEXT_STEP)) {
+            $criteria->add(OpportunityHistoryTableMap::COL_NEXT_STEP, $this->next_step);
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_NAME)) {
+            $criteria->add(OpportunityHistoryTableMap::COL_NAME, $this->name);
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_OWNER_ID)) {
+            $criteria->add(OpportunityHistoryTableMap::COL_OWNER_ID, $this->owner_id);
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_STAGE)) {
+            $criteria->add(OpportunityHistoryTableMap::COL_STAGE, $this->stage);
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_TYPE)) {
+            $criteria->add(OpportunityHistoryTableMap::COL_TYPE, $this->type);
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_CONTACT)) {
+            $criteria->add(OpportunityHistoryTableMap::COL_CONTACT, $this->contact);
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_CREATED_BY)) {
+            $criteria->add(OpportunityHistoryTableMap::COL_CREATED_BY, $this->created_by);
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_DESCRIPTION)) {
+            $criteria->add(OpportunityHistoryTableMap::COL_DESCRIPTION, $this->description);
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_EXPECTED_REVENUE)) {
+            $criteria->add(OpportunityHistoryTableMap::COL_EXPECTED_REVENUE, $this->expected_revenue);
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_FORECAST_CATEGORY)) {
+            $criteria->add(OpportunityHistoryTableMap::COL_FORECAST_CATEGORY, $this->forecast_category);
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_LEAD_SOURCE)) {
+            $criteria->add(OpportunityHistoryTableMap::COL_LEAD_SOURCE, $this->lead_source);
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_PRICE_BOOK)) {
+            $criteria->add(OpportunityHistoryTableMap::COL_PRICE_BOOK, $this->price_book);
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_PRIMARY_CAMPAIGN_SOURCE)) {
+            $criteria->add(OpportunityHistoryTableMap::COL_PRIMARY_CAMPAIGN_SOURCE, $this->primary_campaign_source);
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_IS_PRIVATE)) {
+            $criteria->add(OpportunityHistoryTableMap::COL_IS_PRIVATE, $this->is_private);
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_PROBABILITY)) {
+            $criteria->add(OpportunityHistoryTableMap::COL_PROBABILITY, $this->probability);
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_QUANTITY)) {
+            $criteria->add(OpportunityHistoryTableMap::COL_QUANTITY, $this->quantity);
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_SYNCED_QUOTE)) {
+            $criteria->add(OpportunityHistoryTableMap::COL_SYNCED_QUOTE, $this->synced_quote);
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_CREATED_AT)) {
+            $criteria->add(OpportunityHistoryTableMap::COL_CREATED_AT, $this->created_at);
+        }
+        if ($this->isColumnModified(OpportunityHistoryTableMap::COL_UPDATED_AT)) {
+            $criteria->add(OpportunityHistoryTableMap::COL_UPDATED_AT, $this->updated_at);
         }
 
         return $criteria;
@@ -1262,11 +2487,30 @@ abstract class OpportunityHistory implements ActiveRecordInterface
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setOpportunityId($this->getOpportunityId());
-        $copyObj->setUserAccountId($this->getUserAccountId());
-        $copyObj->setOpportunityStageId($this->getOpportunityStageId());
-        $copyObj->setBuyerStageId($this->getBuyerStageId());
+        $copyObj->setSFDCOpportunityId($this->getSFDCOpportunityId());
+        $copyObj->setAccountSFDCId($this->getAccountSFDCId());
         $copyObj->setAmount($this->getAmount());
         $copyObj->setCloseDate($this->getCloseDate());
+        $copyObj->setLastModifiedBy($this->getLastModifiedBy());
+        $copyObj->setNextStep($this->getNextStep());
+        $copyObj->setName($this->getName());
+        $copyObj->setOwnerId($this->getOwnerId());
+        $copyObj->setStage($this->getStage());
+        $copyObj->setType($this->getType());
+        $copyObj->setContact($this->getContact());
+        $copyObj->setCreatedBy($this->getCreatedBy());
+        $copyObj->setDescription($this->getDescription());
+        $copyObj->setExpectedRevenue($this->getExpectedRevenue());
+        $copyObj->setForecastCategory($this->getForecastCategory());
+        $copyObj->setLeadSource($this->getLeadSource());
+        $copyObj->setPriceBook($this->getPriceBook());
+        $copyObj->setPrimaryCampaignSource($this->getPrimaryCampaignSource());
+        $copyObj->setIsPrivate($this->getIsPrivate());
+        $copyObj->setProbability($this->getProbability());
+        $copyObj->setQuantity($this->getQuantity());
+        $copyObj->setSyncedQuote($this->getSyncedQuote());
+        $copyObj->setCreatedAt($this->getCreatedAt());
+        $copyObj->setUpdatedAt($this->getUpdatedAt());
         if ($makeNew) {
             $copyObj->setNew(true);
             $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
@@ -1296,19 +2540,92 @@ abstract class OpportunityHistory implements ActiveRecordInterface
     }
 
     /**
+     * Declares an association between this object and a ChildOpportunity object.
+     *
+     * @param  ChildOpportunity $v
+     * @return $this|\DataModels\DataModels\OpportunityHistory The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setOpportunity(ChildOpportunity $v = null)
+    {
+        if ($v === null) {
+            $this->setOpportunityId(NULL);
+        } else {
+            $this->setOpportunityId($v->getId());
+        }
+
+        $this->aOpportunity = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildOpportunity object, it will not be re-added.
+        if ($v !== null) {
+            $v->addOpportunityHistory($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildOpportunity object
+     *
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildOpportunity The associated ChildOpportunity object.
+     * @throws PropelException
+     */
+    public function getOpportunity(ConnectionInterface $con = null)
+    {
+        if ($this->aOpportunity === null && ($this->opportunity_id !== null)) {
+            $this->aOpportunity = ChildOpportunityQuery::create()->findPk($this->opportunity_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aOpportunity->addOpportunityHistories($this);
+             */
+        }
+
+        return $this->aOpportunity;
+    }
+
+    /**
      * Clears the current object, sets all attributes to their default values and removes
      * outgoing references as well as back-references (from other objects to this one. Results probably in a database
      * change of those foreign objects when you call `save` there).
      */
     public function clear()
     {
+        if (null !== $this->aOpportunity) {
+            $this->aOpportunity->removeOpportunityHistory($this);
+        }
         $this->id = null;
         $this->opportunity_id = null;
-        $this->user_account_id = null;
-        $this->opportunity_stage_id = null;
-        $this->buyer_stage_id = null;
+        $this->sfdc_opportunity_id = null;
+        $this->account_sfdc_id = null;
         $this->amount = null;
         $this->close_date = null;
+        $this->last_modified_by = null;
+        $this->next_step = null;
+        $this->name = null;
+        $this->owner_id = null;
+        $this->stage = null;
+        $this->type = null;
+        $this->contact = null;
+        $this->created_by = null;
+        $this->description = null;
+        $this->expected_revenue = null;
+        $this->forecast_category = null;
+        $this->lead_source = null;
+        $this->price_book = null;
+        $this->primary_campaign_source = null;
+        $this->is_private = null;
+        $this->probability = null;
+        $this->quantity = null;
+        $this->synced_quote = null;
+        $this->created_at = null;
+        $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
         $this->resetModified();
@@ -1329,6 +2646,7 @@ abstract class OpportunityHistory implements ActiveRecordInterface
         if ($deep) {
         } // if ($deep)
 
+        $this->aOpportunity = null;
     }
 
     /**
@@ -1339,6 +2657,20 @@ abstract class OpportunityHistory implements ActiveRecordInterface
     public function __toString()
     {
         return (string) $this->exportTo(OpportunityHistoryTableMap::DEFAULT_STRING_FORMAT);
+    }
+
+    // timestampable behavior
+
+    /**
+     * Mark the current object so that the update date doesn't get updated during next save
+     *
+     * @return     $this|ChildOpportunityHistory The current object (for fluent API support)
+     */
+    public function keepUpdateDateUnchanged()
+    {
+        $this->modifiedColumns[OpportunityHistoryTableMap::COL_UPDATED_AT] = true;
+
+        return $this;
     }
 
     /**

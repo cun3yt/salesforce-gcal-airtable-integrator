@@ -16,5 +16,4 @@ use DataModels\DataModels\Base\MeetingAttendee as BaseMeetingAttendee;
  */
 class MeetingAttendee extends BaseMeetingAttendee
 {
-
 }

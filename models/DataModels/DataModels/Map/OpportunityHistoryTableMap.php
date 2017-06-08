@@ -59,7 +59,7 @@ class OpportunityHistoryTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 7;
+    const NUM_COLUMNS = 26;
 
     /**
      * The number of lazy-loaded columns
@@ -69,7 +69,7 @@ class OpportunityHistoryTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 7;
+    const NUM_HYDRATE_COLUMNS = 26;
 
     /**
      * the column name for the id field
@@ -82,19 +82,14 @@ class OpportunityHistoryTableMap extends TableMap
     const COL_OPPORTUNITY_ID = 'opportunity_history.opportunity_id';
 
     /**
-     * the column name for the user_account_id field
+     * the column name for the sfdc_opportunity_id field
      */
-    const COL_USER_ACCOUNT_ID = 'opportunity_history.user_account_id';
+    const COL_SFDC_OPPORTUNITY_ID = 'opportunity_history.sfdc_opportunity_id';
 
     /**
-     * the column name for the opportunity_stage_id field
+     * the column name for the account_sfdc_id field
      */
-    const COL_OPPORTUNITY_STAGE_ID = 'opportunity_history.opportunity_stage_id';
-
-    /**
-     * the column name for the buyer_stage_id field
-     */
-    const COL_BUYER_STAGE_ID = 'opportunity_history.buyer_stage_id';
+    const COL_ACCOUNT_SFDC_ID = 'opportunity_history.account_sfdc_id';
 
     /**
      * the column name for the amount field
@@ -105,6 +100,106 @@ class OpportunityHistoryTableMap extends TableMap
      * the column name for the close_date field
      */
     const COL_CLOSE_DATE = 'opportunity_history.close_date';
+
+    /**
+     * the column name for the last_modified_by field
+     */
+    const COL_LAST_MODIFIED_BY = 'opportunity_history.last_modified_by';
+
+    /**
+     * the column name for the next_step field
+     */
+    const COL_NEXT_STEP = 'opportunity_history.next_step';
+
+    /**
+     * the column name for the name field
+     */
+    const COL_NAME = 'opportunity_history.name';
+
+    /**
+     * the column name for the owner_id field
+     */
+    const COL_OWNER_ID = 'opportunity_history.owner_id';
+
+    /**
+     * the column name for the stage field
+     */
+    const COL_STAGE = 'opportunity_history.stage';
+
+    /**
+     * the column name for the type field
+     */
+    const COL_TYPE = 'opportunity_history.type';
+
+    /**
+     * the column name for the contact field
+     */
+    const COL_CONTACT = 'opportunity_history.contact';
+
+    /**
+     * the column name for the created_by field
+     */
+    const COL_CREATED_BY = 'opportunity_history.created_by';
+
+    /**
+     * the column name for the description field
+     */
+    const COL_DESCRIPTION = 'opportunity_history.description';
+
+    /**
+     * the column name for the expected_revenue field
+     */
+    const COL_EXPECTED_REVENUE = 'opportunity_history.expected_revenue';
+
+    /**
+     * the column name for the forecast_category field
+     */
+    const COL_FORECAST_CATEGORY = 'opportunity_history.forecast_category';
+
+    /**
+     * the column name for the lead_source field
+     */
+    const COL_LEAD_SOURCE = 'opportunity_history.lead_source';
+
+    /**
+     * the column name for the price_book field
+     */
+    const COL_PRICE_BOOK = 'opportunity_history.price_book';
+
+    /**
+     * the column name for the primary_campaign_source field
+     */
+    const COL_PRIMARY_CAMPAIGN_SOURCE = 'opportunity_history.primary_campaign_source';
+
+    /**
+     * the column name for the is_private field
+     */
+    const COL_IS_PRIVATE = 'opportunity_history.is_private';
+
+    /**
+     * the column name for the probability field
+     */
+    const COL_PROBABILITY = 'opportunity_history.probability';
+
+    /**
+     * the column name for the quantity field
+     */
+    const COL_QUANTITY = 'opportunity_history.quantity';
+
+    /**
+     * the column name for the synced_quote field
+     */
+    const COL_SYNCED_QUOTE = 'opportunity_history.synced_quote';
+
+    /**
+     * the column name for the created_at field
+     */
+    const COL_CREATED_AT = 'opportunity_history.created_at';
+
+    /**
+     * the column name for the updated_at field
+     */
+    const COL_UPDATED_AT = 'opportunity_history.updated_at';
 
     /**
      * The default string format for model objects of the related table
@@ -118,11 +213,11 @@ class OpportunityHistoryTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'OpportunityId', 'UserAccountId', 'OpportunityStageId', 'BuyerStageId', 'Amount', 'CloseDate', ),
-        self::TYPE_CAMELNAME     => array('id', 'opportunityId', 'userAccountId', 'opportunityStageId', 'buyerStageId', 'amount', 'closeDate', ),
-        self::TYPE_COLNAME       => array(OpportunityHistoryTableMap::COL_ID, OpportunityHistoryTableMap::COL_OPPORTUNITY_ID, OpportunityHistoryTableMap::COL_USER_ACCOUNT_ID, OpportunityHistoryTableMap::COL_OPPORTUNITY_STAGE_ID, OpportunityHistoryTableMap::COL_BUYER_STAGE_ID, OpportunityHistoryTableMap::COL_AMOUNT, OpportunityHistoryTableMap::COL_CLOSE_DATE, ),
-        self::TYPE_FIELDNAME     => array('id', 'opportunity_id', 'user_account_id', 'opportunity_stage_id', 'buyer_stage_id', 'amount', 'close_date', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('Id', 'OpportunityId', 'SFDCOpportunityId', 'AccountSFDCId', 'Amount', 'CloseDate', 'LastModifiedBy', 'NextStep', 'Name', 'OwnerId', 'Stage', 'Type', 'Contact', 'CreatedBy', 'Description', 'ExpectedRevenue', 'ForecastCategory', 'LeadSource', 'PriceBook', 'PrimaryCampaignSource', 'IsPrivate', 'Probability', 'Quantity', 'SyncedQuote', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_CAMELNAME     => array('id', 'opportunityId', 'sFDCOpportunityId', 'accountSFDCId', 'amount', 'closeDate', 'lastModifiedBy', 'nextStep', 'name', 'ownerId', 'stage', 'type', 'contact', 'createdBy', 'description', 'expectedRevenue', 'forecastCategory', 'leadSource', 'priceBook', 'primaryCampaignSource', 'isPrivate', 'probability', 'quantity', 'syncedQuote', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(OpportunityHistoryTableMap::COL_ID, OpportunityHistoryTableMap::COL_OPPORTUNITY_ID, OpportunityHistoryTableMap::COL_SFDC_OPPORTUNITY_ID, OpportunityHistoryTableMap::COL_ACCOUNT_SFDC_ID, OpportunityHistoryTableMap::COL_AMOUNT, OpportunityHistoryTableMap::COL_CLOSE_DATE, OpportunityHistoryTableMap::COL_LAST_MODIFIED_BY, OpportunityHistoryTableMap::COL_NEXT_STEP, OpportunityHistoryTableMap::COL_NAME, OpportunityHistoryTableMap::COL_OWNER_ID, OpportunityHistoryTableMap::COL_STAGE, OpportunityHistoryTableMap::COL_TYPE, OpportunityHistoryTableMap::COL_CONTACT, OpportunityHistoryTableMap::COL_CREATED_BY, OpportunityHistoryTableMap::COL_DESCRIPTION, OpportunityHistoryTableMap::COL_EXPECTED_REVENUE, OpportunityHistoryTableMap::COL_FORECAST_CATEGORY, OpportunityHistoryTableMap::COL_LEAD_SOURCE, OpportunityHistoryTableMap::COL_PRICE_BOOK, OpportunityHistoryTableMap::COL_PRIMARY_CAMPAIGN_SOURCE, OpportunityHistoryTableMap::COL_IS_PRIVATE, OpportunityHistoryTableMap::COL_PROBABILITY, OpportunityHistoryTableMap::COL_QUANTITY, OpportunityHistoryTableMap::COL_SYNCED_QUOTE, OpportunityHistoryTableMap::COL_CREATED_AT, OpportunityHistoryTableMap::COL_UPDATED_AT, ),
+        self::TYPE_FIELDNAME     => array('id', 'opportunity_id', 'sfdc_opportunity_id', 'account_sfdc_id', 'amount', 'close_date', 'last_modified_by', 'next_step', 'name', 'owner_id', 'stage', 'type', 'contact', 'created_by', 'description', 'expected_revenue', 'forecast_category', 'lead_source', 'price_book', 'primary_campaign_source', 'is_private', 'probability', 'quantity', 'synced_quote', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, )
     );
 
     /**
@@ -132,11 +227,11 @@ class OpportunityHistoryTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'OpportunityId' => 1, 'UserAccountId' => 2, 'OpportunityStageId' => 3, 'BuyerStageId' => 4, 'Amount' => 5, 'CloseDate' => 6, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'opportunityId' => 1, 'userAccountId' => 2, 'opportunityStageId' => 3, 'buyerStageId' => 4, 'amount' => 5, 'closeDate' => 6, ),
-        self::TYPE_COLNAME       => array(OpportunityHistoryTableMap::COL_ID => 0, OpportunityHistoryTableMap::COL_OPPORTUNITY_ID => 1, OpportunityHistoryTableMap::COL_USER_ACCOUNT_ID => 2, OpportunityHistoryTableMap::COL_OPPORTUNITY_STAGE_ID => 3, OpportunityHistoryTableMap::COL_BUYER_STAGE_ID => 4, OpportunityHistoryTableMap::COL_AMOUNT => 5, OpportunityHistoryTableMap::COL_CLOSE_DATE => 6, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'opportunity_id' => 1, 'user_account_id' => 2, 'opportunity_stage_id' => 3, 'buyer_stage_id' => 4, 'amount' => 5, 'close_date' => 6, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'OpportunityId' => 1, 'SFDCOpportunityId' => 2, 'AccountSFDCId' => 3, 'Amount' => 4, 'CloseDate' => 5, 'LastModifiedBy' => 6, 'NextStep' => 7, 'Name' => 8, 'OwnerId' => 9, 'Stage' => 10, 'Type' => 11, 'Contact' => 12, 'CreatedBy' => 13, 'Description' => 14, 'ExpectedRevenue' => 15, 'ForecastCategory' => 16, 'LeadSource' => 17, 'PriceBook' => 18, 'PrimaryCampaignSource' => 19, 'IsPrivate' => 20, 'Probability' => 21, 'Quantity' => 22, 'SyncedQuote' => 23, 'CreatedAt' => 24, 'UpdatedAt' => 25, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'opportunityId' => 1, 'sFDCOpportunityId' => 2, 'accountSFDCId' => 3, 'amount' => 4, 'closeDate' => 5, 'lastModifiedBy' => 6, 'nextStep' => 7, 'name' => 8, 'ownerId' => 9, 'stage' => 10, 'type' => 11, 'contact' => 12, 'createdBy' => 13, 'description' => 14, 'expectedRevenue' => 15, 'forecastCategory' => 16, 'leadSource' => 17, 'priceBook' => 18, 'primaryCampaignSource' => 19, 'isPrivate' => 20, 'probability' => 21, 'quantity' => 22, 'syncedQuote' => 23, 'createdAt' => 24, 'updatedAt' => 25, ),
+        self::TYPE_COLNAME       => array(OpportunityHistoryTableMap::COL_ID => 0, OpportunityHistoryTableMap::COL_OPPORTUNITY_ID => 1, OpportunityHistoryTableMap::COL_SFDC_OPPORTUNITY_ID => 2, OpportunityHistoryTableMap::COL_ACCOUNT_SFDC_ID => 3, OpportunityHistoryTableMap::COL_AMOUNT => 4, OpportunityHistoryTableMap::COL_CLOSE_DATE => 5, OpportunityHistoryTableMap::COL_LAST_MODIFIED_BY => 6, OpportunityHistoryTableMap::COL_NEXT_STEP => 7, OpportunityHistoryTableMap::COL_NAME => 8, OpportunityHistoryTableMap::COL_OWNER_ID => 9, OpportunityHistoryTableMap::COL_STAGE => 10, OpportunityHistoryTableMap::COL_TYPE => 11, OpportunityHistoryTableMap::COL_CONTACT => 12, OpportunityHistoryTableMap::COL_CREATED_BY => 13, OpportunityHistoryTableMap::COL_DESCRIPTION => 14, OpportunityHistoryTableMap::COL_EXPECTED_REVENUE => 15, OpportunityHistoryTableMap::COL_FORECAST_CATEGORY => 16, OpportunityHistoryTableMap::COL_LEAD_SOURCE => 17, OpportunityHistoryTableMap::COL_PRICE_BOOK => 18, OpportunityHistoryTableMap::COL_PRIMARY_CAMPAIGN_SOURCE => 19, OpportunityHistoryTableMap::COL_IS_PRIVATE => 20, OpportunityHistoryTableMap::COL_PROBABILITY => 21, OpportunityHistoryTableMap::COL_QUANTITY => 22, OpportunityHistoryTableMap::COL_SYNCED_QUOTE => 23, OpportunityHistoryTableMap::COL_CREATED_AT => 24, OpportunityHistoryTableMap::COL_UPDATED_AT => 25, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'opportunity_id' => 1, 'sfdc_opportunity_id' => 2, 'account_sfdc_id' => 3, 'amount' => 4, 'close_date' => 5, 'last_modified_by' => 6, 'next_step' => 7, 'name' => 8, 'owner_id' => 9, 'stage' => 10, 'type' => 11, 'contact' => 12, 'created_by' => 13, 'description' => 14, 'expected_revenue' => 15, 'forecast_category' => 16, 'lead_source' => 17, 'price_book' => 18, 'primary_campaign_source' => 19, 'is_private' => 20, 'probability' => 21, 'quantity' => 22, 'synced_quote' => 23, 'created_at' => 24, 'updated_at' => 25, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, )
     );
 
     /**
@@ -158,12 +253,31 @@ class OpportunityHistoryTableMap extends TableMap
         $this->setPrimaryKeyMethodInfo('opportunity_history_id_seq');
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('opportunity_id', 'OpportunityId', 'INTEGER', false, null, null);
-        $this->addColumn('user_account_id', 'UserAccountId', 'INTEGER', false, null, null);
-        $this->addColumn('opportunity_stage_id', 'OpportunityStageId', 'INTEGER', false, null, null);
-        $this->addColumn('buyer_stage_id', 'BuyerStageId', 'INTEGER', false, null, null);
-        $this->addColumn('amount', 'Amount', 'VARCHAR', false, null, null);
+        $this->addForeignKey('opportunity_id', 'OpportunityId', 'INTEGER', 'opportunity', 'id', false, null, null);
+        $this->addColumn('sfdc_opportunity_id', 'SFDCOpportunityId', 'VARCHAR', false, 127, null);
+        $this->addColumn('account_sfdc_id', 'AccountSFDCId', 'VARCHAR', false, 127, null);
+        $this->addColumn('amount', 'Amount', 'NUMERIC', false, 16, null);
         $this->addColumn('close_date', 'CloseDate', 'DATE', false, null, null);
+        $this->addColumn('last_modified_by', 'LastModifiedBy', 'VARCHAR', false, 127, null);
+        $this->addColumn('next_step', 'NextStep', 'VARCHAR', false, 255, null);
+        $this->addColumn('name', 'Name', 'VARCHAR', false, 120, null);
+        $this->addColumn('owner_id', 'OwnerId', 'VARCHAR', false, 127, null);
+        $this->addColumn('stage', 'Stage', 'VARCHAR', false, 63, null);
+        $this->addColumn('type', 'Type', 'VARCHAR', false, 63, null);
+        $this->addColumn('contact', 'Contact', 'VARCHAR', false, 127, null);
+        $this->addColumn('created_by', 'CreatedBy', 'VARCHAR', false, 127, null);
+        $this->addColumn('description', 'Description', 'VARCHAR', false, null, null);
+        $this->addColumn('expected_revenue', 'ExpectedRevenue', 'NUMERIC', false, 16, null);
+        $this->addColumn('forecast_category', 'ForecastCategory', 'VARCHAR', false, 127, null);
+        $this->addColumn('lead_source', 'LeadSource', 'VARCHAR', false, 127, null);
+        $this->addColumn('price_book', 'PriceBook', 'VARCHAR', false, 127, null);
+        $this->addColumn('primary_campaign_source', 'PrimaryCampaignSource', 'VARCHAR', false, 127, null);
+        $this->addColumn('is_private', 'IsPrivate', 'BOOLEAN', false, null, null);
+        $this->addColumn('probability', 'Probability', 'NUMERIC', false, 5, null);
+        $this->addColumn('quantity', 'Quantity', 'NUMERIC', false, 16, null);
+        $this->addColumn('synced_quote', 'SyncedQuote', 'VARCHAR', false, 63, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
 
     /**
@@ -171,7 +285,27 @@ class OpportunityHistoryTableMap extends TableMap
      */
     public function buildRelations()
     {
+        $this->addRelation('Opportunity', '\\DataModels\\DataModels\\Opportunity', RelationMap::MANY_TO_ONE, array (
+  0 =>
+  array (
+    0 => ':opportunity_id',
+    1 => ':id',
+  ),
+), null, null, null, false);
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_created_at' => 'false', 'disable_updated_at' => 'false', ),
+        );
+    } // getBehaviors()
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -316,19 +450,57 @@ class OpportunityHistoryTableMap extends TableMap
         if (null === $alias) {
             $criteria->addSelectColumn(OpportunityHistoryTableMap::COL_ID);
             $criteria->addSelectColumn(OpportunityHistoryTableMap::COL_OPPORTUNITY_ID);
-            $criteria->addSelectColumn(OpportunityHistoryTableMap::COL_USER_ACCOUNT_ID);
-            $criteria->addSelectColumn(OpportunityHistoryTableMap::COL_OPPORTUNITY_STAGE_ID);
-            $criteria->addSelectColumn(OpportunityHistoryTableMap::COL_BUYER_STAGE_ID);
+            $criteria->addSelectColumn(OpportunityHistoryTableMap::COL_SFDC_OPPORTUNITY_ID);
+            $criteria->addSelectColumn(OpportunityHistoryTableMap::COL_ACCOUNT_SFDC_ID);
             $criteria->addSelectColumn(OpportunityHistoryTableMap::COL_AMOUNT);
             $criteria->addSelectColumn(OpportunityHistoryTableMap::COL_CLOSE_DATE);
+            $criteria->addSelectColumn(OpportunityHistoryTableMap::COL_LAST_MODIFIED_BY);
+            $criteria->addSelectColumn(OpportunityHistoryTableMap::COL_NEXT_STEP);
+            $criteria->addSelectColumn(OpportunityHistoryTableMap::COL_NAME);
+            $criteria->addSelectColumn(OpportunityHistoryTableMap::COL_OWNER_ID);
+            $criteria->addSelectColumn(OpportunityHistoryTableMap::COL_STAGE);
+            $criteria->addSelectColumn(OpportunityHistoryTableMap::COL_TYPE);
+            $criteria->addSelectColumn(OpportunityHistoryTableMap::COL_CONTACT);
+            $criteria->addSelectColumn(OpportunityHistoryTableMap::COL_CREATED_BY);
+            $criteria->addSelectColumn(OpportunityHistoryTableMap::COL_DESCRIPTION);
+            $criteria->addSelectColumn(OpportunityHistoryTableMap::COL_EXPECTED_REVENUE);
+            $criteria->addSelectColumn(OpportunityHistoryTableMap::COL_FORECAST_CATEGORY);
+            $criteria->addSelectColumn(OpportunityHistoryTableMap::COL_LEAD_SOURCE);
+            $criteria->addSelectColumn(OpportunityHistoryTableMap::COL_PRICE_BOOK);
+            $criteria->addSelectColumn(OpportunityHistoryTableMap::COL_PRIMARY_CAMPAIGN_SOURCE);
+            $criteria->addSelectColumn(OpportunityHistoryTableMap::COL_IS_PRIVATE);
+            $criteria->addSelectColumn(OpportunityHistoryTableMap::COL_PROBABILITY);
+            $criteria->addSelectColumn(OpportunityHistoryTableMap::COL_QUANTITY);
+            $criteria->addSelectColumn(OpportunityHistoryTableMap::COL_SYNCED_QUOTE);
+            $criteria->addSelectColumn(OpportunityHistoryTableMap::COL_CREATED_AT);
+            $criteria->addSelectColumn(OpportunityHistoryTableMap::COL_UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.opportunity_id');
-            $criteria->addSelectColumn($alias . '.user_account_id');
-            $criteria->addSelectColumn($alias . '.opportunity_stage_id');
-            $criteria->addSelectColumn($alias . '.buyer_stage_id');
+            $criteria->addSelectColumn($alias . '.sfdc_opportunity_id');
+            $criteria->addSelectColumn($alias . '.account_sfdc_id');
             $criteria->addSelectColumn($alias . '.amount');
             $criteria->addSelectColumn($alias . '.close_date');
+            $criteria->addSelectColumn($alias . '.last_modified_by');
+            $criteria->addSelectColumn($alias . '.next_step');
+            $criteria->addSelectColumn($alias . '.name');
+            $criteria->addSelectColumn($alias . '.owner_id');
+            $criteria->addSelectColumn($alias . '.stage');
+            $criteria->addSelectColumn($alias . '.type');
+            $criteria->addSelectColumn($alias . '.contact');
+            $criteria->addSelectColumn($alias . '.created_by');
+            $criteria->addSelectColumn($alias . '.description');
+            $criteria->addSelectColumn($alias . '.expected_revenue');
+            $criteria->addSelectColumn($alias . '.forecast_category');
+            $criteria->addSelectColumn($alias . '.lead_source');
+            $criteria->addSelectColumn($alias . '.price_book');
+            $criteria->addSelectColumn($alias . '.primary_campaign_source');
+            $criteria->addSelectColumn($alias . '.is_private');
+            $criteria->addSelectColumn($alias . '.probability');
+            $criteria->addSelectColumn($alias . '.quantity');
+            $criteria->addSelectColumn($alias . '.synced_quote');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 

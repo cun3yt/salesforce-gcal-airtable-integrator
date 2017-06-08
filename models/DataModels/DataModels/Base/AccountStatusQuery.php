@@ -20,12 +20,16 @@ use Propel\Runtime\Exception\PropelException;
  *
  *
  * @method     ChildAccountStatusQuery orderById($order = Criteria::ASC) Order by the id column
- * @method     ChildAccountStatusQuery orderByCustomerId($order = Criteria::ASC) Order by the customer_id column
+ * @method     ChildAccountStatusQuery orderByClientId($order = Criteria::ASC) Order by the client column
  * @method     ChildAccountStatusQuery orderByStatus($order = Criteria::ASC) Order by the status column
+ * @method     ChildAccountStatusQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
+ * @method     ChildAccountStatusQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildAccountStatusQuery groupById() Group by the id column
- * @method     ChildAccountStatusQuery groupByCustomerId() Group by the customer_id column
+ * @method     ChildAccountStatusQuery groupByClientId() Group by the client column
  * @method     ChildAccountStatusQuery groupByStatus() Group by the status column
+ * @method     ChildAccountStatusQuery groupByCreatedAt() Group by the created_at column
+ * @method     ChildAccountStatusQuery groupByUpdatedAt() Group by the updated_at column
  *
  * @method     ChildAccountStatusQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method     ChildAccountStatusQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -39,20 +43,26 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccountStatus findOneOrCreate(ConnectionInterface $con = null) Return the first ChildAccountStatus matching the query, or a new ChildAccountStatus object populated from the query conditions when no match is found
  *
  * @method     ChildAccountStatus findOneById(int $id) Return the first ChildAccountStatus filtered by the id column
- * @method     ChildAccountStatus findOneByCustomerId(int $customer_id) Return the first ChildAccountStatus filtered by the customer_id column
- * @method     ChildAccountStatus findOneByStatus(string $status) Return the first ChildAccountStatus filtered by the status column *
+ * @method     ChildAccountStatus findOneByClientId(int $client) Return the first ChildAccountStatus filtered by the client column
+ * @method     ChildAccountStatus findOneByStatus(string $status) Return the first ChildAccountStatus filtered by the status column
+ * @method     ChildAccountStatus findOneByCreatedAt(string $created_at) Return the first ChildAccountStatus filtered by the created_at column
+ * @method     ChildAccountStatus findOneByUpdatedAt(string $updated_at) Return the first ChildAccountStatus filtered by the updated_at column *
 
  * @method     ChildAccountStatus requirePk($key, ConnectionInterface $con = null) Return the ChildAccountStatus by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccountStatus requireOne(ConnectionInterface $con = null) Return the first ChildAccountStatus matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildAccountStatus requireOneById(int $id) Return the first ChildAccountStatus filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildAccountStatus requireOneByCustomerId(int $customer_id) Return the first ChildAccountStatus filtered by the customer_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildAccountStatus requireOneByClientId(int $client) Return the first ChildAccountStatus filtered by the client column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccountStatus requireOneByStatus(string $status) Return the first ChildAccountStatus filtered by the status column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildAccountStatus requireOneByCreatedAt(string $created_at) Return the first ChildAccountStatus filtered by the created_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildAccountStatus requireOneByUpdatedAt(string $updated_at) Return the first ChildAccountStatus filtered by the updated_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildAccountStatus[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildAccountStatus objects based on current ModelCriteria
  * @method     ChildAccountStatus[]|ObjectCollection findById(int $id) Return ChildAccountStatus objects filtered by the id column
- * @method     ChildAccountStatus[]|ObjectCollection findByCustomerId(int $customer_id) Return ChildAccountStatus objects filtered by the customer_id column
+ * @method     ChildAccountStatus[]|ObjectCollection findByClientId(int $client) Return ChildAccountStatus objects filtered by the client column
  * @method     ChildAccountStatus[]|ObjectCollection findByStatus(string $status) Return ChildAccountStatus objects filtered by the status column
+ * @method     ChildAccountStatus[]|ObjectCollection findByCreatedAt(string $created_at) Return ChildAccountStatus objects filtered by the created_at column
+ * @method     ChildAccountStatus[]|ObjectCollection findByUpdatedAt(string $updated_at) Return ChildAccountStatus objects filtered by the updated_at column
  * @method     ChildAccountStatus[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
  *
  */
@@ -151,7 +161,7 @@ abstract class AccountStatusQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, customer_id, status FROM account_status WHERE id = :p0';
+        $sql = 'SELECT id, client, status, created_at, updated_at FROM account_status WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -283,16 +293,16 @@ abstract class AccountStatusQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the customer_id column
+     * Filter the query on the client column
      *
      * Example usage:
      * <code>
-     * $query->filterByCustomerId(1234); // WHERE customer_id = 1234
-     * $query->filterByCustomerId(array(12, 34)); // WHERE customer_id IN (12, 34)
-     * $query->filterByCustomerId(array('min' => 12)); // WHERE customer_id > 12
+     * $query->filterByClientId(1234); // WHERE client = 1234
+     * $query->filterByClientId(array(12, 34)); // WHERE client IN (12, 34)
+     * $query->filterByClientId(array('min' => 12)); // WHERE client > 12
      * </code>
      *
-     * @param     mixed $customerId The value to use as filter.
+     * @param     mixed $clientId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
@@ -300,16 +310,16 @@ abstract class AccountStatusQuery extends ModelCriteria
      *
      * @return $this|ChildAccountStatusQuery The current query, for fluid interface
      */
-    public function filterByCustomerId($customerId = null, $comparison = null)
+    public function filterByClientId($clientId = null, $comparison = null)
     {
-        if (is_array($customerId)) {
+        if (is_array($clientId)) {
             $useMinMax = false;
-            if (isset($customerId['min'])) {
-                $this->addUsingAlias(AccountStatusTableMap::COL_CUSTOMER_ID, $customerId['min'], Criteria::GREATER_EQUAL);
+            if (isset($clientId['min'])) {
+                $this->addUsingAlias(AccountStatusTableMap::COL_CLIENT, $clientId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($customerId['max'])) {
-                $this->addUsingAlias(AccountStatusTableMap::COL_CUSTOMER_ID, $customerId['max'], Criteria::LESS_EQUAL);
+            if (isset($clientId['max'])) {
+                $this->addUsingAlias(AccountStatusTableMap::COL_CLIENT, $clientId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -320,7 +330,7 @@ abstract class AccountStatusQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(AccountStatusTableMap::COL_CUSTOMER_ID, $customerId, $comparison);
+        return $this->addUsingAlias(AccountStatusTableMap::COL_CLIENT, $clientId, $comparison);
     }
 
     /**
@@ -346,6 +356,92 @@ abstract class AccountStatusQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(AccountStatusTableMap::COL_STATUS, $status, $comparison);
+    }
+
+    /**
+     * Filter the query on the created_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByCreatedAt('2011-03-14'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt('now'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $createdAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildAccountStatusQuery The current query, for fluid interface
+     */
+    public function filterByCreatedAt($createdAt = null, $comparison = null)
+    {
+        if (is_array($createdAt)) {
+            $useMinMax = false;
+            if (isset($createdAt['min'])) {
+                $this->addUsingAlias(AccountStatusTableMap::COL_CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($createdAt['max'])) {
+                $this->addUsingAlias(AccountStatusTableMap::COL_CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(AccountStatusTableMap::COL_CREATED_AT, $createdAt, $comparison);
+    }
+
+    /**
+     * Filter the query on the updated_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt('now'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $updatedAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildAccountStatusQuery The current query, for fluid interface
+     */
+    public function filterByUpdatedAt($updatedAt = null, $comparison = null)
+    {
+        if (is_array($updatedAt)) {
+            $useMinMax = false;
+            if (isset($updatedAt['min'])) {
+                $this->addUsingAlias(AccountStatusTableMap::COL_UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($updatedAt['max'])) {
+                $this->addUsingAlias(AccountStatusTableMap::COL_UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(AccountStatusTableMap::COL_UPDATED_AT, $updatedAt, $comparison);
     }
 
     /**
@@ -423,6 +519,72 @@ abstract class AccountStatusQuery extends ModelCriteria
 
             return $affectedRows;
         });
+    }
+
+    // timestampable behavior
+
+    /**
+     * Filter by the latest updated
+     *
+     * @param      int $nbDays Maximum age of the latest update in days
+     *
+     * @return     $this|ChildAccountStatusQuery The current query, for fluid interface
+     */
+    public function recentlyUpdated($nbDays = 7)
+    {
+        return $this->addUsingAlias(AccountStatusTableMap::COL_UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     $this|ChildAccountStatusQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(AccountStatusTableMap::COL_UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     $this|ChildAccountStatusQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(AccountStatusTableMap::COL_UPDATED_AT);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     $this|ChildAccountStatusQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(AccountStatusTableMap::COL_CREATED_AT);
+    }
+
+    /**
+     * Filter by the latest created
+     *
+     * @param      int $nbDays Maximum age of in days
+     *
+     * @return     $this|ChildAccountStatusQuery The current query, for fluid interface
+     */
+    public function recentlyCreated($nbDays = 7)
+    {
+        return $this->addUsingAlias(AccountStatusTableMap::COL_CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by create date asc
+     *
+     * @return     $this|ChildAccountStatusQuery The current query, for fluid interface
+     */
+    public function firstCreatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(AccountStatusTableMap::COL_CREATED_AT);
     }
 
 } // AccountStatusQuery

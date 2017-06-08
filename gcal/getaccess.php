@@ -1,33 +1,36 @@
-<?php
-session_start();
-require_once 'vendor/autoload.php';
+<?
+require_once('./config.php');
+require_once $_SERVER['DOCUMENT_ROOT'].'/gcal/vendor/autoload.php';
+require_once('../libraries/Helpers.php');
 
-//echo "testgetaccess";
-//exit;
+Helpers::setDebugParam($isDebugActive);
 
 $client = new Google_Client();
-$client->setAuthConfig('clientkey.json');
-$client->addScope(Google_Service_Calendar::CALENDAR);
-$guzzleClient = new \GuzzleHttp\Client(array( 'curl' => array( CURLOPT_SSL_VERIFYPEER => false, ), ));
+$client->setAuthConfig($googleCalAPICredentialFile);
+$client->addScope(
+        array(
+            Google_Service_Calendar::CALENDAR,
+            "https://www.googleapis.com/auth/contacts.readonly",
+            "https://www.googleapis.com/auth/userinfo.profile"
+        ));
+
+$guzzleClient = new \GuzzleHttp\Client(array('curl' => array(CURLOPT_SSL_VERIFYPEER => false)));
 $client->setHttpClient($guzzleClient);
-$client->setRedirectUri('http://localhost/gcal/getaccess.php');
-if (!isset($_GET['code'])) {
-	$auth_url = $client->createAuthUrl();
-	$filtered_url = filter_var($auth_url, FILTER_SANITIZE_URL);
-	
-	?>
-	<script type="text/javascript">
-		var strAuthUrl = '<?php echo $filtered_url; ?>';
-		window.location = strAuthUrl;
-	</script>
-	<?php
+
+$client->setAccessType("offline");
+$client->setIncludeGrantedScopes(true);
+$client->setRedirectUri(Helpers::generateLink('gcal/getaccess.php'));
+
+$urlToDirect = "";
+
+if (isset($_GET['code'])) {
+    $client->authenticate($_GET['code']);
+    $_SESSION['access_token'] = $client->getAccessToken();
+    $urlToDirect = Helpers::generateLink("gcal/add_new_gcal.php");
 } else {
-	$client->authenticate($_GET['code']);
-	$_SESSION['access_token'] = $client->getAccessToken();
-	?>
-	<script type="text/javascript">
-		window.location = "http://localhost/gcal/testcalnew.php";
-	</script>
-	<?php
+    $client->setApprovalPrompt('force');
+    $auth_url = $client->createAuthUrl();
+    $urlToDirect = filter_var($auth_url, FILTER_SANITIZE_URL);
 }
-?>
+
+Helpers::redirect($urlToDirect);

@@ -59,7 +59,7 @@ class AccountStatusTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 3;
+    const NUM_COLUMNS = 5;
 
     /**
      * The number of lazy-loaded columns
@@ -69,7 +69,7 @@ class AccountStatusTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 3;
+    const NUM_HYDRATE_COLUMNS = 5;
 
     /**
      * the column name for the id field
@@ -77,14 +77,24 @@ class AccountStatusTableMap extends TableMap
     const COL_ID = 'account_status.id';
 
     /**
-     * the column name for the customer_id field
+     * the column name for the client field
      */
-    const COL_CUSTOMER_ID = 'account_status.customer_id';
+    const COL_CLIENT = 'account_status.client';
 
     /**
      * the column name for the status field
      */
     const COL_STATUS = 'account_status.status';
+
+    /**
+     * the column name for the created_at field
+     */
+    const COL_CREATED_AT = 'account_status.created_at';
+
+    /**
+     * the column name for the updated_at field
+     */
+    const COL_UPDATED_AT = 'account_status.updated_at';
 
     /**
      * The default string format for model objects of the related table
@@ -98,11 +108,11 @@ class AccountStatusTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'CustomerId', 'Status', ),
-        self::TYPE_CAMELNAME     => array('id', 'customerId', 'status', ),
-        self::TYPE_COLNAME       => array(AccountStatusTableMap::COL_ID, AccountStatusTableMap::COL_CUSTOMER_ID, AccountStatusTableMap::COL_STATUS, ),
-        self::TYPE_FIELDNAME     => array('id', 'customer_id', 'status', ),
-        self::TYPE_NUM           => array(0, 1, 2, )
+        self::TYPE_PHPNAME       => array('Id', 'ClientId', 'Status', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_CAMELNAME     => array('id', 'clientId', 'status', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(AccountStatusTableMap::COL_ID, AccountStatusTableMap::COL_CLIENT, AccountStatusTableMap::COL_STATUS, AccountStatusTableMap::COL_CREATED_AT, AccountStatusTableMap::COL_UPDATED_AT, ),
+        self::TYPE_FIELDNAME     => array('id', 'client', 'status', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -112,11 +122,11 @@ class AccountStatusTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'CustomerId' => 1, 'Status' => 2, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'customerId' => 1, 'status' => 2, ),
-        self::TYPE_COLNAME       => array(AccountStatusTableMap::COL_ID => 0, AccountStatusTableMap::COL_CUSTOMER_ID => 1, AccountStatusTableMap::COL_STATUS => 2, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'customer_id' => 1, 'status' => 2, ),
-        self::TYPE_NUM           => array(0, 1, 2, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'ClientId' => 1, 'Status' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'clientId' => 1, 'status' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
+        self::TYPE_COLNAME       => array(AccountStatusTableMap::COL_ID => 0, AccountStatusTableMap::COL_CLIENT => 1, AccountStatusTableMap::COL_STATUS => 2, AccountStatusTableMap::COL_CREATED_AT => 3, AccountStatusTableMap::COL_UPDATED_AT => 4, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'client' => 1, 'status' => 2, 'created_at' => 3, 'updated_at' => 4, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -138,8 +148,10 @@ class AccountStatusTableMap extends TableMap
         $this->setPrimaryKeyMethodInfo('account_status_id_seq');
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('customer_id', 'CustomerId', 'INTEGER', false, null, null);
+        $this->addColumn('client', 'ClientId', 'INTEGER', false, null, null);
         $this->addColumn('status', 'Status', 'VARCHAR', false, 255, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
 
     /**
@@ -148,6 +160,19 @@ class AccountStatusTableMap extends TableMap
     public function buildRelations()
     {
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_created_at' => 'false', 'disable_updated_at' => 'false', ),
+        );
+    } // getBehaviors()
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -291,12 +316,16 @@ class AccountStatusTableMap extends TableMap
     {
         if (null === $alias) {
             $criteria->addSelectColumn(AccountStatusTableMap::COL_ID);
-            $criteria->addSelectColumn(AccountStatusTableMap::COL_CUSTOMER_ID);
+            $criteria->addSelectColumn(AccountStatusTableMap::COL_CLIENT);
             $criteria->addSelectColumn(AccountStatusTableMap::COL_STATUS);
+            $criteria->addSelectColumn(AccountStatusTableMap::COL_CREATED_AT);
+            $criteria->addSelectColumn(AccountStatusTableMap::COL_UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
-            $criteria->addSelectColumn($alias . '.customer_id');
+            $criteria->addSelectColumn($alias . '.client');
             $criteria->addSelectColumn($alias . '.status');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 

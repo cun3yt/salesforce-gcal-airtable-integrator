@@ -2,8 +2,10 @@
 
 namespace DataModels\DataModels\Base;
 
+use \DateTime;
 use \Exception;
 use \PDO;
+use DataModels\DataModels\BillingCycle as ChildBillingCycle;
 use DataModels\DataModels\BillingCycleQuery as ChildBillingCycleQuery;
 use DataModels\DataModels\Map\BillingCycleTableMap;
 use Propel\Runtime\Propel;
@@ -17,6 +19,7 @@ use Propel\Runtime\Exception\LogicException;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
+use Propel\Runtime\Util\PropelDateTime;
 
 /**
  * Base class that represents a row from the 'billing_cycle' table.
@@ -67,11 +70,11 @@ abstract class BillingCycle implements ActiveRecordInterface
     protected $id;
 
     /**
-     * The value for the customer_id field.
+     * The value for the client_id field.
      *
      * @var        int
      */
-    protected $customer_id;
+    protected $client_id;
 
     /**
      * The value for the type field.
@@ -79,6 +82,20 @@ abstract class BillingCycle implements ActiveRecordInterface
      * @var        string
      */
     protected $type;
+
+    /**
+     * The value for the created_at field.
+     *
+     * @var        DateTime
+     */
+    protected $created_at;
+
+    /**
+     * The value for the updated_at field.
+     *
+     * @var        DateTime
+     */
+    protected $updated_at;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -324,13 +341,13 @@ abstract class BillingCycle implements ActiveRecordInterface
     }
 
     /**
-     * Get the [customer_id] column value.
+     * Get the [client_id] column value.
      *
      * @return int
      */
-    public function getCustomerId()
+    public function getClientId()
     {
-        return $this->customer_id;
+        return $this->client_id;
     }
 
     /**
@@ -341,6 +358,46 @@ abstract class BillingCycle implements ActiveRecordInterface
     public function getType()
     {
         return $this->type;
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [created_at] column value.
+     *
+     *
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw DateTime object will be returned.
+     *
+     * @return string|DateTime Formatted date/time value as string or DateTime object (if format is NULL), NULL if column is NULL
+     *
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getCreatedAt($format = NULL)
+    {
+        if ($format === null) {
+            return $this->created_at;
+        } else {
+            return $this->created_at instanceof \DateTimeInterface ? $this->created_at->format($format) : null;
+        }
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [updated_at] column value.
+     *
+     *
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw DateTime object will be returned.
+     *
+     * @return string|DateTime Formatted date/time value as string or DateTime object (if format is NULL), NULL if column is NULL
+     *
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getUpdatedAt($format = NULL)
+    {
+        if ($format === null) {
+            return $this->updated_at;
+        } else {
+            return $this->updated_at instanceof \DateTimeInterface ? $this->updated_at->format($format) : null;
+        }
     }
 
     /**
@@ -364,24 +421,24 @@ abstract class BillingCycle implements ActiveRecordInterface
     } // setId()
 
     /**
-     * Set the value of [customer_id] column.
+     * Set the value of [client_id] column.
      *
      * @param int $v new value
      * @return $this|\DataModels\DataModels\BillingCycle The current object (for fluent API support)
      */
-    public function setCustomerId($v)
+    public function setClientId($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->customer_id !== $v) {
-            $this->customer_id = $v;
-            $this->modifiedColumns[BillingCycleTableMap::COL_CUSTOMER_ID] = true;
+        if ($this->client_id !== $v) {
+            $this->client_id = $v;
+            $this->modifiedColumns[BillingCycleTableMap::COL_CLIENT_ID] = true;
         }
 
         return $this;
-    } // setCustomerId()
+    } // setClientId()
 
     /**
      * Set the value of [type] column.
@@ -402,6 +459,46 @@ abstract class BillingCycle implements ActiveRecordInterface
 
         return $this;
     } // setType()
+
+    /**
+     * Sets the value of [created_at] column to a normalized version of the date/time value specified.
+     *
+     * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
+     *               Empty strings are treated as NULL.
+     * @return $this|\DataModels\DataModels\BillingCycle The current object (for fluent API support)
+     */
+    public function setCreatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->created_at !== null || $dt !== null) {
+            if ($this->created_at === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->created_at->format("Y-m-d H:i:s.u")) {
+                $this->created_at = $dt === null ? null : clone $dt;
+                $this->modifiedColumns[BillingCycleTableMap::COL_CREATED_AT] = true;
+            }
+        } // if either are not null
+
+        return $this;
+    } // setCreatedAt()
+
+    /**
+     * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
+     *
+     * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
+     *               Empty strings are treated as NULL.
+     * @return $this|\DataModels\DataModels\BillingCycle The current object (for fluent API support)
+     */
+    public function setUpdatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->updated_at !== null || $dt !== null) {
+            if ($this->updated_at === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->updated_at->format("Y-m-d H:i:s.u")) {
+                $this->updated_at = $dt === null ? null : clone $dt;
+                $this->modifiedColumns[BillingCycleTableMap::COL_UPDATED_AT] = true;
+            }
+        } // if either are not null
+
+        return $this;
+    } // setUpdatedAt()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -442,11 +539,17 @@ abstract class BillingCycle implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : BillingCycleTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : BillingCycleTableMap::translateFieldName('CustomerId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->customer_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : BillingCycleTableMap::translateFieldName('ClientId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->client_id = (null !== $col) ? (int) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : BillingCycleTableMap::translateFieldName('Type', TableMap::TYPE_PHPNAME, $indexType)];
             $this->type = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : BillingCycleTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : BillingCycleTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -455,7 +558,7 @@ abstract class BillingCycle implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 3; // 3 = BillingCycleTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 5; // 5 = BillingCycleTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\DataModels\\DataModels\\BillingCycle'), 0, $e);
@@ -582,8 +685,20 @@ abstract class BillingCycle implements ActiveRecordInterface
             $isInsert = $this->isNew();
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
+                // timestampable behavior
+
+                if (!$this->isColumnModified(BillingCycleTableMap::COL_CREATED_AT)) {
+                    $this->setCreatedAt(\Propel\Runtime\Util\PropelDateTime::createHighPrecision());
+                }
+                if (!$this->isColumnModified(BillingCycleTableMap::COL_UPDATED_AT)) {
+                    $this->setUpdatedAt(\Propel\Runtime\Util\PropelDateTime::createHighPrecision());
+                }
             } else {
                 $ret = $ret && $this->preUpdate($con);
+                // timestampable behavior
+                if ($this->isModified() && !$this->isColumnModified(BillingCycleTableMap::COL_UPDATED_AT)) {
+                    $this->setUpdatedAt(\Propel\Runtime\Util\PropelDateTime::createHighPrecision());
+                }
             }
             if ($ret) {
                 $affectedRows = $this->doSave($con);
@@ -668,11 +783,17 @@ abstract class BillingCycle implements ActiveRecordInterface
         if ($this->isColumnModified(BillingCycleTableMap::COL_ID)) {
             $modifiedColumns[':p' . $index++]  = 'id';
         }
-        if ($this->isColumnModified(BillingCycleTableMap::COL_CUSTOMER_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'customer_id';
+        if ($this->isColumnModified(BillingCycleTableMap::COL_CLIENT_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'client_id';
         }
         if ($this->isColumnModified(BillingCycleTableMap::COL_TYPE)) {
             $modifiedColumns[':p' . $index++]  = 'type';
+        }
+        if ($this->isColumnModified(BillingCycleTableMap::COL_CREATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = 'created_at';
+        }
+        if ($this->isColumnModified(BillingCycleTableMap::COL_UPDATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = 'updated_at';
         }
 
         $sql = sprintf(
@@ -688,11 +809,17 @@ abstract class BillingCycle implements ActiveRecordInterface
                     case 'id':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case 'customer_id':
-                        $stmt->bindValue($identifier, $this->customer_id, PDO::PARAM_INT);
+                    case 'client_id':
+                        $stmt->bindValue($identifier, $this->client_id, PDO::PARAM_INT);
                         break;
                     case 'type':
                         $stmt->bindValue($identifier, $this->type, PDO::PARAM_STR);
+                        break;
+                    case 'created_at':
+                        $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
+                        break;
+                    case 'updated_at':
+                        $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -753,10 +880,16 @@ abstract class BillingCycle implements ActiveRecordInterface
                 return $this->getId();
                 break;
             case 1:
-                return $this->getCustomerId();
+                return $this->getClientId();
                 break;
             case 2:
                 return $this->getType();
+                break;
+            case 3:
+                return $this->getCreatedAt();
+                break;
+            case 4:
+                return $this->getUpdatedAt();
                 break;
             default:
                 return null;
@@ -788,9 +921,19 @@ abstract class BillingCycle implements ActiveRecordInterface
         $keys = BillingCycleTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getCustomerId(),
+            $keys[1] => $this->getClientId(),
             $keys[2] => $this->getType(),
+            $keys[3] => $this->getCreatedAt(),
+            $keys[4] => $this->getUpdatedAt(),
         );
+        if ($result[$keys[3]] instanceof \DateTime) {
+            $result[$keys[3]] = $result[$keys[3]]->format('c');
+        }
+
+        if ($result[$keys[4]] instanceof \DateTime) {
+            $result[$keys[4]] = $result[$keys[4]]->format('c');
+        }
+
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
             $result[$key] = $virtualColumn;
@@ -833,10 +976,16 @@ abstract class BillingCycle implements ActiveRecordInterface
                 $this->setId($value);
                 break;
             case 1:
-                $this->setCustomerId($value);
+                $this->setClientId($value);
                 break;
             case 2:
                 $this->setType($value);
+                break;
+            case 3:
+                $this->setCreatedAt($value);
+                break;
+            case 4:
+                $this->setUpdatedAt($value);
                 break;
         } // switch()
 
@@ -868,10 +1017,16 @@ abstract class BillingCycle implements ActiveRecordInterface
             $this->setId($arr[$keys[0]]);
         }
         if (array_key_exists($keys[1], $arr)) {
-            $this->setCustomerId($arr[$keys[1]]);
+            $this->setClientId($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
             $this->setType($arr[$keys[2]]);
+        }
+        if (array_key_exists($keys[3], $arr)) {
+            $this->setCreatedAt($arr[$keys[3]]);
+        }
+        if (array_key_exists($keys[4], $arr)) {
+            $this->setUpdatedAt($arr[$keys[4]]);
         }
     }
 
@@ -917,11 +1072,17 @@ abstract class BillingCycle implements ActiveRecordInterface
         if ($this->isColumnModified(BillingCycleTableMap::COL_ID)) {
             $criteria->add(BillingCycleTableMap::COL_ID, $this->id);
         }
-        if ($this->isColumnModified(BillingCycleTableMap::COL_CUSTOMER_ID)) {
-            $criteria->add(BillingCycleTableMap::COL_CUSTOMER_ID, $this->customer_id);
+        if ($this->isColumnModified(BillingCycleTableMap::COL_CLIENT_ID)) {
+            $criteria->add(BillingCycleTableMap::COL_CLIENT_ID, $this->client_id);
         }
         if ($this->isColumnModified(BillingCycleTableMap::COL_TYPE)) {
             $criteria->add(BillingCycleTableMap::COL_TYPE, $this->type);
+        }
+        if ($this->isColumnModified(BillingCycleTableMap::COL_CREATED_AT)) {
+            $criteria->add(BillingCycleTableMap::COL_CREATED_AT, $this->created_at);
+        }
+        if ($this->isColumnModified(BillingCycleTableMap::COL_UPDATED_AT)) {
+            $criteria->add(BillingCycleTableMap::COL_UPDATED_AT, $this->updated_at);
         }
 
         return $criteria;
@@ -1009,8 +1170,10 @@ abstract class BillingCycle implements ActiveRecordInterface
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setCustomerId($this->getCustomerId());
+        $copyObj->setClientId($this->getClientId());
         $copyObj->setType($this->getType());
+        $copyObj->setCreatedAt($this->getCreatedAt());
+        $copyObj->setUpdatedAt($this->getUpdatedAt());
         if ($makeNew) {
             $copyObj->setNew(true);
             $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
@@ -1047,8 +1210,10 @@ abstract class BillingCycle implements ActiveRecordInterface
     public function clear()
     {
         $this->id = null;
-        $this->customer_id = null;
+        $this->client_id = null;
         $this->type = null;
+        $this->created_at = null;
+        $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
         $this->resetModified();
@@ -1079,6 +1244,20 @@ abstract class BillingCycle implements ActiveRecordInterface
     public function __toString()
     {
         return (string) $this->exportTo(BillingCycleTableMap::DEFAULT_STRING_FORMAT);
+    }
+
+    // timestampable behavior
+
+    /**
+     * Mark the current object so that the update date doesn't get updated during next save
+     *
+     * @return     $this|ChildBillingCycle The current object (for fluent API support)
+     */
+    public function keepUpdateDateUnchanged()
+    {
+        $this->modifiedColumns[BillingCycleTableMap::COL_UPDATED_AT] = true;
+
+        return $this;
     }
 
     /**

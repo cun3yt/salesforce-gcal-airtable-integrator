@@ -2,7 +2,9 @@
 
 namespace DataModels\DataModels;
 
+use DataModels\DataModels\Opportunity as Opportunity;
 use DataModels\DataModels\Base\OpportunityHistory as BaseOpportunityHistory;
+use DataModels\DataModels\IHistoryTrackAbility as IHistoryTrackAbility;
 
 /**
  * Skeleton subclass for representing a row from the 'opportunity_history' table.
@@ -14,7 +16,71 @@ use DataModels\DataModels\Base\OpportunityHistory as BaseOpportunityHistory;
  * long as it does not already exist in the output directory.
  *
  */
-class OpportunityHistory extends BaseOpportunityHistory
+class OpportunityHistory extends BaseOpportunityHistory implements IHistoryTrackAbility
 {
+    /**
+     * Association of object attributes to Salesforce API response array items.
+     * These items are the ones on which the changes we care.
+     *
+     * @var array
+     */
+    private $historyTrack = array(
+        'account_sfdc_id' => 'AccountId',
+        'amount' => 'Amount',
+        'close_date' => 'CloseDate',
+        'last_modified_by' => 'LastModifiedById',
+        'next_step' => 'NextStep',
+        'name' => 'Name',
+        'owner_id' => 'OwnerId',
+        'stage' => 'StageName',
+        'type' => 'Type'
+    );
 
+    /**
+     * @var HistoryTrackDelegate HistoryTrackDelegate
+     */
+    private $historyTrackDelegate = null;
+
+    public function __construct() {
+        parent::__construct();
+        $this->historyTrackDelegate = new HistoryTrackDelegate($this);
+    }
+
+    public function getHistoryTrack() {
+        return $this->historyTrack;
+    }
+
+    public function isThereAnyUpdate(array $SFDCResponse, $sfdcHistoryList) {
+        return $this->historyTrackDelegate->isThereAnyUpdate($SFDCResponse, $sfdcHistoryList);
+    }
+
+    /**
+     * @param Opportunity $opportunity
+     * @param array $SFDCResponse
+     * @return OpportunityHistory
+     */
+    public static function createOpportunityHistory(Opportunity $opportunity, $SFDCResponse) {
+        $opportunityHistory = new OpportunityHistory();
+        $opportunityHistory
+            ->setOpportunity($opportunity)
+            ->setAccountSFDCId($SFDCResponse['AccountId'])
+            ->setAmount($SFDCResponse['Amount'])
+            ->setCloseDate($SFDCResponse['CloseDate'])
+            ->setCreatedBy($SFDCResponse['CreatedById'])
+            ->setDescription($SFDCResponse['Description'])
+            ->setSFDCOpportunityId($SFDCResponse['Id'])
+            ->setLastModifiedBy($SFDCResponse['LastModifiedById'])
+            ->setLeadSource($SFDCResponse['LeadSource'])
+            ->setName($SFDCResponse['Name'])
+            ->setNextStep($SFDCResponse['NextStep'])
+            ->setOwnerId($SFDCResponse['OwnerId'])
+            ->setStage($SFDCResponse['StageName'])
+            ->setSyncedQuote($SFDCResponse['SyncedQuoteId'])
+            ->setType($SFDCResponse['Type'])
+            ->setProbability($SFDCResponse['Probability'])
+            ->setPriceBook($SFDCResponse['Pricebook2Id'])
+            ->save();
+
+        return $opportunityHistory;
+    }
 }

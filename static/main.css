@@ -1,0 +1,84 @@
+.main {
+    width:98%;
+    margin:0 auto;
+}
+.main .heading {
+    width:100%;
+    border-bottom:1px solid #dae1e3;
+    float:left;
+    height: 40px;
+    background-color:#f5f7f7;
+}
+.main .content {
+    width:100%;
+    float:left;
+}
+.content .box {
+    width:23%;
+    margin:1%;
+    float:left;
+}
+.content .box .box-content {
+    border: 1px solid #dae1e3;
+    border-radius: 4px;
+    width:100%;
+    text-align:center;
+    padding-bottom: 40px;
+}
+.content .box .box-content .title {
+    background-color:#f5f7f7;
+    text-align:center;
+    color:#399ce2;
+    text-transform:uppercase;
+    padding: 26px 5px;
+}
+.content .box .box-content .title img {
+    width:15px;
+    margin-right:10px;
+}
+.content .box .box-content p {
+    padding: 10px;
+    color:#6b747b;
+}
+.content .calendor-btn {
+    width:23%;
+    margin:1%;
+    float:left;
+}
+.content .calendor-btn .add-button {
+    background-color: #f5f7f7;
+    border: 1px solid #dae1e3;
+    border-radius: 4px;
+    font-size: 16px;
+    padding: 10px 15px;
+    cursor:pointer;
+    color:#399ce2;
+    margin-top:170px;
+}
+.content .calendor-btn .add-button:hover {
+    background-color:#ededed;
+    color:#399ce2;
+}
+.disable-btn {
+    background-color:#f84e4e;
+    border: 1px solid #f84e4e;
+    color:#fff;
+    border-radius:0px;
+    padding:4px 8px;
+    cursor:pointer;
+}
+.setting-btn {
+    background-color:transparent;
+    border: 1px solid #dae1e3;
+    color:#6b747b;
+    border-radius:0px;
+    padding:4px 8px;
+    cursor:pointer;
+}
+.disable-btn:hover {
+    background-color:#f5f7f7;
+    color:#6b747b;
+}
+.setting-btn:hover {
+    background-color:#f5f7f7;
+}

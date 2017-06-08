@@ -10,6 +10,7 @@ use DataModels\DataModels\Map\OpportunityTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Propel\Runtime\ActiveQuery\ModelJoin;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
@@ -21,17 +22,17 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildOpportunityQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildOpportunityQuery orderByAccountId($order = Criteria::ASC) Order by the account_id column
- * @method     ChildOpportunityQuery orderByStageId($order = Criteria::ASC) Order by the stage_id column
- * @method     ChildOpportunityQuery orderByName($order = Criteria::ASC) Order by the name column
- * @method     ChildOpportunityQuery orderByAmount($order = Criteria::ASC) Order by the amount column
- * @method     ChildOpportunityQuery orderByCloseDate($order = Criteria::ASC) Order by the close_date column
+ * @method     ChildOpportunityQuery orderBySFDCId($order = Criteria::ASC) Order by the sfdc_id column
+ * @method     ChildOpportunityQuery orderBySFDCLastCheckTime($order = Criteria::ASC) Order by the sfdc_last_check_time column
+ * @method     ChildOpportunityQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
+ * @method     ChildOpportunityQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildOpportunityQuery groupById() Group by the id column
  * @method     ChildOpportunityQuery groupByAccountId() Group by the account_id column
- * @method     ChildOpportunityQuery groupByStageId() Group by the stage_id column
- * @method     ChildOpportunityQuery groupByName() Group by the name column
- * @method     ChildOpportunityQuery groupByAmount() Group by the amount column
- * @method     ChildOpportunityQuery groupByCloseDate() Group by the close_date column
+ * @method     ChildOpportunityQuery groupBySFDCId() Group by the sfdc_id column
+ * @method     ChildOpportunityQuery groupBySFDCLastCheckTime() Group by the sfdc_last_check_time column
+ * @method     ChildOpportunityQuery groupByCreatedAt() Group by the created_at column
+ * @method     ChildOpportunityQuery groupByUpdatedAt() Group by the updated_at column
  *
  * @method     ChildOpportunityQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method     ChildOpportunityQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -41,33 +42,55 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildOpportunityQuery rightJoinWith($relation) Adds a RIGHT JOIN clause and with to the query
  * @method     ChildOpportunityQuery innerJoinWith($relation) Adds a INNER JOIN clause and with to the query
  *
+ * @method     ChildOpportunityQuery leftJoinAccount($relationAlias = null) Adds a LEFT JOIN clause to the query using the Account relation
+ * @method     ChildOpportunityQuery rightJoinAccount($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Account relation
+ * @method     ChildOpportunityQuery innerJoinAccount($relationAlias = null) Adds a INNER JOIN clause to the query using the Account relation
+ *
+ * @method     ChildOpportunityQuery joinWithAccount($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the Account relation
+ *
+ * @method     ChildOpportunityQuery leftJoinWithAccount() Adds a LEFT JOIN clause and with to the query using the Account relation
+ * @method     ChildOpportunityQuery rightJoinWithAccount() Adds a RIGHT JOIN clause and with to the query using the Account relation
+ * @method     ChildOpportunityQuery innerJoinWithAccount() Adds a INNER JOIN clause and with to the query using the Account relation
+ *
+ * @method     ChildOpportunityQuery leftJoinOpportunityHistory($relationAlias = null) Adds a LEFT JOIN clause to the query using the OpportunityHistory relation
+ * @method     ChildOpportunityQuery rightJoinOpportunityHistory($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OpportunityHistory relation
+ * @method     ChildOpportunityQuery innerJoinOpportunityHistory($relationAlias = null) Adds a INNER JOIN clause to the query using the OpportunityHistory relation
+ *
+ * @method     ChildOpportunityQuery joinWithOpportunityHistory($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the OpportunityHistory relation
+ *
+ * @method     ChildOpportunityQuery leftJoinWithOpportunityHistory() Adds a LEFT JOIN clause and with to the query using the OpportunityHistory relation
+ * @method     ChildOpportunityQuery rightJoinWithOpportunityHistory() Adds a RIGHT JOIN clause and with to the query using the OpportunityHistory relation
+ * @method     ChildOpportunityQuery innerJoinWithOpportunityHistory() Adds a INNER JOIN clause and with to the query using the OpportunityHistory relation
+ *
+ * @method     \DataModels\DataModels\AccountQuery|\DataModels\DataModels\OpportunityHistoryQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ *
  * @method     ChildOpportunity findOne(ConnectionInterface $con = null) Return the first ChildOpportunity matching the query
  * @method     ChildOpportunity findOneOrCreate(ConnectionInterface $con = null) Return the first ChildOpportunity matching the query, or a new ChildOpportunity object populated from the query conditions when no match is found
  *
  * @method     ChildOpportunity findOneById(int $id) Return the first ChildOpportunity filtered by the id column
  * @method     ChildOpportunity findOneByAccountId(int $account_id) Return the first ChildOpportunity filtered by the account_id column
- * @method     ChildOpportunity findOneByStageId(int $stage_id) Return the first ChildOpportunity filtered by the stage_id column
- * @method     ChildOpportunity findOneByName(string $name) Return the first ChildOpportunity filtered by the name column
- * @method     ChildOpportunity findOneByAmount(string $amount) Return the first ChildOpportunity filtered by the amount column
- * @method     ChildOpportunity findOneByCloseDate(string $close_date) Return the first ChildOpportunity filtered by the close_date column *
+ * @method     ChildOpportunity findOneBySFDCId(string $sfdc_id) Return the first ChildOpportunity filtered by the sfdc_id column
+ * @method     ChildOpportunity findOneBySFDCLastCheckTime(string $sfdc_last_check_time) Return the first ChildOpportunity filtered by the sfdc_last_check_time column
+ * @method     ChildOpportunity findOneByCreatedAt(string $created_at) Return the first ChildOpportunity filtered by the created_at column
+ * @method     ChildOpportunity findOneByUpdatedAt(string $updated_at) Return the first ChildOpportunity filtered by the updated_at column *
 
  * @method     ChildOpportunity requirePk($key, ConnectionInterface $con = null) Return the ChildOpportunity by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildOpportunity requireOne(ConnectionInterface $con = null) Return the first ChildOpportunity matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildOpportunity requireOneById(int $id) Return the first ChildOpportunity filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildOpportunity requireOneByAccountId(int $account_id) Return the first ChildOpportunity filtered by the account_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildOpportunity requireOneByStageId(int $stage_id) Return the first ChildOpportunity filtered by the stage_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildOpportunity requireOneByName(string $name) Return the first ChildOpportunity filtered by the name column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildOpportunity requireOneByAmount(string $amount) Return the first ChildOpportunity filtered by the amount column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildOpportunity requireOneByCloseDate(string $close_date) Return the first ChildOpportunity filtered by the close_date column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildOpportunity requireOneBySFDCId(string $sfdc_id) Return the first ChildOpportunity filtered by the sfdc_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildOpportunity requireOneBySFDCLastCheckTime(string $sfdc_last_check_time) Return the first ChildOpportunity filtered by the sfdc_last_check_time column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildOpportunity requireOneByCreatedAt(string $created_at) Return the first ChildOpportunity filtered by the created_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildOpportunity requireOneByUpdatedAt(string $updated_at) Return the first ChildOpportunity filtered by the updated_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildOpportunity[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildOpportunity objects based on current ModelCriteria
  * @method     ChildOpportunity[]|ObjectCollection findById(int $id) Return ChildOpportunity objects filtered by the id column
  * @method     ChildOpportunity[]|ObjectCollection findByAccountId(int $account_id) Return ChildOpportunity objects filtered by the account_id column
- * @method     ChildOpportunity[]|ObjectCollection findByStageId(int $stage_id) Return ChildOpportunity objects filtered by the stage_id column
- * @method     ChildOpportunity[]|ObjectCollection findByName(string $name) Return ChildOpportunity objects filtered by the name column
- * @method     ChildOpportunity[]|ObjectCollection findByAmount(string $amount) Return ChildOpportunity objects filtered by the amount column
- * @method     ChildOpportunity[]|ObjectCollection findByCloseDate(string $close_date) Return ChildOpportunity objects filtered by the close_date column
+ * @method     ChildOpportunity[]|ObjectCollection findBySFDCId(string $sfdc_id) Return ChildOpportunity objects filtered by the sfdc_id column
+ * @method     ChildOpportunity[]|ObjectCollection findBySFDCLastCheckTime(string $sfdc_last_check_time) Return ChildOpportunity objects filtered by the sfdc_last_check_time column
+ * @method     ChildOpportunity[]|ObjectCollection findByCreatedAt(string $created_at) Return ChildOpportunity objects filtered by the created_at column
+ * @method     ChildOpportunity[]|ObjectCollection findByUpdatedAt(string $updated_at) Return ChildOpportunity objects filtered by the updated_at column
  * @method     ChildOpportunity[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
  *
  */
@@ -166,7 +189,7 @@ abstract class OpportunityQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, account_id, stage_id, name, amount, close_date FROM opportunity WHERE id = :p0';
+        $sql = 'SELECT id, account_id, sfdc_id, sfdc_last_check_time, created_at, updated_at FROM opportunity WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -307,6 +330,8 @@ abstract class OpportunityQuery extends ModelCriteria
      * $query->filterByAccountId(array('min' => 12)); // WHERE account_id > 12
      * </code>
      *
+     * @see       filterByAccount()
+     *
      * @param     mixed $accountId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
@@ -339,107 +364,41 @@ abstract class OpportunityQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the stage_id column
+     * Filter the query on the sfdc_id column
      *
      * Example usage:
      * <code>
-     * $query->filterByStageId(1234); // WHERE stage_id = 1234
-     * $query->filterByStageId(array(12, 34)); // WHERE stage_id IN (12, 34)
-     * $query->filterByStageId(array('min' => 12)); // WHERE stage_id > 12
+     * $query->filterBySFDCId('fooValue');   // WHERE sfdc_id = 'fooValue'
+     * $query->filterBySFDCId('%fooValue%', Criteria::LIKE); // WHERE sfdc_id LIKE '%fooValue%'
      * </code>
      *
-     * @param     mixed $stageId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $sFDCId The value to use as filter.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return $this|ChildOpportunityQuery The current query, for fluid interface
      */
-    public function filterByStageId($stageId = null, $comparison = null)
-    {
-        if (is_array($stageId)) {
-            $useMinMax = false;
-            if (isset($stageId['min'])) {
-                $this->addUsingAlias(OpportunityTableMap::COL_STAGE_ID, $stageId['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($stageId['max'])) {
-                $this->addUsingAlias(OpportunityTableMap::COL_STAGE_ID, $stageId['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(OpportunityTableMap::COL_STAGE_ID, $stageId, $comparison);
-    }
-
-    /**
-     * Filter the query on the name column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByName('fooValue');   // WHERE name = 'fooValue'
-     * $query->filterByName('%fooValue%', Criteria::LIKE); // WHERE name LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $name The value to use as filter.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return $this|ChildOpportunityQuery The current query, for fluid interface
-     */
-    public function filterByName($name = null, $comparison = null)
+    public function filterBySFDCId($sFDCId = null, $comparison = null)
     {
         if (null === $comparison) {
-            if (is_array($name)) {
+            if (is_array($sFDCId)) {
                 $comparison = Criteria::IN;
             }
         }
 
-        return $this->addUsingAlias(OpportunityTableMap::COL_NAME, $name, $comparison);
+        return $this->addUsingAlias(OpportunityTableMap::COL_SFDC_ID, $sFDCId, $comparison);
     }
 
     /**
-     * Filter the query on the amount column
+     * Filter the query on the sfdc_last_check_time column
      *
      * Example usage:
      * <code>
-     * $query->filterByAmount('fooValue');   // WHERE amount = 'fooValue'
-     * $query->filterByAmount('%fooValue%', Criteria::LIKE); // WHERE amount LIKE '%fooValue%'
+     * $query->filterBySFDCLastCheckTime('2011-03-14'); // WHERE sfdc_last_check_time = '2011-03-14'
+     * $query->filterBySFDCLastCheckTime('now'); // WHERE sfdc_last_check_time = '2011-03-14'
+     * $query->filterBySFDCLastCheckTime(array('max' => 'yesterday')); // WHERE sfdc_last_check_time > '2011-03-13'
      * </code>
      *
-     * @param     string $amount The value to use as filter.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return $this|ChildOpportunityQuery The current query, for fluid interface
-     */
-    public function filterByAmount($amount = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($amount)) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(OpportunityTableMap::COL_AMOUNT, $amount, $comparison);
-    }
-
-    /**
-     * Filter the query on the close_date column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByCloseDate('2011-03-14'); // WHERE close_date = '2011-03-14'
-     * $query->filterByCloseDate('now'); // WHERE close_date = '2011-03-14'
-     * $query->filterByCloseDate(array('max' => 'yesterday')); // WHERE close_date > '2011-03-13'
-     * </code>
-     *
-     * @param     mixed $closeDate The value to use as filter.
+     * @param     mixed $sFDCLastCheckTime The value to use as filter.
      *              Values can be integers (unix timestamps), DateTime objects, or strings.
      *              Empty strings are treated as NULL.
      *              Use scalar values for equality.
@@ -449,16 +408,16 @@ abstract class OpportunityQuery extends ModelCriteria
      *
      * @return $this|ChildOpportunityQuery The current query, for fluid interface
      */
-    public function filterByCloseDate($closeDate = null, $comparison = null)
+    public function filterBySFDCLastCheckTime($sFDCLastCheckTime = null, $comparison = null)
     {
-        if (is_array($closeDate)) {
+        if (is_array($sFDCLastCheckTime)) {
             $useMinMax = false;
-            if (isset($closeDate['min'])) {
-                $this->addUsingAlias(OpportunityTableMap::COL_CLOSE_DATE, $closeDate['min'], Criteria::GREATER_EQUAL);
+            if (isset($sFDCLastCheckTime['min'])) {
+                $this->addUsingAlias(OpportunityTableMap::COL_SFDC_LAST_CHECK_TIME, $sFDCLastCheckTime['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($closeDate['max'])) {
-                $this->addUsingAlias(OpportunityTableMap::COL_CLOSE_DATE, $closeDate['max'], Criteria::LESS_EQUAL);
+            if (isset($sFDCLastCheckTime['max'])) {
+                $this->addUsingAlias(OpportunityTableMap::COL_SFDC_LAST_CHECK_TIME, $sFDCLastCheckTime['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -469,7 +428,243 @@ abstract class OpportunityQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(OpportunityTableMap::COL_CLOSE_DATE, $closeDate, $comparison);
+        return $this->addUsingAlias(OpportunityTableMap::COL_SFDC_LAST_CHECK_TIME, $sFDCLastCheckTime, $comparison);
+    }
+
+    /**
+     * Filter the query on the created_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByCreatedAt('2011-03-14'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt('now'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $createdAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildOpportunityQuery The current query, for fluid interface
+     */
+    public function filterByCreatedAt($createdAt = null, $comparison = null)
+    {
+        if (is_array($createdAt)) {
+            $useMinMax = false;
+            if (isset($createdAt['min'])) {
+                $this->addUsingAlias(OpportunityTableMap::COL_CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($createdAt['max'])) {
+                $this->addUsingAlias(OpportunityTableMap::COL_CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(OpportunityTableMap::COL_CREATED_AT, $createdAt, $comparison);
+    }
+
+    /**
+     * Filter the query on the updated_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt('now'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $updatedAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildOpportunityQuery The current query, for fluid interface
+     */
+    public function filterByUpdatedAt($updatedAt = null, $comparison = null)
+    {
+        if (is_array($updatedAt)) {
+            $useMinMax = false;
+            if (isset($updatedAt['min'])) {
+                $this->addUsingAlias(OpportunityTableMap::COL_UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($updatedAt['max'])) {
+                $this->addUsingAlias(OpportunityTableMap::COL_UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(OpportunityTableMap::COL_UPDATED_AT, $updatedAt, $comparison);
+    }
+
+    /**
+     * Filter the query by a related \DataModels\DataModels\Account object
+     *
+     * @param \DataModels\DataModels\Account|ObjectCollection $account The related object(s) to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return ChildOpportunityQuery The current query, for fluid interface
+     */
+    public function filterByAccount($account, $comparison = null)
+    {
+        if ($account instanceof \DataModels\DataModels\Account) {
+            return $this
+                ->addUsingAlias(OpportunityTableMap::COL_ACCOUNT_ID, $account->getId(), $comparison);
+        } elseif ($account instanceof ObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(OpportunityTableMap::COL_ACCOUNT_ID, $account->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByAccount() only accepts arguments of type \DataModels\DataModels\Account or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Account relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildOpportunityQuery The current query, for fluid interface
+     */
+    public function joinAccount($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Account');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Account');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Account relation Account object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \DataModels\DataModels\AccountQuery A secondary query class using the current class as primary query
+     */
+    public function useAccountQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinAccount($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Account', '\DataModels\DataModels\AccountQuery');
+    }
+
+    /**
+     * Filter the query by a related \DataModels\DataModels\OpportunityHistory object
+     *
+     * @param \DataModels\DataModels\OpportunityHistory|ObjectCollection $opportunityHistory the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOpportunityQuery The current query, for fluid interface
+     */
+    public function filterByOpportunityHistory($opportunityHistory, $comparison = null)
+    {
+        if ($opportunityHistory instanceof \DataModels\DataModels\OpportunityHistory) {
+            return $this
+                ->addUsingAlias(OpportunityTableMap::COL_ID, $opportunityHistory->getOpportunityId(), $comparison);
+        } elseif ($opportunityHistory instanceof ObjectCollection) {
+            return $this
+                ->useOpportunityHistoryQuery()
+                ->filterByPrimaryKeys($opportunityHistory->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByOpportunityHistory() only accepts arguments of type \DataModels\DataModels\OpportunityHistory or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the OpportunityHistory relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildOpportunityQuery The current query, for fluid interface
+     */
+    public function joinOpportunityHistory($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('OpportunityHistory');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'OpportunityHistory');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the OpportunityHistory relation OpportunityHistory object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \DataModels\DataModels\OpportunityHistoryQuery A secondary query class using the current class as primary query
+     */
+    public function useOpportunityHistoryQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinOpportunityHistory($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'OpportunityHistory', '\DataModels\DataModels\OpportunityHistoryQuery');
     }
 
     /**
@@ -547,6 +742,72 @@ abstract class OpportunityQuery extends ModelCriteria
 
             return $affectedRows;
         });
+    }
+
+    // timestampable behavior
+
+    /**
+     * Filter by the latest updated
+     *
+     * @param      int $nbDays Maximum age of the latest update in days
+     *
+     * @return     $this|ChildOpportunityQuery The current query, for fluid interface
+     */
+    public function recentlyUpdated($nbDays = 7)
+    {
+        return $this->addUsingAlias(OpportunityTableMap::COL_UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     $this|ChildOpportunityQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(OpportunityTableMap::COL_UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     $this|ChildOpportunityQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(OpportunityTableMap::COL_UPDATED_AT);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     $this|ChildOpportunityQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(OpportunityTableMap::COL_CREATED_AT);
+    }
+
+    /**
+     * Filter by the latest created
+     *
+     * @param      int $nbDays Maximum age of in days
+     *
+     * @return     $this|ChildOpportunityQuery The current query, for fluid interface
+     */
+    public function recentlyCreated($nbDays = 7)
+    {
+        return $this->addUsingAlias(OpportunityTableMap::COL_CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by create date asc
+     *
+     * @return     $this|ChildOpportunityQuery The current query, for fluid interface
+     */
+    public function firstCreatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(OpportunityTableMap::COL_CREATED_AT);
     }
 
 } // OpportunityQuery

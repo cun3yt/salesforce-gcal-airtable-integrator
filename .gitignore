@@ -1,7 +1,15 @@
+# OS & Dev Tools Specific
 .DS_Store
 .idea
 
+# Dependency Manager Specific
 composer.phar
 /vendor/
 
+# ORM Specific
 propel.json
+## propel is a symbolic link
+propel
+
+# Configuration Override
+global-config-override.php

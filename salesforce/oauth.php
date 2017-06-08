@@ -1,0 +1,1 @@
+<?require_once("${_SERVER['DOCUMENT_ROOT']}/salesforce/config.php");require_once("${_SERVER['DOCUMENT_ROOT']}/libraries/Helpers.php");$authUrl = LOGIN_URI . "/services/oauth2/authorize?response_type=code&client_id=" . CLIENT_ID . "&redirect_uri=" . urlencode(REDIRECT_URI);Helpers::redirect($authUrl);

@@ -59,7 +59,7 @@ class MeetingHasAccountHistoryTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 3;
+    const NUM_COLUMNS = 5;
 
     /**
      * The number of lazy-loaded columns
@@ -69,7 +69,7 @@ class MeetingHasAccountHistoryTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 3;
+    const NUM_HYDRATE_COLUMNS = 5;
 
     /**
      * the column name for the id field
@@ -87,6 +87,16 @@ class MeetingHasAccountHistoryTableMap extends TableMap
     const COL_ACCOUNT_HISTORY_ID = 'meeting_has_account_history.account_history_id';
 
     /**
+     * the column name for the created_at field
+     */
+    const COL_CREATED_AT = 'meeting_has_account_history.created_at';
+
+    /**
+     * the column name for the updated_at field
+     */
+    const COL_UPDATED_AT = 'meeting_has_account_history.updated_at';
+
+    /**
      * The default string format for model objects of the related table
      */
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -98,11 +108,11 @@ class MeetingHasAccountHistoryTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'MeetingId', 'AccountHistoryId', ),
-        self::TYPE_CAMELNAME     => array('id', 'meetingId', 'accountHistoryId', ),
-        self::TYPE_COLNAME       => array(MeetingHasAccountHistoryTableMap::COL_ID, MeetingHasAccountHistoryTableMap::COL_MEETING_ID, MeetingHasAccountHistoryTableMap::COL_ACCOUNT_HISTORY_ID, ),
-        self::TYPE_FIELDNAME     => array('id', 'meeting_id', 'account_history_id', ),
-        self::TYPE_NUM           => array(0, 1, 2, )
+        self::TYPE_PHPNAME       => array('Id', 'MeetingId', 'AccountHistoryId', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_CAMELNAME     => array('id', 'meetingId', 'accountHistoryId', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(MeetingHasAccountHistoryTableMap::COL_ID, MeetingHasAccountHistoryTableMap::COL_MEETING_ID, MeetingHasAccountHistoryTableMap::COL_ACCOUNT_HISTORY_ID, MeetingHasAccountHistoryTableMap::COL_CREATED_AT, MeetingHasAccountHistoryTableMap::COL_UPDATED_AT, ),
+        self::TYPE_FIELDNAME     => array('id', 'meeting_id', 'account_history_id', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -112,11 +122,11 @@ class MeetingHasAccountHistoryTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'MeetingId' => 1, 'AccountHistoryId' => 2, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'meetingId' => 1, 'accountHistoryId' => 2, ),
-        self::TYPE_COLNAME       => array(MeetingHasAccountHistoryTableMap::COL_ID => 0, MeetingHasAccountHistoryTableMap::COL_MEETING_ID => 1, MeetingHasAccountHistoryTableMap::COL_ACCOUNT_HISTORY_ID => 2, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'meeting_id' => 1, 'account_history_id' => 2, ),
-        self::TYPE_NUM           => array(0, 1, 2, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'MeetingId' => 1, 'AccountHistoryId' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'meetingId' => 1, 'accountHistoryId' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
+        self::TYPE_COLNAME       => array(MeetingHasAccountHistoryTableMap::COL_ID => 0, MeetingHasAccountHistoryTableMap::COL_MEETING_ID => 1, MeetingHasAccountHistoryTableMap::COL_ACCOUNT_HISTORY_ID => 2, MeetingHasAccountHistoryTableMap::COL_CREATED_AT => 3, MeetingHasAccountHistoryTableMap::COL_UPDATED_AT => 4, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'meeting_id' => 1, 'account_history_id' => 2, 'created_at' => 3, 'updated_at' => 4, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -140,6 +150,8 @@ class MeetingHasAccountHistoryTableMap extends TableMap
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('meeting_id', 'MeetingId', 'INTEGER', false, null, null);
         $this->addColumn('account_history_id', 'AccountHistoryId', 'INTEGER', false, null, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
 
     /**
@@ -148,6 +160,19 @@ class MeetingHasAccountHistoryTableMap extends TableMap
     public function buildRelations()
     {
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_created_at' => 'false', 'disable_updated_at' => 'false', ),
+        );
+    } // getBehaviors()
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -293,10 +318,14 @@ class MeetingHasAccountHistoryTableMap extends TableMap
             $criteria->addSelectColumn(MeetingHasAccountHistoryTableMap::COL_ID);
             $criteria->addSelectColumn(MeetingHasAccountHistoryTableMap::COL_MEETING_ID);
             $criteria->addSelectColumn(MeetingHasAccountHistoryTableMap::COL_ACCOUNT_HISTORY_ID);
+            $criteria->addSelectColumn(MeetingHasAccountHistoryTableMap::COL_CREATED_AT);
+            $criteria->addSelectColumn(MeetingHasAccountHistoryTableMap::COL_UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.meeting_id');
             $criteria->addSelectColumn($alias . '.account_history_id');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 

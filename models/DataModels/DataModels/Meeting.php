@@ -16,5 +16,6 @@ use DataModels\DataModels\Base\Meeting as BaseMeeting;
  */
 class Meeting extends BaseMeeting
 {
-
+    const PROCESS_STATE_NOT_PROCESSED = "not processed";
+    const PROCESS_STATE_PROCESSED = "processed";
 }

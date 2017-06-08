@@ -10,6 +10,7 @@ use DataModels\DataModels\Map\MeetingHasAttendeeTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Propel\Runtime\ActiveQuery\ModelJoin;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
@@ -19,13 +20,15 @@ use Propel\Runtime\Exception\PropelException;
  *
  *
  *
- * @method     ChildMeetingHasAttendeeQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildMeetingHasAttendeeQuery orderByMeetingId($order = Criteria::ASC) Order by the meeting_id column
  * @method     ChildMeetingHasAttendeeQuery orderByMeetingAttendeeId($order = Criteria::ASC) Order by the meeting_attendee_id column
+ * @method     ChildMeetingHasAttendeeQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
+ * @method     ChildMeetingHasAttendeeQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
- * @method     ChildMeetingHasAttendeeQuery groupById() Group by the id column
  * @method     ChildMeetingHasAttendeeQuery groupByMeetingId() Group by the meeting_id column
  * @method     ChildMeetingHasAttendeeQuery groupByMeetingAttendeeId() Group by the meeting_attendee_id column
+ * @method     ChildMeetingHasAttendeeQuery groupByCreatedAt() Group by the created_at column
+ * @method     ChildMeetingHasAttendeeQuery groupByUpdatedAt() Group by the updated_at column
  *
  * @method     ChildMeetingHasAttendeeQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method     ChildMeetingHasAttendeeQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -35,24 +38,49 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildMeetingHasAttendeeQuery rightJoinWith($relation) Adds a RIGHT JOIN clause and with to the query
  * @method     ChildMeetingHasAttendeeQuery innerJoinWith($relation) Adds a INNER JOIN clause and with to the query
  *
+ * @method     ChildMeetingHasAttendeeQuery leftJoinMeeting($relationAlias = null) Adds a LEFT JOIN clause to the query using the Meeting relation
+ * @method     ChildMeetingHasAttendeeQuery rightJoinMeeting($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Meeting relation
+ * @method     ChildMeetingHasAttendeeQuery innerJoinMeeting($relationAlias = null) Adds a INNER JOIN clause to the query using the Meeting relation
+ *
+ * @method     ChildMeetingHasAttendeeQuery joinWithMeeting($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the Meeting relation
+ *
+ * @method     ChildMeetingHasAttendeeQuery leftJoinWithMeeting() Adds a LEFT JOIN clause and with to the query using the Meeting relation
+ * @method     ChildMeetingHasAttendeeQuery rightJoinWithMeeting() Adds a RIGHT JOIN clause and with to the query using the Meeting relation
+ * @method     ChildMeetingHasAttendeeQuery innerJoinWithMeeting() Adds a INNER JOIN clause and with to the query using the Meeting relation
+ *
+ * @method     ChildMeetingHasAttendeeQuery leftJoinMeetingAttendee($relationAlias = null) Adds a LEFT JOIN clause to the query using the MeetingAttendee relation
+ * @method     ChildMeetingHasAttendeeQuery rightJoinMeetingAttendee($relationAlias = null) Adds a RIGHT JOIN clause to the query using the MeetingAttendee relation
+ * @method     ChildMeetingHasAttendeeQuery innerJoinMeetingAttendee($relationAlias = null) Adds a INNER JOIN clause to the query using the MeetingAttendee relation
+ *
+ * @method     ChildMeetingHasAttendeeQuery joinWithMeetingAttendee($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the MeetingAttendee relation
+ *
+ * @method     ChildMeetingHasAttendeeQuery leftJoinWithMeetingAttendee() Adds a LEFT JOIN clause and with to the query using the MeetingAttendee relation
+ * @method     ChildMeetingHasAttendeeQuery rightJoinWithMeetingAttendee() Adds a RIGHT JOIN clause and with to the query using the MeetingAttendee relation
+ * @method     ChildMeetingHasAttendeeQuery innerJoinWithMeetingAttendee() Adds a INNER JOIN clause and with to the query using the MeetingAttendee relation
+ *
+ * @method     \DataModels\DataModels\MeetingQuery|\DataModels\DataModels\MeetingAttendeeQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ *
  * @method     ChildMeetingHasAttendee findOne(ConnectionInterface $con = null) Return the first ChildMeetingHasAttendee matching the query
  * @method     ChildMeetingHasAttendee findOneOrCreate(ConnectionInterface $con = null) Return the first ChildMeetingHasAttendee matching the query, or a new ChildMeetingHasAttendee object populated from the query conditions when no match is found
  *
- * @method     ChildMeetingHasAttendee findOneById(int $id) Return the first ChildMeetingHasAttendee filtered by the id column
  * @method     ChildMeetingHasAttendee findOneByMeetingId(int $meeting_id) Return the first ChildMeetingHasAttendee filtered by the meeting_id column
- * @method     ChildMeetingHasAttendee findOneByMeetingAttendeeId(int $meeting_attendee_id) Return the first ChildMeetingHasAttendee filtered by the meeting_attendee_id column *
+ * @method     ChildMeetingHasAttendee findOneByMeetingAttendeeId(int $meeting_attendee_id) Return the first ChildMeetingHasAttendee filtered by the meeting_attendee_id column
+ * @method     ChildMeetingHasAttendee findOneByCreatedAt(string $created_at) Return the first ChildMeetingHasAttendee filtered by the created_at column
+ * @method     ChildMeetingHasAttendee findOneByUpdatedAt(string $updated_at) Return the first ChildMeetingHasAttendee filtered by the updated_at column *
 
  * @method     ChildMeetingHasAttendee requirePk($key, ConnectionInterface $con = null) Return the ChildMeetingHasAttendee by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildMeetingHasAttendee requireOne(ConnectionInterface $con = null) Return the first ChildMeetingHasAttendee matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
- * @method     ChildMeetingHasAttendee requireOneById(int $id) Return the first ChildMeetingHasAttendee filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildMeetingHasAttendee requireOneByMeetingId(int $meeting_id) Return the first ChildMeetingHasAttendee filtered by the meeting_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildMeetingHasAttendee requireOneByMeetingAttendeeId(int $meeting_attendee_id) Return the first ChildMeetingHasAttendee filtered by the meeting_attendee_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildMeetingHasAttendee requireOneByCreatedAt(string $created_at) Return the first ChildMeetingHasAttendee filtered by the created_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildMeetingHasAttendee requireOneByUpdatedAt(string $updated_at) Return the first ChildMeetingHasAttendee filtered by the updated_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildMeetingHasAttendee[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildMeetingHasAttendee objects based on current ModelCriteria
- * @method     ChildMeetingHasAttendee[]|ObjectCollection findById(int $id) Return ChildMeetingHasAttendee objects filtered by the id column
  * @method     ChildMeetingHasAttendee[]|ObjectCollection findByMeetingId(int $meeting_id) Return ChildMeetingHasAttendee objects filtered by the meeting_id column
  * @method     ChildMeetingHasAttendee[]|ObjectCollection findByMeetingAttendeeId(int $meeting_attendee_id) Return ChildMeetingHasAttendee objects filtered by the meeting_attendee_id column
+ * @method     ChildMeetingHasAttendee[]|ObjectCollection findByCreatedAt(string $created_at) Return ChildMeetingHasAttendee objects filtered by the created_at column
+ * @method     ChildMeetingHasAttendee[]|ObjectCollection findByUpdatedAt(string $updated_at) Return ChildMeetingHasAttendee objects filtered by the updated_at column
  * @method     ChildMeetingHasAttendee[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
  *
  */
@@ -102,10 +130,10 @@ abstract class MeetingHasAttendeeQuery extends ModelCriteria
      * Go fast if the query is untouched.
      *
      * <code>
-     * $obj  = $c->findPk(12, $con);
+     * $obj = $c->findPk(array(12, 34), $con);
      * </code>
      *
-     * @param mixed $key Primary key to use for the query
+     * @param array[$meeting_id, $meeting_attendee_id] $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
      * @return ChildMeetingHasAttendee|array|mixed the result, formatted by the current formatter
@@ -130,7 +158,7 @@ abstract class MeetingHasAttendeeQuery extends ModelCriteria
             return $this->findPkComplex($key, $con);
         }
 
-        if ((null !== ($obj = MeetingHasAttendeeTableMap::getInstanceFromPool(null === $key || is_scalar($key) || is_callable([$key, '__toString']) ? (string) $key : $key)))) {
+        if ((null !== ($obj = MeetingHasAttendeeTableMap::getInstanceFromPool(serialize([(null === $key[0] || is_scalar($key[0]) || is_callable([$key[0], '__toString']) ? (string) $key[0] : $key[0]), (null === $key[1] || is_scalar($key[1]) || is_callable([$key[1], '__toString']) ? (string) $key[1] : $key[1])]))))) {
             // the object is already in the instance pool
             return $obj;
         }
@@ -151,10 +179,11 @@ abstract class MeetingHasAttendeeQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, meeting_id, meeting_attendee_id FROM meeting_has_attendee WHERE id = :p0';
+        $sql = 'SELECT meeting_id, meeting_attendee_id, created_at, updated_at FROM meeting_has_attendee WHERE meeting_id = :p0 AND meeting_attendee_id = :p1';
         try {
             $stmt = $con->prepare($sql);
-            $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
+            $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
+            $stmt->bindValue(':p1', $key[1], PDO::PARAM_INT);
             $stmt->execute();
         } catch (Exception $e) {
             Propel::log($e->getMessage(), Propel::LOG_ERR);
@@ -165,7 +194,7 @@ abstract class MeetingHasAttendeeQuery extends ModelCriteria
             /** @var ChildMeetingHasAttendee $obj */
             $obj = new ChildMeetingHasAttendee();
             $obj->hydrate($row);
-            MeetingHasAttendeeTableMap::addInstanceToPool($obj, null === $key || is_scalar($key) || is_callable([$key, '__toString']) ? (string) $key : $key);
+            MeetingHasAttendeeTableMap::addInstanceToPool($obj, serialize([(null === $key[0] || is_scalar($key[0]) || is_callable([$key[0], '__toString']) ? (string) $key[0] : $key[0]), (null === $key[1] || is_scalar($key[1]) || is_callable([$key[1], '__toString']) ? (string) $key[1] : $key[1])]));
         }
         $stmt->closeCursor();
 
@@ -194,7 +223,7 @@ abstract class MeetingHasAttendeeQuery extends ModelCriteria
     /**
      * Find objects by primary key
      * <code>
-     * $objs = $c->findPks(array(12, 56, 832), $con);
+     * $objs = $c->findPks(array(array(12, 56), array(832, 123), array(123, 456)), $con);
      * </code>
      * @param     array $keys Primary keys to use for the query
      * @param     ConnectionInterface $con an optional connection object
@@ -224,8 +253,10 @@ abstract class MeetingHasAttendeeQuery extends ModelCriteria
      */
     public function filterByPrimaryKey($key)
     {
+        $this->addUsingAlias(MeetingHasAttendeeTableMap::COL_MEETING_ID, $key[0], Criteria::EQUAL);
+        $this->addUsingAlias(MeetingHasAttendeeTableMap::COL_MEETING_ATTENDEE_ID, $key[1], Criteria::EQUAL);
 
-        return $this->addUsingAlias(MeetingHasAttendeeTableMap::COL_ID, $key, Criteria::EQUAL);
+        return $this;
     }
 
     /**
@@ -237,49 +268,17 @@ abstract class MeetingHasAttendeeQuery extends ModelCriteria
      */
     public function filterByPrimaryKeys($keys)
     {
-
-        return $this->addUsingAlias(MeetingHasAttendeeTableMap::COL_ID, $keys, Criteria::IN);
-    }
-
-    /**
-     * Filter the query on the id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterById(1234); // WHERE id = 1234
-     * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
-     * </code>
-     *
-     * @param     mixed $id The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return $this|ChildMeetingHasAttendeeQuery The current query, for fluid interface
-     */
-    public function filterById($id = null, $comparison = null)
-    {
-        if (is_array($id)) {
-            $useMinMax = false;
-            if (isset($id['min'])) {
-                $this->addUsingAlias(MeetingHasAttendeeTableMap::COL_ID, $id['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($id['max'])) {
-                $this->addUsingAlias(MeetingHasAttendeeTableMap::COL_ID, $id['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
+        if (empty($keys)) {
+            return $this->add(null, '1<>1', Criteria::CUSTOM);
+        }
+        foreach ($keys as $key) {
+            $cton0 = $this->getNewCriterion(MeetingHasAttendeeTableMap::COL_MEETING_ID, $key[0], Criteria::EQUAL);
+            $cton1 = $this->getNewCriterion(MeetingHasAttendeeTableMap::COL_MEETING_ATTENDEE_ID, $key[1], Criteria::EQUAL);
+            $cton0->addAnd($cton1);
+            $this->addOr($cton0);
         }
 
-        return $this->addUsingAlias(MeetingHasAttendeeTableMap::COL_ID, $id, $comparison);
+        return $this;
     }
 
     /**
@@ -291,6 +290,8 @@ abstract class MeetingHasAttendeeQuery extends ModelCriteria
      * $query->filterByMeetingId(array(12, 34)); // WHERE meeting_id IN (12, 34)
      * $query->filterByMeetingId(array('min' => 12)); // WHERE meeting_id > 12
      * </code>
+     *
+     * @see       filterByMeeting()
      *
      * @param     mixed $meetingId The value to use as filter.
      *              Use scalar values for equality.
@@ -333,6 +334,8 @@ abstract class MeetingHasAttendeeQuery extends ModelCriteria
      * $query->filterByMeetingAttendeeId(array('min' => 12)); // WHERE meeting_attendee_id > 12
      * </code>
      *
+     * @see       filterByMeetingAttendee()
+     *
      * @param     mixed $meetingAttendeeId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
@@ -365,6 +368,246 @@ abstract class MeetingHasAttendeeQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the created_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByCreatedAt('2011-03-14'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt('now'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $createdAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildMeetingHasAttendeeQuery The current query, for fluid interface
+     */
+    public function filterByCreatedAt($createdAt = null, $comparison = null)
+    {
+        if (is_array($createdAt)) {
+            $useMinMax = false;
+            if (isset($createdAt['min'])) {
+                $this->addUsingAlias(MeetingHasAttendeeTableMap::COL_CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($createdAt['max'])) {
+                $this->addUsingAlias(MeetingHasAttendeeTableMap::COL_CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(MeetingHasAttendeeTableMap::COL_CREATED_AT, $createdAt, $comparison);
+    }
+
+    /**
+     * Filter the query on the updated_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt('now'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $updatedAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildMeetingHasAttendeeQuery The current query, for fluid interface
+     */
+    public function filterByUpdatedAt($updatedAt = null, $comparison = null)
+    {
+        if (is_array($updatedAt)) {
+            $useMinMax = false;
+            if (isset($updatedAt['min'])) {
+                $this->addUsingAlias(MeetingHasAttendeeTableMap::COL_UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($updatedAt['max'])) {
+                $this->addUsingAlias(MeetingHasAttendeeTableMap::COL_UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(MeetingHasAttendeeTableMap::COL_UPDATED_AT, $updatedAt, $comparison);
+    }
+
+    /**
+     * Filter the query by a related \DataModels\DataModels\Meeting object
+     *
+     * @param \DataModels\DataModels\Meeting|ObjectCollection $meeting The related object(s) to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return ChildMeetingHasAttendeeQuery The current query, for fluid interface
+     */
+    public function filterByMeeting($meeting, $comparison = null)
+    {
+        if ($meeting instanceof \DataModels\DataModels\Meeting) {
+            return $this
+                ->addUsingAlias(MeetingHasAttendeeTableMap::COL_MEETING_ID, $meeting->getId(), $comparison);
+        } elseif ($meeting instanceof ObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(MeetingHasAttendeeTableMap::COL_MEETING_ID, $meeting->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByMeeting() only accepts arguments of type \DataModels\DataModels\Meeting or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Meeting relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildMeetingHasAttendeeQuery The current query, for fluid interface
+     */
+    public function joinMeeting($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Meeting');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Meeting');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Meeting relation Meeting object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \DataModels\DataModels\MeetingQuery A secondary query class using the current class as primary query
+     */
+    public function useMeetingQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinMeeting($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Meeting', '\DataModels\DataModels\MeetingQuery');
+    }
+
+    /**
+     * Filter the query by a related \DataModels\DataModels\MeetingAttendee object
+     *
+     * @param \DataModels\DataModels\MeetingAttendee|ObjectCollection $meetingAttendee The related object(s) to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return ChildMeetingHasAttendeeQuery The current query, for fluid interface
+     */
+    public function filterByMeetingAttendee($meetingAttendee, $comparison = null)
+    {
+        if ($meetingAttendee instanceof \DataModels\DataModels\MeetingAttendee) {
+            return $this
+                ->addUsingAlias(MeetingHasAttendeeTableMap::COL_MEETING_ATTENDEE_ID, $meetingAttendee->getId(), $comparison);
+        } elseif ($meetingAttendee instanceof ObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(MeetingHasAttendeeTableMap::COL_MEETING_ATTENDEE_ID, $meetingAttendee->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByMeetingAttendee() only accepts arguments of type \DataModels\DataModels\MeetingAttendee or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the MeetingAttendee relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildMeetingHasAttendeeQuery The current query, for fluid interface
+     */
+    public function joinMeetingAttendee($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('MeetingAttendee');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'MeetingAttendee');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the MeetingAttendee relation MeetingAttendee object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \DataModels\DataModels\MeetingAttendeeQuery A secondary query class using the current class as primary query
+     */
+    public function useMeetingAttendeeQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinMeetingAttendee($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'MeetingAttendee', '\DataModels\DataModels\MeetingAttendeeQuery');
+    }
+
+    /**
      * Exclude object from result
      *
      * @param   ChildMeetingHasAttendee $meetingHasAttendee Object to remove from the list of results
@@ -374,7 +617,9 @@ abstract class MeetingHasAttendeeQuery extends ModelCriteria
     public function prune($meetingHasAttendee = null)
     {
         if ($meetingHasAttendee) {
-            $this->addUsingAlias(MeetingHasAttendeeTableMap::COL_ID, $meetingHasAttendee->getId(), Criteria::NOT_EQUAL);
+            $this->addCond('pruneCond0', $this->getAliasedColName(MeetingHasAttendeeTableMap::COL_MEETING_ID), $meetingHasAttendee->getMeetingId(), Criteria::NOT_EQUAL);
+            $this->addCond('pruneCond1', $this->getAliasedColName(MeetingHasAttendeeTableMap::COL_MEETING_ATTENDEE_ID), $meetingHasAttendee->getMeetingAttendeeId(), Criteria::NOT_EQUAL);
+            $this->combine(array('pruneCond0', 'pruneCond1'), Criteria::LOGICAL_OR);
         }
 
         return $this;
@@ -439,6 +684,72 @@ abstract class MeetingHasAttendeeQuery extends ModelCriteria
 
             return $affectedRows;
         });
+    }
+
+    // timestampable behavior
+
+    /**
+     * Filter by the latest updated
+     *
+     * @param      int $nbDays Maximum age of the latest update in days
+     *
+     * @return     $this|ChildMeetingHasAttendeeQuery The current query, for fluid interface
+     */
+    public function recentlyUpdated($nbDays = 7)
+    {
+        return $this->addUsingAlias(MeetingHasAttendeeTableMap::COL_UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     $this|ChildMeetingHasAttendeeQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(MeetingHasAttendeeTableMap::COL_UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     $this|ChildMeetingHasAttendeeQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(MeetingHasAttendeeTableMap::COL_UPDATED_AT);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     $this|ChildMeetingHasAttendeeQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(MeetingHasAttendeeTableMap::COL_CREATED_AT);
+    }
+
+    /**
+     * Filter by the latest created
+     *
+     * @param      int $nbDays Maximum age of in days
+     *
+     * @return     $this|ChildMeetingHasAttendeeQuery The current query, for fluid interface
+     */
+    public function recentlyCreated($nbDays = 7)
+    {
+        return $this->addUsingAlias(MeetingHasAttendeeTableMap::COL_CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by create date asc
+     *
+     * @return     $this|ChildMeetingHasAttendeeQuery The current query, for fluid interface
+     */
+    public function firstCreatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(MeetingHasAttendeeTableMap::COL_CREATED_AT);
     }
 
 } // MeetingHasAttendeeQuery
