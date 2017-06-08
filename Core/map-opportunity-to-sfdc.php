@@ -64,10 +64,10 @@ while(1) {
             die;
         }
 
-        $account->setSFDCOpptyLastCheckTime(time());
-
         if($opptyDetailSFDC['totalSize'] < 1) {
-            $account->save();
+            $account
+                ->setSFDCOpptyLastCheckTime(time())
+                ->save();
             continue;
         }
 
@@ -84,18 +84,22 @@ while(1) {
         if( !$opptyHistory ) {
             OpportunityHistory::createOpportunityHistory($oppty, $sfdcOppty);
         } else {
-            $sfdcHistoryList = Helpers::SFDCGetOpptyHistoryLatest($sfcdToken->instance_url, $sfdcToken->access_token,
-                $oppty->getSFDCOpportunityId());
+            $sfdcHistoryList = Helpers::SFDCGetOpptyHistoryLatest($sfdcToken->instance_url, $sfdcToken->access_token,
+                $oppty->getSFDCId());
 
             if( $opptyHistory->isThereAnyUpdate($sfdcOppty, $sfdcHistoryList) ) {
                 OpportunityHistory::createOpportunityHistory($oppty, $sfdcOppty);
             }
         }
 
-        $account->save();
+        $account
+            ->setSFDCOpptyLastCheckTime(time())
+            ->save();
+
+        // @todo Meeting Oppty Mapping will be here! Techila's function for this purpose: fnUpdateMeetingRecord
     }
 
-    $pager = getAccountsNotRecentlySFDCChecked($client, 1);
+    $pager = getAccountsWithOpptyNotRecentlySFDCChecked($client, 1);
 }
 
 /**
@@ -110,75 +114,6 @@ function getAccountsWithOpptyNotRecentlySFDCChecked(Client $client, int $page = 
     return $q->filterByClient($client)
         ->filterBySfdcAccountId(NULL, Criteria::NOT_EQUAL)
         ->where("(sfdc_oppty_last_check_time IS NULL) OR (sfdc_oppty_last_check_time < CURRENT_TIMESTAMP - INTERVAL '3 DAYS')")
+        ->orderById(Criteria::ASC)
         ->paginate($page, $pageSize);
-}
-
-
-
-
-die;
-
-// vvvv DANGER! Techila Code Below vvvv
-
-
-foreach ($arrGcalUser as $arrUser) {
-    $arrUpdatedIds = array();
-    $arrProcessIds = array();
-    $intAccCnts = 0;
-    $strARecId = $arrUser['id'];
-    $arrAccountDetail = $arrUser['fields']['acoount_id'];
-
-    foreach ($arrAccountDetail as $arrAccount) {
-        $intAccCnts++;
-        $arrAccDetail = Helpers::fnGetAccountDetail($arrAccount);
-        $arrOpportunityDetail = Helpers::fnGetOpportunityDetail($arrAccDetail['fields']['Account']);
-        if (is_array($arrOpportunityDetail) && (count($arrOpportunityDetail) > 0)) {
-            $arrAccountDetailSF = Helpers::getOpptyDetailFromSFDC($instance_url, $access_token, $arrAccDetail['fields']['Account ID']);
-            if (is_array($arrAccountDetailSF['records']) && (count($arrAccountDetailSF['records']) > 0)) {
-                $arrOppHIds = $arrOpportunityDetail[0]['fields']['Opportunity History'];
-                $IsToBeInserted = Helpers::fnCheckIfOppHistoryToBeInserted($arrAccountDetailSF['records']);
-
-                if ($IsToBeInserted && $IsToBeInserted == "1") {
-                    $isUpdatedAccountHistory = Helpers::fnInsertOppHistory($arrAccountDetailSF['records'], $$arrOpportunityDetail[0]['id']);
-                    if ($isUpdatedAccountHistory['id']) {
-                        $arrOppHIds[] = $isUpdatedAccountHistory['id'];
-                        $arrUpdatedIds[] = $isUpdatedAccountHistory['id'];
-                    }
-                } else if($IsToBeInserted) {
-                    $arrOppHIds[] = $IsToBeInserted;
-                    $arrUpdatedIds[] = $IsToBeInserted;
-                } else {
-                    $arrOppHIds[] = $IsToBeInserted;
-                    $arrUpdatedIds[] = $IsToBeInserted;
-                }
-
-                Helpers::fnUpdateAccountRecordForOppties($arrOpportunityDetail[0]['id'], $arrOppHIds);
-            }
-
-            continue;
-        }
-
-        $arrAccountDetailSF = Helpers::getOpptyDetailFromSFDC($instance_url, $access_token, $arrAccDetail['fields']['Account ID']);
-
-        if( !(is_array($arrAccountDetailSF['records']) && (count($arrAccountDetailSF['records']) > 0)) ) {
-            $arrProcessIds[] = $strARecId;
-            continue;
-        }
-
-        $arrUpdatedAccountHistory = Helpers::fnInsertOpportunity($arrAccountDetailSF['records'], $arrAccDetail['id']);
-        $isUpdatedAccountHistory = Helpers::fnInsertOppHistory($arrAccountDetailSF['records'], $arrUpdatedAccountHistory['id']);
-        $arrUpdatedIds[] = $isUpdatedAccountHistory['id'];
-        Helpers::fnUpdateAccountRecordForOppties($arrUpdatedAccountHistory['id'], array($isUpdatedAccountHistory['id']));
-    }
-
-    if(!is_array($arrProcessIds)) {
-        continue;
-    }
-
-    if (count($arrProcessIds) == $intAccCnts) {
-        Helpers::fnUpdateOppProcessedRecord($strARecId);
-    } elseif(count($arrUpdatedIds) > 0) {
-        $arrUpdatedIds = array_unique($arrUpdatedIds);
-        Helpers::fnUpdateMeetingRecord($strARecId, $arrUpdatedIds);
-    }
 }

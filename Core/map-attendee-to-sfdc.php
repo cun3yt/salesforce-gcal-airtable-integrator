@@ -164,6 +164,10 @@ foreach($arrGcalUser as $arrUser) {
             }
 
             $arrAccDetail = Helpers::fnGetAccountDetailForAttendees($arrAccountDetailSF['records'][0]['AccountId']);
+
+            /**
+             * @todo Houston we have problem here! The line below still reaches to Airtable!!
+             */
             $arrUpdatedAccountHistory = Helpers::fnInsertContact($arrAccountDetailSF['records'],$arrAccDetail[0]['id']);
 
             if( !(is_array($arrUpdatedAccountHistory) && (count($arrUpdatedAccountHistory)>0)) ) {

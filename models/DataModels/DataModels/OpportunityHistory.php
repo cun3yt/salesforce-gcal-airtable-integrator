@@ -61,12 +61,25 @@ class OpportunityHistory extends BaseOpportunityHistory implements IHistoryTrack
      */
     public static function createOpportunityHistory(Opportunity $opportunity, $SFDCResponse) {
         $opportunityHistory = new OpportunityHistory();
-        $opportunityHistory->setOpportunity($opportunity)
+        $opportunityHistory
+            ->setOpportunity($opportunity)
+            ->setAccountSFDCId($SFDCResponse['AccountId'])
             ->setAmount($SFDCResponse['Amount'])
             ->setCloseDate($SFDCResponse['CloseDate'])
-            ->setAccountName($SFDCResponse['AccountName']);
-
-        // @todo rest of the set functions will be here!
+            ->setCreatedBy($SFDCResponse['CreatedById'])
+            ->setDescription($SFDCResponse['Description'])
+            ->setSFDCOpportunityId($SFDCResponse['Id'])
+            ->setLastModifiedBy($SFDCResponse['LastModifiedById'])
+            ->setLeadSource($SFDCResponse['LeadSource'])
+            ->setName($SFDCResponse['Name'])
+            ->setNextStep($SFDCResponse['NextStep'])
+            ->setOwnerId($SFDCResponse['OwnerId'])
+            ->setStage($SFDCResponse['StageName'])
+            ->setSyncedQuote($SFDCResponse['SyncedQuoteId'])
+            ->setType($SFDCResponse['Type'])
+            ->setProbability($SFDCResponse['Probability'])
+            ->setPriceBook($SFDCResponse['Pricebook2Id'])
+            ->save();
 
         return $opportunityHistory;
     }

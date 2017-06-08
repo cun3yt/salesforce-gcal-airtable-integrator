@@ -97,13 +97,6 @@ abstract class Opportunity implements ActiveRecordInterface
     protected $sfdc_last_check_time;
 
     /**
-     * The value for the sfdc_opportunity_id field.
-     *
-     * @var        string
-     */
-    protected $sfdc_opportunity_id;
-
-    /**
      * The value for the created_at field.
      *
      * @var        DateTime
@@ -418,16 +411,6 @@ abstract class Opportunity implements ActiveRecordInterface
     }
 
     /**
-     * Get the [sfdc_opportunity_id] column value.
-     *
-     * @return string
-     */
-    public function getSFDCOpportunityId()
-    {
-        return $this->sfdc_opportunity_id;
-    }
-
-    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
@@ -552,26 +535,6 @@ abstract class Opportunity implements ActiveRecordInterface
     } // setSFDCLastCheckTime()
 
     /**
-     * Set the value of [sfdc_opportunity_id] column.
-     *
-     * @param string $v new value
-     * @return $this|\DataModels\DataModels\Opportunity The current object (for fluent API support)
-     */
-    public function setSFDCOpportunityId($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->sfdc_opportunity_id !== $v) {
-            $this->sfdc_opportunity_id = $v;
-            $this->modifiedColumns[OpportunityTableMap::COL_SFDC_OPPORTUNITY_ID] = true;
-        }
-
-        return $this;
-    } // setSFDCOpportunityId()
-
-    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
@@ -659,13 +622,10 @@ abstract class Opportunity implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : OpportunityTableMap::translateFieldName('SFDCLastCheckTime', TableMap::TYPE_PHPNAME, $indexType)];
             $this->sfdc_last_check_time = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : OpportunityTableMap::translateFieldName('SFDCOpportunityId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->sfdc_opportunity_id = (null !== $col) ? (string) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : OpportunityTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : OpportunityTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : OpportunityTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : OpportunityTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
             $this->resetModified();
 
@@ -675,7 +635,7 @@ abstract class Opportunity implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 7; // 7 = OpportunityTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 6; // 6 = OpportunityTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\DataModels\\DataModels\\Opportunity'), 0, $e);
@@ -945,9 +905,6 @@ abstract class Opportunity implements ActiveRecordInterface
         if ($this->isColumnModified(OpportunityTableMap::COL_SFDC_LAST_CHECK_TIME)) {
             $modifiedColumns[':p' . $index++]  = 'sfdc_last_check_time';
         }
-        if ($this->isColumnModified(OpportunityTableMap::COL_SFDC_OPPORTUNITY_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'sfdc_opportunity_id';
-        }
         if ($this->isColumnModified(OpportunityTableMap::COL_CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'created_at';
         }
@@ -976,9 +933,6 @@ abstract class Opportunity implements ActiveRecordInterface
                         break;
                     case 'sfdc_last_check_time':
                         $stmt->bindValue($identifier, $this->sfdc_last_check_time ? $this->sfdc_last_check_time->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
-                        break;
-                    case 'sfdc_opportunity_id':
-                        $stmt->bindValue($identifier, $this->sfdc_opportunity_id, PDO::PARAM_STR);
                         break;
                     case 'created_at':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
@@ -1054,12 +1008,9 @@ abstract class Opportunity implements ActiveRecordInterface
                 return $this->getSFDCLastCheckTime();
                 break;
             case 4:
-                return $this->getSFDCOpportunityId();
-                break;
-            case 5:
                 return $this->getCreatedAt();
                 break;
-            case 6:
+            case 5:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1096,20 +1047,19 @@ abstract class Opportunity implements ActiveRecordInterface
             $keys[1] => $this->getAccountId(),
             $keys[2] => $this->getSFDCId(),
             $keys[3] => $this->getSFDCLastCheckTime(),
-            $keys[4] => $this->getSFDCOpportunityId(),
-            $keys[5] => $this->getCreatedAt(),
-            $keys[6] => $this->getUpdatedAt(),
+            $keys[4] => $this->getCreatedAt(),
+            $keys[5] => $this->getUpdatedAt(),
         );
         if ($result[$keys[3]] instanceof \DateTime) {
             $result[$keys[3]] = $result[$keys[3]]->format('c');
         }
 
-        if ($result[$keys[5]] instanceof \DateTime) {
-            $result[$keys[5]] = $result[$keys[5]]->format('c');
+        if ($result[$keys[4]] instanceof \DateTime) {
+            $result[$keys[4]] = $result[$keys[4]]->format('c');
         }
 
-        if ($result[$keys[6]] instanceof \DateTime) {
-            $result[$keys[6]] = $result[$keys[6]]->format('c');
+        if ($result[$keys[5]] instanceof \DateTime) {
+            $result[$keys[5]] = $result[$keys[5]]->format('c');
         }
 
         $virtualColumns = $this->virtualColumns;
@@ -1195,12 +1145,9 @@ abstract class Opportunity implements ActiveRecordInterface
                 $this->setSFDCLastCheckTime($value);
                 break;
             case 4:
-                $this->setSFDCOpportunityId($value);
-                break;
-            case 5:
                 $this->setCreatedAt($value);
                 break;
-            case 6:
+            case 5:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1242,13 +1189,10 @@ abstract class Opportunity implements ActiveRecordInterface
             $this->setSFDCLastCheckTime($arr[$keys[3]]);
         }
         if (array_key_exists($keys[4], $arr)) {
-            $this->setSFDCOpportunityId($arr[$keys[4]]);
+            $this->setCreatedAt($arr[$keys[4]]);
         }
         if (array_key_exists($keys[5], $arr)) {
-            $this->setCreatedAt($arr[$keys[5]]);
-        }
-        if (array_key_exists($keys[6], $arr)) {
-            $this->setUpdatedAt($arr[$keys[6]]);
+            $this->setUpdatedAt($arr[$keys[5]]);
         }
     }
 
@@ -1302,9 +1246,6 @@ abstract class Opportunity implements ActiveRecordInterface
         }
         if ($this->isColumnModified(OpportunityTableMap::COL_SFDC_LAST_CHECK_TIME)) {
             $criteria->add(OpportunityTableMap::COL_SFDC_LAST_CHECK_TIME, $this->sfdc_last_check_time);
-        }
-        if ($this->isColumnModified(OpportunityTableMap::COL_SFDC_OPPORTUNITY_ID)) {
-            $criteria->add(OpportunityTableMap::COL_SFDC_OPPORTUNITY_ID, $this->sfdc_opportunity_id);
         }
         if ($this->isColumnModified(OpportunityTableMap::COL_CREATED_AT)) {
             $criteria->add(OpportunityTableMap::COL_CREATED_AT, $this->created_at);
@@ -1401,7 +1342,6 @@ abstract class Opportunity implements ActiveRecordInterface
         $copyObj->setAccountId($this->getAccountId());
         $copyObj->setSFDCId($this->getSFDCId());
         $copyObj->setSFDCLastCheckTime($this->getSFDCLastCheckTime());
-        $copyObj->setSFDCOpportunityId($this->getSFDCOpportunityId());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
 
@@ -1752,7 +1692,6 @@ abstract class Opportunity implements ActiveRecordInterface
         $this->account_id = null;
         $this->sfdc_id = null;
         $this->sfdc_last_check_time = null;
-        $this->sfdc_opportunity_id = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;

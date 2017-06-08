@@ -273,7 +273,7 @@ class AccountHistoryTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
-            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_created_at' => 'false', 'disable_updated_at' => 'false', ),
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_created_at' => 'false', 'disable_updated_at' => 'false', 'created_at' => 'created_at', ),
         );
     } // getBehaviors()
 

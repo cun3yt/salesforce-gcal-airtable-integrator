@@ -22,7 +22,7 @@ class Opportunity extends BaseOpportunity
 {
     public static function findByAccountAndSFDCId(Account $account, $sfdcOpptyId) {
         $q = new OpportunityQuery();
-        return $q->filterByAccount($account)->findOneBySFDCOpportunityId($sfdcOpptyId);
+        return $q->filterByAccount($account)->findOneBySFDCId($sfdcOpptyId);
     }
 
     /**

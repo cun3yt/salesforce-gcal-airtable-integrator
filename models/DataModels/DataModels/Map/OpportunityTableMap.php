@@ -59,7 +59,7 @@ class OpportunityTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 7;
+    const NUM_COLUMNS = 6;
 
     /**
      * The number of lazy-loaded columns
@@ -69,7 +69,7 @@ class OpportunityTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 7;
+    const NUM_HYDRATE_COLUMNS = 6;
 
     /**
      * the column name for the id field
@@ -90,11 +90,6 @@ class OpportunityTableMap extends TableMap
      * the column name for the sfdc_last_check_time field
      */
     const COL_SFDC_LAST_CHECK_TIME = 'opportunity.sfdc_last_check_time';
-
-    /**
-     * the column name for the sfdc_opportunity_id field
-     */
-    const COL_SFDC_OPPORTUNITY_ID = 'opportunity.sfdc_opportunity_id';
 
     /**
      * the column name for the created_at field
@@ -118,11 +113,11 @@ class OpportunityTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'AccountId', 'SFDCId', 'SFDCLastCheckTime', 'SFDCOpportunityId', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_CAMELNAME     => array('id', 'accountId', 'sFDCId', 'sFDCLastCheckTime', 'sFDCOpportunityId', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(OpportunityTableMap::COL_ID, OpportunityTableMap::COL_ACCOUNT_ID, OpportunityTableMap::COL_SFDC_ID, OpportunityTableMap::COL_SFDC_LAST_CHECK_TIME, OpportunityTableMap::COL_SFDC_OPPORTUNITY_ID, OpportunityTableMap::COL_CREATED_AT, OpportunityTableMap::COL_UPDATED_AT, ),
-        self::TYPE_FIELDNAME     => array('id', 'account_id', 'sfdc_id', 'sfdc_last_check_time', 'sfdc_opportunity_id', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('Id', 'AccountId', 'SFDCId', 'SFDCLastCheckTime', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_CAMELNAME     => array('id', 'accountId', 'sFDCId', 'sFDCLastCheckTime', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(OpportunityTableMap::COL_ID, OpportunityTableMap::COL_ACCOUNT_ID, OpportunityTableMap::COL_SFDC_ID, OpportunityTableMap::COL_SFDC_LAST_CHECK_TIME, OpportunityTableMap::COL_CREATED_AT, OpportunityTableMap::COL_UPDATED_AT, ),
+        self::TYPE_FIELDNAME     => array('id', 'account_id', 'sfdc_id', 'sfdc_last_check_time', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -132,11 +127,11 @@ class OpportunityTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'AccountId' => 1, 'SFDCId' => 2, 'SFDCLastCheckTime' => 3, 'SFDCOpportunityId' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'accountId' => 1, 'sFDCId' => 2, 'sFDCLastCheckTime' => 3, 'sFDCOpportunityId' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
-        self::TYPE_COLNAME       => array(OpportunityTableMap::COL_ID => 0, OpportunityTableMap::COL_ACCOUNT_ID => 1, OpportunityTableMap::COL_SFDC_ID => 2, OpportunityTableMap::COL_SFDC_LAST_CHECK_TIME => 3, OpportunityTableMap::COL_SFDC_OPPORTUNITY_ID => 4, OpportunityTableMap::COL_CREATED_AT => 5, OpportunityTableMap::COL_UPDATED_AT => 6, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'account_id' => 1, 'sfdc_id' => 2, 'sfdc_last_check_time' => 3, 'sfdc_opportunity_id' => 4, 'created_at' => 5, 'updated_at' => 6, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'AccountId' => 1, 'SFDCId' => 2, 'SFDCLastCheckTime' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'accountId' => 1, 'sFDCId' => 2, 'sFDCLastCheckTime' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
+        self::TYPE_COLNAME       => array(OpportunityTableMap::COL_ID => 0, OpportunityTableMap::COL_ACCOUNT_ID => 1, OpportunityTableMap::COL_SFDC_ID => 2, OpportunityTableMap::COL_SFDC_LAST_CHECK_TIME => 3, OpportunityTableMap::COL_CREATED_AT => 4, OpportunityTableMap::COL_UPDATED_AT => 5, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'account_id' => 1, 'sfdc_id' => 2, 'sfdc_last_check_time' => 3, 'created_at' => 4, 'updated_at' => 5, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -161,7 +156,6 @@ class OpportunityTableMap extends TableMap
         $this->addForeignKey('account_id', 'AccountId', 'INTEGER', 'account', 'id', false, null, null);
         $this->addColumn('sfdc_id', 'SFDCId', 'VARCHAR', false, 127, null);
         $this->addColumn('sfdc_last_check_time', 'SFDCLastCheckTime', 'TIMESTAMP', false, null, null);
-        $this->addColumn('sfdc_opportunity_id', 'SFDCOpportunityId', 'VARCHAR', false, 127, null);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -345,7 +339,6 @@ class OpportunityTableMap extends TableMap
             $criteria->addSelectColumn(OpportunityTableMap::COL_ACCOUNT_ID);
             $criteria->addSelectColumn(OpportunityTableMap::COL_SFDC_ID);
             $criteria->addSelectColumn(OpportunityTableMap::COL_SFDC_LAST_CHECK_TIME);
-            $criteria->addSelectColumn(OpportunityTableMap::COL_SFDC_OPPORTUNITY_ID);
             $criteria->addSelectColumn(OpportunityTableMap::COL_CREATED_AT);
             $criteria->addSelectColumn(OpportunityTableMap::COL_UPDATED_AT);
         } else {
@@ -353,7 +346,6 @@ class OpportunityTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.account_id');
             $criteria->addSelectColumn($alias . '.sfdc_id');
             $criteria->addSelectColumn($alias . '.sfdc_last_check_time');
-            $criteria->addSelectColumn($alias . '.sfdc_opportunity_id');
             $criteria->addSelectColumn($alias . '.created_at');
             $criteria->addSelectColumn($alias . '.updated_at');
         }

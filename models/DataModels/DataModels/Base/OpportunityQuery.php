@@ -24,7 +24,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildOpportunityQuery orderByAccountId($order = Criteria::ASC) Order by the account_id column
  * @method     ChildOpportunityQuery orderBySFDCId($order = Criteria::ASC) Order by the sfdc_id column
  * @method     ChildOpportunityQuery orderBySFDCLastCheckTime($order = Criteria::ASC) Order by the sfdc_last_check_time column
- * @method     ChildOpportunityQuery orderBySFDCOpportunityId($order = Criteria::ASC) Order by the sfdc_opportunity_id column
  * @method     ChildOpportunityQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildOpportunityQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
@@ -32,7 +31,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildOpportunityQuery groupByAccountId() Group by the account_id column
  * @method     ChildOpportunityQuery groupBySFDCId() Group by the sfdc_id column
  * @method     ChildOpportunityQuery groupBySFDCLastCheckTime() Group by the sfdc_last_check_time column
- * @method     ChildOpportunityQuery groupBySFDCOpportunityId() Group by the sfdc_opportunity_id column
  * @method     ChildOpportunityQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildOpportunityQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -73,7 +71,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildOpportunity findOneByAccountId(int $account_id) Return the first ChildOpportunity filtered by the account_id column
  * @method     ChildOpportunity findOneBySFDCId(string $sfdc_id) Return the first ChildOpportunity filtered by the sfdc_id column
  * @method     ChildOpportunity findOneBySFDCLastCheckTime(string $sfdc_last_check_time) Return the first ChildOpportunity filtered by the sfdc_last_check_time column
- * @method     ChildOpportunity findOneBySFDCOpportunityId(string $sfdc_opportunity_id) Return the first ChildOpportunity filtered by the sfdc_opportunity_id column
  * @method     ChildOpportunity findOneByCreatedAt(string $created_at) Return the first ChildOpportunity filtered by the created_at column
  * @method     ChildOpportunity findOneByUpdatedAt(string $updated_at) Return the first ChildOpportunity filtered by the updated_at column *
 
@@ -84,7 +81,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildOpportunity requireOneByAccountId(int $account_id) Return the first ChildOpportunity filtered by the account_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildOpportunity requireOneBySFDCId(string $sfdc_id) Return the first ChildOpportunity filtered by the sfdc_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildOpportunity requireOneBySFDCLastCheckTime(string $sfdc_last_check_time) Return the first ChildOpportunity filtered by the sfdc_last_check_time column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildOpportunity requireOneBySFDCOpportunityId(string $sfdc_opportunity_id) Return the first ChildOpportunity filtered by the sfdc_opportunity_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildOpportunity requireOneByCreatedAt(string $created_at) Return the first ChildOpportunity filtered by the created_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildOpportunity requireOneByUpdatedAt(string $updated_at) Return the first ChildOpportunity filtered by the updated_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
@@ -93,7 +89,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildOpportunity[]|ObjectCollection findByAccountId(int $account_id) Return ChildOpportunity objects filtered by the account_id column
  * @method     ChildOpportunity[]|ObjectCollection findBySFDCId(string $sfdc_id) Return ChildOpportunity objects filtered by the sfdc_id column
  * @method     ChildOpportunity[]|ObjectCollection findBySFDCLastCheckTime(string $sfdc_last_check_time) Return ChildOpportunity objects filtered by the sfdc_last_check_time column
- * @method     ChildOpportunity[]|ObjectCollection findBySFDCOpportunityId(string $sfdc_opportunity_id) Return ChildOpportunity objects filtered by the sfdc_opportunity_id column
  * @method     ChildOpportunity[]|ObjectCollection findByCreatedAt(string $created_at) Return ChildOpportunity objects filtered by the created_at column
  * @method     ChildOpportunity[]|ObjectCollection findByUpdatedAt(string $updated_at) Return ChildOpportunity objects filtered by the updated_at column
  * @method     ChildOpportunity[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
@@ -194,7 +189,7 @@ abstract class OpportunityQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, account_id, sfdc_id, sfdc_last_check_time, sfdc_opportunity_id, created_at, updated_at FROM opportunity WHERE id = :p0';
+        $sql = 'SELECT id, account_id, sfdc_id, sfdc_last_check_time, created_at, updated_at FROM opportunity WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -434,31 +429,6 @@ abstract class OpportunityQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(OpportunityTableMap::COL_SFDC_LAST_CHECK_TIME, $sFDCLastCheckTime, $comparison);
-    }
-
-    /**
-     * Filter the query on the sfdc_opportunity_id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterBySFDCOpportunityId('fooValue');   // WHERE sfdc_opportunity_id = 'fooValue'
-     * $query->filterBySFDCOpportunityId('%fooValue%', Criteria::LIKE); // WHERE sfdc_opportunity_id LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $sFDCOpportunityId The value to use as filter.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return $this|ChildOpportunityQuery The current query, for fluid interface
-     */
-    public function filterBySFDCOpportunityId($sFDCOpportunityId = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($sFDCOpportunityId)) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(OpportunityTableMap::COL_SFDC_OPPORTUNITY_ID, $sFDCOpportunityId, $comparison);
     }
 
     /**

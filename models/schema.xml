@@ -36,15 +36,13 @@
     <column name="last_activity_date" phpName="LastActivityDate" type="DATE" />
     <column name="owner_id" phpName="OwnerId" type="VARCHAR" size="127"/>
 
-    <index>
-      <index-column name="created_at" />
-    </index>
-
     <foreign-key foreignTable="account" onDelete="none" onUpdate="none">
       <reference local="account_id" foreign="id" />
     </foreign-key>
 
-    <behavior name="timestampable"/>
+    <behavior name="timestampable">
+      <parameter name="created_at" value="created_at" />
+    </behavior>
   </table>
   <table name="account_status" idMethod="native" phpName="AccountStatus" namespace="DataModels">
     <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
