@@ -20,7 +20,6 @@
 
     <column name="name" phpName="Name" type="VARCHAR" size="127"/>
     <column name="num_employees" phpName="NumEmployees" type="INTEGER"/>
-    <column name="arr" phpName="Arr" type="VARCHAR"/>
     <column name="website" phpName="Website" type="VARCHAR" size="255"/>
     <column name="annual_revenue" phpName="AnnualRevenue" type="VARCHAR" size="63"/>
     <column name="industry" phpName="Industry" type="VARCHAR" size="63"/>
