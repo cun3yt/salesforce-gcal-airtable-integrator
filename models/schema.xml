@@ -36,6 +36,9 @@
     <column name="last_activity_date" phpName="LastActivityDate" type="DATE" />
     <column name="owner_id" phpName="OwnerId" type="VARCHAR" size="127"/>
 
+    <column name="account_status_15five_only" phpName="AccountStatus15FiveHack" type="VARCHAR" size="32"/>
+    <column name="arr_15five_only" phpName="ARR15FiveHack" type="NUMERIC" size="16" scale="2"/>
+
     <foreign-key foreignTable="account" onDelete="none" onUpdate="none">
       <reference local="account_id" foreign="id" />
     </foreign-key>

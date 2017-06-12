@@ -198,6 +198,20 @@ abstract class AccountHistory implements ActiveRecordInterface
     protected $owner_id;
 
     /**
+     * The value for the account_status_15five_only field.
+     *
+     * @var        string
+     */
+    protected $account_status_15five_only;
+
+    /**
+     * The value for the arr_15five_only field.
+     *
+     * @var        string
+     */
+    protected $arr_15five_only;
+
+    /**
      * The value for the created_at field.
      *
      * @var        DateTime
@@ -650,6 +664,26 @@ abstract class AccountHistory implements ActiveRecordInterface
     }
 
     /**
+     * Get the [account_status_15five_only] column value.
+     *
+     * @return string
+     */
+    public function getAccountStatus15FiveHack()
+    {
+        return $this->account_status_15five_only;
+    }
+
+    /**
+     * Get the [arr_15five_only] column value.
+     *
+     * @return string
+     */
+    public function getARR15FiveHack()
+    {
+        return $this->arr_15five_only;
+    }
+
+    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
@@ -1074,6 +1108,46 @@ abstract class AccountHistory implements ActiveRecordInterface
     } // setOwnerId()
 
     /**
+     * Set the value of [account_status_15five_only] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\AccountHistory The current object (for fluent API support)
+     */
+    public function setAccountStatus15FiveHack($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->account_status_15five_only !== $v) {
+            $this->account_status_15five_only = $v;
+            $this->modifiedColumns[AccountHistoryTableMap::COL_ACCOUNT_STATUS_15FIVE_ONLY] = true;
+        }
+
+        return $this;
+    } // setAccountStatus15FiveHack()
+
+    /**
+     * Set the value of [arr_15five_only] column.
+     *
+     * @param string $v new value
+     * @return $this|\DataModels\DataModels\AccountHistory The current object (for fluent API support)
+     */
+    public function setARR15FiveHack($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->arr_15five_only !== $v) {
+            $this->arr_15five_only = $v;
+            $this->modifiedColumns[AccountHistoryTableMap::COL_ARR_15FIVE_ONLY] = true;
+        }
+
+        return $this;
+    } // setARR15FiveHack()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
@@ -1206,10 +1280,16 @@ abstract class AccountHistory implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 18 + $startcol : AccountHistoryTableMap::translateFieldName('OwnerId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->owner_id = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 19 + $startcol : AccountHistoryTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 19 + $startcol : AccountHistoryTableMap::translateFieldName('AccountStatus15FiveHack', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->account_status_15five_only = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 20 + $startcol : AccountHistoryTableMap::translateFieldName('ARR15FiveHack', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->arr_15five_only = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 21 + $startcol : AccountHistoryTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 20 + $startcol : AccountHistoryTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 22 + $startcol : AccountHistoryTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
             $this->resetModified();
 
@@ -1219,7 +1299,7 @@ abstract class AccountHistory implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 21; // 21 = AccountHistoryTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 23; // 23 = AccountHistoryTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\DataModels\\DataModels\\AccountHistory'), 0, $e);
@@ -1514,6 +1594,12 @@ abstract class AccountHistory implements ActiveRecordInterface
         if ($this->isColumnModified(AccountHistoryTableMap::COL_OWNER_ID)) {
             $modifiedColumns[':p' . $index++]  = 'owner_id';
         }
+        if ($this->isColumnModified(AccountHistoryTableMap::COL_ACCOUNT_STATUS_15FIVE_ONLY)) {
+            $modifiedColumns[':p' . $index++]  = 'account_status_15five_only';
+        }
+        if ($this->isColumnModified(AccountHistoryTableMap::COL_ARR_15FIVE_ONLY)) {
+            $modifiedColumns[':p' . $index++]  = 'arr_15five_only';
+        }
         if ($this->isColumnModified(AccountHistoryTableMap::COL_CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'created_at';
         }
@@ -1587,6 +1673,12 @@ abstract class AccountHistory implements ActiveRecordInterface
                         break;
                     case 'owner_id':
                         $stmt->bindValue($identifier, $this->owner_id, PDO::PARAM_STR);
+                        break;
+                    case 'account_status_15five_only':
+                        $stmt->bindValue($identifier, $this->account_status_15five_only, PDO::PARAM_STR);
+                        break;
+                    case 'arr_15five_only':
+                        $stmt->bindValue($identifier, $this->arr_15five_only, PDO::PARAM_INT);
                         break;
                     case 'created_at':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
@@ -1707,9 +1799,15 @@ abstract class AccountHistory implements ActiveRecordInterface
                 return $this->getOwnerId();
                 break;
             case 19:
-                return $this->getCreatedAt();
+                return $this->getAccountStatus15FiveHack();
                 break;
             case 20:
+                return $this->getARR15FiveHack();
+                break;
+            case 21:
+                return $this->getCreatedAt();
+                break;
+            case 22:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1761,19 +1859,21 @@ abstract class AccountHistory implements ActiveRecordInterface
             $keys[16] => $this->getBillingCountry(),
             $keys[17] => $this->getLastActivityDate(),
             $keys[18] => $this->getOwnerId(),
-            $keys[19] => $this->getCreatedAt(),
-            $keys[20] => $this->getUpdatedAt(),
+            $keys[19] => $this->getAccountStatus15FiveHack(),
+            $keys[20] => $this->getARR15FiveHack(),
+            $keys[21] => $this->getCreatedAt(),
+            $keys[22] => $this->getUpdatedAt(),
         );
         if ($result[$keys[17]] instanceof \DateTime) {
             $result[$keys[17]] = $result[$keys[17]]->format('c');
         }
 
-        if ($result[$keys[19]] instanceof \DateTime) {
-            $result[$keys[19]] = $result[$keys[19]]->format('c');
+        if ($result[$keys[21]] instanceof \DateTime) {
+            $result[$keys[21]] = $result[$keys[21]]->format('c');
         }
 
-        if ($result[$keys[20]] instanceof \DateTime) {
-            $result[$keys[20]] = $result[$keys[20]]->format('c');
+        if ($result[$keys[22]] instanceof \DateTime) {
+            $result[$keys[22]] = $result[$keys[22]]->format('c');
         }
 
         $virtualColumns = $this->virtualColumns;
@@ -1889,9 +1989,15 @@ abstract class AccountHistory implements ActiveRecordInterface
                 $this->setOwnerId($value);
                 break;
             case 19:
-                $this->setCreatedAt($value);
+                $this->setAccountStatus15FiveHack($value);
                 break;
             case 20:
+                $this->setARR15FiveHack($value);
+                break;
+            case 21:
+                $this->setCreatedAt($value);
+                break;
+            case 22:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1978,10 +2084,16 @@ abstract class AccountHistory implements ActiveRecordInterface
             $this->setOwnerId($arr[$keys[18]]);
         }
         if (array_key_exists($keys[19], $arr)) {
-            $this->setCreatedAt($arr[$keys[19]]);
+            $this->setAccountStatus15FiveHack($arr[$keys[19]]);
         }
         if (array_key_exists($keys[20], $arr)) {
-            $this->setUpdatedAt($arr[$keys[20]]);
+            $this->setARR15FiveHack($arr[$keys[20]]);
+        }
+        if (array_key_exists($keys[21], $arr)) {
+            $this->setCreatedAt($arr[$keys[21]]);
+        }
+        if (array_key_exists($keys[22], $arr)) {
+            $this->setUpdatedAt($arr[$keys[22]]);
         }
     }
 
@@ -2080,6 +2192,12 @@ abstract class AccountHistory implements ActiveRecordInterface
         }
         if ($this->isColumnModified(AccountHistoryTableMap::COL_OWNER_ID)) {
             $criteria->add(AccountHistoryTableMap::COL_OWNER_ID, $this->owner_id);
+        }
+        if ($this->isColumnModified(AccountHistoryTableMap::COL_ACCOUNT_STATUS_15FIVE_ONLY)) {
+            $criteria->add(AccountHistoryTableMap::COL_ACCOUNT_STATUS_15FIVE_ONLY, $this->account_status_15five_only);
+        }
+        if ($this->isColumnModified(AccountHistoryTableMap::COL_ARR_15FIVE_ONLY)) {
+            $criteria->add(AccountHistoryTableMap::COL_ARR_15FIVE_ONLY, $this->arr_15five_only);
         }
         if ($this->isColumnModified(AccountHistoryTableMap::COL_CREATED_AT)) {
             $criteria->add(AccountHistoryTableMap::COL_CREATED_AT, $this->created_at);
@@ -2191,6 +2309,8 @@ abstract class AccountHistory implements ActiveRecordInterface
         $copyObj->setBillingCountry($this->getBillingCountry());
         $copyObj->setLastActivityDate($this->getLastActivityDate());
         $copyObj->setOwnerId($this->getOwnerId());
+        $copyObj->setAccountStatus15FiveHack($this->getAccountStatus15FiveHack());
+        $copyObj->setARR15FiveHack($this->getARR15FiveHack());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         if ($makeNew) {
@@ -2301,6 +2421,8 @@ abstract class AccountHistory implements ActiveRecordInterface
         $this->billing_country = null;
         $this->last_activity_date = null;
         $this->owner_id = null;
+        $this->account_status_15five_only = null;
+        $this->arr_15five_only = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
