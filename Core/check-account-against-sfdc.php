@@ -4,6 +4,7 @@
  * from SFDC and then map it for easy lookup and reference.
  *
  * @todo delete processcalendar.php entry on crontab
+ * @todo This script must be replaced by map-account-to-sfdc. Delete this file
  */
 error_reporting(E_ALL);
 

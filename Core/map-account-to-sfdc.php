@@ -43,7 +43,9 @@ while(1) {
 
         $accountDetailSF = Helpers::getAccountDetailFromSFDC($sfdcToken->instance_url,
             $sfdcToken->access_token,
-            $emailDomainSegment);
+            $emailDomainSegment,
+            $client
+            );
 
         if(!isset($accountDetailSF['records'])) {
             $errorCode = $accountDetailSF[0]['errorCode'];
