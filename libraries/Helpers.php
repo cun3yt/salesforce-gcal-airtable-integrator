@@ -1029,9 +1029,12 @@ class Helpers {
 
     /**
      * @return array
+     *
+     * @todo Not used yet, put it in the correct place
      */
     static function getBannedDomains() {
         return array(
+            "resource.google.calendar",
             "resource.calendar.google.com",
             "ywsync.com"
         );
