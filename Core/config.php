@@ -1,5 +1,6 @@
 <?
 error_reporting(E_ALL);
+ini_set('max_execution_time', 150);
 require_once("${_SERVER['DOCUMENT_ROOT']}/libraries/SessionSingleton.php");
 SessionSingleton::start();
 
