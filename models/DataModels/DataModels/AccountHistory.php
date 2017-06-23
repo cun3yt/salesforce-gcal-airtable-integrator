@@ -5,6 +5,8 @@ namespace DataModels\DataModels;
 use DataModels\DataModels\Base\AccountHistory as BaseAccountHistory;
 use DataModels\DataModels\IHistoryTrackAbility as IHistoryTrackAbility;
 
+use HardCodings;
+
 /**
  * Skeleton subclass for representing a row from the 'account_history' table.
  *
@@ -45,6 +47,9 @@ class AccountHistory extends BaseAccountHistory implements IHistoryTrackAbility
     private $historyTrackDelegate = null;
 
     public function __construct() {
+
+        $this->historyTrack = array_merge($this->historyTrack, HardCodings::get15FiveCustomFields());
+
         parent::__construct();
         $this->historyTrackDelegate = new HistoryTrackDelegate($this);
     }
@@ -74,8 +79,12 @@ class AccountHistory extends BaseAccountHistory implements IHistoryTrackAbility
             ->setLastActivityDate($SFDCResponse['LastActivityDate'])
             ->setOwnerId($SFDCResponse['OwnerId'])
             ->setType($SFDCResponse['Type'])
-            ->setWebsite($SFDCResponse['Website'])
-            ->save();
+            ->setWebsite($SFDCResponse['Website']);
+
+        $history = HardCodings::extendAccountHistoryFieldIf15Five($account, $history, $SFDCResponse);
+
+        $history->save();
+
         return $history;
     }
 }

@@ -24,7 +24,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccountHistoryQuery orderByAccountId($order = Criteria::ASC) Order by the account_id column
  * @method     ChildAccountHistoryQuery orderByName($order = Criteria::ASC) Order by the name column
  * @method     ChildAccountHistoryQuery orderByNumEmployees($order = Criteria::ASC) Order by the num_employees column
- * @method     ChildAccountHistoryQuery orderByArr($order = Criteria::ASC) Order by the arr column
  * @method     ChildAccountHistoryQuery orderByWebsite($order = Criteria::ASC) Order by the website column
  * @method     ChildAccountHistoryQuery orderByAnnualRevenue($order = Criteria::ASC) Order by the annual_revenue column
  * @method     ChildAccountHistoryQuery orderByIndustry($order = Criteria::ASC) Order by the industry column
@@ -39,6 +38,8 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccountHistoryQuery orderByBillingCountry($order = Criteria::ASC) Order by the billing_country column
  * @method     ChildAccountHistoryQuery orderByLastActivityDate($order = Criteria::ASC) Order by the last_activity_date column
  * @method     ChildAccountHistoryQuery orderByOwnerId($order = Criteria::ASC) Order by the owner_id column
+ * @method     ChildAccountHistoryQuery orderByAccountStatus15FiveHack($order = Criteria::ASC) Order by the account_status_15five_only column
+ * @method     ChildAccountHistoryQuery orderByARR15FiveHack($order = Criteria::ASC) Order by the arr_15five_only column
  * @method     ChildAccountHistoryQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildAccountHistoryQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
@@ -46,7 +47,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccountHistoryQuery groupByAccountId() Group by the account_id column
  * @method     ChildAccountHistoryQuery groupByName() Group by the name column
  * @method     ChildAccountHistoryQuery groupByNumEmployees() Group by the num_employees column
- * @method     ChildAccountHistoryQuery groupByArr() Group by the arr column
  * @method     ChildAccountHistoryQuery groupByWebsite() Group by the website column
  * @method     ChildAccountHistoryQuery groupByAnnualRevenue() Group by the annual_revenue column
  * @method     ChildAccountHistoryQuery groupByIndustry() Group by the industry column
@@ -61,6 +61,8 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccountHistoryQuery groupByBillingCountry() Group by the billing_country column
  * @method     ChildAccountHistoryQuery groupByLastActivityDate() Group by the last_activity_date column
  * @method     ChildAccountHistoryQuery groupByOwnerId() Group by the owner_id column
+ * @method     ChildAccountHistoryQuery groupByAccountStatus15FiveHack() Group by the account_status_15five_only column
+ * @method     ChildAccountHistoryQuery groupByARR15FiveHack() Group by the arr_15five_only column
  * @method     ChildAccountHistoryQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildAccountHistoryQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -91,7 +93,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccountHistory findOneByAccountId(int $account_id) Return the first ChildAccountHistory filtered by the account_id column
  * @method     ChildAccountHistory findOneByName(string $name) Return the first ChildAccountHistory filtered by the name column
  * @method     ChildAccountHistory findOneByNumEmployees(int $num_employees) Return the first ChildAccountHistory filtered by the num_employees column
- * @method     ChildAccountHistory findOneByArr(string $arr) Return the first ChildAccountHistory filtered by the arr column
  * @method     ChildAccountHistory findOneByWebsite(string $website) Return the first ChildAccountHistory filtered by the website column
  * @method     ChildAccountHistory findOneByAnnualRevenue(string $annual_revenue) Return the first ChildAccountHistory filtered by the annual_revenue column
  * @method     ChildAccountHistory findOneByIndustry(string $industry) Return the first ChildAccountHistory filtered by the industry column
@@ -106,6 +107,8 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccountHistory findOneByBillingCountry(string $billing_country) Return the first ChildAccountHistory filtered by the billing_country column
  * @method     ChildAccountHistory findOneByLastActivityDate(string $last_activity_date) Return the first ChildAccountHistory filtered by the last_activity_date column
  * @method     ChildAccountHistory findOneByOwnerId(string $owner_id) Return the first ChildAccountHistory filtered by the owner_id column
+ * @method     ChildAccountHistory findOneByAccountStatus15FiveHack(string $account_status_15five_only) Return the first ChildAccountHistory filtered by the account_status_15five_only column
+ * @method     ChildAccountHistory findOneByARR15FiveHack(string $arr_15five_only) Return the first ChildAccountHistory filtered by the arr_15five_only column
  * @method     ChildAccountHistory findOneByCreatedAt(string $created_at) Return the first ChildAccountHistory filtered by the created_at column
  * @method     ChildAccountHistory findOneByUpdatedAt(string $updated_at) Return the first ChildAccountHistory filtered by the updated_at column *
 
@@ -116,7 +119,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccountHistory requireOneByAccountId(int $account_id) Return the first ChildAccountHistory filtered by the account_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccountHistory requireOneByName(string $name) Return the first ChildAccountHistory filtered by the name column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccountHistory requireOneByNumEmployees(int $num_employees) Return the first ChildAccountHistory filtered by the num_employees column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildAccountHistory requireOneByArr(string $arr) Return the first ChildAccountHistory filtered by the arr column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccountHistory requireOneByWebsite(string $website) Return the first ChildAccountHistory filtered by the website column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccountHistory requireOneByAnnualRevenue(string $annual_revenue) Return the first ChildAccountHistory filtered by the annual_revenue column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccountHistory requireOneByIndustry(string $industry) Return the first ChildAccountHistory filtered by the industry column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -131,6 +133,8 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccountHistory requireOneByBillingCountry(string $billing_country) Return the first ChildAccountHistory filtered by the billing_country column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccountHistory requireOneByLastActivityDate(string $last_activity_date) Return the first ChildAccountHistory filtered by the last_activity_date column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccountHistory requireOneByOwnerId(string $owner_id) Return the first ChildAccountHistory filtered by the owner_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildAccountHistory requireOneByAccountStatus15FiveHack(string $account_status_15five_only) Return the first ChildAccountHistory filtered by the account_status_15five_only column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildAccountHistory requireOneByARR15FiveHack(string $arr_15five_only) Return the first ChildAccountHistory filtered by the arr_15five_only column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccountHistory requireOneByCreatedAt(string $created_at) Return the first ChildAccountHistory filtered by the created_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAccountHistory requireOneByUpdatedAt(string $updated_at) Return the first ChildAccountHistory filtered by the updated_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
@@ -139,7 +143,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccountHistory[]|ObjectCollection findByAccountId(int $account_id) Return ChildAccountHistory objects filtered by the account_id column
  * @method     ChildAccountHistory[]|ObjectCollection findByName(string $name) Return ChildAccountHistory objects filtered by the name column
  * @method     ChildAccountHistory[]|ObjectCollection findByNumEmployees(int $num_employees) Return ChildAccountHistory objects filtered by the num_employees column
- * @method     ChildAccountHistory[]|ObjectCollection findByArr(string $arr) Return ChildAccountHistory objects filtered by the arr column
  * @method     ChildAccountHistory[]|ObjectCollection findByWebsite(string $website) Return ChildAccountHistory objects filtered by the website column
  * @method     ChildAccountHistory[]|ObjectCollection findByAnnualRevenue(string $annual_revenue) Return ChildAccountHistory objects filtered by the annual_revenue column
  * @method     ChildAccountHistory[]|ObjectCollection findByIndustry(string $industry) Return ChildAccountHistory objects filtered by the industry column
@@ -154,6 +157,8 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAccountHistory[]|ObjectCollection findByBillingCountry(string $billing_country) Return ChildAccountHistory objects filtered by the billing_country column
  * @method     ChildAccountHistory[]|ObjectCollection findByLastActivityDate(string $last_activity_date) Return ChildAccountHistory objects filtered by the last_activity_date column
  * @method     ChildAccountHistory[]|ObjectCollection findByOwnerId(string $owner_id) Return ChildAccountHistory objects filtered by the owner_id column
+ * @method     ChildAccountHistory[]|ObjectCollection findByAccountStatus15FiveHack(string $account_status_15five_only) Return ChildAccountHistory objects filtered by the account_status_15five_only column
+ * @method     ChildAccountHistory[]|ObjectCollection findByARR15FiveHack(string $arr_15five_only) Return ChildAccountHistory objects filtered by the arr_15five_only column
  * @method     ChildAccountHistory[]|ObjectCollection findByCreatedAt(string $created_at) Return ChildAccountHistory objects filtered by the created_at column
  * @method     ChildAccountHistory[]|ObjectCollection findByUpdatedAt(string $updated_at) Return ChildAccountHistory objects filtered by the updated_at column
  * @method     ChildAccountHistory[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
@@ -254,7 +259,7 @@ abstract class AccountHistoryQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, account_id, name, num_employees, arr, website, annual_revenue, industry, type, billing_latitude, billing_longitude, billing_postal_code, billing_state, billing_cycle_id, billing_city, billing_street, billing_country, last_activity_date, owner_id, created_at, updated_at FROM account_history WHERE id = :p0';
+        $sql = 'SELECT id, account_id, name, num_employees, website, annual_revenue, industry, type, billing_latitude, billing_longitude, billing_postal_code, billing_state, billing_cycle_id, billing_city, billing_street, billing_country, last_activity_date, owner_id, account_status_15five_only, arr_15five_only, created_at, updated_at FROM account_history WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -492,31 +497,6 @@ abstract class AccountHistoryQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(AccountHistoryTableMap::COL_NUM_EMPLOYEES, $numEmployees, $comparison);
-    }
-
-    /**
-     * Filter the query on the arr column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByArr('fooValue');   // WHERE arr = 'fooValue'
-     * $query->filterByArr('%fooValue%', Criteria::LIKE); // WHERE arr LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $arr The value to use as filter.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return $this|ChildAccountHistoryQuery The current query, for fluid interface
-     */
-    public function filterByArr($arr = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($arr)) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(AccountHistoryTableMap::COL_ARR, $arr, $comparison);
     }
 
     /**
@@ -901,6 +881,72 @@ abstract class AccountHistoryQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(AccountHistoryTableMap::COL_OWNER_ID, $ownerId, $comparison);
+    }
+
+    /**
+     * Filter the query on the account_status_15five_only column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByAccountStatus15FiveHack('fooValue');   // WHERE account_status_15five_only = 'fooValue'
+     * $query->filterByAccountStatus15FiveHack('%fooValue%', Criteria::LIKE); // WHERE account_status_15five_only LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $accountStatus15FiveHack The value to use as filter.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildAccountHistoryQuery The current query, for fluid interface
+     */
+    public function filterByAccountStatus15FiveHack($accountStatus15FiveHack = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($accountStatus15FiveHack)) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(AccountHistoryTableMap::COL_ACCOUNT_STATUS_15FIVE_ONLY, $accountStatus15FiveHack, $comparison);
+    }
+
+    /**
+     * Filter the query on the arr_15five_only column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByARR15FiveHack(1234); // WHERE arr_15five_only = 1234
+     * $query->filterByARR15FiveHack(array(12, 34)); // WHERE arr_15five_only IN (12, 34)
+     * $query->filterByARR15FiveHack(array('min' => 12)); // WHERE arr_15five_only > 12
+     * </code>
+     *
+     * @param     mixed $aRR15FiveHack The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildAccountHistoryQuery The current query, for fluid interface
+     */
+    public function filterByARR15FiveHack($aRR15FiveHack = null, $comparison = null)
+    {
+        if (is_array($aRR15FiveHack)) {
+            $useMinMax = false;
+            if (isset($aRR15FiveHack['min'])) {
+                $this->addUsingAlias(AccountHistoryTableMap::COL_ARR_15FIVE_ONLY, $aRR15FiveHack['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($aRR15FiveHack['max'])) {
+                $this->addUsingAlias(AccountHistoryTableMap::COL_ARR_15FIVE_ONLY, $aRR15FiveHack['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(AccountHistoryTableMap::COL_ARR_15FIVE_ONLY, $aRR15FiveHack, $comparison);
     }
 
     /**

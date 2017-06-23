@@ -59,7 +59,7 @@ class AccountHistoryTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 21;
+    const NUM_COLUMNS = 22;
 
     /**
      * The number of lazy-loaded columns
@@ -69,7 +69,7 @@ class AccountHistoryTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 21;
+    const NUM_HYDRATE_COLUMNS = 22;
 
     /**
      * the column name for the id field
@@ -90,11 +90,6 @@ class AccountHistoryTableMap extends TableMap
      * the column name for the num_employees field
      */
     const COL_NUM_EMPLOYEES = 'account_history.num_employees';
-
-    /**
-     * the column name for the arr field
-     */
-    const COL_ARR = 'account_history.arr';
 
     /**
      * the column name for the website field
@@ -167,6 +162,16 @@ class AccountHistoryTableMap extends TableMap
     const COL_OWNER_ID = 'account_history.owner_id';
 
     /**
+     * the column name for the account_status_15five_only field
+     */
+    const COL_ACCOUNT_STATUS_15FIVE_ONLY = 'account_history.account_status_15five_only';
+
+    /**
+     * the column name for the arr_15five_only field
+     */
+    const COL_ARR_15FIVE_ONLY = 'account_history.arr_15five_only';
+
+    /**
      * the column name for the created_at field
      */
     const COL_CREATED_AT = 'account_history.created_at';
@@ -188,11 +193,11 @@ class AccountHistoryTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'AccountId', 'Name', 'NumEmployees', 'Arr', 'Website', 'AnnualRevenue', 'Industry', 'Type', 'BillingLatitude', 'BillingLongitude', 'BillingPostalCode', 'BillingState', 'BillingCycleId', 'BillingCity', 'BillingStreet', 'BillingCountry', 'LastActivityDate', 'OwnerId', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_CAMELNAME     => array('id', 'accountId', 'name', 'numEmployees', 'arr', 'website', 'annualRevenue', 'industry', 'type', 'billingLatitude', 'billingLongitude', 'billingPostalCode', 'billingState', 'billingCycleId', 'billingCity', 'billingStreet', 'billingCountry', 'lastActivityDate', 'ownerId', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(AccountHistoryTableMap::COL_ID, AccountHistoryTableMap::COL_ACCOUNT_ID, AccountHistoryTableMap::COL_NAME, AccountHistoryTableMap::COL_NUM_EMPLOYEES, AccountHistoryTableMap::COL_ARR, AccountHistoryTableMap::COL_WEBSITE, AccountHistoryTableMap::COL_ANNUAL_REVENUE, AccountHistoryTableMap::COL_INDUSTRY, AccountHistoryTableMap::COL_TYPE, AccountHistoryTableMap::COL_BILLING_LATITUDE, AccountHistoryTableMap::COL_BILLING_LONGITUDE, AccountHistoryTableMap::COL_BILLING_POSTAL_CODE, AccountHistoryTableMap::COL_BILLING_STATE, AccountHistoryTableMap::COL_BILLING_CYCLE_ID, AccountHistoryTableMap::COL_BILLING_CITY, AccountHistoryTableMap::COL_BILLING_STREET, AccountHistoryTableMap::COL_BILLING_COUNTRY, AccountHistoryTableMap::COL_LAST_ACTIVITY_DATE, AccountHistoryTableMap::COL_OWNER_ID, AccountHistoryTableMap::COL_CREATED_AT, AccountHistoryTableMap::COL_UPDATED_AT, ),
-        self::TYPE_FIELDNAME     => array('id', 'account_id', 'name', 'num_employees', 'arr', 'website', 'annual_revenue', 'industry', 'type', 'billing_latitude', 'billing_longitude', 'billing_postal_code', 'billing_state', 'billing_cycle_id', 'billing_city', 'billing_street', 'billing_country', 'last_activity_date', 'owner_id', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, )
+        self::TYPE_PHPNAME       => array('Id', 'AccountId', 'Name', 'NumEmployees', 'Website', 'AnnualRevenue', 'Industry', 'Type', 'BillingLatitude', 'BillingLongitude', 'BillingPostalCode', 'BillingState', 'BillingCycleId', 'BillingCity', 'BillingStreet', 'BillingCountry', 'LastActivityDate', 'OwnerId', 'AccountStatus15FiveHack', 'ARR15FiveHack', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_CAMELNAME     => array('id', 'accountId', 'name', 'numEmployees', 'website', 'annualRevenue', 'industry', 'type', 'billingLatitude', 'billingLongitude', 'billingPostalCode', 'billingState', 'billingCycleId', 'billingCity', 'billingStreet', 'billingCountry', 'lastActivityDate', 'ownerId', 'accountStatus15FiveHack', 'aRR15FiveHack', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(AccountHistoryTableMap::COL_ID, AccountHistoryTableMap::COL_ACCOUNT_ID, AccountHistoryTableMap::COL_NAME, AccountHistoryTableMap::COL_NUM_EMPLOYEES, AccountHistoryTableMap::COL_WEBSITE, AccountHistoryTableMap::COL_ANNUAL_REVENUE, AccountHistoryTableMap::COL_INDUSTRY, AccountHistoryTableMap::COL_TYPE, AccountHistoryTableMap::COL_BILLING_LATITUDE, AccountHistoryTableMap::COL_BILLING_LONGITUDE, AccountHistoryTableMap::COL_BILLING_POSTAL_CODE, AccountHistoryTableMap::COL_BILLING_STATE, AccountHistoryTableMap::COL_BILLING_CYCLE_ID, AccountHistoryTableMap::COL_BILLING_CITY, AccountHistoryTableMap::COL_BILLING_STREET, AccountHistoryTableMap::COL_BILLING_COUNTRY, AccountHistoryTableMap::COL_LAST_ACTIVITY_DATE, AccountHistoryTableMap::COL_OWNER_ID, AccountHistoryTableMap::COL_ACCOUNT_STATUS_15FIVE_ONLY, AccountHistoryTableMap::COL_ARR_15FIVE_ONLY, AccountHistoryTableMap::COL_CREATED_AT, AccountHistoryTableMap::COL_UPDATED_AT, ),
+        self::TYPE_FIELDNAME     => array('id', 'account_id', 'name', 'num_employees', 'website', 'annual_revenue', 'industry', 'type', 'billing_latitude', 'billing_longitude', 'billing_postal_code', 'billing_state', 'billing_cycle_id', 'billing_city', 'billing_street', 'billing_country', 'last_activity_date', 'owner_id', 'account_status_15five_only', 'arr_15five_only', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, )
     );
 
     /**
@@ -202,11 +207,11 @@ class AccountHistoryTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'AccountId' => 1, 'Name' => 2, 'NumEmployees' => 3, 'Arr' => 4, 'Website' => 5, 'AnnualRevenue' => 6, 'Industry' => 7, 'Type' => 8, 'BillingLatitude' => 9, 'BillingLongitude' => 10, 'BillingPostalCode' => 11, 'BillingState' => 12, 'BillingCycleId' => 13, 'BillingCity' => 14, 'BillingStreet' => 15, 'BillingCountry' => 16, 'LastActivityDate' => 17, 'OwnerId' => 18, 'CreatedAt' => 19, 'UpdatedAt' => 20, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'accountId' => 1, 'name' => 2, 'numEmployees' => 3, 'arr' => 4, 'website' => 5, 'annualRevenue' => 6, 'industry' => 7, 'type' => 8, 'billingLatitude' => 9, 'billingLongitude' => 10, 'billingPostalCode' => 11, 'billingState' => 12, 'billingCycleId' => 13, 'billingCity' => 14, 'billingStreet' => 15, 'billingCountry' => 16, 'lastActivityDate' => 17, 'ownerId' => 18, 'createdAt' => 19, 'updatedAt' => 20, ),
-        self::TYPE_COLNAME       => array(AccountHistoryTableMap::COL_ID => 0, AccountHistoryTableMap::COL_ACCOUNT_ID => 1, AccountHistoryTableMap::COL_NAME => 2, AccountHistoryTableMap::COL_NUM_EMPLOYEES => 3, AccountHistoryTableMap::COL_ARR => 4, AccountHistoryTableMap::COL_WEBSITE => 5, AccountHistoryTableMap::COL_ANNUAL_REVENUE => 6, AccountHistoryTableMap::COL_INDUSTRY => 7, AccountHistoryTableMap::COL_TYPE => 8, AccountHistoryTableMap::COL_BILLING_LATITUDE => 9, AccountHistoryTableMap::COL_BILLING_LONGITUDE => 10, AccountHistoryTableMap::COL_BILLING_POSTAL_CODE => 11, AccountHistoryTableMap::COL_BILLING_STATE => 12, AccountHistoryTableMap::COL_BILLING_CYCLE_ID => 13, AccountHistoryTableMap::COL_BILLING_CITY => 14, AccountHistoryTableMap::COL_BILLING_STREET => 15, AccountHistoryTableMap::COL_BILLING_COUNTRY => 16, AccountHistoryTableMap::COL_LAST_ACTIVITY_DATE => 17, AccountHistoryTableMap::COL_OWNER_ID => 18, AccountHistoryTableMap::COL_CREATED_AT => 19, AccountHistoryTableMap::COL_UPDATED_AT => 20, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'account_id' => 1, 'name' => 2, 'num_employees' => 3, 'arr' => 4, 'website' => 5, 'annual_revenue' => 6, 'industry' => 7, 'type' => 8, 'billing_latitude' => 9, 'billing_longitude' => 10, 'billing_postal_code' => 11, 'billing_state' => 12, 'billing_cycle_id' => 13, 'billing_city' => 14, 'billing_street' => 15, 'billing_country' => 16, 'last_activity_date' => 17, 'owner_id' => 18, 'created_at' => 19, 'updated_at' => 20, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'AccountId' => 1, 'Name' => 2, 'NumEmployees' => 3, 'Website' => 4, 'AnnualRevenue' => 5, 'Industry' => 6, 'Type' => 7, 'BillingLatitude' => 8, 'BillingLongitude' => 9, 'BillingPostalCode' => 10, 'BillingState' => 11, 'BillingCycleId' => 12, 'BillingCity' => 13, 'BillingStreet' => 14, 'BillingCountry' => 15, 'LastActivityDate' => 16, 'OwnerId' => 17, 'AccountStatus15FiveHack' => 18, 'ARR15FiveHack' => 19, 'CreatedAt' => 20, 'UpdatedAt' => 21, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'accountId' => 1, 'name' => 2, 'numEmployees' => 3, 'website' => 4, 'annualRevenue' => 5, 'industry' => 6, 'type' => 7, 'billingLatitude' => 8, 'billingLongitude' => 9, 'billingPostalCode' => 10, 'billingState' => 11, 'billingCycleId' => 12, 'billingCity' => 13, 'billingStreet' => 14, 'billingCountry' => 15, 'lastActivityDate' => 16, 'ownerId' => 17, 'accountStatus15FiveHack' => 18, 'aRR15FiveHack' => 19, 'createdAt' => 20, 'updatedAt' => 21, ),
+        self::TYPE_COLNAME       => array(AccountHistoryTableMap::COL_ID => 0, AccountHistoryTableMap::COL_ACCOUNT_ID => 1, AccountHistoryTableMap::COL_NAME => 2, AccountHistoryTableMap::COL_NUM_EMPLOYEES => 3, AccountHistoryTableMap::COL_WEBSITE => 4, AccountHistoryTableMap::COL_ANNUAL_REVENUE => 5, AccountHistoryTableMap::COL_INDUSTRY => 6, AccountHistoryTableMap::COL_TYPE => 7, AccountHistoryTableMap::COL_BILLING_LATITUDE => 8, AccountHistoryTableMap::COL_BILLING_LONGITUDE => 9, AccountHistoryTableMap::COL_BILLING_POSTAL_CODE => 10, AccountHistoryTableMap::COL_BILLING_STATE => 11, AccountHistoryTableMap::COL_BILLING_CYCLE_ID => 12, AccountHistoryTableMap::COL_BILLING_CITY => 13, AccountHistoryTableMap::COL_BILLING_STREET => 14, AccountHistoryTableMap::COL_BILLING_COUNTRY => 15, AccountHistoryTableMap::COL_LAST_ACTIVITY_DATE => 16, AccountHistoryTableMap::COL_OWNER_ID => 17, AccountHistoryTableMap::COL_ACCOUNT_STATUS_15FIVE_ONLY => 18, AccountHistoryTableMap::COL_ARR_15FIVE_ONLY => 19, AccountHistoryTableMap::COL_CREATED_AT => 20, AccountHistoryTableMap::COL_UPDATED_AT => 21, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'account_id' => 1, 'name' => 2, 'num_employees' => 3, 'website' => 4, 'annual_revenue' => 5, 'industry' => 6, 'type' => 7, 'billing_latitude' => 8, 'billing_longitude' => 9, 'billing_postal_code' => 10, 'billing_state' => 11, 'billing_cycle_id' => 12, 'billing_city' => 13, 'billing_street' => 14, 'billing_country' => 15, 'last_activity_date' => 16, 'owner_id' => 17, 'account_status_15five_only' => 18, 'arr_15five_only' => 19, 'created_at' => 20, 'updated_at' => 21, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, )
     );
 
     /**
@@ -231,7 +236,6 @@ class AccountHistoryTableMap extends TableMap
         $this->addForeignKey('account_id', 'AccountId', 'INTEGER', 'account', 'id', false, null, null);
         $this->addColumn('name', 'Name', 'VARCHAR', false, 127, null);
         $this->addColumn('num_employees', 'NumEmployees', 'INTEGER', false, null, null);
-        $this->addColumn('arr', 'Arr', 'VARCHAR', false, null, null);
         $this->addColumn('website', 'Website', 'VARCHAR', false, 255, null);
         $this->addColumn('annual_revenue', 'AnnualRevenue', 'VARCHAR', false, 63, null);
         $this->addColumn('industry', 'Industry', 'VARCHAR', false, 63, null);
@@ -246,6 +250,8 @@ class AccountHistoryTableMap extends TableMap
         $this->addColumn('billing_country', 'BillingCountry', 'VARCHAR', false, 255, null);
         $this->addColumn('last_activity_date', 'LastActivityDate', 'DATE', false, null, null);
         $this->addColumn('owner_id', 'OwnerId', 'VARCHAR', false, 127, null);
+        $this->addColumn('account_status_15five_only', 'AccountStatus15FiveHack', 'VARCHAR', false, 32, null);
+        $this->addColumn('arr_15five_only', 'ARR15FiveHack', 'NUMERIC', false, 16, null);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -422,7 +428,6 @@ class AccountHistoryTableMap extends TableMap
             $criteria->addSelectColumn(AccountHistoryTableMap::COL_ACCOUNT_ID);
             $criteria->addSelectColumn(AccountHistoryTableMap::COL_NAME);
             $criteria->addSelectColumn(AccountHistoryTableMap::COL_NUM_EMPLOYEES);
-            $criteria->addSelectColumn(AccountHistoryTableMap::COL_ARR);
             $criteria->addSelectColumn(AccountHistoryTableMap::COL_WEBSITE);
             $criteria->addSelectColumn(AccountHistoryTableMap::COL_ANNUAL_REVENUE);
             $criteria->addSelectColumn(AccountHistoryTableMap::COL_INDUSTRY);
@@ -437,6 +442,8 @@ class AccountHistoryTableMap extends TableMap
             $criteria->addSelectColumn(AccountHistoryTableMap::COL_BILLING_COUNTRY);
             $criteria->addSelectColumn(AccountHistoryTableMap::COL_LAST_ACTIVITY_DATE);
             $criteria->addSelectColumn(AccountHistoryTableMap::COL_OWNER_ID);
+            $criteria->addSelectColumn(AccountHistoryTableMap::COL_ACCOUNT_STATUS_15FIVE_ONLY);
+            $criteria->addSelectColumn(AccountHistoryTableMap::COL_ARR_15FIVE_ONLY);
             $criteria->addSelectColumn(AccountHistoryTableMap::COL_CREATED_AT);
             $criteria->addSelectColumn(AccountHistoryTableMap::COL_UPDATED_AT);
         } else {
@@ -444,7 +451,6 @@ class AccountHistoryTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.account_id');
             $criteria->addSelectColumn($alias . '.name');
             $criteria->addSelectColumn($alias . '.num_employees');
-            $criteria->addSelectColumn($alias . '.arr');
             $criteria->addSelectColumn($alias . '.website');
             $criteria->addSelectColumn($alias . '.annual_revenue');
             $criteria->addSelectColumn($alias . '.industry');
@@ -459,6 +465,8 @@ class AccountHistoryTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.billing_country');
             $criteria->addSelectColumn($alias . '.last_activity_date');
             $criteria->addSelectColumn($alias . '.owner_id');
+            $criteria->addSelectColumn($alias . '.account_status_15five_only');
+            $criteria->addSelectColumn($alias . '.arr_15five_only');
             $criteria->addSelectColumn($alias . '.created_at');
             $criteria->addSelectColumn($alias . '.updated_at');
         }

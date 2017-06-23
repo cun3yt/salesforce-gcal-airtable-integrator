@@ -11,6 +11,8 @@ use DataModels\DataModels\ClientCalendarUserOAuthQuery as ClientCalendarUserOAut
 use DataModels\DataModels\ClientQuery as ClientQuery;
 use Propel\Runtime\ActiveQuery\Criteria as Criteria;
 
+require_once("${_SERVER['DOCUMENT_ROOT']}/libraries/HardCodings.php");
+
 class Helpers {
     // @todo Update this version change to all SFDC calls
     const SFDC_API_VERSION = 'v39.0';
@@ -626,16 +628,20 @@ class Helpers {
         return self::sfdcExecuteGetQuery($instance_url, $access_token, $query);
     }
 
-    static function getAccountDetailFromSFDC($instance_url, $access_token, $strAccDomain = "") {
+    static function getAccountDetailFromSFDC($instance_url, $access_token, $strAccDomain = "", Client $client = NULL) {
         if(!$strAccDomain) {
             return false;
         }
 
-        $query = "SELECT 
-              Id, Name, AnnualRevenue, NumberOfEmployees, Industry, Type, Website,
+        $selectSegment = "Id, Name, AnnualRevenue, NumberOfEmployees, Industry, Type, Website,
               BillingLatitude, BillingLongitude, BillingPostalCode, 
               BillingState, BillingCity, BillingStreet, BillingCountry,
-              LastActivityDate, OwnerId
+              LastActivityDate, OwnerId";
+
+        $selectSegment = HardCodings::extendSelectSegmentIf15Five($selectSegment, $client);
+
+        $query = "SELECT 
+              {$selectSegment}
             FROM 
               Account 
             WHERE 
