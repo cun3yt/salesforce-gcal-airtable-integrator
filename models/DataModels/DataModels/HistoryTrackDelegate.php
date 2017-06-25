@@ -21,11 +21,17 @@ class HistoryTrackDelegate {
         }
 
         foreach($this->historyTracker->getHistoryTrack() as $objField => $responseField) {
-            if($this->historyTracker->{$objField} != $SFDCResponse[$responseField]) {
+            $getFnName = $this->snakeCaseToGetFunctionName($objField);
+
+            if(call_user_func($this->historyTracker, $getFnName) != $SFDCResponse[$responseField]) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    private function snakeCaseToGetFunctionName($value) {
+        return str_replace(' ', '', ucwords(str_replace('_', ' ', $value)));
     }
 }

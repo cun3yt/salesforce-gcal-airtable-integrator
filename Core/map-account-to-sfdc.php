@@ -100,7 +100,7 @@ function getAccountsNotRecentlySFDCChecked(Client $client, int $page = 1, $pageS
     $q = new AccountQuery();
 
     return $q->filterByClient($client)
-        ->where("(sfdc_last_check_time IS NULL) OR (sfdc_last_check_time < CURRENT_TIMESTAMP - INTERVAL '3 DAYS')")
+        ->where("((sfdc_last_check_time IS NULL) OR (sfdc_last_check_time < CURRENT_TIMESTAMP - INTERVAL '3 DAYS'))")
         ->orderById(\Propel\Runtime\ActiveQuery\Criteria::ASC)
         ->paginate($page, $pageSize);
 }

@@ -28,12 +28,17 @@ if(count($SFDCAuths) <= 0) {
 $sfdcCredentialObject = json_decode($SFDCAuths[0]->getData());
 $sfdcToken = $sfdcCredentialObject->tokendata;
 
-$contactPager = getContacts($client, $contactPage = 1);
+$contactPager = getContacts($client, 1);
 
-$contactPageNb = $contactPager->getLastPage();
+while(1) {
+    if($contactPager->getNbResults() < 1) {
+        echo "No unprocessed pages remain. Finished";
+        break;
+    }
 
-while($contactPage <= $contactPageNb) {
-    echo "Processing Contacts: page {$contactPage} of {$contactPageNb}<br/>";
+    $pageNb = $contactPager->getLastPage();
+
+    echo "Processing... Number of pages remaining: {$pageNb}\n";
 
     foreach($contactPager as $contact) {
         $sfdcContact = Helpers::fnGetContactDetailFromSf(
@@ -57,8 +62,7 @@ while($contactPage <= $contactPageNb) {
             ->save();
     }
 
-    ++$contactPage;
-    $contactPager = getContacts($client, $contactPage);
+    $contactPager = getContacts($client, 1);
 }
 
 /**
@@ -71,7 +75,7 @@ function getContacts(Client $client, $page, $maxPerPage = 50) {
     $contactQ = new ContactQuery();
 
     $contactPager = $contactQ->filterByClient($client)
-        ->where("(sfdc_last_check_time IS NULL) OR (sfdc_last_check_time > CURRENT_TIMESTAMP - INTERVAL '3 DAYS')")
+        ->where("((sfdc_last_check_time IS NULL) OR (sfdc_last_check_time < CURRENT_TIMESTAMP - INTERVAL '3 DAYS'))")
         ->paginate($page, $maxPerPage);
 
     return $contactPager;

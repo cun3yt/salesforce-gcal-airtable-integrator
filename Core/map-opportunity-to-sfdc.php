@@ -113,7 +113,7 @@ function getAccountsWithOpptyNotRecentlySFDCChecked(Client $client, int $page = 
 
     return $q->filterByClient($client)
         ->filterBySfdcAccountId(NULL, Criteria::NOT_EQUAL)
-        ->where("(sfdc_oppty_last_check_time IS NULL) OR (sfdc_oppty_last_check_time < CURRENT_TIMESTAMP - INTERVAL '3 DAYS')")
+        ->where("((sfdc_oppty_last_check_time IS NULL) OR (sfdc_oppty_last_check_time < CURRENT_TIMESTAMP - INTERVAL '3 DAYS'))")
         ->orderById(Criteria::ASC)
         ->paginate($page, $pageSize);
 }

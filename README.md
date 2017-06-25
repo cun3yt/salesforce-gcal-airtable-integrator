@@ -27,3 +27,13 @@ and present it in Airtable document.
 
 ### To Re-Load Composer Autoload 
 * `php ./composer.phar dump-autoload`
+
+### Onboarding a New Client
+These scripts must run in this particular order:
+
+* gcal-sync.php [*needs to run again & again until all consumed**, due to the ugly setup of pseudo-pagination]
+* map-contact-to-account.php [one time]
+* map-account-to-sfdc.php [one time]
+* map-attendee-to-sfdc.php [one time]
+* map-opportunity-to-sfdc.php [one time]
+  
