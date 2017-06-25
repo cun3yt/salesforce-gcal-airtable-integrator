@@ -75,6 +75,10 @@ function processCalendars(Client $client, ClientCalendarUserOAuth $auth, Google_
         foreach($calendarList->getItems() as $calendar) {
             echo "Processing Calendar: {$calendar->getId()}<br/>";
             if( !isCalInClient($calendar, $client) ) {
+                /**
+                 * @todo There can be customers (e.g. Feathr) with multiple email domain
+                 */
+
                 trigger_error("{$calendar->getId()} is not in the domain: {$client->getEmailDomain()}. 
                     Checking the next calendar", E_USER_WARNING);
                 continue;
