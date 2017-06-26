@@ -22,7 +22,6 @@ use Propel\Runtime\Exception\PropelException;
  *
  *
  * @method     ChildContactQuery orderByEmail($order = Criteria::ASC) Order by the email column
- * @method     ChildContactQuery orderByFullName($order = Criteria::ASC) Order by the full_name column
  * @method     ChildContactQuery orderByClientId($order = Criteria::ASC) Order by the client_id column
  * @method     ChildContactQuery orderByAccountId($order = Criteria::ASC) Order by the account_id column
  * @method     ChildContactQuery orderBySfdcContactId($order = Criteria::ASC) Order by the sfdc_contact_id column
@@ -35,7 +34,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildContactQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildContactQuery groupByEmail() Group by the email column
- * @method     ChildContactQuery groupByFullName() Group by the full_name column
  * @method     ChildContactQuery groupByClientId() Group by the client_id column
  * @method     ChildContactQuery groupByAccountId() Group by the account_id column
  * @method     ChildContactQuery groupBySfdcContactId() Group by the sfdc_contact_id column
@@ -101,7 +99,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildContact findOneOrCreate(ConnectionInterface $con = null) Return the first ChildContact matching the query, or a new ChildContact object populated from the query conditions when no match is found
  *
  * @method     ChildContact findOneByEmail(string $email) Return the first ChildContact filtered by the email column
- * @method     ChildContact findOneByFullName(string $full_name) Return the first ChildContact filtered by the full_name column
  * @method     ChildContact findOneByClientId(int $client_id) Return the first ChildContact filtered by the client_id column
  * @method     ChildContact findOneByAccountId(int $account_id) Return the first ChildContact filtered by the account_id column
  * @method     ChildContact findOneBySfdcContactId(string $sfdc_contact_id) Return the first ChildContact filtered by the sfdc_contact_id column
@@ -117,7 +114,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildContact requireOne(ConnectionInterface $con = null) Return the first ChildContact matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildContact requireOneByEmail(string $email) Return the first ChildContact filtered by the email column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildContact requireOneByFullName(string $full_name) Return the first ChildContact filtered by the full_name column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildContact requireOneByClientId(int $client_id) Return the first ChildContact filtered by the client_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildContact requireOneByAccountId(int $account_id) Return the first ChildContact filtered by the account_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildContact requireOneBySfdcContactId(string $sfdc_contact_id) Return the first ChildContact filtered by the sfdc_contact_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -131,7 +127,6 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildContact[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildContact objects based on current ModelCriteria
  * @method     ChildContact[]|ObjectCollection findByEmail(string $email) Return ChildContact objects filtered by the email column
- * @method     ChildContact[]|ObjectCollection findByFullName(string $full_name) Return ChildContact objects filtered by the full_name column
  * @method     ChildContact[]|ObjectCollection findByClientId(int $client_id) Return ChildContact objects filtered by the client_id column
  * @method     ChildContact[]|ObjectCollection findByAccountId(int $account_id) Return ChildContact objects filtered by the account_id column
  * @method     ChildContact[]|ObjectCollection findBySfdcContactId(string $sfdc_contact_id) Return ChildContact objects filtered by the sfdc_contact_id column
@@ -240,7 +235,7 @@ abstract class ContactQuery extends ChildMeetingAttendeeQuery
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT email, full_name, client_id, account_id, sfdc_contact_id, sfdc_account_id, sfdc_contact_name, sfdc_contact_title, sfdc_last_check_time, id, created_at, updated_at FROM contact WHERE id = :p0';
+        $sql = 'SELECT email, client_id, account_id, sfdc_contact_id, sfdc_account_id, sfdc_contact_name, sfdc_contact_title, sfdc_last_check_time, id, created_at, updated_at FROM contact WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -353,31 +348,6 @@ abstract class ContactQuery extends ChildMeetingAttendeeQuery
         }
 
         return $this->addUsingAlias(ContactTableMap::COL_EMAIL, $email, $comparison);
-    }
-
-    /**
-     * Filter the query on the full_name column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByFullName('fooValue');   // WHERE full_name = 'fooValue'
-     * $query->filterByFullName('%fooValue%', Criteria::LIKE); // WHERE full_name LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $fullName The value to use as filter.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return $this|ChildContactQuery The current query, for fluid interface
-     */
-    public function filterByFullName($fullName = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($fullName)) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(ContactTableMap::COL_FULL_NAME, $fullName, $comparison);
     }
 
     /**
