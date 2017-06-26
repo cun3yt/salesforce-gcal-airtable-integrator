@@ -66,7 +66,6 @@
     </behavior>
 
     <column name="email" phpName="Email" type="VARCHAR" size="255"/>
-    <column name="full_name" phpName="FullName" type="VARCHAR" size="255"/>
     <column name="client_id" phpName="ClientId" type="INTEGER"/>
     <column name="account_id" phpName="AccountId" type="INTEGER"/>
     <column name="sfdc_contact_id" phpName="SfdcContactId" type="VARCHAR" size="127"/>
