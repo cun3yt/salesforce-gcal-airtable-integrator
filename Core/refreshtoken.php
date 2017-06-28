@@ -7,10 +7,8 @@ error_reporting(E_ALL);
 require_once("${_SERVER['DOCUMENT_ROOT']}/libraries/SessionSingleton.php");
 SessionSingleton::start();
 
-use DataModels\DataModels\Client as Client;
 use DataModels\DataModels\ClientCalendarUser as ClientCalendarUser;
 use DataModels\DataModels\ClientCalendarUserOAuth as ClientCalendarUserOAuth;
-
 
 require_once('config.php');
 
@@ -22,17 +20,12 @@ $calendarAuths = Helpers::getAuthentications($client, ClientCalendarUserOAuth::G
 
 foreach($calendarAuths as $auth) {
     /**
-     * @var $auth ClientCalendarUserOAuth
      * @var $clientCalendarUser ClientCalendarUser
      */
     $clientCalendarUser = $auth->getClientCalendarUser();
+    $authData = (array) json_decode($auth->getData());
 
-    $authData = json_decode($auth->getData());
-
-    /**
-     * @todo below line must be like this: $apiClient->setAccessToken($authData->getData());
-     */
-    $apiClient->setAccessToken($authData->access_token);
+    $apiClient->setAccessToken($authData);
     $isTokenExpired = $apiClient->isAccessTokenExpired();
 
     if(!$isTokenExpired) {
@@ -40,10 +33,10 @@ foreach($calendarAuths as $auth) {
         continue;
     }
 
-    $refreshToken = $authData->refresh_token;
+    $refreshToken = $authData['refresh_token'];
 
     $newToken = $apiClient->fetchAccessTokenWithRefreshToken($refreshToken);
-    $newToken = array_merge((array) $authData, $newToken);
+    $newToken = array_merge($authData, $newToken);
 
     $auth->setStatus(ClientCalendarUserOAuth::STATUS_ACTIVE)
         ->setData(json_encode($newToken))
