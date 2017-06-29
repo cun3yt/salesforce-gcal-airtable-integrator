@@ -823,10 +823,10 @@ class Helpers {
 
     /**
      * @param $refresh_token
-     * @param string $strEmail
+     * @param string $emailAddress
      * @return bool|mixed
      */
-    static function sfdcRefreshToken($refresh_token, $strEmail = "") {
+    static function sfdcRefreshToken($refresh_token, $emailAddress) {
         $url = "https://login.salesforce.com/services/oauth2/token";
         $strPostVariables = "grant_type=refresh_token&client_id=".CLIENT_ID."&client_secret=".CLIENT_SECRET."&refresh_token=".$refresh_token;
 
@@ -850,8 +850,7 @@ class Helpers {
         if(isset($response['error']) &&
             $response['error_description'] == "expired access/refresh token") {
 
-            Helpers::fnUpdatesSGstatus($strEmail);
-            Helpers::sendEmailToSFDCAdminAboutTokenExpiry($strEmail);
+//            Helpers::sendEmailToSFDCAdminAboutTokenExpiry($emailAddress);
 
             trigger_error("Admin for SFDC got an email for account token reset.", E_NOTICE);
             return false;
@@ -912,48 +911,6 @@ class Helpers {
 
         echo("Email sent!"."\n");
         return true;
-    }
-
-    static function fnUpdatesSGstatus($strEmail = "") {
-        global $strAirtableBase,$strAirtableApiKey,$strAirtableBaseEndpoint;
-
-        if(!$strEmail) {
-            return false;
-        }
-
-        $strId = self::fnGetUsergAccSFDC($strEmail);
-
-        if(!$strId) {
-            return false;
-        }
-
-        $base = $strAirtableBase;
-        $table = 'salesuser';
-        $strApiKey = $strAirtableApiKey;
-        $url = $strAirtableBaseEndpoint.$base.'/'.$table.'/'.$strId;
-
-        $authorization = "Authorization: Bearer ".$strApiKey;
-        $arrFields['fields']['status'] = "expired";
-
-        $srtF = json_encode($arrFields);
-        $curl = curl_init($url);
-        // Accept any server (peer) certificate on dev envs
-        curl_setopt($curl, CURLOPT_HEADER, false);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PATCH');
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $srtF);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-type: application/json",$authorization));
-        $info = curl_getinfo($curl);
-        $response = curl_exec($curl);
-
-        if(!$response) {
-            echo curl_error($curl);
-        }
-
-        curl_close($curl);
-        $jsonResponse =  json_decode($response,true);
-
-        return (is_array($jsonResponse) && (count($jsonResponse)>0));
     }
 
     static function fnGetUsergAccSFDC($strEmail = "") {

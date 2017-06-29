@@ -6,7 +6,6 @@ require_once("${_SERVER['DOCUMENT_ROOT']}/libraries/Helpers.php");
 Helpers::setDebugParam($isDebugActive);
 
 use DataModels\DataModels\ClientCalendarUserOAuth as ClientCalendarUserOAuth;
-use DataModels\DataModels\Client as Client;
 
 $client = Helpers::loadClientData($strClientDomainName);
 
@@ -26,7 +25,6 @@ foreach($SFDCAuths as $auth) {
     $tokenData = $data->tokendata;
     $emailAddress = $calendarUser->getEmail();
 
-    // @todo This still hits to Airtable! Needs to be modified
     $newTokenData = Helpers::sfdcRefreshToken($tokenData->refresh_token, $emailAddress);
 
     if( !$newTokenData ) {
