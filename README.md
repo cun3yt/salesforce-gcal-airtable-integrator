@@ -1,7 +1,7 @@
-# Salesforce Gcal Airtable Integrator
+# Attent's Integrator for Different Services
 
-This project is built to fetch data from Salesforce and Client (e.g. 15Five) Google Calendar data; then associate data 
-and present it in Airtable document.
+This project is built to fetch data from Attent's Clients' Salesforce and Google Calendar data; and associate/present 
+data in internal relational database.
  
 ## Environment details
 

@@ -41,7 +41,7 @@ while(1) {
     echo "Processing... Number of pages remaining: {$pageNb}\n";
 
     foreach($contactPager as $contact) {
-        $sfdcContact = Helpers::fnGetContactDetailFromSf(
+        $sfdcContact = Helpers::getContactDetailsFromSFDC(
             $sfdcToken->instance_url,
             $sfdcToken->access_token,
             $contact->getEmail(),
