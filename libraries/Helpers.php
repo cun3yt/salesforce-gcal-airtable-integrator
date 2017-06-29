@@ -530,19 +530,19 @@ class Helpers {
      */
     static function getPersonalEmailDomains() {
         return array("gmail.com", "yahoo.com", "yahoo.co.in", "aol.com", "att.net", "comcast.net",
-            "facebook.com", "gmail.com", "gmx.com", "googlemail.com", "google.com", "hotmail.com", "hotmail.co.uk",
+            "facebook.com", "gmail.com", "gmx.com", "googlemail.com", "hotmail.com", "hotmail.co.uk",
             "mac.com", "me.com", "mail.com", "msn.com", "live.com", "sbcglobal.net", "verizon.net", "yahoo.com",
             "yahoo.co.uk", "rediif.com");
     }
 
     /**
-     * @return array
+     * These are the emails that are excluded for meeting marking as "External"
      *
-     * @todo Not used yet, put it in the correct place
+     * @return array
      */
-    static function getBannedDomains() {
+    static function getNonContactDomains() {
         return array(
-            "resource.google.calendar",
+            "calendar.google.com",
             "resource.calendar.google.com",
             "ywsync.com"
         );
