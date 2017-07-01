@@ -184,8 +184,10 @@ function processCalendar(Client $client, $service, $calendar, ClientCalendarUser
                 continue;
             }
 
-            if(in_array($domain, Helpers::getPersonalEmailDomains() )) {
+            if (in_array($domain, Helpers::getPersonalEmailDomains() )) {
                 $outsideDomain .= "1,";
+            } else if (in_array($domain, Helpers::getNonContactEmailDomains())) {
+                $outsideDomain .= "";
             } else {
                 $eventType = Meeting::EVENT_TYPE_EXTERNAL;
                 $outsideDomain .= "0,";

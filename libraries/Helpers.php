@@ -540,7 +540,7 @@ class Helpers {
      *
      * @return array
      */
-    static function getNonContactDomains() {
+    static function getNonContactEmailDomains() {
         return array(
             "calendar.google.com",
             "resource.calendar.google.com",
