@@ -15,6 +15,9 @@ data in internal relational database.
 * Run Composer Install: `php composer.phar install`
 * Autoload Activation: `php composer.phar dump-autoload`
 
+## Propel Runtime Connection Settings
+* `./propel config:convert` (@todo This needs to be part of deployment!)
+
 ## Migrations
 
 ### Database Change to Migration Class Generation & Model Generation
