@@ -164,7 +164,7 @@ function processCalendar(Client $client, $service, $calendar, ClientCalendarUser
 
         $eventDate = new DateTime($eventDatetime,$timezone);
         $eventAttendeesList = array();
-        $eventType = "Internal";
+        $eventType = Meeting::EVENT_TYPE_INTERNAL;
 
         $startDate = date(DateTimeFormat,strtotime($eventDate->format("Y")."-".$eventDate->format("m")."-".$eventDate->format("d")));
         if($startDate) {
@@ -184,16 +184,18 @@ function processCalendar(Client $client, $service, $calendar, ClientCalendarUser
                 continue;
             }
 
-            if(in_array($domain, Helpers::getPersonalEmailDomains() )) {
+            if (in_array($domain, Helpers::getPersonalEmailDomains() )) {
                 $outsideDomain .= "1,";
+            } else if (in_array($domain, Helpers::getNonContactEmailDomains())) {
+                $outsideDomain .= "";
             } else {
-                $eventType = "External";
+                $eventType = Meeting::EVENT_TYPE_EXTERNAL;
                 $outsideDomain .= "0,";
             }
         }
 
         if($outsideDomain && (stripos($outsideDomain, "0") === false)) {
-            $eventType = "Other";
+            $eventType = Meeting::EVENT_TYPE_OTHER;
         }
 
         if($event->getSummary()) {

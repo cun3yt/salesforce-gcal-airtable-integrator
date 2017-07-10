@@ -18,4 +18,8 @@ class Meeting extends BaseMeeting
 {
     const PROCESS_STATE_NOT_PROCESSED = "not processed";
     const PROCESS_STATE_PROCESSED = "processed";
+
+    const EVENT_TYPE_INTERNAL = "Internal";
+    const EVENT_TYPE_EXTERNAL = "External";
+    const EVENT_TYPE_OTHER = "Other";
 }
